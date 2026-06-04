@@ -424,7 +424,7 @@ function serviceAreaBlock() {
 
 function serviceCtaBlock(heading: string, subheading: string) {
   return block("cta", {
-    variant: "dark",
+    variant: "glass-service",
     heading,
     subheading: `<p>${subheading}</p>`,
     primaryText: "Get Your Free Estimate",

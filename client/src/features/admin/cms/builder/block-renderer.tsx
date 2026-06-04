@@ -400,13 +400,16 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
 
 function CtaBlock({ props }: { props: Record<string, unknown> }) {
   const variant = str(props.variant) || "dark";
-  const bgClass = variant === "dark"
+  const bgClass = variant === "glass-service"
+    ? "bg-[#1a8ead] text-white"
+    : variant === "dark"
     ? "bg-foreground text-background"
     : variant === "accent"
     ? "bg-accent text-accent-foreground"
     : "bg-muted/40 border";
+  const isGlassService = variant === "glass-service";
   return (
-    <div className={`px-4 py-10 text-center sm:px-8 sm:py-14 ${bgClass}`}>
+    <div className={`px-4 py-10 text-center sm:px-8 sm:py-16 ${bgClass}`}>
       <h2 className="mb-3 text-2xl font-heading font-bold leading-tight sm:text-3xl md:text-4xl">{str(props.heading) || "Ready to Get Started?"}</h2>
       {str(props.subheading) && (
         <div
@@ -425,8 +428,8 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
             modalTitle={props.primaryModalTitle}
             modalDescription={props.primaryModalDescription}
             size="lg"
-            variant={variant === "dark" ? "secondary" : "default"}
-            className="w-full sm:w-auto"
+            variant={variant === "dark" || isGlassService ? "secondary" : "default"}
+            className={`w-full sm:w-auto ${isGlassService ? "rounded-md px-8 text-primary" : ""}`}
             testId="cta-primary"
           />
         )}
@@ -441,7 +444,7 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
             modalDescription={props.secondaryModalDescription}
             size="lg"
             variant="outline"
-            className="w-full sm:w-auto"
+            className={`w-full sm:w-auto ${isGlassService ? "rounded-md border-white text-white" : ""}`}
             testId="cta-secondary"
           />
         )}

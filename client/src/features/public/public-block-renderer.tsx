@@ -515,13 +515,18 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
 function CtaBlock({ props }: { props: Record<string, unknown> }) {
   const variant = str(props.variant) || "dark";
   const bgClass =
-    variant === "dark"
+    variant === "glass-service"
+      ? "bg-[#1a8ead] text-white"
+      : variant === "dark"
       ? "bg-foreground text-background"
       : variant === "accent"
         ? "bg-accent text-accent-foreground"
         : "bg-muted/40 border";
+  const isGlassService = variant === "glass-service";
   return (
-    <div className={`rounded-lg px-4 py-10 text-center shadow-xl sm:px-8 sm:py-14 ${bgClass}`}>
+    <div
+      className={`px-4 py-10 text-center sm:px-8 sm:py-16 ${isGlassService ? "" : "rounded-lg shadow-xl"} ${bgClass}`}
+    >
       <h2 className="mb-3 text-2xl font-heading font-bold leading-tight sm:text-3xl md:text-4xl">
         {str(props.heading) || "Ready to Get Started?"}
       </h2>
@@ -542,8 +547,8 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
             modalTitle={props.primaryModalTitle}
             modalDescription={props.primaryModalDescription}
             size="lg"
-            variant={variant === "dark" ? "secondary" : "default"}
-            className="w-full rounded-full sm:w-auto"
+            variant={variant === "dark" || isGlassService ? "secondary" : "default"}
+            className={`w-full sm:w-auto ${isGlassService ? "rounded-md px-8 text-primary hover:bg-white/90" : "rounded-full"}`}
             testId="cta-primary"
           />
         )}
@@ -558,7 +563,7 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
             modalDescription={props.secondaryModalDescription}
             size="lg"
             variant="outline"
-            className="w-full rounded-full sm:w-auto"
+            className={`w-full sm:w-auto ${isGlassService ? "rounded-md border-white text-white hover:bg-white hover:text-primary" : "rounded-full"}`}
             testId="cta-secondary"
           />
         )}

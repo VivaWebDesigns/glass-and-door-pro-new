@@ -72,6 +72,7 @@ const CTA_VARIANT_OPTIONS = [
   { label: "Light", value: "light" },
   { label: "Dark", value: "dark" },
   { label: "Accent", value: "accent" },
+  { label: "Glass Service", value: "glass-service" },
 ];
 
 const COLUMNS_OPTIONS = [
