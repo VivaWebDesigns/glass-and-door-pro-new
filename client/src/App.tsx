@@ -15,6 +15,7 @@ import { DEFAULT_SITE_FEATURES, type SiteFeatures } from "@shared/site-features"
 const HomePage = lazy(() => import("@/features/public/home-page"));
 const AboutPage = lazy(() => import("@/features/public/about-page"));
 const ContactPage = lazy(() => import("@/features/public/contact-page"));
+const GalleryPage = lazy(() => import("@/features/public/gallery-page"));
 const EventsPage = lazy(() => import("@/features/public/events-page"));
 const EventDetailPage = lazy(() => import("@/features/public/event-detail-page"));
 const JoinNetworkPage = lazy(() => import("@/features/public/join-network-page"));
@@ -124,7 +125,7 @@ function Router() {
         <Route path="/" component={() => <CmsHybridPage slug="home" fallback={<HomePage />} />} />
         <Route path="/about" component={() => <CmsHybridPage slug="about" fallback={<AboutPage />} />} />
         <Route path="/contact" component={() => <CmsHybridPage slug="contact" fallback={<ContactPage />} />} />
-        <Route path="/gallery" component={() => <CmsHybridPage slug="gallery" fallback={<NotFound />} />} />
+        <Route path="/gallery" component={() => <CmsHybridPage slug="gallery" fallback={<GalleryPage />} />} />
         <Route path="/services/frameless-showers" component={() => <CmsHybridPage slug="services-frameless-showers" fallback={<NotFound />} />} />
         <Route path="/services/window-installation" component={() => <CmsHybridPage slug="services-window-installation" fallback={<NotFound />} />} />
         <Route path="/services/door-installation" component={() => <CmsHybridPage slug="services-door-installation" fallback={<NotFound />} />} />
