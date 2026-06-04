@@ -400,14 +400,16 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
 
 function CtaBlock({ props }: { props: Record<string, unknown> }) {
   const variant = str(props.variant) || "dark";
-  const bgClass = variant === "glass-service"
+  const isGlassService =
+    variant === "glass-service" ||
+    (variant === "dark" && str(props.secondaryText).toLowerCase() === "back to home");
+  const bgClass = isGlassService
     ? "bg-[#1a8ead] text-white"
     : variant === "dark"
     ? "bg-foreground text-background"
     : variant === "accent"
     ? "bg-accent text-accent-foreground"
     : "bg-muted/40 border";
-  const isGlassService = variant === "glass-service";
   return (
     <div className={`px-4 py-10 text-center sm:px-8 sm:py-16 ${bgClass}`}>
       <h2 className="mb-3 text-2xl font-heading font-bold leading-tight sm:text-3xl md:text-4xl">{str(props.heading) || "Ready to Get Started?"}</h2>
