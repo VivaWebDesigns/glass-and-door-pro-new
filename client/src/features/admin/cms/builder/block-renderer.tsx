@@ -411,7 +411,10 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
     ? "bg-accent text-accent-foreground"
     : "bg-muted/40 border";
   return (
-    <div className={`px-4 py-10 text-center sm:px-8 sm:py-16 ${bgClass}`}>
+    <div
+      className={`px-4 py-10 text-center sm:px-8 sm:py-16 ${bgClass}`}
+      style={isGlassService ? { backgroundColor: "#1a8ead", color: "#ffffff" } : undefined}
+    >
       <h2 className="mb-3 text-2xl font-heading font-bold leading-tight sm:text-3xl md:text-4xl">{str(props.heading) || "Ready to Get Started?"}</h2>
       {str(props.subheading) && (
         <div

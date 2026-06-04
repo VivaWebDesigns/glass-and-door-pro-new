@@ -528,6 +528,7 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
   return (
     <div
       className={`px-4 py-10 text-center sm:px-8 sm:py-16 ${isGlassService ? "" : "rounded-lg shadow-xl"} ${bgClass}`}
+      style={isGlassService ? { backgroundColor: "#1a8ead", color: "#ffffff" } : undefined}
     >
       <h2 className="mb-3 text-2xl font-heading font-bold leading-tight sm:text-3xl md:text-4xl">
         {str(props.heading) || "Ready to Get Started?"}
