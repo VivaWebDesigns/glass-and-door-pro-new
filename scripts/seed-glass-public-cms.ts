@@ -259,7 +259,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
           "Tell us what you need installed, repaired, or replaced. Doug will follow up with the next steps.",
         formTitle: "Send a Message",
         formSlug: "contact-form",
-        sectionBackgroundColor: "#0f172a",
+        sectionBackgroundColor: "#f0f8fb",
         sectionPaddingTop: "none",
         sectionPaddingBottom: "none",
         contactItems: [

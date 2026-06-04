@@ -1937,20 +1937,20 @@ function ContactFormBlock({ props = {} }: { props?: Record<string, unknown> }) {
     const items = arr<{ icon: string; label: string; value: string; href?: string }>(props.contactItems);
     return (
       <section id={str(props.anchorId) || "contact"} className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20" data-testid="dynamic-contact-form">
-        <div className="mb-10 max-w-3xl text-white">
+        <div className="mb-10 max-w-3xl">
           {str(props.eyebrow) && (
-            <p className="mb-3 text-sm font-bold uppercase tracking-[0.16em] text-white/70">{str(props.eyebrow)}</p>
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.16em] text-[#1a8ead]">{str(props.eyebrow)}</p>
           )}
-          <h2 className="font-heading text-3xl font-bold leading-tight sm:text-4xl">{str(props.heading) || "Ready to start your project?"}</h2>
+          <h2 className="font-heading text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">{str(props.heading) || "Ready to start your project?"}</h2>
           {str(props.subheading) && (
-            <p className="mt-4 text-base leading-7 text-white/75 sm:text-lg">{str(props.subheading)}</p>
+            <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">{str(props.subheading)}</p>
           )}
         </div>
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
           <Card className="lg:col-span-3 border-none bg-white shadow-xl">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Send className="h-5 w-5 text-primary" />
+              <CardTitle className="flex items-center gap-2 text-slate-900">
+                <Send className="h-5 w-5 text-[#1a8ead]" />
                 {str(props.formTitle) || "Send a Message"}
               </CardTitle>
             </CardHeader>
@@ -1963,14 +1963,14 @@ function ContactFormBlock({ props = {} }: { props?: Record<string, unknown> }) {
               items.map((item, index) => {
                 const Icon = CONTACT_ICON_MAP[item.icon] ?? MapPin;
                 return (
-                  <Card key={`${item.label}-${index}`} className="border-white/10 bg-white/10 text-white shadow-lg">
-                    <CardContent className="flex gap-4 p-5">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15">
-                        <Icon className="h-5 w-5" />
+                  <Card key={`${item.label}-${index}`} className="border-none bg-white text-slate-900 shadow-sm">
+                    <CardContent className="flex gap-4 p-6">
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#1a8ead] text-white">
+                        <Icon className="h-7 w-7" />
                       </div>
                       <div>
-                        <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/60">{item.label}</p>
-                        <p className="mt-1 whitespace-pre-line text-sm font-semibold leading-6">{item.value}</p>
+                        <p className="text-xl font-bold leading-6 text-slate-900">{item.label}</p>
+                        <p className="mt-1 whitespace-pre-line text-base leading-6 text-slate-500">{item.value}</p>
                       </div>
                     </CardContent>
                   </Card>
