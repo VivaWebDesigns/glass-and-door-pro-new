@@ -19,13 +19,14 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
-import logoIcon from "@assets/Core-Platform_Icon.webp";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { UserProfileDialog } from "@/components/shared/user-profile-dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetBody } from "@/components/ui/sheet";
+
+const logoIcon = "/images/glass-door-pro/brand/site-icon-512-tight.png";
 
 interface NavItem {
   title: string;
@@ -132,8 +133,11 @@ export function TherapistSidebar({ children }: TherapistSidebarProps) {
         <div className="flex items-center gap-3" data-testid="text-therapist-title">
           <img
             src={logoIcon}
-            alt="Core Platform"
-            className="h-9 w-9 object-contain flex-shrink-0"
+            alt="Glass & Door Pro"
+            className={cn(
+              "object-contain flex-shrink-0 transition-[height,width] duration-200",
+              collapsed ? "h-9 w-9" : "h-11 w-11",
+            )}
             data-testid="img-therapist-logo"
           />
           <h2
@@ -288,7 +292,7 @@ export function TherapistSidebar({ children }: TherapistSidebarProps) {
           <SheetContent side="left" className="w-72 p-0">
             <SheetHeader className="p-4 border-b">
               <SheetTitle className="flex items-center gap-3">
-                <img src={logoIcon} alt="Core Platform" className="h-8 w-8 object-contain" />
+                <img src={logoIcon} alt="Glass & Door Pro" className="h-10 w-10 object-contain" />
                 <span className="font-heading text-base">My Account</span>
               </SheetTitle>
             </SheetHeader>

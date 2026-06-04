@@ -32,7 +32,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
-import logoIcon from "@assets/Core-Platform_Icon.webp";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -42,6 +41,8 @@ import { UserProfileDialog } from "@/components/shared/user-profile-dialog";
 import { DEFAULT_SITE_FEATURES, type SiteFeatures } from "@shared/site-features";
 import type { AdminPermission } from "@shared/types";
 import type { User as AppUser } from "@shared/schema";
+
+const adminLogo = "/images/glass-door-pro/brand/site-icon-512-tight.png";
 
 interface NavItem {
   title: string;
@@ -295,7 +296,6 @@ export function AdminSidebar({ children }: AdminSidebarProps) {
   const [profileOpen, setProfileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
-  const adminLogo = logoIcon;
   const { data: siteFeaturesData } = useQuery<SiteFeatures>({
     queryKey: ["/api/site-config"],
     staleTime: 60_000,
@@ -429,8 +429,11 @@ export function AdminSidebar({ children }: AdminSidebarProps) {
               <div className="flex items-center gap-3" data-testid="text-admin-title">
                 <img
                   src={adminLogo}
-                  alt="Core Platform"
-                  className="h-9 w-9 object-contain flex-shrink-0"
+                  alt="Glass & Door Pro"
+                  className={cn(
+                    "object-contain flex-shrink-0 transition-[height,width] duration-200",
+                    collapsed ? "h-9 w-9" : "h-11 w-11",
+                  )}
                   data-testid="img-admin-logo"
                 />
                 <h2

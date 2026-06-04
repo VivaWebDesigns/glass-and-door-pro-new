@@ -1291,7 +1291,7 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
 
 const brandingSettings: Record<string, string> = {
   frontend_logo_url: "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp",
-  favicon_url: "/favicon.ico",
+  favicon_url: "/favicon-32x32.png",
   company_name: "Glass & Door Pro",
   company_address: "2341 Waverly Dr\nMonroe, NC 28112",
   company_phone_numbers: "(704) 771-6111",
