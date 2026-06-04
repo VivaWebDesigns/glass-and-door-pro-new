@@ -122,7 +122,7 @@ export function ContactFormBlock({ props = {} }: { props?: Record<string, unknow
               <PublicFormRenderer
                 slug={str(props.formSlug) || "contact-form"}
                 showHeader={false}
-                submitButtonClassName="bg-[#1a8ead] text-white hover:bg-[#14758f]"
+                submitButtonClassName="!bg-[#1a8ead] !text-white hover:!bg-[#14758f]"
               />
             </CardContent>
           </Card>
