@@ -24,6 +24,7 @@ interface PublicFormRendererProps {
   showHeader?: boolean;
   descriptionOverride?: string;
   buttonTextOverride?: string;
+  submitButtonClassName?: string;
   compact?: boolean;
   onSubmitSuccess?: () => void;
 }
@@ -484,6 +485,7 @@ export function PublicFormRenderer({
   showHeader = true,
   descriptionOverride,
   buttonTextOverride,
+  submitButtonClassName,
   compact = false,
   onSubmitSuccess,
 }: PublicFormRendererProps) {
@@ -661,7 +663,11 @@ export function PublicFormRenderer({
               {nextButtonText}
             </Button>
           ) : (
-            <Button type="submit" disabled={mutation.isPending} className={compact ? "w-full" : undefined}>
+            <Button
+              type="submit"
+              disabled={mutation.isPending}
+              className={cn(compact ? "w-full" : undefined, submitButtonClassName)}
+            >
               {mutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               {submitLabel}
             </Button>
