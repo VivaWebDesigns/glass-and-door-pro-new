@@ -67,6 +67,10 @@ import {
   Lock,
   Building2,
   Loader2,
+  Droplets,
+  Grid3X3,
+  DoorOpen,
+  Wrench,
 } from "lucide-react";
 import type { BlockInstance, BuilderContent } from "@/features/admin/cms/builder/block-registry";
 import { mergeJoinHeroBlocks } from "@shared/cms-blocks";
@@ -102,6 +106,10 @@ const LUCIDE_MAP: Record<string, React.ElementType> = {
   ShieldCheck,
   Lock,
   Building2,
+  Droplets,
+  Grid3X3,
+  DoorOpen,
+  Wrench,
 };
 
 function LucideIcon({ name, className }: { name: string; className?: string }) {
@@ -158,6 +166,7 @@ function DynamicFallback() {
 function HeroBlock({ props }: { props: Record<string, unknown> }) {
   const bg = resolveCmsAssetUrl(str(props.backgroundImageUrl));
   const videoBg = str(props.videoBackgroundUrl);
+  const variant = str(props.variant);
   const opacity = num(props.overlayOpacity as number, 50);
   const overlayColor = normalizeHexColor(str(props.overlayColor)) || "#000000";
   const layout = str(props.layout) || "stacked";
@@ -177,6 +186,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
 
   return (
     <section
+      id={str(props.anchorId) || undefined}
       className={`public-hero-pattern relative flex items-center overflow-hidden ${isSplit ? "justify-start text-left" : "justify-center text-center"}`}
       style={{
         minHeight: minHeightStyle,
@@ -189,7 +199,13 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
               backgroundSize: "cover",
               backgroundPosition: `${bgPosX}% ${bgPosY}%`,
             }
-          : !videoBg && !sectionStyleConfig.backgroundColor
+          : bg && videoBg
+            ? {
+                backgroundImage: `url(${bg})`,
+                backgroundSize: "cover",
+                backgroundPosition: `${bgPosX}% ${bgPosY}%`,
+              }
+            : !videoBg && !sectionStyleConfig.backgroundColor
             ? {}
             : {}),
       }}
@@ -200,6 +216,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
           muted
           loop
           playsInline
+          poster={bg || undefined}
           className="absolute inset-0 w-full h-full object-cover"
         >
           <source src={videoBg} type="video/mp4" />
@@ -216,7 +233,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
           </span>
         )}
         <h1
-          className="mb-5 text-4xl font-heading font-bold leading-tight text-white sm:text-5xl md:text-6xl"
+          className={`mb-5 font-heading font-bold leading-tight text-white ${variant === "glass-home" ? "text-4xl sm:text-5xl md:text-6xl lg:text-7xl" : "text-4xl sm:text-5xl md:text-6xl"}`}
           style={headingTextStyle}
         >
           {str(props.heading) || "Hero Heading"}
@@ -438,6 +455,8 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
   const hasImage = !!str(props.imageUrl);
   const mobileImageStyles = getMobileImageStyles(props);
   const align = str(props.alignment) || "left";
+  const badgeValue = str(props.badgeValue);
+  const badgeLabel = str(props.badgeLabel);
   const bodyAlign =
     align === "center" ? "text-center" : align === "right" ? "text-right" : "text-left";
   return (
@@ -467,6 +486,14 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
                 style={mobileImageStyles}
                 className="w-full rounded-lg shadow-xl [height:var(--mobile-image-height)] [object-fit:var(--mobile-image-fit)] [object-position:var(--mobile-image-position)] md:absolute md:inset-0 md:h-full md:w-full md:object-cover md:object-center"
               />
+              {(badgeValue || badgeLabel) && (
+                <div className="absolute -bottom-4 -right-3 rounded-lg bg-primary px-5 py-4 text-primary-foreground shadow-xl sm:-right-4">
+                  {badgeValue && <div className="text-2xl font-bold leading-none">{badgeValue}</div>}
+                  {badgeLabel && (
+                    <div className="mt-1 text-xs font-semibold uppercase tracking-wide">{badgeLabel}</div>
+                  )}
+                </div>
+              )}
             </div>
             {str(props.imageCaption) && (
               <p className="text-xs text-muted-foreground mt-2 text-center">
@@ -542,8 +569,22 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
 function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
   const cols = str(props.columns) || "3";
   const colsClass =
-    cols === "2" ? "md:grid-cols-2" : cols === "4" ? "md:grid-cols-4" : "md:grid-cols-3";
-  const cards = arr<{ title: string; description: string; icon: string }>(props.cards);
+    cols === "2"
+      ? "md:grid-cols-2"
+      : cols === "4"
+        ? "md:grid-cols-2 lg:grid-cols-4"
+        : cols === "5"
+          ? "md:grid-cols-2 lg:grid-cols-5"
+          : "md:grid-cols-3";
+  const variant = str(props.variant);
+  const cards = arr<{
+    title: string;
+    description: string;
+    icon: string;
+    link?: string;
+    buttonText?: string;
+    openInNewTab?: boolean;
+  }>(props.cards);
   return (
     <div className="py-4">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
@@ -556,16 +597,32 @@ function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
           cards.map((card, i) => (
             <Card
               key={i}
-              className="public-section-card-hover h-full overflow-hidden rounded-lg border-border/70 text-center shadow-sm"
+              className={`public-section-card-hover h-full overflow-hidden rounded-lg border-border/70 text-center shadow-sm ${variant === "service-links" ? "border-none bg-white" : ""}`}
             >
-              <CardContent className="px-4 pb-5 pt-6 sm:px-6 sm:pb-6 sm:pt-8">
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 ring-1 ring-accent/20">
-                  <LucideIcon name={card.icon || "Globe"} className="h-6 w-6 text-accent" />
+              <CardContent className="flex h-full flex-col px-4 pb-5 pt-6 sm:px-6 sm:pb-6 sm:pt-8">
+                <div className={`mx-auto mb-4 flex items-center justify-center rounded-full bg-accent/10 ring-1 ring-accent/20 ${variant === "service-links" ? "h-16 w-16" : "h-12 w-12"}`}>
+                  <LucideIcon
+                    name={card.icon || "Globe"}
+                    className={variant === "service-links" ? "h-8 w-8 text-primary" : "h-6 w-6 text-accent"}
+                  />
                 </div>
                 <h3 className="mb-2 text-base font-semibold leading-snug break-words">
                   {card.title}
                 </h3>
                 <p className="text-sm leading-relaxed text-muted-foreground">{card.description}</p>
+                {card.link && (
+                  <div className="mt-auto pt-5">
+                    <a
+                      href={card.link}
+                      target={card.openInNewTab ? "_blank" : undefined}
+                      rel={card.openInNewTab ? "noopener noreferrer" : undefined}
+                      className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                    >
+                      {card.buttonText || "Learn More"}
+                      <ArrowRight className="ml-1.5 h-4 w-4" />
+                    </a>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))
@@ -606,16 +663,35 @@ function FaqBlock({ props }: { props: Record<string, unknown> }) {
 }
 
 function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
-  const items = arr<{ quote: string; name: string; role: string; location: string }>(props.items);
+  const variant = str(props.variant);
+  const items = arr<{
+    quote: string;
+    name: string;
+    role: string;
+    location: string;
+    rating?: number;
+    source?: string;
+  }>(props.items);
   const shouldCarousel = items.length > 2;
 
   const renderCard = (
-    item: { quote: string; name: string; role: string; location: string },
+    item: { quote: string; name: string; role: string; location: string; rating?: number; source?: string },
     i: number,
   ) => (
-    <Card key={i} className="public-section-card h-full rounded-lg">
+    <Card key={i} className={`public-section-card h-full rounded-lg ${variant === "google-carousel" ? "border-none bg-white shadow-lg" : ""}`}>
       <CardContent className="pt-6">
-        <Quote className="h-5 w-5 text-accent mb-3" />
+        {variant === "google-carousel" ? (
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div className="flex text-yellow-400">
+              {Array.from({ length: Math.max(1, Math.min(5, num(item.rating, 5))) }).map((_, index) => (
+                <Star key={index} className="h-4 w-4 fill-current" />
+              ))}
+            </div>
+            <span className="text-xs font-semibold text-muted-foreground">{item.source || "Google"}</span>
+          </div>
+        ) : (
+          <Quote className="h-5 w-5 text-accent mb-3" />
+        )}
         <p className="text-sm leading-relaxed mb-4 italic">"{item.quote}"</p>
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center">
@@ -994,6 +1070,28 @@ function ImageBlockRenderer({ props }: { props: Record<string, unknown> }) {
   const widthClass = IMAGE_WIDTH_MAP[str(props.width)] ?? IMAGE_WIDTH_MAP.contained;
   const hasImage = !!str(props.imageUrl);
   const mobileImageStyles = getMobileImageStyles(props);
+  const variant = str(props.variant);
+
+  if (variant === "banner") {
+    return (
+      <section className="relative h-[50vh] min-h-[360px] overflow-hidden py-0">
+        {hasImage ? (
+          <img src={str(props.imageUrl)} alt={str(props.alt)} className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full items-center justify-center bg-muted/40 text-sm text-muted-foreground">
+            Image placeholder
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+        {str(props.caption) && (
+          <p className="absolute bottom-4 left-1/2 max-w-3xl -translate-x-1/2 px-4 text-center text-sm text-white/90">
+            {str(props.caption)}
+          </p>
+        )}
+      </section>
+    );
+  }
+
   return (
     <div className={`py-4 ${widthClass}`}>
       <SectionHeading props={props} defaultAlignment="center" className="mb-6" />
@@ -1285,6 +1383,7 @@ function ImageGridBlock({ props }: { props: Record<string, unknown> }) {
   const gapSize = str(props.gap) || "md";
   const gapClass =
     gapSize === "sm" ? "gap-2" : gapSize === "lg" ? "gap-6" : gapSize === "xl" ? "gap-8" : "gap-4";
+  const variant = str(props.variant);
   const images = arr<{ url: string; alt: string; caption: string }>(props.images);
   return (
     <div className="py-4" data-testid="block-image-grid">
@@ -1294,13 +1393,17 @@ function ImageGridBlock({ props }: { props: Record<string, unknown> }) {
           <p className="text-sm text-muted-foreground">Add images to display here</p>
         </div>
       ) : (
-        <div className={`grid grid-cols-1 ${colsClass} ${gapClass}`}>
+        <div className={variant === "gallery-strip" ? "grid grid-cols-2 gap-3 md:grid-cols-4" : `grid grid-cols-1 ${colsClass} ${gapClass}`}>
           {images.map((img, i) => (
-            <div key={i} data-testid={`grid-image-${i}`}>
+            <div
+              key={i}
+              className={variant === "gallery-strip" ? "aspect-square overflow-hidden rounded-lg shadow-md" : ""}
+              data-testid={`grid-image-${i}`}
+            >
               <img
                 src={img.url}
                 alt={img.alt}
-                className="w-full rounded-lg object-cover aspect-square"
+                className={`w-full rounded-lg object-cover aspect-square ${variant === "gallery-strip" ? "h-full transition-transform duration-300 hover:scale-105" : ""}`}
               />
               {img.caption && (
                 <p className="text-xs text-muted-foreground text-center mt-1">{img.caption}</p>
@@ -1800,7 +1903,7 @@ export function PublicBlockRenderer({
     if (block.type === "contact-form") {
       renderedBlock = (
         <Suspense fallback={<DynamicFallback />}>
-          <LazyContactFormBlock />
+          <LazyContactFormBlock props={block.props} />
         </Suspense>
       );
     }
@@ -1870,6 +1973,7 @@ export function PublicBlockRenderer({
 
   return (
     <SectionStyleWrapper
+      id={str(block.props.anchorId) || undefined}
       props={block.props}
       resolveAssetUrl={resolveCmsAssetUrl}
       contentClassName={getSectionPaddingClasses(block.props)}
@@ -1889,7 +1993,10 @@ export function PublicPageRenderer({ blocks }: { blocks: BlockInstance[] }) {
           return null;
         }
 
-        const isFullWidth = FULL_WIDTH_BLOCK_TYPES.has(block.type);
+        const isFullWidth =
+          FULL_WIDTH_BLOCK_TYPES.has(block.type) ||
+          (block.type === "image-block" && str(block.props.variant) === "banner") ||
+          (block.type === "contact-form" && str(block.props.variant) === "split-contact");
         const sectionStyleConfig = getSectionStyleConfig(block.props, {
           resolveAssetUrl: resolveCmsAssetUrl,
         });
@@ -1902,6 +2009,7 @@ export function PublicPageRenderer({ blocks }: { blocks: BlockInstance[] }) {
           return (
             <SectionStyleWrapper
               key={block.id}
+              id={str(block.props.anchorId) || undefined}
               props={block.props}
               resolveAssetUrl={resolveCmsAssetUrl}
               className="rounded-none"
@@ -1925,6 +2033,7 @@ export function PublicPageRenderer({ blocks }: { blocks: BlockInstance[] }) {
         return (
           <section
             key={block.id}
+            id={str(block.props.anchorId) || undefined}
             className={`relative overflow-hidden ${isAlternate ? "bg-muted/30" : ""}`}
           >
             {isAlternate && (

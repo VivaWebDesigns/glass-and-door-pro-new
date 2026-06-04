@@ -1,10 +1,10 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, type ElementType } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { MapPin, Send, Loader2, ArrowRight, Clock, Search, BookOpen, ExternalLink } from "lucide-react";
+import { MapPin, Send, Loader2, ArrowRight, Clock, Search, BookOpen, ExternalLink, Mail, Phone } from "lucide-react";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { MapView } from "@/components/directory/map-view";
 import { SectionHeading } from "@/features/admin/cms/builder/section-heading";
@@ -16,6 +16,10 @@ import { CompanyInformationCard } from "@/components/shared/company-information-
 
 function str(v: unknown): string {
   return typeof v === "string" ? v : "";
+}
+
+function arr<T>(v: unknown): T[] {
+  return Array.isArray(v) ? (v as T[]) : [];
 }
 
 function colorStyle(value: unknown, fallback?: string) {
@@ -83,7 +87,79 @@ export function TherapistMapBlock({ props }: { props: Record<string, unknown> })
   );
 }
 
-export function ContactFormBlock() {
+const CONTACT_ICON_MAP: Record<string, ElementType> = {
+  MapPin,
+  Mail,
+  Phone,
+  Clock,
+};
+
+export function ContactFormBlock({ props = {} }: { props?: Record<string, unknown> }) {
+  const variant = str(props.variant);
+
+  if (variant === "split-contact") {
+    const items = arr<{ icon: string; label: string; value: string; href?: string }>(props.contactItems);
+    return (
+      <section id={str(props.anchorId) || "contact"} className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20" data-testid="dynamic-contact-form">
+        <div className="mb-10 max-w-3xl text-white">
+          {str(props.eyebrow) && (
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.16em] text-white/70">{str(props.eyebrow)}</p>
+          )}
+          <h2 className="font-heading text-3xl font-bold leading-tight sm:text-4xl">{str(props.heading) || "Ready to start your project?"}</h2>
+          {str(props.subheading) && (
+            <p className="mt-4 text-base leading-7 text-white/75 sm:text-lg">{str(props.subheading)}</p>
+          )}
+        </div>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
+          <Card className="lg:col-span-3 border-none bg-white shadow-xl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Send className="h-5 w-5 text-primary" />
+                {str(props.formTitle) || "Send a Message"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PublicFormRenderer slug={str(props.formSlug) || "contact-form"} showHeader={false} />
+            </CardContent>
+          </Card>
+          <div className="space-y-4 lg:col-span-2">
+            {items.length > 0 ? (
+              items.map((item, index) => {
+                const Icon = CONTACT_ICON_MAP[item.icon] ?? MapPin;
+                const content = <span className="whitespace-pre-line">{item.value}</span>;
+                return (
+                  <Card key={`${item.label}-${index}`} className="border-white/10 bg-white/10 text-white shadow-lg backdrop-blur">
+                    <CardContent className="flex gap-4 p-5">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/60">{item.label}</p>
+                        {item.href ? (
+                          <a href={item.href} className="mt-1 block text-sm font-semibold leading-6 hover:text-white/80">
+                            {content}
+                          </a>
+                        ) : (
+                          <p className="mt-1 text-sm font-semibold leading-6">{content}</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })
+            ) : (
+              <CompanyInformationCard
+                titleClassName="public-heading-3"
+                bodyClassName="public-helper-text"
+                linkClassName="public-text-link hover:text-[hsl(var(--public-text-link-hover))]"
+              />
+            )}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8" data-testid="dynamic-contact-form">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
