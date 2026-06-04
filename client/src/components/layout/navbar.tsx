@@ -132,7 +132,7 @@ export function Navbar() {
   const resourceLinks = allResourceLinks.filter((link) => !(link.hideFromClients && isClient));
 
   const unreadNotifCount = useUnreadNotificationCount();
-  const brandLogo = frontendLogoUrl || "/images/glass-door-pro/logo.png";
+  const brandLogo = frontendLogoUrl || "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
   const brandName = companyName || "Glass & Door Pro";
 
   return (

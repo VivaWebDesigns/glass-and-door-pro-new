@@ -13,9 +13,9 @@ interface PublicHtmlSnapshot {
   jsonLd?: Array<Record<string, unknown>>;
 }
 
-const DEFAULT_TITLE = "Core Platform - Find Your Core Platform-Informed Therapist";
+const DEFAULT_TITLE = "Glass & Door Pro | Charlotte Glass, Windows & Doors";
 const DEFAULT_DESCRIPTION =
-  "Core Platform connects Third Culture Kids with culturally informed therapists worldwide. Find your therapist today.";
+  "Glass & Door Pro serves the Charlotte area with frameless showers, residential windows, door installation, window repair, and commercial glass.";
 
 const FALLBACK_STATIC_PAGES: Record<
   string,
@@ -24,9 +24,9 @@ const FALLBACK_STATIC_PAGES: Record<
   "/": {
     title: "Home",
     description:
-      "Explore Core Platform-informed mental health support, featured articles, and upcoming events from Core Platform.",
+      "Explore frameless showers, window installation, door installation, window repair, and commercial glass from Glass & Door Pro.",
     body:
-      "Core Platform connects Third Culture Kids with culturally informed care, featured articles, and upcoming events.",
+      "Glass & Door Pro serves greater Charlotte with frameless showers, windows, doors, window repair, and commercial glass.",
   },
   "/about": {
     title: "About",
@@ -180,8 +180,8 @@ function absoluteUrl(path: string | null | undefined, siteUrl: string) {
 }
 
 function buildHeadTitle(rawTitle: string, seo?: SeoSettings | null) {
-  const suffix = seo?.titleSuffix ?? " | Core Platform";
-  return rawTitle.includes("Core Platform") ? rawTitle : `${rawTitle}${suffix}`;
+  const suffix = seo?.titleSuffix ?? " | Glass & Door Pro";
+  return rawTitle.includes("Glass & Door Pro") ? rawTitle : `${rawTitle}${suffix}`;
 }
 
 function buildOrganizationSchema(seo: SeoSettings | null, siteUrl: string) {
@@ -189,7 +189,7 @@ function buildOrganizationSchema(seo: SeoSettings | null, siteUrl: string) {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: seo?.organizationName || seo?.siteName || "Core Platform",
+    name: seo?.organizationName || seo?.siteName || "Glass & Door Pro",
     url: siteUrl,
     logo: seo?.organizationLogoUrl
       ? {
@@ -219,7 +219,7 @@ function buildWebsiteSchema(seo: SeoSettings | null, siteUrl: string) {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: seo?.siteName || "Core Platform",
+    name: seo?.siteName || "Glass & Door Pro",
     url: siteUrl,
   };
 }
@@ -504,7 +504,9 @@ export async function getPublicHtmlSnapshot(
   }
 
   const seo = (await storage.seoSettings.get()) ?? null;
-  const siteUrl = (seo?.siteUrl || "").replace(/\/$/, "") || "https://coreplatform.com";
+  const siteUrl =
+    (seo?.siteUrl || "").replace(/\/$/, "") ||
+    "https://glass-and-door-pro-new-production.up.railway.app";
 
   if (pathname === "/search") {
     const params = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);

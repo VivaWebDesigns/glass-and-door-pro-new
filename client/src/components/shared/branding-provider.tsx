@@ -272,7 +272,7 @@ export function BrandingProvider({ children }: { children: React.ReactNode }) {
   ]);
 
   useEffect(() => {
-    const faviconHref = isAdminRoute ? "/favicon.png" : branding.faviconUrl || "/favicon.png";
+    const faviconHref = isAdminRoute ? "/favicon.ico" : branding.faviconUrl || "/favicon.ico";
     let faviconEl = document.head.querySelector<HTMLLinkElement>('link[rel="icon"]');
 
     if (!faviconEl) {

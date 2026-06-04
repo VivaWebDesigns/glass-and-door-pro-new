@@ -178,7 +178,7 @@ export function Footer() {
     return links.length > 0 ? links : defaultCompanyLinks;
   }, [publicMenus]) as FooterLegalLink[];
 
-  const brandLogo = frontendLogoUrl || "/images/glass-door-pro/logo.png";
+  const brandLogo = frontendLogoUrl || "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
   const brandName = companyName || "Glass & Door Pro";
   const address = (companyAddress || "2341 Waverly Dr, Monroe, NC 28112").replace(/\s*\n\s*/g, ", ");
   const phone = companyPhoneNumbers || "(704) 771-6111";

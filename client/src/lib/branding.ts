@@ -62,8 +62,8 @@ export const BRANDING_SANS_FONT_OPTIONS = BRANDING_FONT_OPTIONS.filter((option) 
 export const BRANDING_SERIF_FONT_OPTIONS = BRANDING_FONT_OPTIONS.filter((option) => option.category === "serif");
 
 export const DEFAULT_BRANDING_SETTINGS: BrandingSettings = {
-  frontendLogoUrl: "/images/glass-door-pro/logo.png",
-  faviconUrl: null,
+  frontendLogoUrl: "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp",
+  faviconUrl: "/favicon.ico",
   companyName: "Glass & Door Pro",
   companyAddress: "2341 Waverly Dr\nMonroe, NC 28112",
   companyPhoneNumbers: "(704) 771-6111",

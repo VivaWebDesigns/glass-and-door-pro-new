@@ -1290,7 +1290,8 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
 ];
 
 const brandingSettings: Record<string, string> = {
-  frontend_logo_url: "/images/glass-door-pro/logo.png",
+  frontend_logo_url: "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp",
+  favicon_url: "/favicon.ico",
   company_name: "Glass & Door Pro",
   company_address: "2341 Waverly Dr\nMonroe, NC 28112",
   company_phone_numbers: "(704) 771-6111",
@@ -1316,9 +1317,9 @@ const glassSeoSettings: Partial<InsertSeoSettings> = {
   defaultMetaDescription:
     "Glass & Door Pro serves Charlotte, NC with frameless shower doors, window installation, door replacement, window repair, and commercial glass.",
   siteUrl: "https://glass-and-door-pro-new-production.up.railway.app",
-  defaultOgImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.jpg",
+  defaultOgImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
   organizationName: "Glass & Door Pro",
-  organizationLogoUrl: "/images/glass-door-pro/logo.png",
+  organizationLogoUrl: "/images/glass-door-pro/brand/logo-full-white-bg.png",
 };
 
 async function upsertMenu(menu: InsertCmsMenu & { location: MenuLocation }) {

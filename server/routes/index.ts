@@ -81,11 +81,13 @@ export function registerApiRoutes(app: Express) {
     try {
       const branding = await storage.settings.getDecryptedCategory("branding");
       res.json({
-        frontendLogoUrl: branding.frontend_logo_url || null,
-        faviconUrl: branding.favicon_url || null,
-        companyName: branding.company_name || null,
-        companyAddress: branding.company_address || null,
-        companyPhoneNumbers: branding.company_phone_numbers || null,
+        frontendLogoUrl:
+          branding.frontend_logo_url ||
+          "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp",
+        faviconUrl: branding.favicon_url || "/favicon.ico",
+        companyName: branding.company_name || "Glass & Door Pro",
+        companyAddress: branding.company_address || "2341 Waverly Dr\nMonroe, NC 28112",
+        companyPhoneNumbers: branding.company_phone_numbers || "(704) 771-6111",
         companyGoogleBusinessUrl: branding.company_google_business_url || null,
         bodyFont: branding.frontend_body_font || null,
         headingFont: branding.frontend_heading_font || null,
@@ -115,11 +117,11 @@ export function registerApiRoutes(app: Express) {
         error: err instanceof Error ? err.message : String(err),
       });
       res.json({
-        frontendLogoUrl: null,
-        faviconUrl: null,
-        companyName: null,
-        companyAddress: null,
-        companyPhoneNumbers: null,
+        frontendLogoUrl: "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp",
+        faviconUrl: "/favicon.ico",
+        companyName: "Glass & Door Pro",
+        companyAddress: "2341 Waverly Dr\nMonroe, NC 28112",
+        companyPhoneNumbers: "(704) 771-6111",
         companyGoogleBusinessUrl: null,
         bodyFont: null,
         headingFont: null,
