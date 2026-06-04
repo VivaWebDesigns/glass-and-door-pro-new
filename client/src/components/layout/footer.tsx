@@ -1,36 +1,31 @@
 import { useMemo } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import logoImg from "@assets/IMG_0002_1772999718659.png";
 import { useBranding } from "@/components/shared/branding-provider";
 import type { CmsMenu, MenuItem, PublicMenuLocation } from "@shared/schema";
 
 const defaultPlatformLinks = [
-  {
-    href: "/directory",
-    label: "Find a Mental Health Professional",
-    testId: "link-footer-directory",
-  },
-  { href: "/events", label: "Events & Workshops", testId: "link-footer-events" },
-  { href: "/about", label: "How It Works", testId: "link-footer-how-it-works" },
+  { href: "/#services", label: "Frameless Showers", testId: "link-footer-frameless-showers" },
+  { href: "/#services", label: "Window Installation", testId: "link-footer-window-installation" },
+  { href: "/#services", label: "Door Installation", testId: "link-footer-door-installation" },
 ];
 
 const defaultTherapistLinks = [
-  { href: "/join", label: "Applications open in June", testId: "link-footer-join" },
-  { href: "/auth/login", label: "Mental Health Professional Login", testId: "link-footer-login" },
-  { href: "/therapist/subscription", label: "Membership Plans", testId: "link-footer-membership" },
+  { href: "/#services", label: "Window Repair", testId: "link-footer-window-repair" },
+  { href: "/#services", label: "Commercial Glass", testId: "link-footer-commercial-glass" },
+  { href: "/#contact", label: "Get a Free Quote", testId: "link-footer-quote" },
 ];
 
 const defaultResourceLinks = [
-  { href: "/about", label: "About Core Platforms", testId: "link-footer-about-corePlatforms" },
-  { href: "/events", label: "Upcoming Events", testId: "link-footer-upcoming-events" },
-  { href: "/directory", label: "Browse Specializations", testId: "link-footer-specializations" },
+  { href: "/#about", label: "About Doug", testId: "link-footer-about-doug" },
+  { href: "/#gallery", label: "Project Gallery", testId: "link-footer-gallery" },
+  { href: "/#reviews", label: "Reviews", testId: "link-footer-reviews" },
 ];
 
 const defaultCompanyLinks = [
-  { href: "/about", label: "About Us", testId: "link-footer-about" },
-  { href: "/contact", label: "Contact", testId: "link-footer-contact" },
-  { href: "/contact", label: "Support", testId: "link-footer-support" },
+  { href: "/#contact", label: "Contact", testId: "link-footer-contact" },
+  { href: "tel:+17047716111", label: "(704) 771-6111", testId: "link-footer-phone" },
+  { href: "mailto:Doug@GlassandDoorPro.com", label: "Doug@GlassandDoorPro.com", testId: "link-footer-email" },
 ];
 
 const defaultLegalLinks = [
@@ -55,19 +50,29 @@ function FooterColumn({
 }) {
   return (
     <div>
-      <h4 className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-foreground sm:mb-4">
+      <h4 className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-white sm:mb-4">
         {title}
       </h4>
       <ul className="space-y-2.5 text-sm sm:space-y-3">
         {links.map((link) => (
           <li key={link.testId}>
-            <Link
-              href={link.href}
-              className="text-muted-foreground transition-colors hover:text-foreground"
-              data-testid={link.testId}
-            >
-              {link.label}
-            </Link>
+            {link.href.startsWith("tel:") || link.href.startsWith("mailto:") ? (
+              <a
+                href={link.href}
+                className="text-slate-400 transition-colors hover:text-white"
+                data-testid={link.testId}
+              >
+                {link.label}
+              </a>
+            ) : (
+              <Link
+                href={link.href}
+                className="text-slate-400 transition-colors hover:text-white"
+                data-testid={link.testId}
+              >
+                {link.label}
+              </Link>
+            )}
           </li>
         ))}
       </ul>
@@ -90,7 +95,7 @@ function DynamicFooterColumn({ item }: { item: MenuItem }) {
   const allLinks = flattenFooterItems(item.children || []);
   return (
     <div>
-      <h4 className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-foreground sm:mb-4">
+      <h4 className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-white sm:mb-4">
         {item.label}
       </h4>
       <ul className="space-y-2.5 sm:space-y-3 text-sm">
@@ -101,7 +106,7 @@ function DynamicFooterColumn({ item }: { item: MenuItem }) {
                 href={child.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground transition-colors hover:text-foreground"
+                className="text-slate-400 transition-colors hover:text-white"
                 data-testid={`link-footer-${child.id}`}
               >
                 {child.label}
@@ -109,7 +114,7 @@ function DynamicFooterColumn({ item }: { item: MenuItem }) {
             ) : (
               <Link
                 href={child.url}
-                className="text-muted-foreground transition-colors hover:text-foreground"
+                className="text-slate-400 transition-colors hover:text-white"
                 data-testid={`link-footer-${child.id}`}
               >
                 {child.label}
@@ -132,7 +137,7 @@ function StandardFooterColumn({ menu }: { menu: CmsMenu }) {
 
   return (
     <div>
-      <h4 className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-foreground sm:mb-4">
+      <h4 className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-white sm:mb-4">
         {menu.name}
       </h4>
       <ul className="space-y-2.5 sm:space-y-3 text-sm">
@@ -143,7 +148,7 @@ function StandardFooterColumn({ menu }: { menu: CmsMenu }) {
                 href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground transition-colors hover:text-foreground"
+                className="text-slate-400 transition-colors hover:text-white"
                 data-testid={`link-footer-${item.id}`}
               >
                 {item.label}
@@ -151,7 +156,7 @@ function StandardFooterColumn({ menu }: { menu: CmsMenu }) {
             ) : (
               <Link
                 href={item.url}
-                className="text-muted-foreground transition-colors hover:text-foreground"
+                className="text-slate-400 transition-colors hover:text-white"
                 data-testid={`link-footer-${item.id}`}
               >
                 {item.label}
@@ -165,7 +170,7 @@ function StandardFooterColumn({ menu }: { menu: CmsMenu }) {
 }
 
 export function Footer() {
-  const { frontendLogoUrl } = useBranding();
+  const { frontendLogoUrl, companyName } = useBranding();
   const { data: publicMenus } = useQuery<Partial<Record<PublicMenuLocation, CmsMenu>>>({
     queryKey: ["/api/cms/menus"],
     queryFn: async () => {
@@ -212,19 +217,21 @@ export function Footer() {
   }, [publicMenus]) as FooterLegalLink[];
 
   const useStandardFooterMenus = standardFooterMenus.length > 0;
-  const brandLogo = frontendLogoUrl || logoImg;
+  const brandLogo = frontendLogoUrl || "/images/glass-door-pro/logo.png";
+  const brandName = companyName || "Glass & Door Pro";
 
   return (
-    <footer className="public-footer-surface border-t border-border/70" data-testid="footer">
+    <footer className="border-t border-slate-800 bg-slate-950 text-slate-200" data-testid="footer">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:py-16">
         <div
           className={`grid grid-cols-2 sm:grid-cols-2 ${useStandardFooterMenus ? "lg:grid-cols-6" : "lg:grid-cols-5"} gap-8 sm:gap-10 lg:gap-12`}
         >
           <div className="col-span-2">
-            <img src={brandLogo} alt="Core Platform" className="mb-4 h-9 w-auto sm:h-10" />
-            <p className="max-w-sm text-sm leading-7 text-muted-foreground">
-              Connecting Third Culture Kids with culturally informed mental health professionals
-              worldwide. Find support that understands your unique journey.
+            <img src={brandLogo} alt={brandName} className="mb-4 h-12 w-auto brightness-0 invert sm:h-14" />
+            <p className="max-w-sm text-sm leading-7 text-slate-400">
+              Specializing in frameless glass showers, residential window replacements and
+              repairs, door installations, and commercial glass throughout the greater Charlotte
+              area.
             </p>
           </div>
 
@@ -243,7 +250,7 @@ export function Footer() {
                           href={item.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-semibold text-muted-foreground transition-colors hover:text-foreground"
+                          className="font-semibold text-slate-400 transition-colors hover:text-white"
                           data-testid={`link-footer-${item.id}`}
                         >
                           {item.label}
@@ -251,7 +258,7 @@ export function Footer() {
                       ) : (
                         <Link
                           href={item.url}
-                          className="font-semibold text-muted-foreground transition-colors hover:text-foreground"
+                          className="font-semibold text-slate-400 transition-colors hover:text-white"
                           data-testid={`link-footer-${item.id}`}
                         >
                           {item.label}
@@ -264,8 +271,8 @@ export function Footer() {
             )
           ) : (
             <>
-              <FooterColumn title="Platform" links={defaultPlatformLinks} />
-              <FooterColumn title="For Mental Health Professionals" links={defaultTherapistLinks} />
+              <FooterColumn title="Services" links={defaultPlatformLinks} />
+              <FooterColumn title="More Services" links={defaultTherapistLinks} />
               <div className="col-span-2 sm:col-span-1">
                 <FooterColumn title="Resources" links={defaultResourceLinks} />
                 <div className="mt-6 sm:mt-8">
@@ -277,11 +284,11 @@ export function Footer() {
         </div>
 
         <div
-          className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-border/70 pt-6 text-sm text-muted-foreground sm:mt-10 sm:flex-row sm:gap-4"
+          className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-slate-800 pt-6 text-sm text-slate-400 sm:mt-10 sm:flex-row sm:gap-4"
           data-testid="text-copyright"
         >
           <span className="text-center sm:text-left">
-            &copy; {new Date().getFullYear()} Interaction International. All rights reserved.
+            &copy; {new Date().getFullYear()} {brandName}. All rights reserved.
           </span>
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
             {legalLinks.map((link) =>
@@ -291,7 +298,7 @@ export function Footer() {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-foreground transition-colors"
+                  className="hover:text-white transition-colors"
                   data-testid={link.testId}
                 >
                   {link.label}
@@ -300,7 +307,7 @@ export function Footer() {
                 <Link
                   key={link.testId}
                   href={link.href}
-                  className="hover:text-foreground transition-colors"
+                  className="hover:text-white transition-colors"
                   data-testid={link.testId}
                 >
                   {link.label}

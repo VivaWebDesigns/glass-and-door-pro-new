@@ -17,7 +17,7 @@ import {
   List, Shield, Newspaper, TrendingUp, Grid3X3, Rss,
   ListChecks, FlaskConical, BadgeCheck, Workflow, ListOrdered,
   ChevronLeft, ChevronRight, GalleryHorizontal, Grid2X2, Building2,
-  ExternalLink, XCircle,
+  ExternalLink, XCircle, Droplets, DoorOpen, Wrench,
 } from "lucide-react";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { MapView } from "@/components/directory/map-view";
@@ -62,7 +62,7 @@ const LUCIDE_MAP: Record<string, React.ElementType> = {
   List, Shield, Newspaper, TrendingUp, Grid3X3, Rss,
   ListChecks, FlaskConical, BadgeCheck, Workflow, ListOrdered,
   ChevronLeft, ChevronRight, GalleryHorizontal, Grid2X2, Building2,
-  ExternalLink, XCircle,
+  ExternalLink, XCircle, Droplets, DoorOpen, Wrench,
 };
 
 function LucideIcon({ name, className }: { name: string; className?: string }) {
@@ -105,6 +105,7 @@ function DynamicPreviewFallback() {
 function HeroBlock({ props }: { props: Record<string, unknown> }) {
   const bg = resolveCmsAssetUrl(str(props.backgroundImageUrl));
   const videoBg = str(props.videoBackgroundUrl);
+  const variant = str(props.variant);
   const opacity = num(props.overlayOpacity as number, 50);
   const overlayColor = normalizeHexColor(str(props.overlayColor)) || "#000000";
   const layout = str(props.layout) || "stacked";
@@ -124,11 +125,14 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
 
   return (
     <section
+      id={str(props.anchorId) || undefined}
       className={`relative flex items-center overflow-hidden ${isSplit ? "justify-start text-left" : "justify-center text-center"}`}
       style={{
         minHeight: minHeightStyle,
         ...(sectionStyleConfig.backgroundColor ? { backgroundColor: sectionStyleConfig.backgroundColor } : {}),
         ...(bg && !videoBg
+          ? { backgroundImage: `url(${bg})`, backgroundSize: "cover", backgroundPosition: `${bgPosX}% ${bgPosY}%` }
+          : bg && videoBg
           ? { backgroundImage: `url(${bg})`, backgroundSize: "cover", backgroundPosition: `${bgPosX}% ${bgPosY}%` }
           : !videoBg && !sectionStyleConfig.backgroundColor
           ? { background: DEFAULT_SECTION_LINEAR_GRADIENT }
@@ -136,7 +140,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
       }}
     >
       {videoBg && (
-        <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover">
+        <video autoPlay muted loop playsInline poster={bg || undefined} className="absolute inset-0 w-full h-full object-cover">
           <source src={videoBg} type="video/mp4" />
         </video>
       )}
@@ -147,7 +151,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
             {badge}
           </span>
         )}
-        <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-4 leading-tight" style={headingTextStyle}>
+        <h1 className={`font-heading font-bold text-white mb-4 leading-tight ${variant === "glass-home" ? "text-4xl md:text-6xl" : "text-4xl md:text-5xl"}`} style={headingTextStyle}>
           {str(props.heading) || "Hero Heading"}
           {accentHeading && (
             <>
@@ -350,6 +354,8 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
   const hasImage = !!str(props.imageUrl);
   const mobileImageStyles = getMobileImageStyles(props);
   const align = str(props.alignment) || "left";
+  const badgeValue = str(props.badgeValue);
+  const badgeLabel = str(props.badgeLabel);
   const bodyAlign = align === "center" ? "text-center" : align === "right" ? "text-right" : "text-left";
   return (
     <div className={`flex flex-col ${imageRight ? "md:flex-row" : "md:flex-row-reverse"} gap-8 py-4 md:items-stretch`}>
@@ -372,6 +378,12 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
               style={mobileImageStyles}
               className="w-full rounded-xl [height:var(--mobile-image-height)] [object-fit:var(--mobile-image-fit)] [object-position:var(--mobile-image-position)] md:absolute md:inset-0 md:h-full md:w-full md:object-cover md:object-center"
             />
+            {(badgeValue || badgeLabel) && (
+              <div className="absolute -bottom-4 -right-3 rounded-lg bg-primary px-5 py-4 text-primary-foreground shadow-xl sm:-right-4">
+                {badgeValue && <div className="text-2xl font-bold leading-none">{badgeValue}</div>}
+                {badgeLabel && <div className="mt-1 text-xs font-semibold uppercase tracking-wide">{badgeLabel}</div>}
+              </div>
+            )}
             </div>
             {str(props.imageCaption) && <p className="text-xs text-muted-foreground mt-2 text-center">{str(props.imageCaption)}</p>}
           </div>
@@ -439,8 +451,23 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
 
 function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
   const cols = str(props.columns) || "3";
-  const colsClass = cols === "2" ? "md:grid-cols-2" : cols === "4" ? "md:grid-cols-4" : "md:grid-cols-3";
-  const cards = arr<{ title: string; description: string; icon: string }>(props.cards);
+  const colsClass =
+    cols === "2"
+      ? "md:grid-cols-2"
+      : cols === "4"
+        ? "md:grid-cols-2 lg:grid-cols-4"
+        : cols === "5"
+          ? "md:grid-cols-2 lg:grid-cols-5"
+          : "md:grid-cols-3";
+  const variant = str(props.variant);
+  const cards = arr<{
+    title: string;
+    description: string;
+    icon: string;
+    link?: string;
+    buttonText?: string;
+    openInNewTab?: boolean;
+  }>(props.cards);
   return (
     <div className="py-4">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
@@ -448,13 +475,21 @@ function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
         {cards.length === 0 ? (
           <div className="col-span-full text-center text-muted-foreground py-8">Add cards to display here</div>
         ) : cards.map((card, i) => (
-          <Card key={i} className="h-full overflow-hidden text-center transition-shadow hover:shadow-md">
-            <CardContent className="px-4 pb-5 pt-6 sm:px-6 sm:pb-6 sm:pt-8">
-              <div className="h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center mx-auto mb-4">
-                <LucideIcon name={card.icon || "Globe"} className="h-6 w-6 text-accent" />
+          <Card key={i} className={`h-full overflow-hidden text-center transition-shadow hover:shadow-md ${variant === "service-links" ? "border-none bg-white" : ""}`}>
+            <CardContent className="flex h-full flex-col px-4 pb-5 pt-6 sm:px-6 sm:pb-6 sm:pt-8">
+              <div className={`mx-auto mb-4 flex items-center justify-center rounded-full bg-accent/10 ${variant === "service-links" ? "h-16 w-16" : "h-12 w-12"}`}>
+                <LucideIcon name={card.icon || "Globe"} className={variant === "service-links" ? "h-8 w-8 text-primary" : "h-6 w-6 text-accent"} />
               </div>
               <h3 className="mb-2 text-base font-semibold leading-snug break-words">{card.title}</h3>
               <p className="text-sm leading-relaxed text-muted-foreground">{card.description}</p>
+              {card.link && (
+                <div className="mt-auto pt-5">
+                  <span className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm">
+                    {card.buttonText || "Learn More"}
+                    <ArrowRight className="ml-1.5 h-4 w-4" />
+                  </span>
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}
@@ -488,13 +523,25 @@ function FaqBlock({ props }: { props: Record<string, unknown> }) {
 }
 
 function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
-  const items = arr<{ quote: string; name: string; role: string; location: string }>(props.items);
+  const variant = str(props.variant);
+  const items = arr<{ quote: string; name: string; role: string; location: string; rating?: number; source?: string }>(props.items);
   const shouldCarousel = items.length > 2;
 
-  const renderCard = (item: { quote: string; name: string; role: string; location: string }, i: number) => (
-    <Card key={i} className="bg-muted/30 h-full">
+  const renderCard = (item: { quote: string; name: string; role: string; location: string; rating?: number; source?: string }, i: number) => (
+    <Card key={i} className={`${variant === "google-carousel" ? "border-none bg-white shadow-lg" : "bg-muted/30"} h-full`}>
       <CardContent className="pt-6">
-        <Quote className="h-5 w-5 text-accent mb-3" />
+        {variant === "google-carousel" ? (
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div className="flex text-yellow-400">
+              {Array.from({ length: Math.max(1, Math.min(5, num(item.rating, 5))) }).map((_, index) => (
+                <Star key={index} className="h-4 w-4 fill-current" />
+              ))}
+            </div>
+            <span className="text-xs font-semibold text-muted-foreground">{item.source || "Google"}</span>
+          </div>
+        ) : (
+          <Quote className="h-5 w-5 text-accent mb-3" />
+        )}
         <p className="text-sm leading-relaxed mb-4 italic">"{item.quote}"</p>
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center">
@@ -774,6 +821,28 @@ function ImageBlockRenderer({ props }: { props: Record<string, unknown> }) {
   const widthClass = IMAGE_WIDTH_MAP[str(props.width)] ?? IMAGE_WIDTH_MAP.contained;
   const hasImage = !!str(props.imageUrl);
   const mobileImageStyles = getMobileImageStyles(props);
+  const variant = str(props.variant);
+
+  if (variant === "banner") {
+    return (
+      <section className="relative h-[50vh] min-h-[360px] overflow-hidden py-0">
+        {hasImage ? (
+          <img src={str(props.imageUrl)} alt={str(props.alt)} className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full items-center justify-center bg-muted/40 text-sm text-muted-foreground">
+            Image placeholder
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+        {str(props.caption) && (
+          <p className="absolute bottom-4 left-1/2 max-w-3xl -translate-x-1/2 px-4 text-center text-sm text-white/90">
+            {str(props.caption)}
+          </p>
+        )}
+      </section>
+    );
+  }
+
   return (
     <div className={`py-4 ${widthClass}`}>
       <SectionHeading props={props} defaultAlignment="center" className="mb-6" />
@@ -1029,6 +1098,7 @@ function ImageGridBlock({ props }: { props: Record<string, unknown> }) {
   const colsClass = cols === "2" ? "md:grid-cols-2" : cols === "4" ? "md:grid-cols-4" : "md:grid-cols-3";
   const gapSize = str(props.gap) || "md";
   const gapClass = gapSize === "sm" ? "gap-2" : gapSize === "lg" ? "gap-6" : gapSize === "xl" ? "gap-8" : "gap-4";
+  const variant = str(props.variant);
   const images = arr<{ url: string; alt: string; caption: string }>(props.images);
   return (
     <div className="py-4" data-testid="block-image-grid">
@@ -1038,10 +1108,10 @@ function ImageGridBlock({ props }: { props: Record<string, unknown> }) {
           <p className="text-sm text-muted-foreground">Add images to display here</p>
         </div>
       ) : (
-        <div className={`grid grid-cols-1 ${colsClass} ${gapClass}`}>
+        <div className={variant === "gallery-strip" ? "grid grid-cols-2 gap-3 md:grid-cols-4" : `grid grid-cols-1 ${colsClass} ${gapClass}`}>
           {images.map((img, i) => (
-            <div key={i} data-testid={`grid-image-${i}`}>
-              <img src={img.url} alt={img.alt} className="w-full rounded-lg object-cover aspect-square" />
+            <div key={i} className={variant === "gallery-strip" ? "aspect-square overflow-hidden rounded-lg shadow-md" : ""} data-testid={`grid-image-${i}`}>
+              <img src={img.url} alt={img.alt} className={`w-full rounded-lg object-cover aspect-square ${variant === "gallery-strip" ? "h-full transition-transform duration-300 hover:scale-105" : ""}`} />
               {img.caption && <p className="text-xs text-muted-foreground text-center mt-1">{img.caption}</p>}
             </div>
           ))}
@@ -1853,7 +1923,68 @@ function TherapistMapBlock({ props }: { props: Record<string, unknown> }) {
   );
 }
 
-function ContactFormBlock() {
+const CONTACT_ICON_MAP: Record<string, React.ElementType> = {
+  MapPin,
+  Mail,
+  Phone,
+  Clock,
+};
+
+function ContactFormBlock({ props = {} }: { props?: Record<string, unknown> }) {
+  const variant = str(props.variant);
+
+  if (variant === "split-contact") {
+    const items = arr<{ icon: string; label: string; value: string; href?: string }>(props.contactItems);
+    return (
+      <section id={str(props.anchorId) || "contact"} className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20" data-testid="dynamic-contact-form">
+        <div className="mb-10 max-w-3xl text-white">
+          {str(props.eyebrow) && (
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.16em] text-white/70">{str(props.eyebrow)}</p>
+          )}
+          <h2 className="font-heading text-3xl font-bold leading-tight sm:text-4xl">{str(props.heading) || "Ready to start your project?"}</h2>
+          {str(props.subheading) && (
+            <p className="mt-4 text-base leading-7 text-white/75 sm:text-lg">{str(props.subheading)}</p>
+          )}
+        </div>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
+          <Card className="lg:col-span-3 border-none bg-white shadow-xl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Send className="h-5 w-5 text-primary" />
+                {str(props.formTitle) || "Send a Message"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PublicFormRenderer slug={str(props.formSlug) || "contact-form"} showHeader={false} />
+            </CardContent>
+          </Card>
+          <div className="space-y-4 lg:col-span-2">
+            {items.length > 0 ? (
+              items.map((item, index) => {
+                const Icon = CONTACT_ICON_MAP[item.icon] ?? MapPin;
+                return (
+                  <Card key={`${item.label}-${index}`} className="border-white/10 bg-white/10 text-white shadow-lg">
+                    <CardContent className="flex gap-4 p-5">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/60">{item.label}</p>
+                        <p className="mt-1 whitespace-pre-line text-sm font-semibold leading-6">{item.value}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })
+            ) : (
+              <CompanyInformationCard />
+            )}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8" data-testid="dynamic-contact-form">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -2052,7 +2183,7 @@ export function BlockRenderer({
       renderedBlock = <DynamicPlaceholderAdmin block={block} />;
     }
     if (!renderedBlock && block.type === "therapist-map") renderedBlock = <TherapistMapBlock props={block.props} />;
-    if (!renderedBlock && block.type === "contact-form") renderedBlock = <ContactFormBlock />;
+    if (!renderedBlock && block.type === "contact-form") renderedBlock = <ContactFormBlock props={block.props} />;
     if (!renderedBlock && block.type === "form-embed") {
       renderedBlock = (
         <Suspense fallback={<DynamicPreviewFallback />}>
@@ -2110,6 +2241,7 @@ export function BlockRenderer({
 
   return (
     <SectionStyleWrapper
+      id={str(block.props.anchorId) || undefined}
       props={block.props}
       resolveAssetUrl={resolveCmsAssetUrl}
       contentClassName={getSectionPaddingClasses(block.props)}
@@ -2141,7 +2273,10 @@ export function PageRenderer({ blocks }: { blocks: BlockInstance[] }) {
   return (
     <div>
       {normalizedBlocks.map((block) => {
-        const isFullWidth = FULL_WIDTH_BLOCKS.has(block.type);
+        const isFullWidth =
+          FULL_WIDTH_BLOCKS.has(block.type) ||
+          (block.type === "image-block" && str(block.props.variant) === "banner") ||
+          (block.type === "contact-form" && str(block.props.variant) === "split-contact");
         const sectionStyleConfig = getSectionStyleConfig(block.props, { resolveAssetUrl: resolveCmsAssetUrl });
         const hasCustomSectionStyle = block.type !== "hero" && hasSectionStyleConfig(sectionStyleConfig);
 
@@ -2149,6 +2284,7 @@ export function PageRenderer({ blocks }: { blocks: BlockInstance[] }) {
           return (
             <SectionStyleWrapper
               key={block.id}
+              id={str(block.props.anchorId) || undefined}
               props={block.props}
               resolveAssetUrl={resolveCmsAssetUrl}
               className="rounded-none"
@@ -2170,7 +2306,7 @@ export function PageRenderer({ blocks }: { blocks: BlockInstance[] }) {
         }
 
         return (
-          <div key={block.id} className={`max-w-7xl mx-auto px-4 sm:px-6 ${getSectionPaddingClasses(block.props)}`}>
+          <div key={block.id} id={str(block.props.anchorId) || undefined} className={`max-w-7xl mx-auto px-4 sm:px-6 ${getSectionPaddingClasses(block.props)}`}>
             <BlockRenderer block={block} disableSectionStyleWrap />
           </div>
         );

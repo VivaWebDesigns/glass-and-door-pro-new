@@ -78,6 +78,7 @@ const COLUMNS_OPTIONS = [
   { label: "2 columns", value: "2" },
   { label: "3 columns", value: "3" },
   { label: "4 columns", value: "4" },
+  { label: "5 columns", value: "5" },
 ];
 
 const FEATURE_LIST_COLUMNS_OPTIONS = [
@@ -141,6 +142,36 @@ const DIVIDER_STYLE_OPTIONS = [
 const HERO_LAYOUT_OPTIONS = [
   { label: "Stacked (centered)", value: "stacked" },
   { label: "Split (text left, image right)", value: "split" },
+];
+
+const HERO_VARIANT_OPTIONS = [
+  { label: "Default", value: "default" },
+  { label: "Glass Home", value: "glass-home" },
+];
+
+const CARDS_GRID_VARIANT_OPTIONS = [
+  { label: "Default", value: "default" },
+  { label: "Service Links", value: "service-links" },
+];
+
+const TESTIMONIAL_VARIANT_OPTIONS = [
+  { label: "Default", value: "default" },
+  { label: "Google Carousel", value: "google-carousel" },
+];
+
+const IMAGE_BLOCK_VARIANT_OPTIONS = [
+  { label: "Default", value: "default" },
+  { label: "Banner", value: "banner" },
+];
+
+const IMAGE_GRID_VARIANT_OPTIONS = [
+  { label: "Default", value: "default" },
+  { label: "Gallery Strip", value: "gallery-strip" },
+];
+
+const CONTACT_FORM_VARIANT_OPTIONS = [
+  { label: "Default", value: "default" },
+  { label: "Split Contact", value: "split-contact" },
 ];
 
 const HERO_MIN_HEIGHT_OPTIONS = [
@@ -263,10 +294,12 @@ const SHARED_SECTION_HEADING_PROP_DEFS: PropDef[] = [
 
 const SHARED_VISIBILITY_DEFAULTS = {
   isActive: true,
+  anchorId: "",
 };
 
 const SHARED_VISIBILITY_PROP_DEFS: PropDef[] = [
   { key: "isActive", label: "Active on Public Site", type: "boolean" },
+  { key: "anchorId", label: "Anchor ID", type: "text", placeholder: "e.g. services" },
 ];
 
 const SHARED_MOBILE_IMAGE_DEFAULTS = {
@@ -406,8 +439,10 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       layout: "stacked",
       videoBackgroundUrl: "",
       minHeight: "420",
+      variant: "default",
     },
     propDefs: [
+      { key: "variant", label: "Design Variant", type: "select", options: HERO_VARIANT_OPTIONS },
       { key: "badge", label: "Badge Text", type: "text", placeholder: "e.g. New, Coming Soon" },
       { key: "heading", label: "Heading", type: "text", placeholder: "Main heading" },
       { key: "accentHeading", label: "Accent Heading", type: "text", placeholder: "Optional highlighted heading text" },
@@ -492,6 +527,8 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       imageAlt: "About Core Platform",
       imageCaption: "",
       imagePosition: "right",
+      badgeValue: "",
+      badgeLabel: "",
       ...SHARED_MOBILE_IMAGE_DEFAULTS,
     },
     propDefs: [
@@ -505,6 +542,8 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       { key: "imageAlt", label: "Image Alt Text", type: "text", placeholder: "Descriptive alt text" },
       { key: "imageCaption", label: "Image Caption", type: "text", placeholder: "Optional caption" },
       { key: "imagePosition", label: "Image Position", type: "select", options: IMAGE_POSITION_OPTIONS },
+      { key: "badgeValue", label: "Image Badge Value", type: "text", placeholder: "e.g. 15+" },
+      { key: "badgeLabel", label: "Image Badge Label", type: "text", placeholder: "e.g. Years Experience" },
       ...SHARED_MOBILE_IMAGE_PROP_DEFS,
     ],
   },
@@ -670,6 +709,7 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       title: "Why Choose Core Platform",
       subtitle: "",
       columns: "3",
+      variant: "default",
       cards: [
         { title: "Culturally Informed", description: "Mental health professionals who understand the Core Platform experience.", icon: "Globe" },
         { title: "Specialized Support", description: "Targeted help for unique Core Platform challenges.", icon: "Heart" },
@@ -680,6 +720,7 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       { key: "title", label: "Section Title", type: "text", placeholder: "Grid section title" },
       { key: "subtitle", label: "Section Subtitle", type: "text", placeholder: "Optional subtitle" },
       { key: "columns", label: "Columns", type: "select", options: COLUMNS_OPTIONS },
+      { key: "variant", label: "Design Variant", type: "select", options: CARDS_GRID_VARIANT_OPTIONS },
       {
         key: "cards",
         label: "Cards",
@@ -688,6 +729,9 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
           { key: "title", label: "Card Title", type: "text", placeholder: "Card title" },
           { key: "description", label: "Description", type: "textarea", placeholder: "Card description" },
           { key: "icon", label: "Icon Name (Lucide)", type: "text", placeholder: "e.g. Globe, Heart, Users" },
+          { key: "link", label: "Card Link", type: "url", placeholder: "/contact or #contact" },
+          { key: "buttonText", label: "Button Text", type: "text", placeholder: "Learn More" },
+          { key: "openInNewTab", label: "Open In New Tab", type: "boolean" },
         ],
       },
     ],
@@ -726,6 +770,7 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     category: "social-proof",
     defaultProps: {
       title: "What Our Community Says",
+      variant: "default",
       items: [
         { quote: "Finding a mental health professional who truly understood my Core Platform experience was life-changing.", name: "Sarah M.", role: "Core Platform Client", location: "Singapore" },
         { quote: "I finally feel seen and understood in a way I never did before.", name: "James T.", role: "Core Platform Client", location: "Germany" },
@@ -733,6 +778,7 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     },
     propDefs: [
       { key: "title", label: "Section Title", type: "text", placeholder: "Testimonials heading" },
+      { key: "variant", label: "Design Variant", type: "select", options: TESTIMONIAL_VARIANT_OPTIONS },
       {
         key: "items",
         label: "Testimonials",
@@ -742,6 +788,8 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
           { key: "name", label: "Name", type: "text", placeholder: "Person's name" },
           { key: "role", label: "Role", type: "text", placeholder: "e.g. Core Platform Client" },
           { key: "location", label: "Location", type: "text", placeholder: "e.g. Singapore" },
+          { key: "rating", label: "Rating", type: "number", min: 1, max: 5 },
+          { key: "source", label: "Source", type: "text", placeholder: "e.g. Google" },
         ],
       },
     ],
@@ -873,6 +921,7 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       alt: "",
       caption: "",
       width: "contained",
+      variant: "default",
       ...SHARED_MOBILE_IMAGE_DEFAULTS,
     },
     propDefs: [
@@ -880,6 +929,7 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       { key: "alt", label: "Alt Text", type: "text", placeholder: "Descriptive alt text for accessibility" },
       { key: "caption", label: "Caption", type: "text", placeholder: "Optional image caption" },
       { key: "width", label: "Image Width", type: "select", options: IMAGE_WIDTH_OPTIONS },
+      { key: "variant", label: "Design Variant", type: "select", options: IMAGE_BLOCK_VARIANT_OPTIONS },
       ...SHARED_MOBILE_IMAGE_PROP_DEFS,
     ],
   },
@@ -1140,12 +1190,14 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       title: "",
       columns: "3",
       gap: "md",
+      variant: "default",
       images: [],
     },
     propDefs: [
       { key: "title", label: "Section Title", type: "text", placeholder: "Optional heading" },
       { key: "columns", label: "Columns", type: "select", options: COLUMNS_OPTIONS },
       { key: "gap", label: "Gap Size", type: "select", options: SPACING_OPTIONS },
+      { key: "variant", label: "Design Variant", type: "select", options: IMAGE_GRID_VARIANT_OPTIONS },
       {
         key: "images",
         label: "Images",
@@ -1697,8 +1749,36 @@ const BASE_DYNAMIC_BLOCK_TYPES: BlockDef[] = [
     description: "Contact form with validation and submission — managed automatically",
     isDynamic: true,
     category: "dynamic",
-    defaultProps: {},
-    propDefs: [],
+    defaultProps: {
+      variant: "default",
+      anchorId: "contact",
+      eyebrow: "",
+      heading: "",
+      subheading: "",
+      formTitle: "Send a Message",
+      formSlug: "contact-form",
+      contactItems: [],
+    },
+    propDefs: [
+      { key: "variant", label: "Design Variant", type: "select", options: CONTACT_FORM_VARIANT_OPTIONS },
+      { key: "anchorId", label: "Anchor ID", type: "text", placeholder: "contact" },
+      { key: "eyebrow", label: "Eyebrow Label", type: "text", placeholder: "Get in touch" },
+      { key: "heading", label: "Heading", type: "text", placeholder: "Ready to start your project?" },
+      { key: "subheading", label: "Subheading", type: "textarea", placeholder: "Supporting text" },
+      { key: "formTitle", label: "Form Title", type: "text", placeholder: "Send a Message" },
+      { key: "formSlug", label: "Assigned Form", type: "form-select" },
+      {
+        key: "contactItems",
+        label: "Contact Cards",
+        type: "array-items",
+        itemSchema: [
+          { key: "icon", label: "Icon Name (Lucide)", type: "text", placeholder: "Phone, Mail, MapPin, Clock" },
+          { key: "label", label: "Label", type: "text", placeholder: "Phone" },
+          { key: "value", label: "Value", type: "textarea", placeholder: "(704) 771-6111" },
+          { key: "href", label: "Link", type: "url", placeholder: "tel:+17047716111" },
+        ],
+      },
+    ],
   },
   {
     type: "form-embed",

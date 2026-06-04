@@ -33,6 +33,7 @@ interface SectionStyleConfig {
 interface SectionStyleWrapperProps {
   props: Record<string, unknown>;
   children: ReactNode;
+  id?: string;
   className?: string;
   contentClassName?: string;
   resolveAssetUrl?: (url: string) => string;
@@ -139,6 +140,7 @@ export function getSectionPaddingClasses(props: Record<string, unknown>) {
 export function SectionStyleWrapper({
   props,
   children,
+  id,
   className,
   contentClassName,
   resolveAssetUrl,
@@ -184,7 +186,7 @@ export function SectionStyleWrapper({
   const overlayOpacity = config.backgroundImageUrl ? config.backgroundOverlayOpacity / 100 : 0;
 
   return (
-    <section className={`relative overflow-hidden rounded-2xl ${className ?? ""}`.trim()} style={wrapperStyle}>
+    <section id={id} className={`relative overflow-hidden rounded-2xl ${className ?? ""}`.trim()} style={wrapperStyle}>
       {overlayOpacity > 0 && (
         <div
           className="pointer-events-none absolute inset-0"
