@@ -169,6 +169,7 @@ const IMAGE_BLOCK_VARIANT_OPTIONS = [
 const IMAGE_GRID_VARIANT_OPTIONS = [
   { label: "Default", value: "default" },
   { label: "Gallery Strip", value: "gallery-strip" },
+  { label: "Project Gallery", value: "project-gallery" },
 ];
 
 const CONTACT_FORM_VARIANT_OPTIONS = [

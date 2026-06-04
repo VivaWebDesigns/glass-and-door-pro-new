@@ -1394,6 +1394,7 @@ function ImageGridBlock({ props }: { props: Record<string, unknown> }) {
     gapSize === "sm" ? "gap-2" : gapSize === "lg" ? "gap-6" : gapSize === "xl" ? "gap-8" : "gap-4";
   const variant = str(props.variant);
   const images = arr<{ url: string; alt: string; caption: string }>(props.images);
+  const isProjectGallery = variant === "project-gallery";
   return (
     <div className="py-4" data-testid="block-image-grid">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
@@ -1406,16 +1407,32 @@ function ImageGridBlock({ props }: { props: Record<string, unknown> }) {
           {images.map((img, i) => (
             <div
               key={i}
-              className={variant === "gallery-strip" ? "aspect-square overflow-hidden rounded-lg shadow-md" : ""}
+              className={
+                variant === "gallery-strip"
+                  ? "aspect-square overflow-hidden rounded-lg shadow-md"
+                  : isProjectGallery
+                    ? "group overflow-hidden rounded-lg bg-white shadow-md"
+                    : ""
+              }
               data-testid={`grid-image-${i}`}
             >
               <img
                 src={img.url}
                 alt={img.alt}
-                className={`w-full rounded-lg object-cover aspect-square ${variant === "gallery-strip" ? "h-full transition-transform duration-300 hover:scale-105" : ""}`}
+                className={`w-full rounded-lg object-cover ${
+                  isProjectGallery ? "aspect-[4/3] transition-transform duration-300 group-hover:scale-105" : "aspect-square"
+                } ${variant === "gallery-strip" ? "h-full transition-transform duration-300 hover:scale-105" : ""}`}
               />
               {img.caption && (
-                <p className="text-xs text-muted-foreground text-center mt-1">{img.caption}</p>
+                <p
+                  className={
+                    isProjectGallery
+                      ? "px-3 py-3 text-center text-sm font-medium text-slate-700"
+                      : "text-xs text-muted-foreground text-center mt-1"
+                  }
+                >
+                  {img.caption}
+                </p>
               )}
             </div>
           ))}

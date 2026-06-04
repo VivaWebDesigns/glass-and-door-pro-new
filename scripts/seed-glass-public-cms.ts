@@ -291,6 +291,125 @@ const glassHomeContent: InsertCmsPage["content"] = {
   ],
 };
 
+const galleryImages = [
+  {
+    url: "/images/glass-door-pro/gallery/frameless-showers/03.jpg",
+    alt: "Black frame glass shower enclosure with marble walls and freestanding tub installed by Glass & Door Pro in SouthPark, Charlotte, NC",
+    caption: "Frameless Shower Install - SouthPark",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/frameless-showers/01.jpg",
+    alt: "Frameless glass shower enclosure with marble walls and built-in bench installed by Glass & Door Pro in Myers Park, Charlotte, NC",
+    caption: "Frameless Shower Install - Myers Park",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/frameless-showers/06.jpg",
+    alt: "Corner frameless shower with gold hardware and blue accent walls installed by Glass & Door Pro in Weddington, NC",
+    caption: "Frameless Shower Install - Weddington",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/frameless-showers/09.jpg",
+    alt: "Sliding frameless shower door with marble walls and patterned floor installed by Glass & Door Pro in Waxhaw, NC",
+    caption: "Frameless Shower Install - Waxhaw",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/frameless-showers/02.jpg",
+    alt: "Modern frameless shower with barn door hardware and wood ceiling installed by Glass & Door Pro in Dilworth, Charlotte, NC",
+    caption: "Frameless Shower Install - Dilworth",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/frameless-showers/08.jpg",
+    alt: "Large frameless shower enclosure with dual shower heads installed by Glass & Door Pro in Marvin, NC near Monroe",
+    caption: "Frameless Shower Install - Marvin",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/frameless-showers/05.jpg",
+    alt: "Black frame shower door with dark tile and modern hardware installed by Glass & Door Pro in Plaza Midwood, Charlotte, NC",
+    caption: "Frameless Shower Install - Plaza Midwood",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/frameless-showers/12.jpg",
+    alt: "Frameless sliding shower door with gold hardware and wood vanity installed by Glass & Door Pro in Matthews, NC",
+    caption: "Frameless Shower Install - Matthews",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/frameless-showers/04.jpg",
+    alt: "Corner frameless shower with gold hardware and blue tile floor installed by Glass & Door Pro in Ballantyne, Charlotte, NC",
+    caption: "Frameless Shower Install - Ballantyne",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/frameless-showers/07.jpg",
+    alt: "Frameless glass shower with gray subway tile and half wall installed by Glass & Door Pro in the Lake Norman area, NC",
+    caption: "Frameless Shower Install - Lake Norman",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/frameless-showers/10.jpg",
+    alt: "Frameless glass shower enclosure with patterned floor tile installed by Glass & Door Pro in Fort Mill, SC near Charlotte",
+    caption: "Frameless Shower Install - Fort Mill",
+  },
+];
+
+const glassGalleryContent: InsertCmsPage["content"] = {
+  blocks: [
+    block("section-header", {
+      title: "Gallery",
+      subtitle: "Explore our work by category.",
+      alignment: "center",
+      sectionBackgroundColor: "#ffffff",
+      sectionPaddingTop: "lg",
+      sectionPaddingBottom: "sm",
+    }),
+    block("cards-grid", {
+      title: "",
+      columns: "4",
+      variant: "service-links",
+      sectionBackgroundColor: "#ffffff",
+      sectionPaddingTop: "none",
+      sectionPaddingBottom: "lg",
+      cards: [
+        {
+          icon: "Droplets",
+          title: "Frameless Showers",
+          description: "Recent installations",
+          link: "#frameless-showers",
+          buttonText: `${galleryImages.length} Photos`,
+        },
+        {
+          icon: "Grid3X3",
+          title: "Windows",
+          description: "Coming soon",
+        },
+        {
+          icon: "DoorOpen",
+          title: "Doors",
+          description: "Coming soon",
+        },
+        {
+          icon: "Building2",
+          title: "Commercial Glass",
+          description: "Coming soon",
+        },
+      ],
+    }),
+    block("image-grid", {
+      anchorId: "frameless-showers",
+      title: "Frameless Showers",
+      subtitle: "Recent installations",
+      columns: "3",
+      gap: "lg",
+      variant: "project-gallery",
+      sectionBackgroundColor: "#f8fafc",
+      sectionPaddingTop: "lg",
+      sectionPaddingBottom: "lg",
+      images: galleryImages,
+    }),
+    serviceCtaBlock(
+      "Ready to Start Your Project?",
+      "See something you like? Tell us about your glass, shower, window, door, or commercial project and Doug will follow up with next steps.",
+    ),
+  ],
+};
+
 type GlassCard = {
   icon: string;
   title: string;
@@ -1101,7 +1220,7 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
         item("Window Repair", "/services/window-repair"),
         item("Commercial Glass", "/services/commercial-glass"),
       ]),
-      item("Gallery", "/#gallery"),
+      item("Gallery", "/gallery"),
       item("Reviews", "/#reviews"),
       item("Contact", "/#contact"),
     ],
@@ -1129,7 +1248,7 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
     location: "footer_resources",
     items: [
       item("About Doug", "/#about"),
-      item("Project Gallery", "/#gallery"),
+      item("Project Gallery", "/gallery"),
       item("Reviews", "/#reviews"),
     ],
   },
@@ -1163,7 +1282,7 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
         item("Window Repair", "/services/window-repair"),
         item("Commercial Glass", "/services/commercial-glass"),
       ]),
-      item("Gallery", "/#gallery"),
+      item("Gallery", "/gallery"),
       item("Reviews", "/#reviews"),
       item("Contact", "/#contact"),
     ],
@@ -1261,6 +1380,32 @@ async function seedGlassPublicCms() {
       publishedAt: new Date(),
     });
     console.log(`  [created] home page (${page.id})`);
+  }
+
+  const existingGallery = await storage.cmsPages.getPageBySlug("gallery");
+  const galleryPayload: InsertCmsPage = {
+    title: "Gallery",
+    slug: "gallery",
+    pageType: "gallery",
+    status: "published",
+    template: "full-width",
+    content: glassGalleryContent,
+    seoTitle: "Project Gallery",
+    seoDescription:
+      "Browse frameless shower door installations completed by Glass & Door Pro across Charlotte, Monroe, Indian Trail, and surrounding areas.",
+    seoKeywords:
+      "Glass & Door Pro gallery, frameless shower photos, Charlotte glass installation gallery, shower door projects",
+    ogImageUrl: "/images/glass-door-pro/gallery/frameless-showers/03.jpg",
+    canonicalUrl: "https://glass-and-door-pro-new-production.up.railway.app/gallery",
+    publishedAt: new Date(),
+  };
+
+  if (existingGallery) {
+    await storage.cmsPages.updatePage(existingGallery.id, galleryPayload);
+    console.log(`  [updated] gallery page (${existingGallery.id})`);
+  } else {
+    const page = await storage.cmsPages.createPage(galleryPayload);
+    console.log(`  [created] gallery page (${page.id})`);
   }
 
   for (const servicePage of glassServicePages) {
