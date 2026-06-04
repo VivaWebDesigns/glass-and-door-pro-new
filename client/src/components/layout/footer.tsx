@@ -1,6 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { useBranding } from "@/components/shared/branding-provider";
 import type { CmsMenu, MenuItem, PublicMenuLocation } from "@shared/schema";
 
@@ -8,18 +9,9 @@ const defaultPlatformLinks = [
   { href: "/#services", label: "Frameless Showers", testId: "link-footer-frameless-showers" },
   { href: "/#services", label: "Window Installation", testId: "link-footer-window-installation" },
   { href: "/#services", label: "Door Installation", testId: "link-footer-door-installation" },
-];
-
-const defaultTherapistLinks = [
   { href: "/#services", label: "Window Repair", testId: "link-footer-window-repair" },
   { href: "/#services", label: "Commercial Glass", testId: "link-footer-commercial-glass" },
-  { href: "/#contact", label: "Get a Free Quote", testId: "link-footer-quote" },
-];
-
-const defaultResourceLinks = [
-  { href: "/#about", label: "About Doug", testId: "link-footer-about-doug" },
-  { href: "/#gallery", label: "Project Gallery", testId: "link-footer-gallery" },
-  { href: "/#reviews", label: "Reviews", testId: "link-footer-reviews" },
+  { href: "/#gallery", label: "Gallery", testId: "link-footer-gallery" },
 ];
 
 const defaultCompanyLinks = [
@@ -28,57 +20,12 @@ const defaultCompanyLinks = [
   { href: "mailto:Doug@GlassandDoorPro.com", label: "Doug@GlassandDoorPro.com", testId: "link-footer-email" },
 ];
 
-const defaultLegalLinks = [
-  { href: "/privacy-policy", label: "Privacy Policy", testId: "link-footer-privacy" },
-  { href: "/terms-of-service", label: "Terms of Service", testId: "link-footer-terms" },
-  { href: "/disclaimer", label: "Disclaimer", testId: "link-footer-disclaimer" },
-];
-
 type FooterLegalLink = {
   href: string;
   label: string;
   testId: string;
   openInNewTab?: boolean;
 };
-
-function FooterColumn({
-  title,
-  links,
-}: {
-  title: string;
-  links: { href: string; label: string; testId: string }[];
-}) {
-  return (
-    <div>
-      <h4 className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-white sm:mb-4">
-        {title}
-      </h4>
-      <ul className="space-y-2.5 text-sm sm:space-y-3">
-        {links.map((link) => (
-          <li key={link.testId}>
-            {link.href.startsWith("tel:") || link.href.startsWith("mailto:") ? (
-              <a
-                href={link.href}
-                className="text-slate-400 transition-colors hover:text-white"
-                data-testid={link.testId}
-              >
-                {link.label}
-              </a>
-            ) : (
-              <Link
-                href={link.href}
-                className="text-slate-400 transition-colors hover:text-white"
-                data-testid={link.testId}
-              >
-                {link.label}
-              </Link>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
 
 function flattenFooterItems(items: MenuItem[], depth = 0): { item: MenuItem; depth: number }[] {
   const result: { item: MenuItem; depth: number }[] = [];
@@ -131,46 +78,73 @@ function flattenMenuLinks(items: MenuItem[]): MenuItem[] {
   return flattenFooterItems(items).map(({ item }) => item);
 }
 
-function StandardFooterColumn({ menu }: { menu: CmsMenu }) {
-  const links = flattenMenuLinks((menu.items as MenuItem[]) || []);
-  if (links.length === 0) return null;
+function menuItemsToLinks(items: MenuItem[] | undefined, testIdPrefix: string) {
+  return flattenMenuLinks(items || []).map((item) => ({
+    href: item.url,
+    label: item.label === "Project Gallery" ? "Gallery" : item.label,
+    openInNewTab: item.openInNewTab,
+    testId: `${testIdPrefix}-${item.id}`,
+  }));
+}
+
+function uniqueFooterLinks<T extends { href: string; label: string }>(links: T[]) {
+  const seen = new Set<string>();
+  return links.filter((link) => {
+    const key = `${link.label.toLowerCase()}|${link.href}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function FooterTextLink({ link }: { link: FooterLegalLink }) {
+  const className = "text-slate-400 transition-colors hover:text-white";
+  if (link.openInNewTab) {
+    return (
+      <a
+        href={link.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={className}
+        data-testid={link.testId}
+      >
+        {link.label}
+      </a>
+    );
+  }
+
+  if (link.href.startsWith("tel:") || link.href.startsWith("mailto:")) {
+    return (
+      <a href={link.href} className={className} data-testid={link.testId}>
+        {link.label}
+      </a>
+    );
+  }
 
   return (
-    <div>
-      <h4 className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-white sm:mb-4">
-        {menu.name}
-      </h4>
-      <ul className="space-y-2.5 sm:space-y-3 text-sm">
-        {links.map((item) => (
-          <li key={item.id}>
-            {item.openInNewTab ? (
-              <a
-                href={item.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-slate-400 transition-colors hover:text-white"
-                data-testid={`link-footer-${item.id}`}
-              >
-                {item.label}
-              </a>
-            ) : (
-              <Link
-                href={item.url}
-                className="text-slate-400 transition-colors hover:text-white"
-                data-testid={`link-footer-${item.id}`}
-              >
-                {item.label}
-              </Link>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <Link href={link.href} className={className} data-testid={link.testId}>
+      {link.label}
+    </Link>
+  );
+}
+
+function ContactInfoItem({
+  icon: Icon,
+  children,
+}: {
+  icon: typeof MapPin;
+  children: ReactNode;
+}) {
+  return (
+    <li className="flex items-start gap-3 text-sm leading-6 text-slate-400">
+      <Icon className="mt-0.5 h-5 w-5 shrink-0 text-cyan-500" aria-hidden="true" />
+      <span>{children}</span>
+    </li>
   );
 }
 
 export function Footer() {
-  const { frontendLogoUrl, companyName } = useBranding();
+  const { frontendLogoUrl, companyAddress, companyName, companyPhoneNumbers } = useBranding();
   const { data: publicMenus } = useQuery<Partial<Record<PublicMenuLocation, CmsMenu>>>({
     queryKey: ["/api/cms/menus"],
     queryFn: async () => {
@@ -188,58 +162,50 @@ export function Footer() {
     return items.length > 0 ? items : null;
   }, [publicMenus]);
 
-  const standardFooterMenus = useMemo(
-    () =>
-      [
-        publicMenus?.footer_platform,
-        publicMenus?.footer_professionals,
-        publicMenus?.footer_resources,
-        publicMenus?.footer_company,
-      ].filter((menu): menu is CmsMenu =>
-        Boolean(menu && Array.isArray(menu.items) && menu.items.length > 0),
-      ),
-    [publicMenus],
-  );
+  const servicesLinks = useMemo(() => {
+    const platformLinks = menuItemsToLinks(publicMenus?.footer_platform?.items as MenuItem[] | undefined, "link-footer-platform");
+    const professionalLinks = menuItemsToLinks(publicMenus?.footer_professionals?.items as MenuItem[] | undefined, "link-footer-professionals");
+    const galleryLinks = menuItemsToLinks(publicMenus?.footer_resources?.items as MenuItem[] | undefined, "link-footer-resources")
+      .filter((link) => /gallery/i.test(link.label));
+    const cmsLinks = uniqueFooterLinks([...platformLinks, ...professionalLinks, ...galleryLinks])
+      .filter((link) => !/quote/i.test(link.label));
 
-  const legalLinks = useMemo(() => {
-    const legalMenu = publicMenus?.footer_legal;
-    if (!legalMenu?.items) return defaultLegalLinks;
-
-    const items = flattenMenuLinks((legalMenu.items as MenuItem[]) || []);
-    if (items.length === 0) return defaultLegalLinks;
-
-    return items.map((item) => ({
-      href: item.url,
-      label: item.label,
-      openInNewTab: item.openInNewTab,
-      testId: `link-footer-${item.id}`,
-    }));
+    return cmsLinks.length > 0 ? cmsLinks.slice(0, 6) : defaultPlatformLinks;
   }, [publicMenus]) as FooterLegalLink[];
 
-  const useStandardFooterMenus = standardFooterMenus.length > 0;
+  const companyLinks = useMemo(() => {
+    const links = menuItemsToLinks(publicMenus?.footer_company?.items as MenuItem[] | undefined, "link-footer-company");
+    return links.length > 0 ? links : defaultCompanyLinks;
+  }, [publicMenus]) as FooterLegalLink[];
+
   const brandLogo = frontendLogoUrl || "/images/glass-door-pro/logo.png";
   const brandName = companyName || "Glass & Door Pro";
+  const address = (companyAddress || "2341 Waverly Dr, Monroe, NC 28112").replace(/\s*\n\s*/g, ", ");
+  const phone = companyPhoneNumbers || "(704) 771-6111";
+  const phoneLink = companyLinks.find((link) => link.href.startsWith("tel:"))?.href || "tel:+17047716111";
+  const emailLink =
+    companyLinks.find((link) => link.href.startsWith("mailto:")) || {
+      href: "mailto:Doug@GlassandDoorPro.com",
+      label: "Doug@GlassandDoorPro.com",
+      testId: "link-footer-email",
+    };
 
   return (
-    <footer className="border-t border-slate-800 bg-slate-950 text-slate-200" data-testid="footer">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:py-16">
-        <div
-          className={`grid grid-cols-2 sm:grid-cols-2 ${useStandardFooterMenus ? "lg:grid-cols-6" : "lg:grid-cols-5"} gap-8 sm:gap-10 lg:gap-12`}
-        >
-          <div className="col-span-2">
-            <div className="mb-4 inline-flex rounded bg-white p-3">
-              <img src={brandLogo} alt={brandName} className="h-12 w-auto sm:h-14" />
+    <footer className="border-t border-slate-800 bg-slate-900 text-slate-200" data-testid="footer">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12">
+        <div className="grid gap-10 lg:grid-cols-[1.25fr_0.9fr_1.25fr] lg:gap-20">
+          <div>
+            <div className="mb-5 inline-flex bg-white p-1.5">
+              <img src={brandLogo} alt={brandName} className="h-12 w-auto sm:h-11" />
             </div>
-            <p className="max-w-sm text-sm leading-7 text-slate-400">
-              Specializing in frameless glass showers, residential window replacements and
-              repairs, door installations, and commercial glass throughout the greater Charlotte
-              area.
+            <p className="max-w-md text-sm leading-7 text-slate-400">
+              Specializing in frameless glass shower doors, residential window replacements and
+              repairs, door installations, and commercial glass replacements and installations in
+              the greater Charlotte area.
             </p>
           </div>
 
-          {useStandardFooterMenus ? (
-            standardFooterMenus.map((menu) => <StandardFooterColumn key={menu.id} menu={menu} />)
-          ) : legacyFooterItems ? (
+          {legacyFooterItems ? (
             legacyFooterItems.map((item) =>
               item.children && item.children.length > 0 ? (
                 <DynamicFooterColumn key={item.id} item={item} />
@@ -273,50 +239,43 @@ export function Footer() {
             )
           ) : (
             <>
-              <FooterColumn title="Services" links={defaultPlatformLinks} />
-              <FooterColumn title="More Services" links={defaultTherapistLinks} />
-              <div className="col-span-2 sm:col-span-1">
-                <FooterColumn title="Resources" links={defaultResourceLinks} />
-                <div className="mt-6 sm:mt-8">
-                  <FooterColumn title="Company" links={defaultCompanyLinks} />
-                </div>
+              <div>
+                <h4 className="mb-4 text-base font-bold text-white">Services</h4>
+                <ul className="space-y-2.5 text-sm sm:space-y-3">
+                  {servicesLinks.map((link) => (
+                    <li key={link.testId}>
+                      <FooterTextLink link={link} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="mb-4 text-base font-bold text-white">Contact Info</h4>
+                <ul className="space-y-3">
+                  <ContactInfoItem icon={MapPin}>{address}</ContactInfoItem>
+                  <ContactInfoItem icon={Phone}>
+                    <a href={phoneLink} className="transition-colors hover:text-white">
+                      {phone}
+                    </a>
+                  </ContactInfoItem>
+                  <ContactInfoItem icon={Mail}>
+                    <a href={emailLink.href} className="transition-colors hover:text-white">
+                      {emailLink.label}
+                    </a>
+                  </ContactInfoItem>
+                  <ContactInfoItem icon={Clock}>Mon-Sat: 7am - 6pm</ContactInfoItem>
+                </ul>
               </div>
             </>
           )}
         </div>
 
         <div
-          className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-slate-800 pt-6 text-sm text-slate-400 sm:mt-10 sm:flex-row sm:gap-4"
+          className="mt-10 border-t border-slate-800 pt-8 text-center text-sm text-slate-500"
           data-testid="text-copyright"
         >
-          <span className="text-center sm:text-left">
-            &copy; {new Date().getFullYear()} {brandName}. All rights reserved.
-          </span>
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-            {legalLinks.map((link) =>
-              link.openInNewTab ? (
-                <a
-                  key={link.testId}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white transition-colors"
-                  data-testid={link.testId}
-                >
-                  {link.label}
-                </a>
-              ) : (
-                <Link
-                  key={link.testId}
-                  href={link.href}
-                  className="hover:text-white transition-colors"
-                  data-testid={link.testId}
-                >
-                  {link.label}
-                </Link>
-              ),
-            )}
-          </div>
+          &copy; {new Date().getFullYear()} {brandName}. All rights reserved.
         </div>
       </div>
     </footer>
