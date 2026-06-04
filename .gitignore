@@ -1,0 +1,13 @@
+node_modules
+dist
+.DS_Store
+server/public
+uploads
+vite.config.ts.*
+*.tar.gz
+.playwright-cli
+attached_assets/Pasted-*
+attached_assets/Screenshot_*
+attached_assets/targeted_element_*
+attached_assets/IMG_0002_1772999860333.jpeg
+attached_assets/IMG_0003_1773001677731.png
