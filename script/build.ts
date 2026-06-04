@@ -22,8 +22,8 @@ async function buildAll() {
       "process.env.NODE_ENV": '"production"',
       __APP_VERSION__: JSON.stringify(packageJson.version ?? "unknown"),
     },
-    minify: true,
-    packages: "bundle",
+    minify: false,
+    packages: "external",
     logLevel: "info",
   });
 
