@@ -227,7 +227,9 @@ export function Footer() {
           className={`grid grid-cols-2 sm:grid-cols-2 ${useStandardFooterMenus ? "lg:grid-cols-6" : "lg:grid-cols-5"} gap-8 sm:gap-10 lg:gap-12`}
         >
           <div className="col-span-2">
-            <img src={brandLogo} alt={brandName} className="mb-4 h-12 w-auto brightness-0 invert sm:h-14" />
+            <div className="mb-4 inline-flex rounded bg-white p-3">
+              <img src={brandLogo} alt={brandName} className="h-12 w-auto sm:h-14" />
+            </div>
             <p className="max-w-sm text-sm leading-7 text-slate-400">
               Specializing in frameless glass showers, residential window replacements and
               repairs, door installations, and commercial glass throughout the greater Charlotte
