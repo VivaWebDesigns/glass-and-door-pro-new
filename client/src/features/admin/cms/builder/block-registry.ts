@@ -147,6 +147,7 @@ const HERO_LAYOUT_OPTIONS = [
 const HERO_VARIANT_OPTIONS = [
   { label: "Default", value: "default" },
   { label: "Glass Home", value: "glass-home" },
+  { label: "Glass Service", value: "glass-service" },
 ];
 
 const CARDS_GRID_VARIANT_OPTIONS = [

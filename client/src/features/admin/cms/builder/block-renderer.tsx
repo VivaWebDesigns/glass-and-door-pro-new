@@ -106,6 +106,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
   const bg = resolveCmsAssetUrl(str(props.backgroundImageUrl));
   const videoBg = str(props.videoBackgroundUrl);
   const variant = str(props.variant);
+  const isGlassService = variant === "glass-service";
   const opacity = num(props.overlayOpacity as number, 50);
   const overlayColor = normalizeHexColor(str(props.overlayColor)) || "#000000";
   const layout = str(props.layout) || "stacked";
@@ -115,7 +116,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
   const minHeightStyle = minH === "100vh" ? "100vh" : `${minH}px`;
   const bgPosX = Math.max(0, Math.min(100, num(props.backgroundPositionX as number, 50)));
   const bgPosY = Math.max(0, Math.min(100, num(props.backgroundPositionY as number, 50)));
-  const isSplit = layout === "split";
+  const isSplit = layout === "split" || isGlassService;
   const overlayStrength = Math.max(0, Math.min(opacity, 100)) / 100;
   const sectionStyleConfig = getSectionStyleConfig(props, { resolveAssetUrl: resolveCmsAssetUrl });
   const overlayStyle = { backgroundColor: hexToRgba(overlayColor, overlayStrength) };
@@ -199,7 +200,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
           )}
         </div>
       </div>
-      {isSplit && bg && (
+      {isSplit && bg && !isGlassService && (
         <div className="hidden md:block absolute right-0 top-0 bottom-0 w-1/3">
           <img src={bg} alt="" className="w-full h-full object-cover" />
         </div>
