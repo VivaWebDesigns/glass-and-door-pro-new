@@ -112,6 +112,11 @@ const LUCIDE_MAP: Record<string, React.ElementType> = {
   Wrench,
 };
 
+const GLASS_CTA_PRIMARY_CLASS =
+  "rounded-md border border-white bg-[#1a8ead] px-8 text-white shadow-sm hover:bg-[#167f9b] hover:text-white";
+const GLASS_CTA_SECONDARY_CLASS =
+  "rounded-md border border-white bg-transparent px-8 text-white shadow-sm hover:bg-white/10 hover:text-white";
+
 function LucideIcon({ name, className }: { name: string; className?: string }) {
   const Icon = LUCIDE_MAP[name] ?? Globe;
   return <Icon className={className} />;
@@ -267,7 +272,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
               modalTitle={props.ctaModalTitle}
               modalDescription={props.ctaModalDescription}
               size="lg"
-              className="w-full rounded-full bg-white px-7 text-primary shadow-lg hover:bg-white/90 sm:w-auto"
+              className={`w-full sm:w-auto ${isGlassService ? GLASS_CTA_PRIMARY_CLASS : "rounded-full bg-white px-7 text-primary shadow-lg hover:bg-white/90"}`}
               testId="hero-cta-primary"
             />
           )}
@@ -282,7 +287,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
               modalDescription={props.ctaSecondaryModalDescription}
               size="lg"
               variant="outline"
-              className="w-full rounded-full border-white/60 bg-white/10 px-7 text-white shadow-sm backdrop-blur hover:bg-white/20 sm:w-auto"
+              className={`w-full sm:w-auto ${isGlassService ? GLASS_CTA_SECONDARY_CLASS : "rounded-full border-white/60 bg-white/10 px-7 text-white shadow-sm backdrop-blur hover:bg-white/20"}`}
               testId="hero-cta-secondary"
             />
           )}
@@ -550,8 +555,8 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
             modalTitle={props.primaryModalTitle}
             modalDescription={props.primaryModalDescription}
             size="lg"
-            variant={variant === "dark" || isGlassService ? "secondary" : "default"}
-            className={`w-full sm:w-auto ${isGlassService ? "rounded-md px-8 text-primary hover:bg-white/90" : "rounded-full"}`}
+            variant={isGlassService ? "default" : variant === "dark" ? "secondary" : "default"}
+            className={`w-full sm:w-auto ${isGlassService ? GLASS_CTA_PRIMARY_CLASS : "rounded-full"}`}
             testId="cta-primary"
           />
         )}
@@ -566,7 +571,7 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
             modalDescription={props.secondaryModalDescription}
             size="lg"
             variant="outline"
-            className={`w-full sm:w-auto ${isGlassService ? "rounded-md border-white text-white hover:bg-white hover:text-primary" : "rounded-full"}`}
+            className={`w-full sm:w-auto ${isGlassService ? GLASS_CTA_SECONDARY_CLASS : "rounded-full"}`}
             testId="cta-secondary"
           />
         )}
