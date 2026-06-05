@@ -697,14 +697,14 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
     const showGoogleIcon = (item.sourceIcon || source).toLowerCase() === "google";
 
     return (
-      <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+      <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
         {showGoogleIcon ? (
-          <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-200 bg-white text-[11px] font-bold shadow-sm">
+          <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#1a8ead]/25 bg-[#e9f7fb] text-[11px] font-bold shadow-sm">
             <span className="text-[#4285F4]">G</span>
           </span>
         ) : null}
         <span>{source}</span>
-        {item.date ? <span className="font-normal text-slate-400">· {item.date}</span> : null}
+        {item.date ? <span className="font-medium text-[#1a8ead]">· {item.date}</span> : null}
       </div>
     );
   }
@@ -781,7 +781,7 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
           </Carousel>
           {ctaText && ctaLink ? (
             <div className="mt-7 flex justify-center">
-              <Button asChild variant="outline" className="border-accent text-accent hover:bg-accent hover:text-white">
+              <Button asChild variant="outline" className="border-[#1a8ead] bg-white text-[#1a8ead] hover:bg-[#1a8ead] hover:text-white">
                 <a href={ctaLink} target="_blank" rel="noopener noreferrer">
                   {ctaText}
                   <ExternalLink className="ml-2 h-4 w-4" aria-hidden="true" />
@@ -797,7 +797,7 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
       )}
       {!shouldCarousel && ctaText && ctaLink ? (
         <div className="mt-7 flex justify-center">
-          <Button asChild variant="outline" className="border-accent text-accent hover:bg-accent hover:text-white">
+          <Button asChild variant="outline" className="border-[#1a8ead] bg-white text-[#1a8ead] hover:bg-[#1a8ead] hover:text-white">
             <a href={ctaLink} target="_blank" rel="noopener noreferrer">
               {ctaText}
               <ExternalLink className="ml-2 h-4 w-4" aria-hidden="true" />
