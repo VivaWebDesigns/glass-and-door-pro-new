@@ -782,6 +782,8 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     propDefs: [
       { key: "title", label: "Section Title", type: "text", placeholder: "Testimonials heading" },
       { key: "variant", label: "Design Variant", type: "select", options: TESTIMONIAL_VARIANT_OPTIONS },
+      { key: "ctaText", label: "CTA Button Text", type: "text", placeholder: "Optional button label" },
+      { key: "ctaLink", label: "CTA Button Link", type: "url", placeholder: "https://..." },
       {
         key: "items",
         label: "Testimonials",

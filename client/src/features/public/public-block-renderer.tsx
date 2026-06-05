@@ -678,6 +678,8 @@ function FaqBlock({ props }: { props: Record<string, unknown> }) {
 
 function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
   const variant = str(props.variant);
+  const ctaText = str(props.ctaText);
+  const ctaLink = str(props.ctaLink);
   const items = arr<{
     quote: string;
     name: string;
@@ -777,12 +779,32 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
               <CarouselNext className="static h-9 w-9 translate-x-0 translate-y-0 border-border/70 bg-background/95" />
             </div>
           </Carousel>
+          {ctaText && ctaLink ? (
+            <div className="mt-7 flex justify-center">
+              <Button asChild variant="outline" className="border-accent text-accent hover:bg-accent hover:text-white">
+                <a href={ctaLink} target="_blank" rel="noopener noreferrer">
+                  {ctaText}
+                  <ExternalLink className="ml-2 h-4 w-4" aria-hidden="true" />
+                </a>
+              </Button>
+            </div>
+          ) : null}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {items.map((item, i) => renderCard(item, i))}
         </div>
       )}
+      {!shouldCarousel && ctaText && ctaLink ? (
+        <div className="mt-7 flex justify-center">
+          <Button asChild variant="outline" className="border-accent text-accent hover:bg-accent hover:text-white">
+            <a href={ctaLink} target="_blank" rel="noopener noreferrer">
+              {ctaText}
+              <ExternalLink className="ml-2 h-4 w-4" aria-hidden="true" />
+            </a>
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }

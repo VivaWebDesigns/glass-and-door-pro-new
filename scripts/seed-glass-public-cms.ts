@@ -646,6 +646,8 @@ const glassReviewsContent: InsertCmsPage["content"] = {
       sectionBackgroundColor: "#ffffff",
       sectionPaddingTop: "md",
       sectionPaddingBottom: "lg",
+      ctaText: "Read all reviews on Google",
+      ctaLink: "https://share.google/XGkNPblei2YGTC8FB",
       items: glassReviewItems,
     }),
   ],
