@@ -298,10 +298,10 @@ const blocks: BlockInstance[] = [
       ctaSecondaryModalDescription: "Share a few project details and Doug will follow up with next steps.",
       backgroundImageUrl: "/images/glass-door-pro/reviews-hero-1920w.webp",
       overlayColor: "#0f172a",
-      overlayOpacity: 58,
-      minHeight: "560",
+      overlayOpacity: 18,
+      minHeight: "660",
       backgroundPositionX: 50,
-      backgroundPositionY: 50,
+      backgroundPositionY: 46,
     },
   },
   {

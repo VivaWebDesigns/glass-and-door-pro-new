@@ -126,6 +126,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
   const overlayStrength = Math.max(0, Math.min(opacity, 100)) / 100;
   const sectionStyleConfig = getSectionStyleConfig(props, { resolveAssetUrl: resolveCmsAssetUrl });
   const overlayStyle = { backgroundColor: hexToRgba(overlayColor, overlayStrength) };
+  const isGlassReviews = variant === "glass-reviews";
   const headingTextStyle = colorStyle(props.headingColor);
   const accentHeadingTextStyle = colorStyle(props.accentHeadingColor);
   const subheadingTextStyle = colorStyle(props.subheadingColor);
@@ -151,7 +152,20 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
           <source src={videoBg} type="video/mp4" />
         </video>
       )}
-      <div className="absolute inset-0" style={overlayStyle} />
+      {isGlassReviews ? (
+        <>
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(15, 23, 42, 0.08) 0%, rgba(15, 23, 42, 0.18) 45%, rgba(15, 23, 42, 0.58) 100%)",
+            }}
+          />
+          <div className="absolute inset-0 bg-slate-950/10" />
+        </>
+      ) : (
+        <div className="absolute inset-0" style={overlayStyle} />
+      )}
       <div className={`relative z-10 px-8 py-16 ${isSplit ? "max-w-2xl" : "max-w-3xl mx-auto"}`}>
         {badge && (
           <span className="inline-block px-3 py-1 rounded-full bg-accent/20 text-accent text-xs font-semibold mb-4 border border-accent/30">

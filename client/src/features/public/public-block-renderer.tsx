@@ -187,6 +187,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
   const overlayStrength = Math.max(0, Math.min(opacity, 100)) / 100;
   const sectionStyleConfig = getSectionStyleConfig(props, { resolveAssetUrl: resolveCmsAssetUrl });
   const overlayStyle = { backgroundColor: hexToRgba(overlayColor, overlayStrength) };
+  const isGlassReviews = variant === "glass-reviews";
   const headingTextStyle = colorStyle(props.headingColor);
   const accentHeadingTextStyle = colorStyle(props.accentHeadingColor);
   const subheadingTextStyle = colorStyle(props.subheadingColor);
@@ -229,8 +230,23 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
           <source src={videoBg} type="video/mp4" />
         </video>
       )}
-      <div className="absolute inset-0" style={overlayStyle} />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-background/35 to-transparent" />
+      {isGlassReviews ? (
+        <>
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(15, 23, 42, 0.08) 0%, rgba(15, 23, 42, 0.18) 45%, rgba(15, 23, 42, 0.58) 100%)",
+            }}
+          />
+          <div className="absolute inset-0 bg-slate-950/10" />
+        </>
+      ) : (
+        <>
+          <div className="absolute inset-0" style={overlayStyle} />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-background/35 to-transparent" />
+        </>
+      )}
       <div
         className={`relative z-10 px-6 py-20 sm:px-8 sm:py-24 md:py-28 ${isSplit ? "max-w-3xl lg:ml-[max(2rem,calc((100vw-80rem)/2))]" : "max-w-4xl mx-auto"}`}
       >
