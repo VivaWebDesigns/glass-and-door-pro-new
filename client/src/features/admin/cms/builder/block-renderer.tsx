@@ -112,6 +112,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
   const videoBg = str(props.videoBackgroundUrl);
   const variant = str(props.variant);
   const isGlassService = variant === "glass-service";
+  const usesGlassCtas = isGlassService || variant === "glass-reviews";
   const opacity = num(props.overlayOpacity as number, 50);
   const overlayColor = normalizeHexColor(str(props.overlayColor)) || "#000000";
   const layout = str(props.layout) || "stacked";
@@ -184,7 +185,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
               modalTitle={props.ctaModalTitle}
               modalDescription={props.ctaModalDescription}
               size="lg"
-              className={isGlassService ? GLASS_CTA_PRIMARY_CLASS : "bg-accent text-accent-foreground hover:bg-accent/90"}
+              className={usesGlassCtas ? GLASS_CTA_PRIMARY_CLASS : "bg-accent text-accent-foreground hover:bg-accent/90"}
               testId="hero-cta-primary"
             />
           )}
@@ -199,7 +200,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
               modalDescription={props.ctaSecondaryModalDescription}
               size="lg"
               variant="outline"
-              className={isGlassService ? GLASS_CTA_SECONDARY_CLASS : "border-white text-white hover:bg-white/10"}
+              className={usesGlassCtas ? GLASS_CTA_SECONDARY_CLASS : "border-white text-white hover:bg-white/10"}
               testId="hero-cta-secondary"
             />
           )}

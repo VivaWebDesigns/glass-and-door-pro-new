@@ -149,6 +149,7 @@ const HERO_VARIANT_OPTIONS = [
   { label: "Default", value: "default" },
   { label: "Glass Home", value: "glass-home" },
   { label: "Glass Service", value: "glass-service" },
+  { label: "Glass Reviews", value: "glass-reviews" },
 ];
 
 const CARDS_GRID_VARIANT_OPTIONS = [

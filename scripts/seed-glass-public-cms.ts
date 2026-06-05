@@ -629,14 +629,29 @@ const glassGalleryContent: InsertCmsPage["content"] = {
 
 const glassReviewsContent: InsertCmsPage["content"] = {
   blocks: [
-    block("section-header", {
-      title: "Customer Reviews",
-      subtitle:
-        "5.0 stars from customers across the Charlotte area who trusted Glass & Door Pro for showers, windows, doors, repairs, and commercial glass.",
-      alignment: "center",
-      sectionBackgroundColor: "#f0f8fb",
-      sectionPaddingTop: "lg",
-      sectionPaddingBottom: "lg",
+    block("hero", {
+      anchorId: "reviews-hero",
+      variant: "glass-reviews",
+      layout: "stacked",
+      badge: "Customer Reviews",
+      heading: "What Charlotte Customers Say About Glass & Door Pro",
+      subheading:
+        "<p>Real feedback from homeowners and businesses who trusted Doug for showers, windows, doors, repairs, and commercial glass.</p>",
+      ctaText: "Read all reviews on Google",
+      ctaAction: "custom-link",
+      ctaLink: "https://share.google/XGkNPblei2YGTC8FB",
+      ctaOpenInNewTab: true,
+      ctaSecondaryText: "Request a Free Estimate",
+      ctaSecondaryAction: "form-modal",
+      ctaSecondaryFormSlug: "contact-form",
+      ctaSecondaryModalTitle: "Request a Free Estimate",
+      ctaSecondaryModalDescription: "Share a few project details and Doug will follow up with next steps.",
+      backgroundImageUrl: "/images/glass-door-pro/reviews-hero-1920w.webp",
+      overlayColor: "#0f172a",
+      overlayOpacity: 58,
+      minHeight: "560",
+      backgroundPositionX: 50,
+      backgroundPositionY: 50,
     }),
     block("testimonials", {
       anchorId: "reviews",
@@ -646,8 +661,6 @@ const glassReviewsContent: InsertCmsPage["content"] = {
       sectionBackgroundColor: "#ffffff",
       sectionPaddingTop: "md",
       sectionPaddingBottom: "lg",
-      ctaText: "Read all reviews on Google",
-      ctaLink: "https://share.google/XGkNPblei2YGTC8FB",
       items: glassReviewItems,
     }),
   ],

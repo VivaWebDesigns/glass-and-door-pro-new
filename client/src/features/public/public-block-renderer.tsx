@@ -173,6 +173,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
   const videoBg = str(props.videoBackgroundUrl);
   const variant = str(props.variant);
   const isGlassService = variant === "glass-service";
+  const usesGlassCtas = isGlassService || variant === "glass-reviews";
   const opacity = num(props.overlayOpacity as number, 50);
   const overlayColor = normalizeHexColor(str(props.overlayColor)) || "#000000";
   const layout = str(props.layout) || "stacked";
@@ -272,7 +273,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
               modalTitle={props.ctaModalTitle}
               modalDescription={props.ctaModalDescription}
               size="lg"
-              className={`w-full sm:w-auto ${isGlassService ? GLASS_CTA_PRIMARY_CLASS : "rounded-full bg-white px-7 text-primary shadow-lg hover:bg-white/90"}`}
+              className={`w-full sm:w-auto ${usesGlassCtas ? GLASS_CTA_PRIMARY_CLASS : "rounded-full bg-white px-7 text-primary shadow-lg hover:bg-white/90"}`}
               testId="hero-cta-primary"
             />
           )}
@@ -287,7 +288,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
               modalDescription={props.ctaSecondaryModalDescription}
               size="lg"
               variant="outline"
-              className={`w-full sm:w-auto ${isGlassService ? GLASS_CTA_SECONDARY_CLASS : "rounded-full border-white/60 bg-white/10 px-7 text-white shadow-sm backdrop-blur hover:bg-white/20"}`}
+              className={`w-full sm:w-auto ${usesGlassCtas ? GLASS_CTA_SECONDARY_CLASS : "rounded-full border-white/60 bg-white/10 px-7 text-white shadow-sm backdrop-blur hover:bg-white/20"}`}
               testId="hero-cta-secondary"
             />
           )}
