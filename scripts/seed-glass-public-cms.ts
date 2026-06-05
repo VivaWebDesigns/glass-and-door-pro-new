@@ -302,7 +302,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
       props: {
         anchorId: "hero",
         variant: "glass-home",
-        heading: "We've got your glass and door needs covered.",
+        heading: "We've got your glass & door needs covered.",
         subheading:
           "<p>Specializing in frameless glass showers, windows, and doors for homeowners in Charlotte, NC.</p>",
         ctaText: "Get a Free Quote",
@@ -634,7 +634,7 @@ const glassReviewsContent: InsertCmsPage["content"] = {
       variant: "glass-reviews",
       layout: "stacked",
       badge: "Customer Reviews",
-      heading: "What Charlotte Customers Say About Glass and Door Pro",
+      heading: "What Charlotte Customers Say About Glass & Door Pro",
       subheading:
         "<p>Real feedback from homeowners and businesses who trusted Doug for showers, windows, doors, repairs, and commercial glass.</p>",
       ctaText: "Read all reviews on Google",
@@ -656,7 +656,7 @@ const glassReviewsContent: InsertCmsPage["content"] = {
     block("testimonials", {
       anchorId: "reviews",
       title: "Latest Google Reviews",
-      subtitle: "Newest first from the Glass and Door Pro Google Business Profile.",
+      subtitle: "Newest first from the Glass & Door Pro Google Business Profile.",
       variant: "google-carousel",
       sectionBackgroundColor: "#ffffff",
       sectionPaddingTop: "md",
@@ -1344,7 +1344,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       intro: {
         title: "Commercial Glass Solutions for Your Business",
         content:
-          "<p>Your business space needs glass that looks professional, performs reliably, and supports the way your team and customers use the building. Glass and Door Pro provides commercial glass installation and repair with clear communication, careful workmanship, and responsive service.</p>",
+          "<p>Your business space needs glass that looks professional, performs reliably, and supports the way your team and customers use the building. Glass & Door Pro provides commercial glass installation and repair with clear communication, careful workmanship, and responsive service.</p>",
       },
       cardsTitle: "Our Commercial Glass Services",
       cards: [
@@ -1418,7 +1418,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         },
         {
           icon: "BadgeCheck",
-          title: "Licensed and Insured",
+          title: "Licensed & Insured",
           description: "Professional service with the credentials commercial properties expect.",
         },
         {

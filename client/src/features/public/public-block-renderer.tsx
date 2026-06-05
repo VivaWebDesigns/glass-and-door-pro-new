@@ -37,7 +37,7 @@ import {
   SPACING_MAP,
   str,
 } from "@/features/admin/cms/builder/block-renderer.shared";
-import { publicDisplayText, SectionHeading } from "@/features/admin/cms/builder/section-heading";
+import { renderPublicDisplayText, SectionHeading } from "@/features/admin/cms/builder/section-heading";
 import { getEventPath } from "@shared/event-url";
 import {
   Globe,
@@ -259,12 +259,12 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
           className={`mb-5 font-heading font-bold leading-tight text-white ${variant === "glass-home" ? "text-4xl sm:text-5xl md:text-6xl lg:text-7xl" : "text-4xl sm:text-5xl md:text-6xl"}`}
           style={headingTextStyle}
         >
-          {publicDisplayText(str(props.heading) || "Hero Heading")}
+          {renderPublicDisplayText(str(props.heading) || "Hero Heading")}
           {accentHeading && (
             <>
               {" "}
               <span className="text-accent" style={accentHeadingTextStyle}>
-                {publicDisplayText(accentHeading)}
+                {renderPublicDisplayText(accentHeading)}
               </span>
             </>
           )}

@@ -1,4 +1,4 @@
-import type { ElementType } from "react";
+import type { ElementType, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 type HeadingLevel = "h1" | "h2";
@@ -17,8 +17,16 @@ function str(v: unknown): string {
   return typeof v === "string" ? v : "";
 }
 
-export function publicDisplayText(value: string): string {
-  return value.replace(/\s&\s/g, " and ");
+export function renderPublicDisplayText(value: string): ReactNode {
+  return value.split(/(\s&\s)/g).map((part, index) =>
+    part === " & " ? (
+      <span key={`${part}-${index}`} className="font-sans">
+        {" & "}
+      </span>
+    ) : (
+      part
+    )
+  );
 }
 
 function headingLevel(v: unknown): HeadingLevel {
@@ -38,8 +46,8 @@ export function SectionHeading({
   subtitleClassName,
   fallbackTitle,
 }: SectionHeadingProps) {
-  const eyebrow = publicDisplayText(str(props.sectionEyebrow) || str(props.eyebrow));
-  const title = publicDisplayText(str(props.title) || str(props.heading) || fallbackTitle || "");
+  const eyebrow = str(props.sectionEyebrow) || str(props.eyebrow);
+  const title = str(props.title) || str(props.heading) || fallbackTitle || "";
   const subtitle = str(props.subtitle) || str(props.subheading);
   const level = headingLevel(props.sectionHeadingLevel ?? props.headingLevel);
   const alignment = headingAlignment(props.sectionHeadingAlignment ?? props.alignment, defaultAlignment);
@@ -63,7 +71,7 @@ export function SectionHeading({
       )}
       {title && (
         <HeadingTag className={cn(defaultTitleClass, titleClassName)}>
-          {title}
+          {renderPublicDisplayText(title)}
         </HeadingTag>
       )}
       {subtitle && (
