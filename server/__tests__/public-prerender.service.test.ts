@@ -184,6 +184,16 @@ describe("public-prerender.service", () => {
     expect(snapshot?.bodyHtml).toContain("Glass &amp; Door Pro project photos");
   });
 
+  it("returns a reviews fallback snapshot when the CMS reviews page is not seeded", async () => {
+    const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
+
+    const snapshot = await getPublicHtmlSnapshot("/reviews");
+
+    expect(snapshot?.title).toContain("Customer Reviews");
+    expect(snapshot?.canonicalUrl).toBe("https://coreplatform.com/reviews");
+    expect(snapshot?.bodyHtml).toContain("Glass &amp; Door Pro customer reviews");
+  });
+
   it("returns a prerender snapshot for blog posts and event detail pages", async () => {
     mockGetPostBySlug.mockResolvedValue(blogPost);
     mockGetEventByIdentifier.mockResolvedValue(event);

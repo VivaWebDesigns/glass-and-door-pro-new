@@ -31,7 +31,7 @@ import type { CmsMenu, MenuItem, PublicMenuLocation } from "@shared/schema";
 const defaultNavLinks = [
   { label: "About", href: "/#about" },
   { label: "Services", href: "/#services" },
-  { label: "Reviews", href: "/#reviews" },
+  { label: "Reviews", href: "/reviews" },
 ];
 
 const allResourceLinks: { label: string; href: string; hideFromClients?: boolean }[] = [];
@@ -39,6 +39,9 @@ const allResourceLinks: { label: string; href: string; hideFromClients?: boolean
 function normalizePublicMenuUrl(item: Pick<MenuItem, "label" | "url">) {
   if (/gallery/i.test(item.label) && item.url === "/#gallery") {
     return "/gallery";
+  }
+  if (/reviews?/i.test(item.label) && item.url === "/#reviews") {
+    return "/reviews";
   }
   return item.url;
 }

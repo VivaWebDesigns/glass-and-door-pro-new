@@ -12,6 +12,7 @@ const defaultPlatformLinks = [
   { href: "/#services", label: "Window Repair", testId: "link-footer-window-repair" },
   { href: "/#services", label: "Commercial Glass", testId: "link-footer-commercial-glass" },
   { href: "/#gallery", label: "Gallery", testId: "link-footer-gallery" },
+  { href: "/reviews", label: "Reviews", testId: "link-footer-reviews" },
 ];
 
 const defaultCompanyLinks = [
@@ -30,6 +31,9 @@ type FooterLegalLink = {
 function normalizeFooterMenuUrl(item: Pick<MenuItem, "label" | "url">) {
   if (/gallery/i.test(item.label) && item.url === "/#gallery") {
     return "/gallery";
+  }
+  if (/reviews?/i.test(item.label) && item.url === "/#reviews") {
+    return "/reviews";
   }
   return item.url;
 }
@@ -53,29 +57,32 @@ function DynamicFooterColumn({ item }: { item: MenuItem }) {
         {item.label}
       </h4>
       <ul className="space-y-2.5 sm:space-y-3 text-sm">
-        {allLinks.map(({ item: child, depth }) => (
-          <li key={child.id} style={depth > 0 ? { paddingLeft: `${depth * 12}px` } : undefined}>
-            {child.openInNewTab ? (
-              <a
-                href={child.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-slate-400 transition-colors hover:text-white"
-                data-testid={`link-footer-${child.id}`}
-              >
-                {child.label}
-              </a>
-            ) : (
-              <Link
-                href={child.url}
-                className="text-slate-400 transition-colors hover:text-white"
-                data-testid={`link-footer-${child.id}`}
-              >
-                {child.label}
-              </Link>
-            )}
-          </li>
-        ))}
+        {allLinks.map(({ item: child, depth }) => {
+          const href = normalizeFooterMenuUrl(child);
+          return (
+            <li key={child.id} style={depth > 0 ? { paddingLeft: `${depth * 12}px` } : undefined}>
+              {child.openInNewTab ? (
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-slate-400 transition-colors hover:text-white"
+                  data-testid={`link-footer-${child.id}`}
+                >
+                  {child.label}
+                </a>
+              ) : (
+                <Link
+                  href={href}
+                  className="text-slate-400 transition-colors hover:text-white"
+                  data-testid={`link-footer-${child.id}`}
+                >
+                  {child.label}
+                </Link>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
@@ -222,7 +229,7 @@ export function Footer() {
                     <li>
                       {item.openInNewTab ? (
                         <a
-                          href={item.url}
+                          href={normalizeFooterMenuUrl(item)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="font-semibold text-slate-400 transition-colors hover:text-white"
@@ -232,7 +239,7 @@ export function Footer() {
                         </a>
                       ) : (
                         <Link
-                          href={item.url}
+                          href={normalizeFooterMenuUrl(item)}
                           className="font-semibold text-slate-400 transition-colors hover:text-white"
                           data-testid={`link-footer-${item.id}`}
                         >

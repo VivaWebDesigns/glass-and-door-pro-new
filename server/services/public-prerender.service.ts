@@ -63,6 +63,13 @@ const FALLBACK_STATIC_PAGES: Record<
     body:
       "Browse recent Glass & Door Pro project photos, including frameless shower installations across Charlotte, Monroe, Indian Trail, and nearby communities.",
   },
+  "/reviews": {
+    title: "Customer Reviews",
+    description:
+      "Read customer reviews for Glass & Door Pro glass, shower, window, door, and commercial glass work in the Charlotte area.",
+    body:
+      "Read Glass & Door Pro customer reviews from homeowners and businesses across Charlotte, Monroe, Indian Trail, and nearby communities.",
+  },
   "/insights": {
     title: "Insights & Articles",
     description:

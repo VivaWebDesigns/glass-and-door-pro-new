@@ -410,6 +410,88 @@ const glassGalleryContent: InsertCmsPage["content"] = {
   ],
 };
 
+const glassReviewsContent: InsertCmsPage["content"] = {
+  blocks: [
+    block("section-header", {
+      title: "Customer Reviews",
+      subtitle:
+        "Hear from homeowners and businesses across the Charlotte area who trusted Glass & Door Pro.",
+      alignment: "center",
+      sectionBackgroundColor: "#ffffff",
+      sectionPaddingTop: "lg",
+      sectionPaddingBottom: "sm",
+    }),
+    block("testimonials", {
+      anchorId: "reviews",
+      title: "What Our Customers Say",
+      variant: "google-carousel",
+      sectionBackgroundColor: "#ffffff",
+      sectionPaddingTop: "sm",
+      sectionPaddingBottom: "lg",
+      items: [
+        {
+          quote:
+            "Doug was great. He's extremely detailed in his work. Will definitely use him again when I'm ready to upgrade the other shower door. Highly recommend!",
+          name: "Thomas F.",
+          role: "Customer",
+          location: "Google review",
+          rating: 5,
+          source: "Google",
+        },
+        {
+          quote:
+            "Very happy with the service by Doug. Fast out to give a quote, friendly and good communication, installation as promised and high quality product.",
+          name: "Leah O.",
+          role: "Customer",
+          location: "Google review",
+          rating: 5,
+          source: "Google",
+        },
+        {
+          quote:
+            "Doug was simply fantastic. Very thorough and the shower glass turned out amazing! Highly recommend!",
+          name: "Gary D.",
+          role: "Customer",
+          location: "Google review",
+          rating: 5,
+          source: "Google",
+        },
+        {
+          quote:
+            "Doug was a great communicator and made the whole process easy. He took great care during installation of my frameless shower glass to protect my Carrara Marble.",
+          name: "Tyler W.",
+          role: "Customer",
+          location: "Google review",
+          rating: 5,
+          source: "Google",
+        },
+        {
+          quote:
+            "Very pleased with the results on our frameless shower. Doug was great to work with, very responsive, and professional.",
+          name: "Will F.",
+          role: "Customer",
+          location: "Google review",
+          rating: 5,
+          source: "Google",
+        },
+        {
+          quote:
+            "Great work! Doug was very professional and did a super job with my house window glass replacements.",
+          name: "Pam",
+          role: "Customer",
+          location: "Google review",
+          rating: 5,
+          source: "Google",
+        },
+      ],
+    }),
+    serviceCtaBlock(
+      "Ready to Start Your Project?",
+      "Tell us about your glass, shower, window, door, or commercial project and Doug will follow up with next steps.",
+    ),
+  ],
+};
+
 type GlassCard = {
   icon: string;
   title: string;
@@ -1221,7 +1303,7 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
         item("Commercial Glass", "/services/commercial-glass"),
       ]),
       item("Gallery", "/gallery"),
-      item("Reviews", "/#reviews"),
+      item("Reviews", "/reviews"),
       item("Contact", "/#contact"),
     ],
   },
@@ -1249,7 +1331,7 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
     items: [
       item("About Doug", "/#about"),
       item("Project Gallery", "/gallery"),
-      item("Reviews", "/#reviews"),
+      item("Reviews", "/reviews"),
     ],
   },
   {
@@ -1283,7 +1365,7 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
         item("Commercial Glass", "/services/commercial-glass"),
       ]),
       item("Gallery", "/gallery"),
-      item("Reviews", "/#reviews"),
+      item("Reviews", "/reviews"),
       item("Contact", "/#contact"),
     ],
   },
@@ -1407,6 +1489,32 @@ async function seedGlassPublicCms() {
   } else {
     const page = await storage.cmsPages.createPage(galleryPayload);
     console.log(`  [created] gallery page (${page.id})`);
+  }
+
+  const existingReviews = await storage.cmsPages.getPageBySlug("reviews");
+  const reviewsPayload: InsertCmsPage = {
+    title: "Customer Reviews",
+    slug: "reviews",
+    pageType: "reviews",
+    status: "published",
+    template: "full-width",
+    content: glassReviewsContent,
+    seoTitle: "Customer Reviews",
+    seoDescription:
+      "Read customer reviews for Glass & Door Pro's frameless shower doors, window installation, door installation, window repair, and commercial glass work around Charlotte.",
+    seoKeywords:
+      "Glass & Door Pro reviews, Charlotte glass company reviews, shower door reviews, window installation reviews",
+    ogImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
+    canonicalUrl: "https://glass-and-door-pro-new-production.up.railway.app/reviews",
+    publishedAt: new Date(),
+  };
+
+  if (existingReviews) {
+    await storage.cmsPages.updatePage(existingReviews.id, reviewsPayload);
+    console.log(`  [updated] reviews page (${existingReviews.id})`);
+  } else {
+    const page = await storage.cmsPages.createPage(reviewsPayload);
+    console.log(`  [created] reviews page (${page.id})`);
   }
 
   for (const servicePage of glassServicePages) {
