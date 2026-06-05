@@ -10,6 +10,15 @@ import {
 
 const BrandingContext = createContext<BrandingSettings>(DEFAULT_BRANDING_SETTINGS);
 
+function resolveFaviconUrl(value: string | null | undefined) {
+  if (!value) return "/favicon-32x32.png?v=large-2";
+  if (/^\/favicon(?:-|\.|$)/.test(value)) {
+    const [path] = value.split("?");
+    return `${path}?v=large-2`;
+  }
+  return value;
+}
+
 export function BrandingProvider({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const { data } = useQuery<BrandingSettings>({
@@ -272,7 +281,9 @@ export function BrandingProvider({ children }: { children: React.ReactNode }) {
   ]);
 
   useEffect(() => {
-    const faviconHref = isAdminRoute ? "/favicon-32x32.png" : branding.faviconUrl || "/favicon-32x32.png";
+    const faviconHref = isAdminRoute
+      ? "/favicon-32x32.png?v=large-2"
+      : resolveFaviconUrl(branding.faviconUrl);
     let faviconEl = document.head.querySelector<HTMLLinkElement>('link[rel="icon"]');
 
     if (!faviconEl) {

@@ -84,7 +84,7 @@ export function registerApiRoutes(app: Express) {
         frontendLogoUrl:
           branding.frontend_logo_url ||
           "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp",
-        faviconUrl: branding.favicon_url || "/favicon-32x32.png",
+        faviconUrl: branding.favicon_url || "/favicon-32x32.png?v=large-2",
         companyName: branding.company_name || "Glass & Door Pro",
         companyAddress: branding.company_address || "2341 Waverly Dr\nMonroe, NC 28112",
         companyPhoneNumbers: branding.company_phone_numbers || "(704) 771-6111",
@@ -118,7 +118,7 @@ export function registerApiRoutes(app: Express) {
       });
       res.json({
         frontendLogoUrl: "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp",
-        faviconUrl: "/favicon-32x32.png",
+        faviconUrl: "/favicon-32x32.png?v=large-2",
         companyName: "Glass & Door Pro",
         companyAddress: "2341 Waverly Dr\nMonroe, NC 28112",
         companyPhoneNumbers: "(704) 771-6111",
