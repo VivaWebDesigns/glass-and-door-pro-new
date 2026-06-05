@@ -685,11 +685,39 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
     location: string;
     rating?: number;
     source?: string;
+    sourceIcon?: string;
+    date?: string;
   }>(props.items);
   const shouldCarousel = items.length > 2;
 
+  function SourceBadge({ item }: { item: { source?: string; sourceIcon?: string; date?: string } }) {
+    const source = item.source || "Google";
+    const showGoogleIcon = (item.sourceIcon || source).toLowerCase() === "google";
+
+    return (
+      <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+        {showGoogleIcon ? (
+          <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-200 bg-white text-[11px] font-bold shadow-sm">
+            <span className="text-[#4285F4]">G</span>
+          </span>
+        ) : null}
+        <span>{source}</span>
+        {item.date ? <span className="font-normal text-slate-400">· {item.date}</span> : null}
+      </div>
+    );
+  }
+
   const renderCard = (
-    item: { quote: string; name: string; role: string; location: string; rating?: number; source?: string },
+    item: {
+      quote: string;
+      name: string;
+      role: string;
+      location: string;
+      rating?: number;
+      source?: string;
+      sourceIcon?: string;
+      date?: string;
+    },
     i: number,
   ) => (
     <Card key={i} className={`public-section-card h-full rounded-lg ${variant === "google-carousel" ? "border-none bg-white shadow-lg" : ""}`}>
@@ -701,7 +729,7 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
                 <Star key={index} className="h-4 w-4 fill-current" />
               ))}
             </div>
-            <span className="text-xs font-semibold text-muted-foreground">{item.source || "Google"}</span>
+            <SourceBadge item={item} />
           </div>
         ) : (
           <Quote className="h-5 w-5 text-accent mb-3" />

@@ -12,6 +12,7 @@ const reviewItems = [
     location: "Google review",
     rating: 5,
     source: "Google",
+    sourceIcon: "google",
   },
   {
     quote:
@@ -21,6 +22,7 @@ const reviewItems = [
     location: "Google review",
     rating: 5,
     source: "Google",
+    sourceIcon: "google",
   },
   {
     quote:
@@ -30,6 +32,7 @@ const reviewItems = [
     location: "Google review",
     rating: 5,
     source: "Google",
+    sourceIcon: "google",
   },
   {
     quote:
@@ -39,6 +42,7 @@ const reviewItems = [
     location: "Google review",
     rating: 5,
     source: "Google",
+    sourceIcon: "google",
   },
   {
     quote:
@@ -48,6 +52,7 @@ const reviewItems = [
     location: "Google review",
     rating: 5,
     source: "Google",
+    sourceIcon: "google",
   },
   {
     quote:
@@ -57,6 +62,7 @@ const reviewItems = [
     location: "Google review",
     rating: 5,
     source: "Google",
+    sourceIcon: "google",
   },
 ];
 

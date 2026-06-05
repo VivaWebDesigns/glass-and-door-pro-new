@@ -198,6 +198,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
             location: "Google review",
             rating: 5,
             source: "Google",
+            sourceIcon: "google",
           },
           {
             quote:
@@ -207,6 +208,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
             location: "Google review",
             rating: 5,
             source: "Google",
+            sourceIcon: "google",
           },
           {
             quote:
@@ -216,6 +218,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
             location: "Google review",
             rating: 5,
             source: "Google",
+            sourceIcon: "google",
           },
           {
             quote:
@@ -225,6 +228,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
             location: "Google review",
             rating: 5,
             source: "Google",
+            sourceIcon: "google",
           },
           {
             quote:
@@ -234,6 +238,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
             location: "Google review",
             rating: 5,
             source: "Google",
+            sourceIcon: "google",
           },
           {
             quote:
@@ -243,6 +248,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
             location: "Google review",
             rating: 5,
             source: "Google",
+            sourceIcon: "google",
           },
         ],
       },
@@ -437,6 +443,7 @@ const glassReviewsContent: InsertCmsPage["content"] = {
           location: "Google review",
           rating: 5,
           source: "Google",
+          sourceIcon: "google",
         },
         {
           quote:
@@ -446,6 +453,7 @@ const glassReviewsContent: InsertCmsPage["content"] = {
           location: "Google review",
           rating: 5,
           source: "Google",
+          sourceIcon: "google",
         },
         {
           quote:
@@ -455,6 +463,7 @@ const glassReviewsContent: InsertCmsPage["content"] = {
           location: "Google review",
           rating: 5,
           source: "Google",
+          sourceIcon: "google",
         },
         {
           quote:
@@ -464,6 +473,7 @@ const glassReviewsContent: InsertCmsPage["content"] = {
           location: "Google review",
           rating: 5,
           source: "Google",
+          sourceIcon: "google",
         },
         {
           quote:
@@ -473,6 +483,7 @@ const glassReviewsContent: InsertCmsPage["content"] = {
           location: "Google review",
           rating: 5,
           source: "Google",
+          sourceIcon: "google",
         },
         {
           quote:
@@ -482,6 +493,7 @@ const glassReviewsContent: InsertCmsPage["content"] = {
           location: "Google review",
           rating: 5,
           source: "Google",
+          sourceIcon: "google",
         },
       ],
     }),
