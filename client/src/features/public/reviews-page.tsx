@@ -282,11 +282,11 @@ const blocks: BlockInstance[] = [
     props: {
       title: "Customer Reviews",
       subtitle:
-        "Hear from homeowners and businesses across the Charlotte area who trusted Glass & Door Pro.",
+        "5.0 stars from customers across the Charlotte area who trusted Glass & Door Pro for showers, windows, doors, repairs, and commercial glass.",
       alignment: "center",
-      sectionBackgroundColor: "#ffffff",
+      sectionBackgroundColor: "#f0f8fb",
       sectionPaddingTop: "lg",
-      sectionPaddingBottom: "sm",
+      sectionPaddingBottom: "lg",
     },
   },
   {
@@ -294,30 +294,13 @@ const blocks: BlockInstance[] = [
     type: "testimonials",
     props: {
       anchorId: "reviews",
-      title: "What Our Customers Say",
+      title: "Latest Google Reviews",
+      subtitle: "Newest first from the Glass & Door Pro Google Business Profile.",
       variant: "google-carousel",
       sectionBackgroundColor: "#ffffff",
-      sectionPaddingTop: "sm",
+      sectionPaddingTop: "md",
       sectionPaddingBottom: "lg",
       items: reviewItems,
-    },
-  },
-  {
-    id: "reviews-cta",
-    type: "cta",
-    props: {
-      variant: "glass-service",
-      heading: "Ready to Start Your Project?",
-      subheading:
-        "<p>Tell us about your glass, shower, window, door, or commercial project and Doug will follow up with next steps.</p>",
-      primaryText: "Get Your Free Estimate",
-      primaryAction: "form-modal",
-      primaryFormSlug: "contact-form",
-      primaryModalTitle: "Request a Free Estimate",
-      primaryModalDescription: "Share a few project details and Doug will follow up with next steps.",
-      secondaryText: "View Gallery",
-      secondaryAction: "internal-link",
-      secondaryLink: "/gallery",
     },
   },
 ];
