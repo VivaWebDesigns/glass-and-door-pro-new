@@ -408,10 +408,14 @@
     font-weight: 700;
   }
 
-  .public-nav-link:hover,
+  .public-nav-link:hover {
+    color: hsl(var(--accent));
+    background: transparent;
+  }
+
   .public-nav-link[aria-current="page"] {
-    color: hsl(var(--foreground));
-    background: hsl(var(--accent) / 0.1);
+    color: hsl(var(--accent));
+    background: transparent;
   }
 
   .public-section-card {

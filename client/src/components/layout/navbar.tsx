@@ -81,8 +81,9 @@ function DynamicDropdown({ item, location: currentPath }: { item: MenuItem; loca
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className={`public-nav-link ${isActive ? "toggle-elevate toggle-elevated" : ""}`}
+          className="public-nav-link"
           data-testid={`link-nav-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+          aria-current={isActive ? "page" : undefined}
         >
           {item.label}
           <ChevronDown className="ml-1 h-3.5 w-3.5" />
@@ -182,7 +183,7 @@ export function Navbar() {
                 <Link key={item.id} href={item.url}>
                   <Button
                     variant="ghost"
-                    className={`public-nav-link ${location === item.url ? "toggle-elevate toggle-elevated" : ""}`}
+                    className="public-nav-link"
                     data-testid={`link-nav-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
                     aria-current={location === item.url ? "page" : undefined}
                   >
@@ -197,7 +198,7 @@ export function Navbar() {
                 <Link key={link.href} href={link.href}>
                   <Button
                     variant="ghost"
-                    className={`public-nav-link ${location === link.href ? "toggle-elevate toggle-elevated" : ""}`}
+                    className="public-nav-link"
                     data-testid={`link-nav-${link.label.toLowerCase()}`}
                     aria-current={location === link.href ? "page" : undefined}
                   >
@@ -210,8 +211,9 @@ export function Navbar() {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
-                      className={`public-nav-link ${resourceLinks.some((r) => location === r.href) ? "toggle-elevate toggle-elevated" : ""}`}
+                      className="public-nav-link"
                       data-testid="link-nav-resources"
+                      aria-current={resourceLinks.some((r) => location === r.href) ? "page" : undefined}
                     >
                       Resources
                       <ChevronDown className="ml-1 h-3.5 w-3.5" />
@@ -234,7 +236,7 @@ export function Navbar() {
               <Link href="/#contact">
                 <Button
                   variant="ghost"
-                  className={`public-nav-link ${location === "/#contact" ? "toggle-elevate toggle-elevated" : ""}`}
+                  className="public-nav-link"
                   data-testid="link-nav-contact"
                   aria-current={location === "/#contact" ? "page" : undefined}
                 >
@@ -380,7 +382,7 @@ export function Navbar() {
                       <Link key={item.id} href={item.url} onClick={() => setMobileOpen(false)}>
                         <Button
                           variant="ghost"
-                          className={`w-full justify-start ${location === item.url ? "toggle-elevate toggle-elevated" : ""}`}
+                          className="w-full justify-start aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
                           style={depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined}
                           data-testid={`link-mobile-${item.id}`}
                           aria-current={location === item.url ? "page" : undefined}
@@ -396,7 +398,7 @@ export function Navbar() {
                       <Link key={link.href} href={link.href} onClick={() => setMobileOpen(false)}>
                         <Button
                           variant="ghost"
-                          className={`w-full justify-start ${location === link.href ? "toggle-elevate toggle-elevated" : ""}`}
+                          className="w-full justify-start aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
                           data-testid={`link-mobile-${link.label.toLowerCase()}`}
                           aria-current={location === link.href ? "page" : undefined}
                         >
@@ -413,7 +415,7 @@ export function Navbar() {
                           <Link key={link.href} href={link.href} onClick={() => setMobileOpen(false)}>
                             <Button
                               variant="ghost"
-                              className={`w-full justify-start pl-6 ${location === link.href ? "toggle-elevate toggle-elevated" : ""}`}
+                              className="w-full justify-start pl-6 aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
                               data-testid={`link-mobile-resource-${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
                               aria-current={location === link.href ? "page" : undefined}
                             >
@@ -426,7 +428,7 @@ export function Navbar() {
                     <Link href="/#contact" onClick={() => setMobileOpen(false)}>
                       <Button
                         variant="ghost"
-                        className={`w-full justify-start ${location === "/#contact" ? "toggle-elevate toggle-elevated" : ""}`}
+                        className="w-full justify-start aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
                         data-testid="link-mobile-contact"
                         aria-current={location === "/#contact" ? "page" : undefined}
                       >
