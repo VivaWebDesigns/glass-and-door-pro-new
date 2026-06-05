@@ -15,7 +15,7 @@ const glassHomeContent = {
       props: {
         anchorId: "hero",
         variant: "glass-home",
-        heading: "We've got your glass & door needs covered.",
+        heading: "We've got your glass and door needs covered.",
         subheading:
           "<p>Specializing in frameless glass showers, windows, and doors for homeowners in Charlotte, NC.</p>",
         ctaText: "Get a Free Quote",

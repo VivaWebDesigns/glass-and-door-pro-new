@@ -37,7 +37,7 @@ import {
   hexToRgba,
   normalizeHexColor,
 } from "./section-style";
-import { SectionHeading } from "./section-heading";
+import { publicDisplayText, SectionHeading } from "./section-heading";
 import { getPostCategories, getPrimaryPostCategory, postMatchesCategory } from "@/lib/blog-post-categories";
 import {
   arr,
@@ -173,11 +173,11 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
           </span>
         )}
         <h1 className={`font-heading font-bold text-white mb-4 leading-tight ${variant === "glass-home" ? "text-4xl md:text-6xl" : "text-4xl md:text-5xl"}`} style={headingTextStyle}>
-          {str(props.heading) || "Hero Heading"}
+          {publicDisplayText(str(props.heading) || "Hero Heading")}
           {accentHeading && (
             <>
               {" "}
-              <span className="text-accent" style={accentHeadingTextStyle}>{accentHeading}</span>
+              <span className="text-accent" style={accentHeadingTextStyle}>{publicDisplayText(accentHeading)}</span>
             </>
           )}
         </h1>

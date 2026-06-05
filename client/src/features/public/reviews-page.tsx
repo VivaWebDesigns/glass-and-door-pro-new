@@ -284,7 +284,7 @@ const blocks: BlockInstance[] = [
       variant: "glass-reviews",
       layout: "stacked",
       badge: "Customer Reviews",
-      heading: "What Charlotte Customers Say About Glass & Door Pro",
+      heading: "What Charlotte Customers Say About Glass and Door Pro",
       subheading:
         "<p>Real feedback from homeowners and businesses who trusted Doug for showers, windows, doors, repairs, and commercial glass.</p>",
       ctaText: "Read all reviews on Google",
@@ -310,7 +310,7 @@ const blocks: BlockInstance[] = [
     props: {
       anchorId: "reviews",
       title: "Latest Google Reviews",
-      subtitle: "Newest first from the Glass & Door Pro Google Business Profile.",
+      subtitle: "Newest first from the Glass and Door Pro Google Business Profile.",
       variant: "google-carousel",
       sectionBackgroundColor: "#ffffff",
       sectionPaddingTop: "md",

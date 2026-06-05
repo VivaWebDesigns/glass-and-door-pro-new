@@ -17,6 +17,10 @@ function str(v: unknown): string {
   return typeof v === "string" ? v : "";
 }
 
+export function publicDisplayText(value: string): string {
+  return value.replace(/\s&\s/g, " and ");
+}
+
 function headingLevel(v: unknown): HeadingLevel {
   return str(v) === "h1" ? "h1" : "h2";
 }
@@ -34,8 +38,8 @@ export function SectionHeading({
   subtitleClassName,
   fallbackTitle,
 }: SectionHeadingProps) {
-  const eyebrow = str(props.sectionEyebrow) || str(props.eyebrow);
-  const title = str(props.title) || str(props.heading) || fallbackTitle || "";
+  const eyebrow = publicDisplayText(str(props.sectionEyebrow) || str(props.eyebrow));
+  const title = publicDisplayText(str(props.title) || str(props.heading) || fallbackTitle || "");
   const subtitle = str(props.subtitle) || str(props.subheading);
   const level = headingLevel(props.sectionHeadingLevel ?? props.headingLevel);
   const alignment = headingAlignment(props.sectionHeadingAlignment ?? props.alignment, defaultAlignment);
