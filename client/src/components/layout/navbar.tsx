@@ -36,6 +36,21 @@ const defaultNavLinks = [
 
 const allResourceLinks: { label: string; href: string; hideFromClients?: boolean }[] = [];
 
+function normalizePublicMenuUrl(item: Pick<MenuItem, "label" | "url">) {
+  if (/gallery/i.test(item.label) && item.url === "/#gallery") {
+    return "/gallery";
+  }
+  return item.url;
+}
+
+function normalizePublicMenuItems(items: MenuItem[]): MenuItem[] {
+  return items.map((item) => ({
+    ...item,
+    url: normalizePublicMenuUrl(item),
+    children: item.children?.length ? normalizePublicMenuItems(item.children) : item.children,
+  }));
+}
+
 function flattenItems(items: MenuItem[], depth = 0): { item: MenuItem; depth: number }[] {
   const result: { item: MenuItem; depth: number }[] = [];
   for (const item of items) {
@@ -124,7 +139,7 @@ export function Navbar() {
   const dynamicItems = useMemo(() => {
     const headerMenu = publicMenus?.main_navigation ?? publicMenus?.header;
     if (!headerMenu?.items) return null;
-    const items = headerMenu.items as MenuItem[];
+    const items = normalizePublicMenuItems(headerMenu.items as MenuItem[]);
     return items.length > 0 ? items : null;
   }, [publicMenus]);
 

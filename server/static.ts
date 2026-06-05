@@ -38,23 +38,32 @@ export function serveStatic(app: Express) {
     },
   }));
 
+  function getRequestPathAndSearch(originalUrl: string) {
+    const parsed = new URL(originalUrl, "http://localhost");
+    return {
+      pathname: parsed.pathname || "/",
+      search: parsed.search,
+    };
+  }
+
   // fall through to index.html if the file doesn't exist
   app.use("/{*path}", async (req, res) => {
     const template = await getIndexTemplate();
-    const snapshot = await getPublicHtmlSnapshot(req.path, req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "");
+    const { pathname, search } = getRequestPathAndSearch(req.originalUrl || req.url || "/");
+    const snapshot = await getPublicHtmlSnapshot(pathname, search);
     const shouldInjectPublicHead =
-      !req.path.startsWith("/admin") &&
-      !req.path.startsWith("/auth") &&
-      !req.path.startsWith("/therapist") &&
-      !req.path.startsWith("/setup") &&
-      !req.path.startsWith("/preview") &&
-      !req.path.startsWith("/uploads") &&
-      !req.path.startsWith("/api");
+      !pathname.startsWith("/admin") &&
+      !pathname.startsWith("/auth") &&
+      !pathname.startsWith("/therapist") &&
+      !pathname.startsWith("/setup") &&
+      !pathname.startsWith("/preview") &&
+      !pathname.startsWith("/uploads") &&
+      !pathname.startsWith("/api");
     const customHeadHtml = shouldInjectPublicHead ? await getPublicHeadAdditions() : null;
 
     res.setHeader(
       "Cache-Control",
-      req.path.startsWith("/admin") || req.path.startsWith("/auth") || req.path.startsWith("/therapist")
+      pathname.startsWith("/admin") || pathname.startsWith("/auth") || pathname.startsWith("/therapist")
         ? "private, no-store, max-age=0"
         : "no-cache",
     );

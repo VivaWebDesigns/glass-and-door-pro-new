@@ -174,6 +174,16 @@ describe("public-prerender.service", () => {
     expect(snapshot?.canonicalUrl).toBe("https://coreplatform.com/join");
   });
 
+  it("returns a gallery fallback snapshot when the CMS gallery page is not seeded", async () => {
+    const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
+
+    const snapshot = await getPublicHtmlSnapshot("/gallery");
+
+    expect(snapshot?.title).toContain("Gallery");
+    expect(snapshot?.canonicalUrl).toBe("https://coreplatform.com/gallery");
+    expect(snapshot?.bodyHtml).toContain("Glass &amp; Door Pro project photos");
+  });
+
   it("returns a prerender snapshot for blog posts and event detail pages", async () => {
     mockGetPostBySlug.mockResolvedValue(blogPost);
     mockGetEventByIdentifier.mockResolvedValue(event);

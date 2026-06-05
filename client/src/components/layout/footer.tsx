@@ -27,6 +27,13 @@ type FooterLegalLink = {
   openInNewTab?: boolean;
 };
 
+function normalizeFooterMenuUrl(item: Pick<MenuItem, "label" | "url">) {
+  if (/gallery/i.test(item.label) && item.url === "/#gallery") {
+    return "/gallery";
+  }
+  return item.url;
+}
+
 function flattenFooterItems(items: MenuItem[], depth = 0): { item: MenuItem; depth: number }[] {
   const result: { item: MenuItem; depth: number }[] = [];
   for (const item of items) {
@@ -80,7 +87,7 @@ function flattenMenuLinks(items: MenuItem[]): MenuItem[] {
 
 function menuItemsToLinks(items: MenuItem[] | undefined, testIdPrefix: string) {
   return flattenMenuLinks(items || []).map((item) => ({
-    href: item.url,
+    href: normalizeFooterMenuUrl(item),
     label: item.label === "Project Gallery" ? "Gallery" : item.label,
     openInNewTab: item.openInNewTab,
     testId: `${testIdPrefix}-${item.id}`,

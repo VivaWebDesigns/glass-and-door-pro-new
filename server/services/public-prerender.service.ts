@@ -56,6 +56,13 @@ const FALLBACK_STATIC_PAGES: Record<
     body:
       "Find a mental health professional by searching specialties, locations, languages, and session formats in the Core Platform directory.",
   },
+  "/gallery": {
+    title: "Gallery",
+    description:
+      "Browse recent frameless shower, glass, window, and door installation projects from Glass & Door Pro in the Charlotte area.",
+    body:
+      "Browse recent Glass & Door Pro project photos, including frameless shower installations across Charlotte, Monroe, Indian Trail, and nearby communities.",
+  },
   "/insights": {
     title: "Insights & Articles",
     description:
