@@ -14,6 +14,7 @@ import {
   buildFaqPageLd,
   extractFaqItems,
 } from "@/lib/structured-data";
+import { formatBrandFirstTitle } from "@shared/seo-title";
 
 interface CmsHybridPageProps {
   slug: string;
@@ -87,19 +88,20 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
     const prevTitle = document.title;
     const effectiveTitle = page.seoTitle || page.title;
     const titleSuffix = globalSeo?.titleSuffix ?? " | Core Platform";
+    const headTitle = formatBrandFirstTitle(effectiveTitle, titleSuffix, globalSeo?.siteName ?? "Core Platform");
     const effectiveDescription = page.seoDescription || globalSeo?.defaultMetaDescription || "";
     const effectiveOgImage = page.ogImageUrl || globalSeo?.defaultOgImageUrl || "";
     const origin =
       globalSeo?.siteUrl || (typeof window !== "undefined" ? window.location.origin : "");
 
-    if (effectiveTitle) document.title = `${effectiveTitle}${titleSuffix}`;
+    if (effectiveTitle) document.title = headTitle;
 
     if (effectiveDescription) {
       setMeta("description", effectiveDescription);
       setMeta("og:description", effectiveDescription, true);
     }
 
-    if (effectiveTitle) setMeta("og:title", effectiveTitle, true);
+    if (effectiveTitle) setMeta("og:title", headTitle, true);
 
     if (effectiveOgImage) {
       setMeta("og:image", effectiveOgImage, true);

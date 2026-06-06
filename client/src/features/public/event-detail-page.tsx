@@ -28,6 +28,7 @@ import {
   buildEventLd,
   buildVideoObjectLd,
 } from "@/lib/structured-data";
+import { formatBrandFirstTitle } from "@shared/seo-title";
 import {
   CalendarDays,
   Clock,
@@ -553,7 +554,11 @@ function RegistrationSection({
 function EventSeo({ event, globalSeo }: { event: Event; globalSeo?: SeoSettings }) {
   const titleSuffix = globalSeo?.titleSuffix ?? " | Core Platform";
   const siteUrl = globalSeo?.siteUrl || (typeof window !== "undefined" ? window.location.origin : "");
-  const effectiveTitle = `${event.title}${titleSuffix}`;
+  const effectiveTitle = formatBrandFirstTitle(
+    event.title,
+    titleSuffix,
+    globalSeo?.siteName ?? "Core Platform",
+  );
   const effectiveDescription = event.description
     ? stripHtml(event.description)
     : globalSeo?.defaultMetaDescription || undefined;

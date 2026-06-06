@@ -18,6 +18,7 @@ import {
   buildBreadcrumbLd,
   buildArticleLd,
 } from "@/lib/structured-data";
+import { formatBrandFirstTitle } from "@shared/seo-title";
 
 function PodcastPlayer({ podcastUrl }: { podcastUrl: string }) {
   const { toast } = useToast();
@@ -75,7 +76,11 @@ function PodcastPlayer({ podcastUrl }: { podcastUrl: string }) {
 
 function PostSeo({ post, globalSeo }: { post: BlogPost; globalSeo?: SeoSettings }) {
   const titleSuffix = globalSeo?.titleSuffix ?? " | Core Platform";
-  const effectiveTitle = post.seoTitle || `${post.title}${titleSuffix}`;
+  const effectiveTitle = formatBrandFirstTitle(
+    post.seoTitle || post.title,
+    titleSuffix,
+    globalSeo?.siteName ?? "Core Platform",
+  );
   const effectiveDescription =
     post.seoDescription || post.excerpt || globalSeo?.defaultMetaDescription || undefined;
   const effectiveOgImage =

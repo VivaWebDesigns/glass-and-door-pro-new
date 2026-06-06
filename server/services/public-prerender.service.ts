@@ -1,6 +1,7 @@
 import sanitizeHtml from "sanitize-html";
 import type { BlogPost, CmsPage, Event, SeoSettings } from "@shared/schema";
 import { getEventPath } from "@shared/event-url";
+import { formatBrandFirstTitle } from "@shared/seo-title";
 import { storage } from "../storage";
 
 interface PublicHtmlSnapshot {
@@ -194,8 +195,7 @@ function absoluteUrl(path: string | null | undefined, siteUrl: string) {
 }
 
 function buildHeadTitle(rawTitle: string, seo?: SeoSettings | null) {
-  const suffix = seo?.titleSuffix ?? " | Glass & Door Pro";
-  return rawTitle.includes("Glass & Door Pro") ? rawTitle : `${rawTitle}${suffix}`;
+  return formatBrandFirstTitle(rawTitle, seo?.titleSuffix ?? " | Glass & Door Pro", seo?.siteName ?? "Glass & Door Pro");
 }
 
 function buildOrganizationSchema(seo: SeoSettings | null, siteUrl: string) {
