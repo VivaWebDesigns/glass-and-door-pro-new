@@ -579,7 +579,7 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
     return (
       <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
         {showGoogleIcon ? <GoogleSourceIcon /> : null}
-        <span>{source}</span>
+        {!showGoogleIcon ? <span>{source}</span> : null}
         {item.date ? <span className="font-medium text-[#1a8ead]">· {item.date}</span> : null}
       </div>
     );
