@@ -508,7 +508,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
   ],
 };
 
-const galleryImages = [
+const framelessShowerImages = [
   {
     url: "/images/glass-door-pro/gallery/frameless-showers/03.jpg",
     alt: "Black frame glass shower enclosure with marble walls and freestanding tub installed by Glass & Door Pro in SouthPark, Charlotte, NC",
@@ -564,6 +564,128 @@ const galleryImages = [
     alt: "Frameless glass shower enclosure with patterned floor tile installed by Glass & Door Pro in Fort Mill, SC near Charlotte",
     caption: "Frameless Shower Install - Fort Mill",
   },
+  {
+    url: "/images/glass-door-pro/gallery/frameless-showers/13.webp",
+    alt: "Frameless glass shower enclosure with marble tile and black hardware installed by Glass & Door Pro",
+    caption: "Frameless Shower Install - Marble Bath",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/frameless-showers/14.webp",
+    alt: "Frameless sliding shower glass enclosure installed by Glass & Door Pro",
+    caption: "Frameless Shower Install - Sliding Glass",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/frameless-showers/15.webp",
+    alt: "Skylit bathroom with frameless shower glass installed by Glass & Door Pro",
+    caption: "Frameless Shower Install - Skylit Bath",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/frameless-showers/16.webp",
+    alt: "Frameless shower glass enclosure with herringbone tile installed by Glass & Door Pro",
+    caption: "Frameless Shower Install - Herringbone Tile",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/frameless-showers/17.webp",
+    alt: "Frameless glass shower enclosure with bench installed by Glass & Door Pro",
+    caption: "Frameless Shower Install - Bench Shower",
+  },
+];
+
+const windowGalleryImages = [
+  {
+    url: "/images/glass-door-pro/gallery/windows/01.webp",
+    alt: "Residential double window installation by Glass & Door Pro",
+    caption: "Residential Window Installation - Double Window",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/windows/02.webp",
+    alt: "Residential single window installation by Glass & Door Pro",
+    caption: "Residential Window Installation - Single Window",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/windows/03.webp",
+    alt: "Exterior residential window installation by Glass & Door Pro",
+    caption: "Residential Window Installation - Exterior Windows",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/windows/04.webp",
+    alt: "Multi-window residential installation project by Glass & Door Pro",
+    caption: "Residential Window Installation - Multi-Window Project",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/windows/05.webp",
+    alt: "Finished residential exterior window installation by Glass & Door Pro",
+    caption: "Residential Window Installation - Finished Exterior",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/windows/06.webp",
+    alt: "Insulated window replacement viewed from inside by Glass & Door Pro",
+    caption: "Insulated Window Replacement - Interior",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/windows/07.webp",
+    alt: "Insulated window replacement with ladder and tools by Glass & Door Pro",
+    caption: "Insulated Window Replacement - Ladder Setup",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/windows/08.webp",
+    alt: "Exterior insulated window replacement by Glass & Door Pro",
+    caption: "Insulated Window Replacement - Exterior",
+  },
+];
+
+const doorGalleryImages = [
+  {
+    url: "/images/glass-door-pro/gallery/doors/01.webp",
+    alt: "Decorative entry door installation by Glass & Door Pro",
+    caption: "Decorative Entry Door Installation",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/doors/02.webp",
+    alt: "Glass entry door installation by Glass & Door Pro",
+    caption: "Glass Entry Door Installation",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/doors/03.webp",
+    alt: "Glass door replacement in Cornelius by Glass & Door Pro",
+    caption: "Glass Door Replacement - Cornelius",
+  },
+];
+
+const commercialGlassGalleryImages = [
+  {
+    url: "/images/glass-door-pro/gallery/commercial-glass/01.webp",
+    alt: "Commercial office glass conference room installed by Glass & Door Pro",
+    caption: "Commercial Office Glass Conference Room",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/commercial-glass/02.webp",
+    alt: "Commercial glass entry doors installed by Glass & Door Pro",
+    caption: "Commercial Glass Entry Doors",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/commercial-glass/03.webp",
+    alt: "Commercial storefront glass entrance by Glass & Door Pro",
+    caption: "Commercial Storefront Glass",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/commercial-glass/04.webp",
+    alt: "Commercial window replacement in Charlotte by Glass & Door Pro",
+    caption: "Commercial Window Replacement - Charlotte",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/commercial-glass/05.webp",
+    alt: "Commercial window installation in Charlotte by Glass & Door Pro",
+    caption: "Commercial Window Installation - Charlotte",
+  },
+];
+
+const windowRepairGalleryImages = [
+  {
+    url: "/images/glass-door-pro/gallery/window-repair/01.webp",
+    alt: "Window repair service with on-site glass work by Glass & Door Pro",
+    caption: "Window Repair Service - On-Site Glass Work",
+  },
 ];
 
 const glassGalleryContent: InsertCmsPage["content"] = {
@@ -589,22 +711,28 @@ const glassGalleryContent: InsertCmsPage["content"] = {
           title: "Frameless Showers",
           description: "Recent installations",
           link: "#frameless-showers",
-          buttonText: `${galleryImages.length} Photos`,
+          buttonText: `${framelessShowerImages.length} Photos`,
         },
         {
           icon: "Grid3X3",
           title: "Windows",
-          description: "Coming soon",
+          description: "Residential projects",
+          link: "#windows",
+          buttonText: `${windowGalleryImages.length} Photos`,
         },
         {
           icon: "DoorOpen",
           title: "Doors",
-          description: "Coming soon",
+          description: "Entry and glass doors",
+          link: "#doors",
+          buttonText: `${doorGalleryImages.length} Photos`,
         },
         {
           icon: "Building2",
           title: "Commercial Glass",
-          description: "Coming soon",
+          description: "Business glass projects",
+          link: "#commercial-glass",
+          buttonText: `${commercialGlassGalleryImages.length} Photos`,
         },
       ],
     }),
@@ -618,7 +746,55 @@ const glassGalleryContent: InsertCmsPage["content"] = {
       sectionBackgroundColor: "#f8fafc",
       sectionPaddingTop: "lg",
       sectionPaddingBottom: "lg",
-      images: galleryImages,
+      images: framelessShowerImages,
+    }),
+    block("image-grid", {
+      anchorId: "windows",
+      title: "Windows",
+      subtitle: "Residential installation projects",
+      columns: "3",
+      gap: "lg",
+      variant: "project-gallery",
+      sectionBackgroundColor: "#ffffff",
+      sectionPaddingTop: "lg",
+      sectionPaddingBottom: "lg",
+      images: windowGalleryImages,
+    }),
+    block("image-grid", {
+      anchorId: "doors",
+      title: "Doors",
+      subtitle: "Entry and exterior glass door projects",
+      columns: "3",
+      gap: "lg",
+      variant: "project-gallery",
+      sectionBackgroundColor: "#f8fafc",
+      sectionPaddingTop: "lg",
+      sectionPaddingBottom: "lg",
+      images: doorGalleryImages,
+    }),
+    block("image-grid", {
+      anchorId: "commercial-glass",
+      title: "Commercial Glass",
+      subtitle: "Office, storefront, and entry glass projects",
+      columns: "3",
+      gap: "lg",
+      variant: "project-gallery",
+      sectionBackgroundColor: "#ffffff",
+      sectionPaddingTop: "lg",
+      sectionPaddingBottom: "lg",
+      images: commercialGlassGalleryImages,
+    }),
+    block("image-grid", {
+      anchorId: "window-repair",
+      title: "Window Repair",
+      subtitle: "On-site glass repair work",
+      columns: "3",
+      gap: "lg",
+      variant: "project-gallery",
+      sectionBackgroundColor: "#f8fafc",
+      sectionPaddingTop: "lg",
+      sectionPaddingBottom: "lg",
+      images: windowRepairGalleryImages,
     }),
     serviceCtaBlock(
       "Ready to Start Your Project?",
@@ -944,6 +1120,7 @@ const glassServicePages: GlassServicePageSeed[] = [
           url: "/images/glass-door-pro/gallery-shower2-1280w.webp",
           alt: "Modern frameless shower door with premium hardware",
         },
+        ...framelessShowerImages.slice(11),
       ],
       processTitle: "Our Simple Process",
       process: [
@@ -1053,6 +1230,7 @@ const glassServicePages: GlassServicePageSeed[] = [
           url: "/images/glass-door-pro/gallery-sunroom-1280w.webp",
           alt: "Sunroom windows installed in the Charlotte area",
         },
+        ...windowGalleryImages,
       ],
       processTitle: "Window Installation Process",
       process: [
@@ -1166,6 +1344,7 @@ const glassServicePages: GlassServicePageSeed[] = [
           url: "/images/glass-door-pro/gallery-door3-1280w.webp",
           alt: "Blue entry door installed in the Charlotte area",
         },
+        ...doorGalleryImages,
       ],
       processTitle: "Our Door Installation Process",
       process: [
@@ -1275,6 +1454,7 @@ const glassServicePages: GlassServicePageSeed[] = [
           url: "/images/glass-door-pro/window-repair-living-1280w.webp",
           alt: "Living room window repaired by Glass & Door Pro",
         },
+        ...windowRepairGalleryImages,
       ],
       processTitle: "Why Choose Us for Window Repair",
       process: [
@@ -1389,6 +1569,7 @@ const glassServicePages: GlassServicePageSeed[] = [
           url: "/images/glass-door-pro/commercial-hero-1280w.webp",
           alt: "Commercial storefront glass project",
         },
+        ...commercialGlassGalleryImages,
       ],
       processTitle: "How We Work",
       process: [
