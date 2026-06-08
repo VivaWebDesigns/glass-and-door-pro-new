@@ -45,6 +45,7 @@ const doorImages = [
   ["01.webp", "Decorative Entry Door Installation"],
   ["02.webp", "Glass Entry Door Installation"],
   ["03.webp", "Glass Door Replacement - Cornelius"],
+  ["04.webp", "Luxury Pivot Door Installation"],
 ].map(([file, caption]) => ({
   url: `/images/glass-door-pro/gallery/doors/${file}`,
   alt: `${caption} by Glass & Door Pro`,
@@ -54,7 +55,6 @@ const doorImages = [
 const commercialGlassImages = [
   ["01.webp", "Commercial Office Glass Conference Room"],
   ["02.webp", "Commercial Glass Entry Doors"],
-  ["03.webp", "Commercial Storefront Glass"],
   ["04.webp", "Commercial Window Replacement - Charlotte"],
   ["05.webp", "Commercial Window Installation - Charlotte"],
 ].map(([file, caption]) => ({

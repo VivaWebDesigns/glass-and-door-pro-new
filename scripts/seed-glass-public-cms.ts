@@ -650,6 +650,11 @@ const doorGalleryImages = [
     alt: "Glass door replacement in Cornelius by Glass & Door Pro",
     caption: "Glass Door Replacement - Cornelius",
   },
+  {
+    url: "/images/glass-door-pro/gallery/doors/04.webp",
+    alt: "Luxury pivot door installation by Glass & Door Pro",
+    caption: "Luxury Pivot Door Installation",
+  },
 ];
 
 const commercialGlassGalleryImages = [
@@ -662,11 +667,6 @@ const commercialGlassGalleryImages = [
     url: "/images/glass-door-pro/gallery/commercial-glass/02.webp",
     alt: "Commercial glass entry doors installed by Glass & Door Pro",
     caption: "Commercial Glass Entry Doors",
-  },
-  {
-    url: "/images/glass-door-pro/gallery/commercial-glass/03.webp",
-    alt: "Commercial storefront glass entrance by Glass & Door Pro",
-    caption: "Commercial Storefront Glass",
   },
   {
     url: "/images/glass-door-pro/gallery/commercial-glass/04.webp",
