@@ -35,6 +35,7 @@ const windowImages = [
   ["06.webp", "Insulated Window Replacement - Interior"],
   ["07.webp", "Insulated Window Replacement - Ladder Setup"],
   ["08.webp", "Insulated Window Replacement - Exterior"],
+  ["09.webp", "Window Replacement Service - On-Site Glass Work"],
 ].map(([file, caption]) => ({
   url: `/images/glass-door-pro/gallery/windows/${file}`,
   alt: `${caption} by Glass & Door Pro`,
@@ -59,14 +60,6 @@ const commercialGlassImages = [
   ["05.webp", "Commercial Window Installation - Charlotte"],
 ].map(([file, caption]) => ({
   url: `/images/glass-door-pro/gallery/commercial-glass/${file}`,
-  alt: `${caption} by Glass & Door Pro`,
-  caption,
-}));
-
-const windowRepairImages = [
-  ["01.webp", "Window Repair Service - On-Site Glass Work"],
-].map(([file, caption]) => ({
-  url: `/images/glass-door-pro/gallery/window-repair/${file}`,
   alt: `${caption} by Glass & Door Pro`,
   caption,
 }));
@@ -188,22 +181,6 @@ const blocks: BlockInstance[] = [
       sectionPaddingTop: "lg",
       sectionPaddingBottom: "lg",
       images: commercialGlassImages,
-    },
-  },
-  {
-    id: "gallery-window-repair",
-    type: "image-grid",
-    props: {
-      anchorId: "window-repair",
-      title: "Window Repair",
-      subtitle: "On-site glass repair work",
-      columns: "3",
-      gap: "lg",
-      variant: "project-gallery",
-      sectionBackgroundColor: "#f8fafc",
-      sectionPaddingTop: "lg",
-      sectionPaddingBottom: "lg",
-      images: windowRepairImages,
     },
   },
   {

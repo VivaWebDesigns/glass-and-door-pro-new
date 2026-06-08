@@ -632,6 +632,11 @@ const windowGalleryImages = [
     alt: "Exterior insulated window replacement by Glass & Door Pro",
     caption: "Insulated Window Replacement - Exterior",
   },
+  {
+    url: "/images/glass-door-pro/gallery/windows/09.webp",
+    alt: "Window replacement service with on-site glass work by Glass & Door Pro",
+    caption: "Window Replacement Service - On-Site Glass Work",
+  },
 ];
 
 const doorGalleryImages = [
@@ -677,14 +682,6 @@ const commercialGlassGalleryImages = [
     url: "/images/glass-door-pro/gallery/commercial-glass/05.webp",
     alt: "Commercial window installation in Charlotte by Glass & Door Pro",
     caption: "Commercial Window Installation - Charlotte",
-  },
-];
-
-const windowRepairGalleryImages = [
-  {
-    url: "/images/glass-door-pro/gallery/window-repair/01.webp",
-    alt: "Window repair service with on-site glass work by Glass & Door Pro",
-    caption: "Window Repair Service - On-Site Glass Work",
   },
 ];
 
@@ -783,18 +780,6 @@ const glassGalleryContent: InsertCmsPage["content"] = {
       sectionPaddingTop: "lg",
       sectionPaddingBottom: "lg",
       images: commercialGlassGalleryImages,
-    }),
-    block("image-grid", {
-      anchorId: "window-repair",
-      title: "Window Repair",
-      subtitle: "On-site glass repair work",
-      columns: "3",
-      gap: "lg",
-      variant: "project-gallery",
-      sectionBackgroundColor: "#f8fafc",
-      sectionPaddingTop: "lg",
-      sectionPaddingBottom: "lg",
-      images: windowRepairGalleryImages,
     }),
     serviceCtaBlock(
       "Ready to Start Your Project?",
@@ -1454,7 +1439,6 @@ const glassServicePages: GlassServicePageSeed[] = [
           url: "/images/glass-door-pro/window-repair-living-1280w.webp",
           alt: "Living room window repaired by Glass & Door Pro",
         },
-        ...windowRepairGalleryImages,
       ],
       processTitle: "Why Choose Us for Window Repair",
       process: [
