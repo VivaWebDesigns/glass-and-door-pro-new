@@ -126,7 +126,7 @@ function Router() {
         <Route path="/" component={() => <CmsHybridPage slug="home" fallback={<HomePage />} />} />
         <Route path="/about" component={() => <CmsHybridPage slug="about" fallback={<AboutPage />} />} />
         <Route path="/contact" component={() => <CmsHybridPage slug="contact" fallback={<ContactPage />} />} />
-        <Route path="/gallery" component={() => <CmsHybridPage slug="gallery" fallback={<GalleryPage />} />} />
+        <Route path="/gallery" component={GalleryPage} />
         <Route path="/reviews" component={() => <CmsHybridPage slug="reviews" fallback={<ReviewsPage />} />} />
         <Route path="/services/frameless-showers" component={() => <CmsHybridPage slug="services-frameless-showers" fallback={<NotFound />} />} />
         <Route path="/services/window-installation" component={() => <CmsHybridPage slug="services-window-installation" fallback={<NotFound />} />} />

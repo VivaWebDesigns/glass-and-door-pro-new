@@ -548,6 +548,10 @@ export async function getPublicHtmlSnapshot(
 
   const slug = pathname === "/" ? "home" : pathname.replace(/^\/+/, "");
   if (slug && !slug.includes("/")) {
+    if (slug === "gallery") {
+      return buildFallbackSnapshot(pathname, seo, siteUrl);
+    }
+
     const page = await storage.cmsPages.getPageBySlug(slug);
     if (page?.status === "published") {
       return buildCmsSnapshot(page, seo, siteUrl);
