@@ -350,6 +350,37 @@ describe("CmsPageEditorPage", () => {
     );
   });
 
+  it("allows seeded service pages to save without changing their page type", async () => {
+    editorLockState.isReadOnly = false;
+    const originalPageType = mockPage.pageType;
+    const originalSlug = mockPage.slug;
+    mockPage.pageType = "service";
+    mockPage.slug = "services-frameless-showers";
+    root = createRoot(container);
+
+    await act(async () => {
+      root!.render(React.createElement(CmsPageEditorPage));
+    });
+
+    const saveButton = container.querySelector('[data-testid="button-save"]') as HTMLButtonElement | null;
+    expect(saveButton).not.toBeNull();
+
+    await act(async () => {
+      saveButton?.click();
+    });
+
+    const updatePayload = mutationStates.flatMap((state) => state.mutate.mock.calls).at(-1)?.[0];
+    expect(updatePayload).toEqual(
+      expect.objectContaining({
+        slug: "services-frameless-showers",
+        pageType: "service",
+      })
+    );
+
+    mockPage.pageType = originalPageType;
+    mockPage.slug = originalSlug;
+  });
+
   it("prompts before publishing when unsaved page edits are still dirty", async () => {
     editorLockState.isReadOnly = false;
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);

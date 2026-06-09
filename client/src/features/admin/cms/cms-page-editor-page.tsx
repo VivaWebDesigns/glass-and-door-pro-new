@@ -79,7 +79,7 @@ import { useUnsavedChangesGuard } from "@/hooks/use-unsaved-changes-guard";
 const editorSchema = z.object({
   title: z.string().min(1, "Title is required"),
   slug: z.string().min(1, "Slug is required").regex(/^[a-z0-9-/]+$/, "Lowercase letters, numbers, hyphens and slashes only"),
-  pageType: z.enum(["home", "about", "contact", "landing", "custom"]),
+  pageType: z.enum(["home", "about", "contact", "landing", "custom", "service", "area"]),
   template: z.enum(["full-width", "with-sidebar"]).default("full-width"),
   sidebarId: z.string().default(""),
   status: z.enum(["draft", "published", "scheduled", "archived"]),
@@ -838,6 +838,8 @@ export default function CmsPageEditorPage() {
                                     <SelectItem value="about">About</SelectItem>
                                     <SelectItem value="contact">Contact</SelectItem>
                                     <SelectItem value="landing">Landing</SelectItem>
+                                    <SelectItem value="service">Service</SelectItem>
+                                    <SelectItem value="area">Service Area</SelectItem>
                                     <SelectItem value="custom">Custom</SelectItem>
                                   </SelectContent>
                                 </Select>

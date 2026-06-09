@@ -8,7 +8,7 @@ import { createCmsPreviewToken } from "../../utils/cms-preview-token";
 
 const router = Router();
 
-const PAGE_TYPES = ["home", "about", "contact", "landing", "custom"] as const;
+const PAGE_TYPES = ["home", "about", "contact", "landing", "custom", "service", "area"] as const;
 const STATUSES = ["draft", "published", "scheduled", "archived"] as const;
 
 const createPageSchema = insertCmsPageSchema.extend({
