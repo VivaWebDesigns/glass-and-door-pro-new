@@ -2333,7 +2333,7 @@ const glassSeoSettings: Partial<InsertSeoSettings> = {
 const glassPrivacyPolicyContent = {
   blocks: [
     {
-      id: id(),
+      id: uid(),
       type: "section-header",
       props: {
         eyebrow: "Legal",
@@ -2345,7 +2345,7 @@ const glassPrivacyPolicyContent = {
       },
     },
     {
-      id: id(),
+      id: uid(),
       type: "rich-text",
       props: {
         alignment: "left",
