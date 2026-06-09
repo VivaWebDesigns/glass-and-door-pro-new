@@ -47,8 +47,6 @@ const AdminTherapistsPage = lazy(() => import("@/features/admin/therapists-page"
 const AdminUsersPage = lazy(() => import("@/features/admin/users-page"));
 const AdminDirectorySettingsPage = lazy(() => import("@/features/admin/directory-settings-page"));
 const AdminFormsPage = lazy(() => import("@/features/admin/forms-page"));
-const AdminCrmPage = lazy(() => import("@/features/admin/crm-page"));
-const AdminCrmClientsPage = lazy(() => import("@/features/admin/crm-clients-page"));
 const AdminEventsPage = lazy(() => import("@/features/admin/events-page"));
 const DocsPage = lazy(() => import("@/features/admin/docs-page"));
 const AdminSettingsPage = lazy(() => import("@/features/admin/settings-page"));
@@ -64,8 +62,6 @@ const CmsPagesPage = lazy(() => import("@/features/admin/cms/cms-pages-page"));
 const CmsPageEditorPage = lazy(() => import("@/features/admin/cms/cms-page-editor-page"));
 const CmsMediaPage = lazy(() => import("@/features/admin/cms/cms-media-page"));
 const CmsSeoPage = lazy(() => import("@/features/admin/cms/cms-seo-page"));
-const CmsSectionsPage = lazy(() => import("@/features/admin/cms/cms-sections-page"));
-const CmsSectionEditorPage = lazy(() => import("@/features/admin/cms/cms-section-editor-page"));
 const CmsMenusPage = lazy(() => import("@/features/admin/cms/cms-menus-page"));
 const CmsSidebarsPage = lazy(() => import("@/features/admin/cms/cms-sidebars-page"));
 const SystemBackupsPage = lazy(() => import("@/features/admin/system-backups-page"));
@@ -101,9 +97,6 @@ function AdminIndexRoute() {
     }
     if (hasAdminPermission("content")) {
       return <Redirect to="/admin/cms" replace />;
-    }
-    if (hasAdminPermission("crm")) {
-      return <Redirect to="/admin/crm" replace />;
     }
     if (hasAdminPermission("design")) {
       return <Redirect to="/admin/design/branding" replace />;
@@ -215,16 +208,8 @@ function Router() {
             <AdminFormsPage />
           </ProtectedRoute>
         </Route>
-        <Route path="/admin/crm/clients">
-          <ProtectedRoute roles={["admin", "editor"]} adminPermissions={["crm"]}>
-            {siteFeatures.crmEnabled ? <AdminCrmClientsPage /> : <NotFound />}
-          </ProtectedRoute>
-        </Route>
-        <Route path="/admin/crm">
-          <ProtectedRoute roles={["admin", "editor"]} adminPermissions={["crm"]}>
-            {siteFeatures.crmEnabled ? <AdminCrmPage /> : <NotFound />}
-          </ProtectedRoute>
-        </Route>
+        <Route path="/admin/crm/clients" component={NotFound} />
+        <Route path="/admin/crm" component={NotFound} />
         <Route path="/admin/blog">
           <Redirect to="/admin/cms/blog" />
         </Route>
@@ -322,21 +307,9 @@ function Router() {
             {siteFeatures.blogEnabled ? <CmsBlogPage /> : <NotFound />}
           </ProtectedRoute>
         </Route>
-        <Route path="/admin/cms/sections/new">
-          <ProtectedRoute roles={["admin", "editor"]} adminPermissions={["content", "design"]}>
-            <CmsSectionEditorPage />
-          </ProtectedRoute>
-        </Route>
-        <Route path="/admin/cms/sections/:id">
-          <ProtectedRoute roles={["admin", "editor"]} adminPermissions={["content", "design"]}>
-            <CmsSectionEditorPage />
-          </ProtectedRoute>
-        </Route>
-        <Route path="/admin/cms/sections">
-          <ProtectedRoute roles={["admin", "editor"]} adminPermissions={["content", "design"]}>
-            <CmsSectionsPage />
-          </ProtectedRoute>
-        </Route>
+        <Route path="/admin/cms/sections/new" component={NotFound} />
+        <Route path="/admin/cms/sections/:id" component={NotFound} />
+        <Route path="/admin/cms/sections" component={NotFound} />
         <Route path="/admin/cms/seo">
           <ProtectedRoute roles={["admin", "editor"]} adminPermissions={["content"]}>
             <CmsSeoPage />

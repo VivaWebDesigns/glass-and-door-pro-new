@@ -14,10 +14,11 @@ import {
   ArrowRight,
   Clock,
   BookOpen,
-  Blocks,
 } from "lucide-react";
 import type { CmsPage, BlogPost } from "@shared/schema";
 import { format } from "date-fns";
+
+const HIDDEN_CMS_PAGE_SLUGS = new Set(["directory", "recordings", "events", "insights"]);
 
 export default function CmsOverviewPage() {
   const [, navigate] = useLocation();
@@ -32,10 +33,11 @@ export default function CmsOverviewPage() {
 
   const isLoading = pagesLoading || postsLoading;
 
-  const totalPages = pages.length;
-  const publishedPages = pages.filter((p) => p.status === "published").length;
-  const draftPages = pages.filter((p) => p.status === "draft").length;
-  const recentPages = pages.slice(0, 5);
+  const visiblePages = pages.filter((page) => !HIDDEN_CMS_PAGE_SLUGS.has(page.slug));
+  const totalPages = visiblePages.length;
+  const publishedPages = visiblePages.filter((p) => p.status === "published").length;
+  const draftPages = visiblePages.filter((p) => p.status === "draft").length;
+  const recentPages = visiblePages.slice(0, 5);
 
   const totalPosts = posts.length;
   const publishedPosts = posts.filter((p) => p.isPublished).length;
@@ -65,15 +67,6 @@ export default function CmsOverviewPage() {
       icon: Image,
       href: "/admin/cms/media",
       color: "text-violet-500",
-      bg: "bg-violet-50 dark:bg-violet-950/30",
-      available: true,
-    },
-    {
-      title: "Sections",
-      description: "Save and reuse block groups across any page",
-      icon: Blocks,
-      href: "/admin/cms/sections",
-      color: "text-violet-400",
       bg: "bg-violet-50 dark:bg-violet-950/30",
       available: true,
     },

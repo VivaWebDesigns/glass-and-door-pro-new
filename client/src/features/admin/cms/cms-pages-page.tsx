@@ -23,6 +23,8 @@ import { format } from "date-fns";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 
+const HIDDEN_CMS_PAGE_SLUGS = new Set(["directory", "recordings", "events", "insights"]);
+
 const PAGE_TYPE_COLORS: Record<string, string> = {
   home: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400",
   about: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
@@ -40,6 +42,7 @@ export default function CmsPagesPage() {
   const { data: pages = [], isLoading } = useQuery<CmsPage[]>({
     queryKey: ["/api/admin/cms/pages"],
   });
+  const visiblePages = pages.filter((page) => !HIDDEN_CMS_PAGE_SLUGS.has(page.slug));
 
   const { data: pageLocks = [] } = useQuery<Array<{ resourceId: string; lock: { lockedByUserId: string; lockedByName: string } }>>({
     queryKey: ["/api/admin/editor-locks/resource", "cms_page"],
@@ -109,7 +112,7 @@ export default function CmsPagesPage() {
               <div className="space-y-3 pt-6">
                 {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-14 w-full" />)}
               </div>
-            ) : pages.length === 0 ? (
+            ) : visiblePages.length === 0 ? (
               <div className="text-center py-16 text-muted-foreground" data-testid="text-empty-pages">
                 <Globe className="h-10 w-10 mx-auto mb-3 opacity-30" />
                 <p className="font-medium">No pages yet</p>
@@ -137,7 +140,7 @@ export default function CmsPagesPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {pages.map((page) => {
+                  {visiblePages.map((page) => {
                     const activeLock = pageLocksById.get(page.id);
                     const isLockedByOther = Boolean(activeLock && activeLock.lockedByUserId !== user?.id);
                     const isOwnedByCurrentUser = Boolean(activeLock && activeLock.lockedByUserId === user?.id);

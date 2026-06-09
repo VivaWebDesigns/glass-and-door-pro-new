@@ -2,11 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import {
-  LayoutDashboard,
   Users,
-  UserCheck,
-  CreditCard,
-  CalendarDays,
   FileText,
   Settings,
   LogOut,
@@ -20,15 +16,11 @@ import {
   Image,
   SearchIcon,
   SquarePen,
-  Blocks,
-  ClipboardList,
   Menu as MenuIcon,
   PanelRight,
   Database,
   Palette,
   Type,
-  Tag,
-  Handshake,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -63,97 +55,6 @@ function buildNavGroups(
   hasAdminPermission: (permission: AdminPermission) => boolean,
 ): NavGroup[] {
   const groups: NavGroup[] = [
-    {
-      items: [
-        ...(user?.role === "admin"
-          ? [
-              {
-                title: "Dashboard",
-                href: "/admin",
-                icon: LayoutDashboard,
-                iconColor: "text-teal-600",
-              } satisfies NavItem,
-            ]
-          : []),
-      ],
-    },
-    ...(siteFeatures.directoryEnabled && hasAdminPermission("directory")
-      ? ([
-          {
-            label: "Directory System",
-            items: [
-              {
-                title: "Directory",
-                href: "/admin/therapists",
-                icon: UserCheck,
-                iconColor: "text-emerald-600",
-                children: [
-                  {
-                    title: "Profiles",
-                    href: "/admin/therapists",
-                    icon: UserCheck,
-                    iconColor: "text-emerald-600",
-                  },
-                  {
-                    title: "Specializations",
-                    href: "/admin/therapists/specializations",
-                    icon: Tag,
-                    iconColor: "text-emerald-500",
-                  },
-                  {
-                    title: "Settings",
-                    href: "/admin/directory/settings",
-                    icon: CreditCard,
-                    iconColor: "text-amber-600",
-                  },
-                ],
-              },
-              {
-                title: "Applications",
-                href: "/admin/applications",
-                icon: ClipboardList,
-                iconColor: "text-orange-600",
-              },
-            ],
-          },
-        ] satisfies NavGroup[])
-      : []),
-    ...(siteFeatures.eventsEnabled && hasAdminPermission("content")
-      ? ([
-          {
-            label: "Event Management",
-            items: [
-              {
-                title: "Events",
-                href: "/admin/events",
-                icon: CalendarDays,
-                iconColor: "text-purple-600",
-              },
-            ],
-          },
-        ] satisfies NavGroup[])
-      : []),
-    ...(siteFeatures.crmEnabled && hasAdminPermission("crm")
-      ? ([
-          {
-            label: "CRM",
-            items: [
-              {
-                title: "Pipeline",
-                href: "/admin/crm",
-                icon: Handshake,
-                iconColor: "text-blue-600",
-              },
-              {
-                title: "Clients",
-                href: "/admin/crm/clients",
-                icon: UserCheck,
-                iconColor: "text-emerald-600",
-              },
-            ],
-          },
-        ] satisfies NavGroup[])
-      : []),
     ...(hasAdminPermission("content")
       ? ([
           {
@@ -191,12 +92,6 @@ function buildNavGroups(
                 title: "Media",
                 href: "/admin/cms/media",
                 icon: Image,
-                iconColor: "text-violet-400",
-              },
-              {
-                title: "Sections",
-                href: "/admin/cms/sections",
-                icon: Blocks,
                 iconColor: "text-violet-400",
               },
               {
