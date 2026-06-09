@@ -2330,6 +2330,32 @@ const glassSeoSettings: Partial<InsertSeoSettings> = {
   organizationLogoUrl: "/images/glass-door-pro/brand/logo-full-white-bg.png",
 };
 
+const glassPrivacyPolicyContent = {
+  blocks: [
+    {
+      id: id(),
+      type: "section-header",
+      props: {
+        eyebrow: "Legal",
+        title: "Privacy Policy",
+        subtitle:
+          "How Glass & Door Pro handles contact form details, service inquiries, cookies, analytics, and customer records.",
+        alignment: "left",
+        headingLevel: "h1",
+      },
+    },
+    {
+      id: id(),
+      type: "rich-text",
+      props: {
+        alignment: "left",
+        content:
+          '<p><strong>Last updated:</strong> June 9, 2026</p><p>Glass &amp; Door Pro is a glass, window, and door company located at 2341 Waverly Dr, Monroe, NC 28112. Our website address is <a href="https://glassanddoorpro.com">glassanddoorpro.com</a>.</p><h2>Information We Collect</h2><p>We collect information you provide directly when you contact us, including your name, phone number, email address, service address if provided, and a description of your glass, window, door, shower, or commercial glass project. This information is used solely to respond to your inquiry, provide an estimate, schedule service, document warranty or service history, and communicate with you about your project.</p><p>If you submit our contact form, we receive and store the information contained in the form submission. This information is used only to respond to your request and manage the service relationship. We do not sell or share this information with third parties for marketing purposes.</p><h2>Cookies &amp; Analytics</h2><p>Our website may use cookies and analytics tools, such as Google Analytics, to understand how visitors find and use the site. This data is aggregated and used to improve the website, measure performance, and understand which services visitors are interested in. We do not use analytics data to personally identify individual visitors. You can disable cookies in your browser settings at any time.</p><h2>Third-Party Services</h2><p>Our website may embed maps from Google Maps or link to third-party services such as Google Business Profile, phone links, review platforms, or other tools used to help customers contact or locate us. These third-party services are subject to their own privacy policies. We do not control their data practices.</p><h2>Data Retention</h2><p>We retain contact form submissions, estimate details, project notes, customer records, and related communications for the duration of our business relationship and as needed for warranty, service documentation, accounting, and legal recordkeeping purposes. We do not retain customer payment card information on this website.</p><p>You may contact us at any time to request access to, correction of, or deletion of personal information we hold about you, subject to any records we are required or permitted to retain for legitimate business, warranty, accounting, or legal purposes.</p><h2>Changes to This Policy</h2><p>We may update this privacy policy from time to time. The date at the top of this page reflects the most recent update.</p><h2>Contact Us</h2><p>Questions about this privacy policy can be directed to Glass &amp; Door Pro at <a href="tel:+17047716111">(704) 771-6111</a>, through our contact page, or by mail to 2341 Waverly Dr, Monroe, NC 28112.</p>',
+      },
+    },
+  ],
+};
+
 async function upsertMenu(menu: InsertCmsMenu & { location: MenuLocation }) {
   const allMenus = await storage.cmsMenus.getAll();
   const matches = allMenus.filter((entry) => entry.location === menu.location);
@@ -2494,6 +2520,31 @@ async function seedGlassPublicCms() {
       const page = await storage.cmsPages.createPage(pagePayload);
       console.log(`  [created] ${cityPage.slug} page (${page.id})`);
     }
+  }
+
+  const privacyPayload: InsertCmsPage = {
+    title: "Privacy Policy",
+    slug: "privacy-policy",
+    pageType: "custom",
+    status: "published",
+    template: "full-width",
+    content: glassPrivacyPolicyContent,
+    seoTitle: "Privacy Policy",
+    seoDescription:
+      "Review how Glass & Door Pro handles contact form details, service inquiries, cookies, analytics, and customer records.",
+    seoKeywords: "Glass & Door Pro privacy policy, Charlotte glass company privacy, customer information",
+    ogImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
+    canonicalUrl: "https://glassanddoorpro.com/privacy-policy",
+    noindex: false,
+    publishedAt: new Date(),
+  };
+  const existingPrivacyPolicy = await storage.cmsPages.getPageBySlug("privacy-policy");
+  if (existingPrivacyPolicy) {
+    await storage.cmsPages.updatePage(existingPrivacyPolicy.id, privacyPayload);
+    console.log(`  [updated] privacy-policy page (${existingPrivacyPolicy.id})`);
+  } else {
+    const page = await storage.cmsPages.createPage(privacyPayload);
+    console.log(`  [created] privacy-policy page (${page.id})`);
   }
 
   for (const menu of glassMenus) {
