@@ -354,8 +354,11 @@ describe("CmsPageEditorPage", () => {
     editorLockState.isReadOnly = false;
     const originalPageType = mockPage.pageType;
     const originalSlug = mockPage.slug;
+    const originalSeoDescription = mockPage.seoDescription;
     mockPage.pageType = "service";
     mockPage.slug = "services-frameless-showers";
+    mockPage.seoDescription =
+      "Custom frameless glass shower doors installed by an owner-operator with 15+ years of experience. Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw and surrounding NC. Free quotes. Call today.";
     root = createRoot(container);
 
     await act(async () => {
@@ -374,11 +377,13 @@ describe("CmsPageEditorPage", () => {
       expect.objectContaining({
         slug: "services-frameless-showers",
         pageType: "service",
+        seoDescription: mockPage.seoDescription,
       })
     );
 
     mockPage.pageType = originalPageType;
     mockPage.slug = originalSlug;
+    mockPage.seoDescription = originalSeoDescription;
   });
 
   it("prompts before publishing when unsaved page edits are still dirty", async () => {

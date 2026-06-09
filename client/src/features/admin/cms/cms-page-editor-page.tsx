@@ -84,7 +84,7 @@ const editorSchema = z.object({
   sidebarId: z.string().default(""),
   status: z.enum(["draft", "published", "scheduled", "archived"]),
   seoTitle: z.string().optional(),
-  seoDescription: z.string().max(160, "Max 160 characters").optional(),
+  seoDescription: z.string().optional(),
   seoKeywords: z.string().optional(),
   ogImageUrl: z.string().optional(),
   canonicalUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
@@ -1045,18 +1045,19 @@ export default function CmsPageEditorPage() {
                           <FormItem>
                             <FormLabel>
                               Meta Description
-                              <span className={`ml-2 text-xs font-normal ${(field.value ?? "").length > 130 ? "text-amber-500" : "text-muted-foreground"}`}>
+                              <span className={`ml-2 text-xs font-normal ${(field.value ?? "").length > 160 ? "text-amber-500" : (field.value ?? "").length > 130 ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}>
                                 ({(field.value ?? "").length}/160)
                               </span>
                             </FormLabel>
                             <FormControl>
                               <Textarea
-                                placeholder="Brief description for search engine results (max 160 chars)"
+                                placeholder="Brief description for search engine results"
                                 rows={3}
                                 {...field}
                                 data-testid="textarea-seo-description"
                               />
                             </FormControl>
+                            <FormDescription className="text-xs">Aim for 130-160 characters. Longer descriptions can still be saved.</FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
