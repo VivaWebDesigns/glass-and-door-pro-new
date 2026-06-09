@@ -2217,6 +2217,10 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
         item("Window Repair", "/services/window-repair"),
         item("Commercial Glass", "/services/commercial-glass"),
       ]),
+      item("Service Areas", "/areas-served/charlotte-nc", [
+        item("Charlotte, NC", "/areas-served/charlotte-nc"),
+        item("Monroe, NC", "/areas-served/monroe-nc"),
+      ]),
       item("Gallery", "/gallery"),
       item("Reviews", "/reviews"),
       item("Contact", "/#contact"),
@@ -2244,6 +2248,9 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
     name: "Resources",
     location: "footer_resources",
     items: [
+      item("Service Areas", "/areas-served/charlotte-nc"),
+      item("Charlotte, NC", "/areas-served/charlotte-nc"),
+      item("Monroe, NC", "/areas-served/monroe-nc"),
       item("About Doug", "/#about"),
       item("Project Gallery", "/gallery"),
       item("Reviews", "/reviews"),
@@ -2278,6 +2285,10 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
         item("Door Installation", "/services/door-installation"),
         item("Window Repair", "/services/window-repair"),
         item("Commercial Glass", "/services/commercial-glass"),
+      ]),
+      item("Service Areas", "/areas-served/charlotte-nc", [
+        item("Charlotte, NC", "/areas-served/charlotte-nc"),
+        item("Monroe, NC", "/areas-served/monroe-nc"),
       ]),
       item("Gallery", "/gallery"),
       item("Reviews", "/reviews"),
