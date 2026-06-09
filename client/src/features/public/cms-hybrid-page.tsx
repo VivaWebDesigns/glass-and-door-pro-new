@@ -9,12 +9,17 @@ import type { BlockInstance, BuilderContent } from "@/features/admin/cms/builder
 import type { CmsPage, SeoSettings } from "@shared/schema";
 import { JsonLd } from "@/components/shared/json-ld";
 import {
-  buildOrganizationLd,
   buildBreadcrumbLd,
   buildFaqPageLd,
   extractFaqItems,
 } from "@/lib/structured-data";
 import { formatBrandFirstTitle } from "@shared/seo-title";
+import {
+  buildGlassBreadcrumbItems,
+  buildGlassLocalBusinessLd,
+  buildGlassServiceLdForCmsPage,
+  getCmsPublicPath,
+} from "@shared/glass-seo";
 
 interface CmsHybridPageProps {
   slug: string;
@@ -109,7 +114,9 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
       removeMeta("og:image", true);
     }
 
-    const canonical = page.canonicalUrl || `${origin}/${page.slug}`;
+    const publicPath = getCmsPublicPath(page.slug);
+    const canonical =
+      page.canonicalUrl || (publicPath === "/" ? origin : `${origin}${publicPath}`);
     setLink("canonical", canonical);
 
     if (page.noindex) {
@@ -129,22 +136,18 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
     globalSeo?.siteUrl || (typeof window !== "undefined" ? window.location.origin : "");
 
   const isHome = page.slug === "home" || page.slug === "";
-  const pageUrl = page.canonicalUrl || (isHome ? origin : `${origin}/${page.slug}`);
-  const pageLabel = page.seoTitle || page.title;
 
   const breadcrumbs = isHome
     ? null
-    : buildBreadcrumbLd([
-        { name: "Home", url: origin || "/" },
-        { name: pageLabel, url: pageUrl },
-      ]);
+    : buildBreadcrumbLd(buildGlassBreadcrumbItems(page, origin));
 
   const faqItems = extractFaqItems(page.content);
 
   return (
     <JsonLd
       schemas={[
-        globalSeo ? buildOrganizationLd(globalSeo) : null,
+        buildGlassLocalBusinessLd(origin),
+        buildGlassServiceLdForCmsPage(page, origin),
         breadcrumbs,
         buildFaqPageLd(faqItems),
       ]}

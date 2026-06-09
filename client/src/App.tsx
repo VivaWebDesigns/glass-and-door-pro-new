@@ -133,6 +133,8 @@ function Router() {
         <Route path="/services/door-installation" component={() => <CmsHybridPage slug="services-door-installation" fallback={<NotFound />} />} />
         <Route path="/services/window-repair" component={() => <CmsHybridPage slug="services-window-repair" fallback={<NotFound />} />} />
         <Route path="/services/commercial-glass" component={() => <CmsHybridPage slug="services-commercial-glass" fallback={<NotFound />} />} />
+        <Route path="/areas-served/monroe-nc" component={() => <CmsHybridPage slug="areas-served-monroe-nc" fallback={<NotFound />} />} />
+        <Route path="/areas-served/charlotte-nc" component={() => <CmsHybridPage slug="areas-served-charlotte-nc" fallback={<NotFound />} />} />
         <Route path="/preview/cms/:id" component={CmsPreviewPage} />
         <Route path="/join" component={() => <CmsHybridPage slug="join" fallback={<JoinNetworkPage />} />} />
         <Route path="/events" component={() => siteFeatures.eventsEnabled ? <CmsHybridPage slug="events" fallback={<EventsPage />} /> : <NotFound />} />

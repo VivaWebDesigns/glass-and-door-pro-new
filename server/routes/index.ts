@@ -28,6 +28,7 @@ import { buildRobotsTxtPayload } from "../services/robots-txt.service";
 import { storage } from "../storage/index";
 import { DEFAULT_SITE_FEATURES, normalizeBooleanSetting } from "@shared/site-features";
 import { getEventPath } from "@shared/event-url";
+import { getCmsPublicPath } from "@shared/glass-seo";
 import {
   DEFAULT_DIRECTORY_SETTINGS,
   getDirectorySettings,
@@ -271,7 +272,7 @@ export function registerApiRoutes(app: Express) {
         )
           continue;
         urls.push({
-          loc: `${base}/${page.slug}`,
+          loc: page.canonicalUrl || `${base}${getCmsPublicPath(page.slug)}`,
           lastmod: page.updatedAt
             ? new Date(page.updatedAt).toISOString().split("T")[0]
             : undefined,

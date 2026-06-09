@@ -174,6 +174,58 @@ describe("public-prerender.service", () => {
     expect(snapshot?.canonicalUrl).toBe("https://coreplatform.com/join");
   });
 
+  it("emits CMS FAQPage schema and maps nested public routes to CMS slugs", async () => {
+    mockGetSeo.mockResolvedValue({
+      ...seoSettings,
+      siteName: "Glass & Door Pro",
+      siteUrl: "https://glassanddoorpro.com",
+      titleSuffix: " | Glass & Door Pro",
+      organizationName: "Glass & Door Pro",
+    });
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      title: "Frameless Showers",
+      slug: "services-frameless-showers",
+      pageType: "service",
+      canonicalUrl: "https://glassanddoorpro.com/services/frameless-showers",
+      content: {
+        blocks: [
+          {
+            id: "faq-1",
+            type: "faq",
+            props: {
+              items: [
+                {
+                  question: "How long does installation take?",
+                  answer: "<p>Most frameless shower installations are completed in 2-4 hours.</p>",
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+    const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } = await import(
+      "../services/public-prerender.service"
+    );
+
+    const snapshot = await getPublicHtmlSnapshot("/services/frameless-showers");
+    const html = injectPublicHtmlSnapshot(
+      "<html><head><title>Default</title><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--><div id=\"root\"></div></body></html>",
+      snapshot,
+    );
+
+    expect(mockGetPageBySlug).toHaveBeenCalledWith("services-frameless-showers");
+    expect(snapshot?.jsonLd?.map((schema) => schema["@type"])).toEqual([
+      "LocalBusiness",
+      "Service",
+      "BreadcrumbList",
+      "FAQPage",
+    ]);
+    expect(html).toContain('"@type":"FAQPage"');
+    expect(html).toContain("Most frameless shower installations are completed in 2-4 hours.");
+  });
+
   it("returns a gallery fallback snapshot when the CMS gallery page is not seeded", async () => {
     const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
 

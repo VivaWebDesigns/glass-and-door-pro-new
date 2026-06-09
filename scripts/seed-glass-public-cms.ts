@@ -866,13 +866,14 @@ function serviceHero(props: {
   subheading: string;
   imageUrl: string;
   imagePositionY?: number;
+  primaryText?: string;
 }) {
   return block("hero", {
     variant: "glass-service",
     layout: "split",
     heading: props.heading,
     subheading: `<p>${props.subheading}</p>`,
-    ctaText: "Request a Quote",
+    ctaText: props.primaryText ?? "Request a Free Quote",
     ctaAction: "form-modal",
     ctaFormSlug: "contact-form",
     ctaModalTitle: "Request a Free Quote",
@@ -974,6 +975,259 @@ function serviceCtaBlock(heading: string, subheading: string) {
   });
 }
 
+function quoteCtaBlock(heading: string, body: string, footerLine: string) {
+  return block("cta", {
+    variant: "glass-service",
+    heading,
+    subheading: `<p>${body}</p><p><strong>${footerLine}</strong></p>`,
+    primaryText: "Get Your Free Estimate",
+    primaryAction: "form-modal",
+    primaryFormSlug: "contact-form",
+    primaryModalTitle: "Request a Free Estimate",
+    primaryModalDescription: "Share a few project details and Doug will follow up with next steps.",
+    secondaryText: "Call (704) 771-6111",
+    secondaryAction: "custom-link",
+    secondaryLink: "tel:+17047716111",
+  });
+}
+
+function relatedServicesBlock() {
+  return block("link-list", {
+    title: "Related Services",
+    columns: "1",
+    sectionBackgroundColor: "#ffffff",
+    sectionPaddingTop: "md",
+    sectionPaddingBottom: "md",
+    links: [
+      {
+        label: "Window Installation",
+        description: "For whole-bathroom or whole-home remodels.",
+        url: "/services/window-installation",
+      },
+      {
+        label: "Door Installation",
+        description: "Entry, patio, and interior doors.",
+        url: "/services/door-installation",
+      },
+      {
+        label: "Window Repair",
+        description: "Foggy glass, broken panes, seal failures, and hardware.",
+        url: "/services/window-repair",
+      },
+    ],
+  });
+}
+
+const month1FramelessContent: InsertCmsPage["content"] = {
+  blocks: [
+    serviceHero({
+      heading: "Frameless Glass Shower Doors in Charlotte, Monroe & Surrounding NC",
+      subheading:
+        "Custom frameless shower enclosures, measured, fabricated, and installed personally by Doug — owner-operator with 15+ years of experience. Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and the surrounding greater Charlotte area.",
+      imageUrl: "/images/glass-door-pro/frameless-parallax.jpg",
+      imagePositionY: 25,
+    }),
+    block("rich-text", {
+      title: "",
+      alignment: "left",
+      content:
+        "<p>A frameless shower is one of the highest-impact upgrades you can make to a bathroom. It opens up the space visually, shows off your tile, simplifies cleaning, and adds real resale value. But the difference between a frameless shower that looks breathtaking and one that looks ordinary comes down to how it's measured, fabricated, and installed.</p><p>I've been installing frameless shower doors across the Charlotte metro for over 15 years. Every shower is custom — measured to your specific bathroom, fabricated from heavy tempered safety glass, and installed by me personally with no subcontractors. That's how we get plumb hinges, even reveals, and a clean, water-tight seal every time.</p>",
+      sectionBackgroundColor: "#ffffff",
+      sectionPaddingTop: "lg",
+      sectionPaddingBottom: "md",
+    }),
+    cardsGrid({
+      title: "Why Choose Frameless Shower Doors?",
+      columns: "3",
+      cards: [
+        {
+          icon: "Star",
+          title: "Modern Elegance",
+          description:
+            "Without bulky metal frames, the bathroom reads larger and more open. The tile, stone, and hardware you invested in become the focal point.",
+        },
+        {
+          icon: "ShieldCheck",
+          title: "Premium Quality",
+          description:
+            'We use heavy 3/8" or 1/2" tempered safety glass paired with commercial-grade hinges, clamps, and clips.',
+        },
+        {
+          icon: "Droplets",
+          title: "Easy to Clean",
+          description:
+            "No metal frames means no hidden tracks where soap, mold, and mildew collect. A weekly wipe-down keeps the glass clear.",
+        },
+        {
+          icon: "CheckCircle",
+          title: "Custom Fit",
+          description:
+            "Every shower is measured in person and glass is cut to your exact opening, which is why frameless installations look seamless.",
+        },
+        {
+          icon: "BadgeCheck",
+          title: "Increases Home Value",
+          description:
+            "A frameless shower is one of the most-requested features Charlotte-area buyers look for.",
+        },
+        {
+          icon: "Wrench",
+          title: "Personal Installation",
+          description:
+            "Doug personally handles every installation, from first measurement to final walkthrough.",
+        },
+      ],
+    }),
+    block("rich-text", {
+      title: "Frameless vs. Semi-Frameless: Which Is Right for You?",
+      alignment: "left",
+      content:
+        "<p>Almost every homeowner who calls us asks about the difference. Both are good products — the right choice depends on budget, the look you want, and how the shower opening is built.</p><h3>Fully Frameless</h3><p>No metal framing at all. Heavy 3/8&quot; or 1/2&quot; tempered glass is held by hinges and clamps attached directly to the wall studs, or to a header bar in some configurations. The look is the cleanest possible — pure glass and minimal hardware. Cleaning is easiest because there are no horizontal tracks for water and soap to collect in.</p><h3>Semi-Frameless</h3><p>Uses a lightweight metal channel around the door edge while the rest of the enclosure stays frameless. Glass is typically 3/16&quot; or 1/4&quot; — thinner than full frameless. Semi-frameless is a real cost saver and the look is still modern, just not as clean as fully frameless.</p><h3>Which to choose</h3><p>If budget is the priority and you want a modern look, semi-frameless is a strong choice. If you want the highest-end look, the easiest long-term cleaning, and the best resale impact, fully frameless is worth the difference. We install both, and I'll give you an honest read during the in-home consultation.</p>",
+      sectionBackgroundColor: "#f8fafc",
+      sectionPaddingTop: "lg",
+      sectionPaddingBottom: "lg",
+    }),
+    block("rich-text", {
+      title: 'Glass Thickness: 3/8" vs. 1/2"',
+      alignment: "left",
+      content:
+        "<p>Both 3/8&quot; and 1/2&quot; glass are tempered to the same safety standards. The difference is weight, feel, and visual presence.</p><h3>3/8&quot; Tempered Glass — Our Standard</h3><p>3/8&quot; is what we install on most frameless showers. It's structurally excellent for typical residential enclosures, the panels are easier to handle, and most hardware finishes are designed around it. For 90%+ of bathrooms in the Charlotte area, 3/8&quot; is the right call.</p><h3>1/2&quot; Tempered Glass — Upgrade Option</h3><p>1/2&quot; is the premium choice. The glass has a noticeably more substantial feel — the door swings with more weight and the panels look more solid. It's the right choice for unusually large panels, oversized doors, or a true statement bathroom.</p><h3>What we recommend</h3><p>For a typical 60&quot; alcove or corner shower, 3/8&quot; is the right balance of quality and value. For showers with panels over 36&quot; wide, doors over 30&quot; wide, or for anyone building a true statement bathroom, 1/2&quot; is worth the upgrade.</p>",
+      sectionBackgroundColor: "#ffffff",
+      sectionPaddingTop: "lg",
+      sectionPaddingBottom: "lg",
+    }),
+    block("rich-text", {
+      title: "Standard Clear vs. Low-Iron Glass",
+      alignment: "left",
+      content:
+        "<p>Standard tempered glass has a slight green tint that comes from its iron content. In a 3/8&quot; or 1/2&quot; panel, you mostly notice it on the polished edges and at the corners. The face of the glass looks mostly clear from across the bathroom but slightly cool-toned up close.</p><p>Low-iron glass has that iron removed during manufacturing. Edges look truly colorless. Whites stay white. Marble veining, mosaic tile, and natural stone behind the glass show their true color instead of being slightly tinted.</p><p>Low-iron is worth it if your shower features statement tile, natural stone, or any white or off-white surface where color accuracy matters. If you're using gray, dark, or muted tile, standard tempered is usually fine.</p>",
+      sectionBackgroundColor: "#f8fafc",
+      sectionPaddingTop: "lg",
+      sectionPaddingBottom: "lg",
+    }),
+    block("rich-text", {
+      title: "Hardware Finishes",
+      alignment: "left",
+      content:
+        "<p>Hardware is where a frameless shower expresses style. We carry every common finish and will walk you through the options during your in-home consultation.</p><ul><li><strong>Chrome</strong> — the timeless choice. Bright, easy to match with most plumbing fixtures.</li><li><strong>Brushed Nickel</strong> — warmer than chrome, hides water spots better, the most forgiving in daily use.</li><li><strong>Matte Black</strong> — dramatic, modern, and pairs beautifully with white and gray tile.</li><li><strong>Oil-Rubbed Bronze</strong> — warm and traditional. A natural fit for craftsman and transitional homes.</li><li><strong>Polished Gold &amp; Brushed Gold</strong> — popular in Wesley Chapel and Waxhaw new construction.</li><li><strong>Polished Brass</strong> — period-appropriate for older Charlotte homes and historic Dilworth or Myers Park renovations.</li></ul><p>Whichever finish you choose, make sure all the bathroom hardware is in the same finish — or intentionally contrasting. We'll help you think it through.</p>",
+      sectionBackgroundColor: "#ffffff",
+      sectionPaddingTop: "lg",
+      sectionPaddingBottom: "lg",
+    }),
+    block("rich-text", {
+      title: "Common Frameless Shower Configurations",
+      alignment: "left",
+      content:
+        "<p>Every bathroom is different, but most frameless installations fall into one of these configurations.</p><h3>Single Panel (Walk-In)</h3><p>A single fixed panel of glass, no door. The cleanest look possible.</p><h3>In-Line</h3><p>A swinging or sliding door plus a fixed stationary panel, all in a straight line. The most common configuration in standard alcove showers.</p><h3>90-Degree Corner</h3><p>Two panels of glass meeting at a corner, with a door in one of them.</p><h3>Neo-Angle</h3><p>A three-panel enclosure that fits a corner shower with an angled front. Common in smaller bathrooms.</p><h3>Steam Shower Enclosures</h3><p>A fully sealed enclosure with a transom panel above the door, designed to contain steam.</p><h3>Tub Splash Panels</h3><p>A single fixed glass panel mounted to a tub deck, replacing a shower curtain.</p>",
+      sectionBackgroundColor: "#f8fafc",
+      sectionPaddingTop: "lg",
+      sectionPaddingBottom: "lg",
+    }),
+    galleryBlock("Our Frameless Shower Work", [
+      {
+        url: "/images/glass-door-pro/gallery-shower1-1280w.webp",
+        alt: "Custom frameless glass shower enclosure installed by Glass and Door Pro in a Charlotte, NC area home",
+      },
+      {
+        url: "/images/glass-door-pro/gallery-shower2-1280w.webp",
+        alt: "Modern frameless shower door with gold hardware fixtures installed in Monroe, NC",
+      },
+      {
+        url: "/images/glass-door-pro/gallery/frameless-showers/03.jpg",
+        alt: "Frameless shower glass installation by Glass and Door Pro",
+      },
+    ]),
+    processCards("Our Process", [
+      {
+        title: "Free Consultation",
+        description:
+          "We come out to your home, look at the bathroom, and walk through the configuration, glass, and finish options with you.",
+      },
+      {
+        title: "Precise Measurement",
+        description:
+          "Once you approve the quote, we take detailed measurements after tile and rough-in are complete.",
+      },
+      {
+        title: "Custom Fabrication",
+        description:
+          "Your glass is cut to spec and the edges polished by the fabricator, typically in 1-2 weeks.",
+      },
+      {
+        title: "Expert Installation",
+        description:
+          "Doug personally installs every shower, seals it, checks alignment, and walks you through care and maintenance.",
+      },
+    ]),
+    block("rich-text", {
+      title: "Caring for Your Frameless Shower",
+      alignment: "left",
+      content:
+        "<p>A frameless shower needs less maintenance than a framed one because there are no tracks where soap and mildew collect. A few habits will keep it looking new for decades:</p><ul><li><strong>Squeegee after every shower.</strong> The single most important habit. It takes 20 seconds and prevents almost all hard-water spotting.</li><li><strong>Clean weekly with a non-abrasive glass cleaner.</strong> Anything safe for car windows is safe for shower glass. Avoid abrasive scrubbers.</li><li><strong>Skip vinegar and ammonia</strong> if your glass has a protective coating because they can degrade it.</li><li><strong>Ask about hydrophobic coatings.</strong> Factory-applied hydrophobic coatings can be ordered through the glass manufacturer at the time of fabrication.</li></ul>",
+      sectionBackgroundColor: "#ffffff",
+      sectionPaddingTop: "lg",
+      sectionPaddingBottom: "lg",
+    }),
+    faqBlock([
+      {
+        question: "How long does a frameless shower door installation take?",
+        answer:
+          "<p>Most frameless shower installations are completed in 2-4 hours once the glass is on site. The full process from first call to finished shower typically runs 2-3 weeks because custom glass has to be measured, ordered, and fabricated. We confirm a target install date the day we measure.</p>",
+      },
+      {
+        question: "What thickness of glass do you use for frameless showers?",
+        answer:
+          '<p>We use 3/8" or 1/2" tempered safety glass. 3/8" is our standard and works beautifully for most enclosures. 1/2" is an upgrade option for larger panels, heavier doors, or homeowners who want the most substantial look and feel. Both are tempered to the same safety standards.</p>',
+      },
+      {
+        question: "What's the difference between frameless and semi-frameless shower doors?",
+        answer:
+          '<p>Semi-frameless doors use a thin metal frame around the door edge, with the surrounding panels frameless. They cost less and are a solid option. Fully frameless uses no edge framing at all — heavier 3/8" or 1/2" glass attached with minimal hardware and clips. The look is cleaner, the cleaning is easier, and the resale value tends to be higher.</p>',
+      },
+      {
+        question: "Do you offer different hardware finishes?",
+        answer:
+          "<p>Yes. We carry chrome, brushed nickel, matte black, oil-rubbed bronze, gold, brushed gold, and polished brass. Matte black and brushed gold have been the most popular finishes the last couple of years. We'll walk through the options with you during the in-home consultation and help you choose a finish that complements the rest of your bathroom hardware.</p>",
+      },
+      {
+        question: "What is low-iron glass and is it worth the upgrade?",
+        answer:
+          "<p>Standard tempered glass has a slight green tint from its iron content — you mostly notice it on the edges and in thicker panels. Low-iron glass removes that tint, so the glass looks truly clear and the tile colors behind it look accurate. It costs more, but for showers featuring statement tile or natural stone, most homeowners feel it's worth it.</p>",
+      },
+      {
+        question: "How do I clean and maintain my frameless shower?",
+        answer:
+          "<p>Squeegee the glass after each use — that single habit prevents most water-spot buildup. For weekly cleaning, use a non-abrasive glass cleaner. Avoid anything with vinegar or ammonia if you have a protective coating applied. Hydrophobic glass coatings can be ordered factory-applied through the glass manufacturer at the time of fabrication, which helps water sheet off and significantly reduces maintenance.</p>",
+      },
+      {
+        question: "What configurations of frameless shower doors do you install?",
+        answer:
+          "<p>We install every configuration: single-panel walk-ins, in-line layouts, 90-degree corner enclosures, neo-angle showers, fixed splash panels for tubs, and steam shower enclosures with sealed transoms. Every installation is measured and fabricated specifically for your bathroom — nothing is off-the-shelf.</p>",
+      },
+      {
+        question: "What areas do you serve for frameless shower installation?",
+        answer:
+          "<p>Glass and Door Pro serves the greater Charlotte metro area including Charlotte, Matthews, Mint Hill, Monroe, Pineville, Huntersville, Cornelius, Davidson, Concord, Tega Cay, Waxhaw, Weddington, Wesley Chapel, Indian Trail, Stallings, Fort Mill, Indian Land, Rock Hill, and surrounding areas. We're based in Monroe, NC.</p>",
+      },
+    ]),
+    block("rich-text", {
+      title: "Serving the Greater Charlotte Area",
+      alignment: "center",
+      content:
+        '<p>We serve homeowners and businesses throughout the greater Charlotte metro area, including: <a href="/areas-served/charlotte-nc">Charlotte</a>, Matthews, Mint Hill, <a href="/areas-served/monroe-nc">Monroe</a>, Pineville, Huntersville, Cornelius, Davidson, Concord, Tega Cay, Waxhaw, Weddington, Wesley Chapel, Indian Trail, Stallings, Fort Mill, Indian Land, Rock Hill, and surrounding areas.</p>',
+      sectionBackgroundColor: "#ffffff",
+      sectionPaddingTop: "md",
+      sectionPaddingBottom: "md",
+    }),
+    relatedServicesBlock(),
+    quoteCtaBlock(
+      "Ready to Transform Your Bathroom?",
+      "Get a free quote for your custom frameless shower installation. Doug will come out personally, look at your bathroom, and give you a clear written estimate the same visit.",
+      "Mon–Sat: 7am – 6pm | Saturday appointments available",
+    ),
+  ],
+};
+
 function servicePageContent(props: {
   hero: {
     heading: string;
@@ -1043,117 +1297,13 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Frameless Showers",
     slug: "services-frameless-showers",
-    seoTitle: "Frameless Shower Doors in Charlotte, NC",
+    seoTitle: "Frameless Shower Doors in Charlotte, Monroe & Indian Trail NC | Glass and Door Pro",
     seoDescription:
-      "Custom frameless glass shower door installation in Charlotte, NC with precision-measured tempered safety glass and premium hardware.",
+      "Custom frameless glass shower doors installed by an owner-operator with 15+ years of experience. Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw & surrounding NC. Free quotes. Call (704) 771-6111.",
     seoKeywords:
       "frameless shower doors Charlotte NC, glass shower installation, custom shower enclosure, shower glass Monroe NC",
-    ogImageUrl: "/images/glass-door-pro/frameless-parallax.jpg",
-    content: servicePageContent({
-      hero: {
-        heading: "Frameless Glass Shower Doors",
-        subheading:
-          "Transform your bathroom into a luxurious spa-like retreat with custom frameless glass shower enclosures. Serving Charlotte, NC and surrounding areas with over 15 years of expert installation experience.",
-        imageUrl: "/images/glass-door-pro/frameless-parallax.jpg",
-        imagePositionY: 25,
-      },
-      cardsTitle: "Why Choose Frameless Shower Doors?",
-      cards: [
-        {
-          icon: "Star",
-          title: "Modern Elegance",
-          description:
-            "Frameless designs create a sleek, open feel that makes your bathroom appear larger and more luxurious.",
-        },
-        {
-          icon: "ShieldCheck",
-          title: "Premium Quality",
-          description:
-            "We use thick tempered safety glass and high-quality hardware that's built to last for decades.",
-        },
-        {
-          icon: "Droplets",
-          title: "Easy to Clean",
-          description: "No metal frames means fewer places for mold and mildew to hide. Simply wipe and go.",
-        },
-        {
-          icon: "CheckCircle",
-          title: "Custom Fit",
-          description:
-            "Every installation is precision-measured and custom-cut to perfectly fit your unique bathroom space.",
-        },
-        {
-          icon: "BadgeCheck",
-          title: "Increases Home Value",
-          description:
-            "A beautiful frameless shower is a sought-after feature that adds real value to your home.",
-        },
-        {
-          icon: "Wrench",
-          title: "Professional Installation",
-          description:
-            "Doug personally handles every installation with meticulous attention to detail and craftsmanship.",
-        },
-      ],
-      galleryTitle: "Our Frameless Shower Work",
-      gallery: [
-        {
-          url: "/images/glass-door-pro/gallery-shower1-1280w.webp",
-          alt: "Custom frameless glass shower enclosure installed by Glass & Door Pro",
-        },
-        {
-          url: "/images/glass-door-pro/gallery-shower2-1280w.webp",
-          alt: "Modern frameless shower door with premium hardware",
-        },
-        ...framelessShowerImages.slice(11),
-      ],
-      processTitle: "Our Simple Process",
-      process: [
-        {
-          title: "Free Consultation",
-          description: "Contact us and we'll schedule a convenient time to discuss your vision.",
-        },
-        {
-          title: "Precise Measurement",
-          description: "We take detailed measurements to ensure a perfect custom fit.",
-        },
-        {
-          title: "Custom Fabrication",
-          description: "Your glass is precision-cut and edges polished to perfection.",
-        },
-        {
-          title: "Expert Installation",
-          description: "Professional installation with attention to every detail.",
-        },
-      ],
-      faqs: [
-        {
-          question: "How long does installation take?",
-          answer:
-            "<p>Most frameless shower installations are completed in 2-4 hours, depending on the complexity of your design.</p>",
-        },
-        {
-          question: "What thickness of glass do you use?",
-          answer:
-            '<p>We typically use 3/8" or 1/2" thick tempered safety glass, which provides excellent durability and a premium look.</p>',
-        },
-        {
-          question: "Do you offer different hardware finishes?",
-          answer:
-            "<p>Yes. We offer chrome, brushed nickel, oil-rubbed bronze, matte black, gold, and other finishes to match your bathroom.</p>",
-        },
-        {
-          question: "How do I maintain my frameless shower?",
-          answer:
-            "<p>Simply squeegee after each use and clean weekly with a non-abrasive glass cleaner. We can also apply protective coatings.</p>",
-        },
-      ],
-      cta: {
-        heading: "Ready to Transform Your Bathroom?",
-        subheading:
-          "Get a free quote for your custom frameless shower installation today. We're ready to help you create the bathroom of your dreams.",
-      },
-    }),
+    ogImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
+    content: month1FramelessContent,
   },
   {
     title: "Window Installation",
@@ -1628,6 +1778,432 @@ const glassServicePages: GlassServicePageSeed[] = [
   },
 ];
 
+type GlassCityPageSeed = {
+  title: string;
+  slug: string;
+  path: string;
+  seoTitle: string;
+  seoDescription: string;
+  seoKeywords: string;
+  ogImageUrl: string;
+  content: InsertCmsPage["content"];
+};
+
+function cityPageContent(props: {
+  hero: { heading: string; subheading: string; imageUrl: string; imagePositionY?: number };
+  introTitle: string;
+  introContent: string;
+  benefitsTitle: string;
+  benefits: GlassCard[];
+  servicesTitle: string;
+  servicesIntro: string;
+  serviceCards: GlassCard[];
+  areasTitle: string;
+  areasIntro: string;
+  areas: string[];
+  areasClosing: string;
+  galleryTitle: string;
+  gallery: Array<{ url: string; alt: string }>;
+  faqTitle: string;
+  faqs: GlassFaq[];
+  ctaHeading: string;
+  ctaBody: string;
+  ctaFooter: string;
+}): InsertCmsPage["content"] {
+  return {
+    blocks: [
+      serviceHero(props.hero),
+      block("rich-text", {
+        title: props.introTitle,
+        alignment: "left",
+        content: props.introContent,
+        sectionBackgroundColor: "#ffffff",
+        sectionPaddingTop: "lg",
+        sectionPaddingBottom: "md",
+      }),
+      cardsGrid({
+        title: props.benefitsTitle,
+        cards: props.benefits,
+        columns: "3",
+        backgroundColor: "#f8fafc",
+      }),
+      cardsGrid({
+        title: props.servicesTitle,
+        subtitle: props.servicesIntro,
+        cards: props.serviceCards,
+        columns: "3",
+        backgroundColor: "#ffffff",
+      }),
+      block("rich-text", {
+        title: "Meet Doug Adams",
+        alignment: "left",
+        content:
+          "<p>I'm Doug, and I've been installing glass and doors in the Charlotte area for over 15 years. I started Glass and Door Pro because I wanted to do this work the way I think it should be done: one craftsman, one project at a time, with the person who quotes the job actually being the person who shows up to install it.</p><p>Most of what I do is frameless shower doors, window and door installation, and window repair. I work on everything from brand-new construction to historic homes — and the tricky, custom projects other contractors don't want to mess with are usually the ones I enjoy most.</p><p>Based in Monroe. Serving Charlotte and surrounding areas. Saturday appointments available.</p>",
+        sectionBackgroundColor: "#f8fafc",
+        sectionPaddingTop: "lg",
+        sectionPaddingBottom: "lg",
+      }),
+      block("rich-text", {
+        title: props.areasTitle,
+        alignment: "left",
+        content: `<p>${props.areasIntro}</p><ul>${props.areas
+          .map((area) => `<li>${area}</li>`)
+          .join("")}</ul><p>${props.areasClosing}</p>`,
+        sectionBackgroundColor: "#ffffff",
+        sectionPaddingTop: "lg",
+        sectionPaddingBottom: "md",
+      }),
+      galleryBlock(props.galleryTitle, props.gallery),
+      block("testimonials", {
+        title: "What Our Clients Say",
+        variant: "google-carousel",
+        sectionBackgroundColor: "#ffffff",
+        sectionPaddingTop: "md",
+        sectionPaddingBottom: "md",
+        items: [
+          {
+            quote:
+              "Doug was great. He's extremely detailed in his work. Will definitely use him again when I'm ready to upgrade the other shower door. Highly recommend!",
+            name: "Thomas F.",
+            role: "Customer",
+            location: "Google review",
+            rating: 5,
+            source: "Google",
+            sourceIcon: "google",
+          },
+        ],
+      }),
+      block("faq", {
+        title: props.faqTitle,
+        sectionBackgroundColor: "#f8fafc",
+        sectionPaddingTop: "lg",
+        sectionPaddingBottom: "lg",
+        items: props.faqs,
+      }),
+      quoteCtaBlock(props.ctaHeading, props.ctaBody, props.ctaFooter),
+    ],
+  };
+}
+
+const cityServiceCards: GlassCard[] = [
+  {
+    icon: "Droplets",
+    title: "Frameless Shower Doors",
+    description:
+      'Custom frameless glass shower enclosures in single-panel walk-ins, in-line layouts, 90-degree corners, neo-angle showers, steam enclosures, and tub splash panels. Glass is custom-cut in either 3/8" or 1/2" tempered safety glass.',
+    link: "/services/frameless-showers",
+    buttonText: "Learn more about frameless showers",
+  },
+  {
+    icon: "Grid3X3",
+    title: "Window Installation",
+    description:
+      "Energy-efficient window replacements to enhance your home's comfort and curb appeal. We work with common materials and styles, from double-hung and casement to sliding, bay, and picture windows.",
+    link: "/services/window-installation",
+    buttonText: "Learn more about window installation",
+  },
+  {
+    icon: "DoorOpen",
+    title: "Door Installation",
+    description:
+      "Entry doors, patio doors, sliding glass doors, French doors, storm doors, and pet doors in fiberglass, steel, wood, and composite. Smart locks and security upgrades available.",
+    link: "/services/door-installation",
+    buttonText: "Learn more about door installation",
+  },
+  {
+    icon: "Wrench",
+    title: "Window Repair",
+    description:
+      "Fast, reliable window glass repair for broken panes, foggy windows, and seal failures. We can often repair the glass without replacing the entire window unit.",
+    link: "/services/window-repair",
+    buttonText: "Learn more about window repair",
+  },
+  {
+    icon: "Building2",
+    title: "Commercial Glass",
+    description:
+      "Professional storefront glass, office partitions, and commercial glass solutions for businesses. After-hours and weekend appointments available.",
+    link: "/services/commercial-glass",
+    buttonText: "Learn more about commercial glass",
+  },
+];
+
+const glassCityPages: GlassCityPageSeed[] = [
+  {
+    title: "Monroe, NC",
+    slug: "areas-served-monroe-nc",
+    path: "/areas-served/monroe-nc",
+    seoTitle:
+      "Glass & Door Services in Monroe, NC | Frameless Showers, Windows & Doors | Glass and Door Pro",
+    seoDescription:
+      "Monroe, NC's local glass and door company. Frameless showers, window installation, door installation, window repair, and commercial glass. Owner-operator with 15+ years of experience. Call (704) 771-6111.",
+    seoKeywords:
+      "glass services Monroe NC, frameless shower doors Monroe NC, window installation Monroe NC, door installation Monroe NC, window repair Monroe NC",
+    ogImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
+    content: cityPageContent({
+      hero: {
+        heading: "Glass & Door Services in Monroe, NC",
+        subheading:
+          "Frameless shower doors, window and door installation, window repair, and commercial glass — installed personally by Doug, your Monroe-based owner-operator with 15+ years of experience. Same-week appointments. Saturday hours available.",
+        imageUrl: "/images/glass-door-pro/family-1280w.webp",
+        imagePositionY: 45,
+      },
+      introTitle: "Your Local Glass & Door Company in Monroe",
+      introContent:
+        "<p>Glass and Door Pro is based right here in Monroe. Doug Adams lives and works in Union County, and Monroe homeowners are some of our most valued clients — many have become repeat customers and personal friends.</p><p>Being local matters more than most people realize. When you call a Monroe-area company for a frameless shower install, you're not waiting for a Charlotte-based crew to fit you into a route. We answer the phone, get out for a quote quickly, and don't add a travel premium to Union County projects the way some competitors quietly do. We're also the only local glass and door specialist working Saturdays.</p><p>Whether you're remodeling a master bathroom in one of the newer subdivisions off Highway 74, repairing a foggy bedroom window in a 1990s home near Sun Valley, or replacing the entry door on a historic home near downtown Monroe, this is the kind of work I do every week.</p>",
+      benefitsTitle: "Why Monroe Homeowners Choose Glass and Door Pro",
+      benefits: [
+        {
+          icon: "MapPin",
+          title: "Truly Local",
+          description:
+            "Based in Monroe, not Charlotte. Faster response, no travel surcharges, and a genuine personal stake in our reputation around town.",
+        },
+        {
+          icon: "User",
+          title: "Owner-Operator",
+          description:
+            "Doug measures, plans, and installs every project personally. You won't get a sales rep followed by a subcontracted crew.",
+        },
+        {
+          icon: "CalendarDays",
+          title: "Saturday Appointments",
+          description:
+            "We work Monday through Saturday, 7 AM to 6 PM. Saturday installs and quotes are common.",
+        },
+        {
+          icon: "Wrench",
+          title: "Repair Before Replace",
+          description:
+            "Where it makes sense, we'll repair fogged glass, broken seals, or worn hardware instead of selling something new you don't need.",
+        },
+        {
+          icon: "BadgeCheck",
+          title: "15+ Years of Experience",
+          description:
+            "From simple window repairs to complex frameless steam shower enclosures, Doug has the experience to do the job right.",
+        },
+        {
+          icon: "CheckCircle",
+          title: "Free, Clear Quotes",
+          description:
+            "We come out to your home, look at the project, and leave you with a clear written quote the same visit.",
+        },
+      ],
+      servicesTitle: "Our Services in Monroe, NC",
+      servicesIntro:
+        "Most Monroe homeowners find us for one specific service, then come back for others. Here's the full range of what we install and repair across Union County:",
+      serviceCards: cityServiceCards,
+      areasTitle: "Neighborhoods and Areas We Serve In & Around Monroe",
+      areasIntro: "We regularly work throughout the Monroe area and surrounding Union County communities, including:",
+      areas: [
+        "Downtown Monroe and the historic district",
+        "Belk Heritage District",
+        "The neighborhoods around Sun Valley High School",
+        "Subdivisions along Highway 74 and Highway 200",
+        "The growing developments off the Monroe Bypass",
+        "Indian Trail and Stallings",
+        "Waxhaw and Weddington",
+        "Wesley Chapel and Marvin",
+        "Lake Park, Mineral Springs, and Unionville",
+      ],
+      areasClosing:
+        'Not seeing your area listed? We almost certainly cover it. Give us a call at <a href="tel:+17047716111">(704) 771-6111</a> and we\'ll let you know.',
+      galleryTitle: "Our Work in the Monroe Area",
+      gallery: [
+        {
+          url: "/images/glass-door-pro/gallery-shower2-1280w.webp",
+          alt: "Modern frameless shower door with gold hardware fixtures installed in Monroe, NC",
+        },
+        {
+          url: "/images/glass-door-pro/gallery-door1-1280w.webp",
+          alt: "Professional entry door installation by Glass and Door Pro serving Monroe and Indian Trail, NC",
+        },
+        {
+          url: "/images/glass-door-pro/gallery-windows-1280w.webp",
+          alt: "Energy-efficient window installation for homes in the Monroe and greater Charlotte, NC area",
+        },
+      ],
+      faqTitle: "Frequently Asked Questions — Monroe, NC",
+      faqs: [
+        {
+          question: "Are you actually based in Monroe, NC?",
+          answer:
+            "<p>Yes. Glass and Door Pro is based right here in Monroe. Doug lives and works in Union County, which means shorter response times for Monroe homeowners and a real local presence — not a Charlotte-based company driving an hour into Union County for a quote.</p>",
+        },
+        {
+          question: "How quickly can you get out for a quote in Monroe?",
+          answer:
+            "<p>For Monroe addresses, we can usually get out for a free in-home quote within a few business days, and same-week appointments are common. Saturday appointments are available, which is a meaningful difference vs. most of our competitors who are weekday-only.</p>",
+        },
+        {
+          question: "Do you serve all of Union County or just Monroe city limits?",
+          answer:
+            "<p>All of Union County. We regularly work in Monroe, Indian Trail, Stallings, Waxhaw, Weddington, Wesley Chapel, Marvin, Lake Park, Mineral Springs, and Unionville. Our service area extends well into the greater Charlotte metro and across the SC line to Fort Mill and Indian Land.</p>",
+        },
+        {
+          question: "What's the most common service homeowners in Monroe need?",
+          answer:
+            "<p>It's a mix. Frameless shower doors are very popular in newer Monroe construction and in master bathroom remodels. Window repair, especially foggy windows from failed seals, is a steady call, particularly in homes built in the late 1990s through mid-2000s. Window and door installation picks up seasonally.</p>",
+        },
+        {
+          question: "Are you licensed and insured?",
+          answer:
+            "<p>Yes. Glass and Door Pro is fully insured and licensed for the work we do in North Carolina. We bring proof of insurance to the in-home consultation if you'd like to see it.</p>",
+        },
+        {
+          question: "Do you do work on older Monroe homes, or just new construction?",
+          answer:
+            "<p>Both. Doug has worked on Monroe homes from every era — historic homes in downtown and around the Belk Heritage District, mid-century homes on the south side, and brand-new construction in the developments expanding around the bypass. Older homes often need more careful measurement because walls aren't always plumb, but that's exactly the kind of work we specialize in.</p>",
+        },
+      ],
+      ctaHeading: "Ready to Get Started in Monroe?",
+      ctaBody:
+        "Call, text, or fill out the form for a free in-home quote. Doug will come out personally — and Saturday appointments are available.",
+      ctaFooter: "Mon–Sat: 7am – 6pm | Based in Monroe, NC",
+    }),
+  },
+  {
+    title: "Charlotte, NC",
+    slug: "areas-served-charlotte-nc",
+    path: "/areas-served/charlotte-nc",
+    seoTitle:
+      "Glass & Door Services in Charlotte, NC | Frameless Showers, Windows & Doors | Glass and Door Pro",
+    seoDescription:
+      "Personal, owner-operated glass and door services for Charlotte, NC homeowners. Frameless showers, window installation, door installation, window repair, and commercial glass. 15+ years of experience. Call (704) 771-6111.",
+    seoKeywords:
+      "glass services Charlotte NC, frameless shower doors Charlotte NC, window installation Charlotte NC, door installation Charlotte NC, window repair Charlotte NC",
+    ogImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
+    content: cityPageContent({
+      hero: {
+        heading: "Glass & Door Services in Charlotte, NC",
+        subheading:
+          "Personal, owner-operated frameless shower doors, window and door installation, window repair, and commercial glass — for homeowners and businesses throughout Charlotte, NC. 15+ years of experience. Saturday appointments available.",
+        imageUrl: "/images/glass-door-pro/reviews-hero-1920w.webp",
+        imagePositionY: 45,
+      },
+      introTitle: "Personal Service for Charlotte Homeowners",
+      introContent:
+        "<p>Charlotte has no shortage of glass and door companies — but most of them have something in common: when you call, you talk to a salesperson. When the crew shows up, they're subcontractors. When something needs follow-up, you're calling a 1-800 number.</p><p>Glass and Door Pro is different. I'm Doug — owner, operator, and the person who'll actually come measure your project, plan it with you, and install it myself. I've been doing this work in the greater Charlotte area for 15+ years, and the reason I keep getting referrals is simple: the person who quotes the job is the person who does the job.</p><p>We're based in Monroe, just 30-40 minutes from most Charlotte addresses, and the greater Charlotte metro is our primary service area. Whether you're remodeling a master bathroom in SouthPark, replacing a foggy bedroom window in NoDa, or putting a new entry door on a craftsman bungalow in Dilworth, this is the work I do every week.</p>",
+      benefitsTitle: "Why Charlotte Homeowners Choose Glass and Door Pro",
+      benefits: [
+        {
+          icon: "User",
+          title: "Owner On Every Job",
+          description:
+            "Doug personally measures, plans, and installs every project. You don't get a salesperson followed by a subcontracted crew.",
+        },
+        {
+          icon: "BadgeCheck",
+          title: "Honest Pricing",
+          description:
+            "Our overhead is lower than the larger Charlotte shops, which means competitive quotes on equivalent quality.",
+        },
+        {
+          icon: "CalendarDays",
+          title: "Saturday Appointments",
+          description:
+            "Mon-Sat, 7 AM to 6 PM. Saturday availability is one of the most common reasons clients choose us.",
+        },
+        {
+          icon: "Wrench",
+          title: "Repair Before Replace",
+          description:
+            "Where it makes sense, we repair foggy glass, failed seals, or worn hardware instead of selling something you don't need.",
+        },
+        {
+          icon: "ShieldCheck",
+          title: "15+ Years of Experience",
+          description:
+            "From simple window repairs to complex frameless steam shower enclosures, we have the experience to do the job right.",
+        },
+        {
+          icon: "Phone",
+          title: "Personal, Not Corporate",
+          description:
+            "We answer the phone. We text back. We show up when we say we will.",
+        },
+      ],
+      servicesTitle: "Our Services in Charlotte, NC",
+      servicesIntro:
+        "Most Charlotte clients find us for one specific project, then come back for others. Here's the full range of services we install and repair throughout the city:",
+      serviceCards: cityServiceCards,
+      areasTitle: "Charlotte Neighborhoods and Areas We Serve",
+      areasIntro: "We work throughout the greater Charlotte metro area, including:",
+      areas: [
+        "South Charlotte: SouthPark, Ballantyne, Pineville, Quail Hollow",
+        "Historic neighborhoods: Myers Park, Dilworth, Eastover, Plaza Midwood",
+        "East Charlotte: Cotswold, Elizabeth, Matthews-adjacent",
+        "North Charlotte: NoDa, Optimist Park, Plaza Hills",
+        "Uptown and South End",
+        "Matthews, Mint Hill, Pineville",
+        "Huntersville, Cornelius, and Davidson",
+        "Concord and Harrisburg",
+        "Across the SC line: Fort Mill, Indian Land, Tega Cay, Rock Hill",
+      ],
+      areasClosing:
+        'Not seeing your neighborhood? We almost certainly cover it. Give us a call at <a href="tel:+17047716111">(704) 771-6111</a> and we\'ll let you know.',
+      galleryTitle: "Our Work in the Charlotte Area",
+      gallery: [
+        {
+          url: "/images/glass-door-pro/gallery-shower1-1280w.webp",
+          alt: "Custom frameless glass shower enclosure installed by Glass and Door Pro in a Charlotte, NC area home",
+        },
+        {
+          url: "/images/glass-door-pro/gallery-door2-1280w.webp",
+          alt: "Custom wooden entry door installation with decorative planters by Glass and Door Pro in Charlotte, NC",
+        },
+        {
+          url: "/images/glass-door-pro/gallery-door3-1280w.webp",
+          alt: "Charming blue entry door installed by Glass and Door Pro in the Charlotte, NC metro area",
+        },
+      ],
+      faqTitle: "Frequently Asked Questions — Charlotte, NC",
+      faqs: [
+        {
+          question: "Do you actually come into Charlotte, or do you stay in Union County?",
+          answer:
+            "<p>We work throughout Charlotte regularly. Glass and Door Pro is based in Monroe, but the greater Charlotte metro is our primary service area. We have clients across South Charlotte, Ballantyne, SouthPark, Myers Park, Dilworth, Cotswold, and most other Charlotte neighborhoods. We're typically less than 40 minutes from any Charlotte address.</p>",
+        },
+        {
+          question: "Is there a travel fee for working in Charlotte?",
+          answer:
+            "<p>No. Our quotes for Charlotte addresses include everything — no separate travel fees, no service-area surcharges, no hidden costs. The price you see is the price you pay.</p>",
+        },
+        {
+          question: "What kinds of projects do you do in Charlotte?",
+          answer:
+            "<p>Everything. Frameless shower doors are our most-requested service in Charlotte, especially in higher-end neighborhoods like SouthPark, Ballantyne, and Myers Park. We also do window installation, door installation, window repair (foggy windows, broken panes, seal failures), and commercial glass for storefronts and offices throughout the city.</p>",
+        },
+        {
+          question: "How quickly can you get out for a quote in Charlotte?",
+          answer:
+            "<p>Usually within a few business days. Saturday appointments are available, which is one of the most common reasons Charlotte homeowners choose us — most glass and door companies are weekday-only, and Saturday quotes work much better around busy schedules.</p>",
+        },
+        {
+          question: "Why would I choose a Monroe-based company over a Charlotte-based one?",
+          answer:
+            "<p>Three reasons most clients tell us. First, Doug personally handles every project — no sales reps, no subcontracted crews. Second, our pricing tends to be more competitive than the larger Charlotte shops because our overhead is lower. Third, Saturday availability — we work Monday through Saturday. The Monroe location is only a disadvantage if you assume we don't actually work in Charlotte, which we do, every week.</p>",
+        },
+        {
+          question: "Do you do work in historic Charlotte neighborhoods like Dilworth or Myers Park?",
+          answer:
+            "<p>Yes. Historic Charlotte homes are some of our favorite projects. Older homes often require more careful measurement because walls and openings aren't always plumb or square, but that's exactly what 15+ years of experience prepares you for. We've worked on craftsman bungalows, mid-century homes, and older transitional homes throughout Dilworth, Myers Park, Eastover, Plaza Midwood, and similar neighborhoods.</p>",
+        },
+        {
+          question: "Are you licensed and insured to work in Charlotte?",
+          answer:
+            "<p>Yes. Glass and Door Pro is fully insured and licensed for the work we do throughout North Carolina, including Charlotte and Mecklenburg County. Proof of insurance is available at the in-home consultation.</p>",
+        },
+      ],
+      ctaHeading: "Ready to Get Started in Charlotte?",
+      ctaBody:
+        "Call, text, or fill out the form for a free in-home quote. Doug will come out personally — and Saturday appointments are available.",
+      ctaFooter: "Mon–Sat: 7am – 6pm | Serving the greater Charlotte metro",
+    }),
+  },
+];
+
 const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
   {
     name: "Main Navigation",
@@ -1737,7 +2313,7 @@ const glassSeoSettings: Partial<InsertSeoSettings> = {
   titleSuffix: " | Glass & Door Pro",
   defaultMetaDescription:
     "Glass & Door Pro serves Charlotte, NC with frameless shower doors, window installation, door replacement, window repair, and commercial glass.",
-  siteUrl: "https://glass-and-door-pro-new-production.up.railway.app",
+  siteUrl: "https://glassanddoorpro.com",
   defaultOgImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
   organizationName: "Glass & Door Pro",
   organizationLogoUrl: "/images/glass-door-pro/brand/logo-full-white-bg.png",
@@ -1818,7 +2394,7 @@ async function seedGlassPublicCms() {
     seoKeywords:
       "Glass & Door Pro gallery, frameless shower photos, Charlotte glass installation gallery, shower door projects",
     ogImageUrl: "/images/glass-door-pro/gallery/frameless-showers/03.jpg",
-    canonicalUrl: "https://glass-and-door-pro-new-production.up.railway.app/gallery",
+    canonicalUrl: "https://glassanddoorpro.com/gallery",
     publishedAt: new Date(),
   };
 
@@ -1844,7 +2420,7 @@ async function seedGlassPublicCms() {
     seoKeywords:
       "Glass & Door Pro reviews, Charlotte glass company reviews, shower door reviews, window installation reviews",
     ogImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
-    canonicalUrl: "https://glass-and-door-pro-new-production.up.railway.app/reviews",
+    canonicalUrl: "https://glassanddoorpro.com/reviews",
     publishedAt: new Date(),
   };
 
@@ -1870,7 +2446,7 @@ async function seedGlassPublicCms() {
       seoDescription: servicePage.seoDescription,
       seoKeywords: servicePage.seoKeywords,
       ogImageUrl: servicePage.ogImageUrl,
-      canonicalUrl: `https://glass-and-door-pro-new-production.up.railway.app${servicePath}`,
+      canonicalUrl: `https://glassanddoorpro.com${servicePath}`,
       publishedAt: new Date(),
     };
 
@@ -1880,6 +2456,32 @@ async function seedGlassPublicCms() {
     } else {
       const page = await storage.cmsPages.createPage(pagePayload);
       console.log(`  [created] ${servicePage.slug} page (${page.id})`);
+    }
+  }
+
+  for (const cityPage of glassCityPages) {
+    const existingCityPage = await storage.cmsPages.getPageBySlug(cityPage.slug);
+    const pagePayload: InsertCmsPage = {
+      title: cityPage.title,
+      slug: cityPage.slug,
+      pageType: "area",
+      status: "published",
+      template: "full-width",
+      content: cityPage.content,
+      seoTitle: cityPage.seoTitle,
+      seoDescription: cityPage.seoDescription,
+      seoKeywords: cityPage.seoKeywords,
+      ogImageUrl: cityPage.ogImageUrl,
+      canonicalUrl: `https://glassanddoorpro.com${cityPage.path}`,
+      publishedAt: new Date(),
+    };
+
+    if (existingCityPage) {
+      await storage.cmsPages.updatePage(existingCityPage.id, pagePayload);
+      console.log(`  [updated] ${cityPage.slug} page (${existingCityPage.id})`);
+    } else {
+      const page = await storage.cmsPages.createPage(pagePayload);
+      console.log(`  [created] ${cityPage.slug} page (${page.id})`);
     }
   }
 

@@ -2,6 +2,13 @@ import sanitizeHtml from "sanitize-html";
 import type { BlogPost, CmsPage, Event, SeoSettings } from "@shared/schema";
 import { getEventPath } from "@shared/event-url";
 import { formatBrandFirstTitle } from "@shared/seo-title";
+import {
+  buildGlassBreadcrumbItems,
+  buildGlassLocalBusinessLd,
+  buildGlassServiceLdForCmsPage,
+  getCmsPublicPath,
+  getCmsSlugForPublicPath,
+} from "@shared/glass-seo";
 import { storage } from "../storage";
 
 interface PublicHtmlSnapshot {
@@ -251,6 +258,45 @@ function buildBreadcrumbSchema(items: Array<{ name: string; url: string }>) {
   };
 }
 
+function extractFaqItems(pageContent: unknown): Array<{ question: string; answer: string }> {
+  if (!pageContent || typeof pageContent !== "object") return [];
+  const blocks = (pageContent as { blocks?: unknown }).blocks;
+  if (!Array.isArray(blocks)) return [];
+
+  const items: Array<{ question: string; answer: string }> = [];
+  for (const block of blocks) {
+    if (!block || typeof block !== "object") continue;
+    const entry = block as { type?: unknown; props?: { items?: unknown } };
+    if (entry.type !== "faq" || !Array.isArray(entry.props?.items)) continue;
+    for (const item of entry.props.items) {
+      if (!item || typeof item !== "object") continue;
+      const faq = item as { question?: unknown; answer?: unknown };
+      if (typeof faq.question === "string" && typeof faq.answer === "string") {
+        const question = stripHtml(faq.question);
+        const answer = stripHtml(faq.answer);
+        if (question && answer) items.push({ question, answer });
+      }
+    }
+  }
+  return items;
+}
+
+function buildFaqPageSchema(items: Array<{ question: string; answer: string }>) {
+  if (items.length === 0) return null;
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  };
+}
+
 function buildSimplePageBody(title: string, description: string, fragments: string[] = []) {
   const paragraphs = uniqueFragments([description, ...fragments])
     .filter((fragment) => fragment && fragment.toLowerCase() !== title.trim().toLowerCase())
@@ -272,8 +318,9 @@ function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: strin
     page.seoDescription ||
     truncate(uniqueFragments(collectTextFragments(page.content)).join(" "), 180) ||
     DEFAULT_DESCRIPTION;
+  const publicPath = getCmsPublicPath(page.slug);
   const canonicalUrl =
-    page.canonicalUrl || (page.slug === "home" ? siteUrl : `${siteUrl}/${page.slug}`);
+    page.canonicalUrl || (publicPath === "/" ? siteUrl : `${siteUrl}${publicPath}`);
   const bodyHtml = buildSimplePageBody(
     page.title,
     description,
@@ -281,12 +328,8 @@ function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: strin
   );
 
   const breadcrumbs =
-    page.slug === "home"
-      ? null
-      : buildBreadcrumbSchema([
-          { name: "Home", url: siteUrl },
-          { name: page.title, url: canonicalUrl },
-        ]);
+    page.slug === "home" ? null : buildBreadcrumbSchema(buildGlassBreadcrumbItems(page, siteUrl));
+  const faqItems = extractFaqItems(page.content);
 
   return {
     title: buildHeadTitle(title, seo),
@@ -295,9 +338,12 @@ function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: strin
     ogImageUrl: page.ogImageUrl || seo?.defaultOgImageUrl || null,
     robots: page.noindex ? "noindex,nofollow" : null,
     bodyHtml,
-    jsonLd: [buildOrganizationSchema(seo, siteUrl), buildWebsiteSchema(seo, siteUrl), breadcrumbs].filter(
-      Boolean,
-    ) as Array<Record<string, unknown>>,
+    jsonLd: [
+      buildGlassLocalBusinessLd(siteUrl),
+      buildGlassServiceLdForCmsPage(page, siteUrl),
+      breadcrumbs,
+      buildFaqPageSchema(faqItems),
+    ].filter(Boolean) as Array<Record<string, unknown>>,
   };
 }
 
@@ -520,7 +566,7 @@ export async function getPublicHtmlSnapshot(
   const seo = (await storage.seoSettings.get()) ?? null;
   const siteUrl =
     (seo?.siteUrl || "").replace(/\/$/, "") ||
-    "https://glass-and-door-pro-new-production.up.railway.app";
+    "https://glassanddoorpro.com";
 
   if (pathname === "/search") {
     const params = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
@@ -546,8 +592,8 @@ export async function getPublicHtmlSnapshot(
     return buildTherapistSnapshot(decodeURIComponent(therapistMatch[1]), seo, siteUrl);
   }
 
-  const slug = pathname === "/" ? "home" : pathname.replace(/^\/+/, "");
-  if (slug && !slug.includes("/")) {
+  const slug = getCmsSlugForPublicPath(pathname);
+  if (slug) {
     if (slug === "gallery") {
       return buildFallbackSnapshot(pathname, seo, siteUrl);
     }
