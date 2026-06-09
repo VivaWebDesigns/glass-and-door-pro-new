@@ -21,6 +21,12 @@ const defaultCompanyLinks = [
   { href: "mailto:Doug@GlassandDoorPro.com", label: "Doug@GlassandDoorPro.com", testId: "link-footer-email" },
 ];
 
+const defaultLegalLinks = [
+  { href: "/privacy-policy", label: "Privacy Policy", testId: "link-footer-privacy-policy" },
+  { href: "/terms-of-service", label: "Terms of Service", testId: "link-footer-terms-of-service" },
+  { href: "/disclaimer", label: "Disclaimer", testId: "link-footer-disclaimer" },
+];
+
 type FooterLegalLink = {
   href: string;
   label: string;
@@ -192,6 +198,11 @@ export function Footer() {
     return links.length > 0 ? links : defaultCompanyLinks;
   }, [publicMenus]) as FooterLegalLink[];
 
+  const legalLinks = useMemo(() => {
+    const links = menuItemsToLinks(publicMenus?.footer_legal?.items as MenuItem[] | undefined, "link-footer-legal");
+    return links.length > 0 ? links : defaultLegalLinks;
+  }, [publicMenus]) as FooterLegalLink[];
+
   const brandLogo = frontendLogoUrl || "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
   const brandName = companyName || "Glass & Door Pro";
   const address = (companyAddress || "2341 Waverly Dr, Monroe, NC 28112").replace(/\s*\n\s*/g, ", ");
@@ -285,11 +296,21 @@ export function Footer() {
           )}
         </div>
 
-        <div
-          className="mt-10 border-t border-slate-800 pt-8 text-center text-sm text-slate-500"
-          data-testid="text-copyright"
-        >
-          &copy; {new Date().getFullYear()} {brandName}. All rights reserved.
+        <div className="mt-10 border-t border-slate-800 pt-8 text-sm text-slate-500">
+          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+            <p data-testid="text-copyright">
+              &copy; {new Date().getFullYear()} {brandName}. All rights reserved.
+            </p>
+            <nav aria-label="Legal links">
+              <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+                {legalLinks.map((link) => (
+                  <li key={link.testId}>
+                    <FooterTextLink link={link} />
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
         </div>
       </div>
     </footer>
