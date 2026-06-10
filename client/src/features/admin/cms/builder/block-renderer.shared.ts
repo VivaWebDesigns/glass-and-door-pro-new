@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, SyntheticEvent } from "react";
 import { normalizeHexColor } from "./section-style";
 
 export function str(v: unknown): string {
@@ -68,6 +68,15 @@ export const IMAGE_WIDTH_MAP: Record<string, string> = {
 const LEGACY_CMS_ASSET_MAP: Record<string, string> = {
   "/images/hero-therapy-session.png": "/images/hero-therapy-session-1920w.webp",
 };
+
+export const CMS_MISSING_IMAGE_PLACEHOLDER_URL = "/images/cms-media-missing.svg";
+
+export function handleCmsPreviewImageError(event: SyntheticEvent<HTMLImageElement>) {
+  const image = event.currentTarget;
+  if (image.src.endsWith(CMS_MISSING_IMAGE_PLACEHOLDER_URL)) return;
+  image.onerror = null;
+  image.src = CMS_MISSING_IMAGE_PLACEHOLDER_URL;
+}
 
 export function resolveCmsAssetUrl(url: string): string {
   return LEGACY_CMS_ASSET_MAP[url] ?? url;

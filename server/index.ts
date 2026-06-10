@@ -108,12 +108,44 @@ app.use("/api", apiLimiter);
 app.use(originCheck);
 
 app.use("/uploads", express.static(getLocalUploadsRoot()));
+app.get(/^\/uploads\/cms\/.+\.(?:avif|gif|jpe?g|png|svg|webp)$/i, (_req, res) => {
+  res
+    .status(200)
+    .type("image/svg+xml")
+    .set("Cache-Control", "no-cache")
+    .send(`<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">CMS media unavailable</title>
+  <desc id="desc">Placeholder shown when an uploaded CMS image file is unavailable.</desc>
+  <rect width="1200" height="800" fill="#f4f7f6"/>
+  <rect x="48" y="48" width="1104" height="704" rx="24" fill="none" stroke="#cfdad5" stroke-width="6" stroke-dasharray="22 18"/>
+  <g fill="none" stroke="#3a7e78" stroke-linecap="round" stroke-linejoin="round" stroke-width="22" opacity=".9">
+    <rect x="420" y="260" width="360" height="260" rx="28"/>
+    <circle cx="530" cy="350" r="34"/>
+    <path d="m455 490 120-120 88 88 48-48 76 80"/>
+  </g>
+  <text x="600" y="590" text-anchor="middle" fill="#1e2943" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700">Media unavailable</text>
+  <text x="600" y="642" text-anchor="middle" fill="#646e87" font-family="Arial, Helvetica, sans-serif" font-size="26">Replace or re-upload this CMS image</text>
+</svg>`);
+});
 
 const REDACTED_KEYS = [
-  "password", "currentPassword", "newPassword",
-  "token", "resetToken", "secret", "authorization",
-  "email", "phone", "address", "addressLine1", "addressLine2",
-  "refereeEmail", "refereePhone", "ssn", "dateOfBirth",
+  "password",
+  "currentPassword",
+  "newPassword",
+  "token",
+  "resetToken",
+  "secret",
+  "authorization",
+  "email",
+  "phone",
+  "address",
+  "addressLine1",
+  "addressLine2",
+  "refereeEmail",
+  "refereePhone",
+  "ssn",
+  "dateOfBirth",
   "secureToken",
 ];
 const MAX_LOG_BODY_LENGTH = 500;
@@ -127,7 +159,8 @@ function redactSensitive(obj: any): any {
       redacted[key] = "[REDACTED]";
     } else if (key === "bio" || key === "content" || key === "body" || key === "description") {
       const val = obj[key];
-      redacted[key] = typeof val === "string" && val.length > 100 ? val.substring(0, 100) + "..." : val;
+      redacted[key] =
+        typeof val === "string" && val.length > 100 ? val.substring(0, 100) + "..." : val;
     } else if (typeof obj[key] === "object" && obj[key] !== null) {
       redacted[key] = redactSensitive(obj[key]);
     } else {
