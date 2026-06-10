@@ -60,7 +60,7 @@ export default function RegisterPage() {
       return;
     }
     if (role === "admin") {
-      setLocation("/admin");
+      setLocation("/admin/cms");
     } else if (role === "therapist") {
       setLocation("/therapist");
     } else {

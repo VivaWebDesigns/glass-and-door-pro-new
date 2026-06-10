@@ -283,9 +283,9 @@ export function Navbar() {
                   )}
                   {isAdmin && (
                     <DropdownMenuItem asChild>
-                      <Link href="/admin" data-testid="link-admin-dashboard">
+                      <Link href="/admin/cms" data-testid="link-admin-dashboard">
                         <Shield className="mr-2 h-4 w-4" />
-                        Admin Dashboard
+                        Admin
                       </Link>
                     </DropdownMenuItem>
                   )}
@@ -448,14 +448,14 @@ export function Navbar() {
                       </Link>
                     )}
                     {isAdmin && (
-                      <Link href="/admin" onClick={() => setMobileOpen(false)}>
+                      <Link href="/admin/cms" onClick={() => setMobileOpen(false)}>
                         <Button
                           variant="ghost"
                           className="w-full justify-start"
                           data-testid="link-mobile-admin"
                         >
                           <Shield className="mr-2 h-4 w-4" />
-                          Admin Dashboard
+                          Admin
                         </Button>
                       </Link>
                     )}

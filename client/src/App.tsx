@@ -42,7 +42,6 @@ const ApplicationPage = lazy(() => import("@/features/therapist/application-page
 const ApplicationStatusPage = lazy(() => import("@/features/therapist/application-status-page"));
 const ReferenceFormPage = lazy(() => import("@/features/public/reference-form-page"));
 const StandaloneFormPage = lazy(() => import("@/features/public/standalone-form-page"));
-const AdminDashboardPage = lazy(() => import("@/features/admin/dashboard-page"));
 const AdminTherapistsPage = lazy(() => import("@/features/admin/therapists-page"));
 const AdminUsersPage = lazy(() => import("@/features/admin/users-page"));
 const AdminDirectorySettingsPage = lazy(() => import("@/features/admin/directory-settings-page"));
@@ -88,7 +87,7 @@ function AdminIndexRoute() {
   }
 
   if (user.role === "admin") {
-    return <AdminDashboardPage />;
+    return <Redirect to="/admin/cms" replace />;
   }
 
   if (user.role === "editor") {

@@ -55,7 +55,7 @@ export function LoginDialog({
       onSuccess: (data: any) => {
         toast({ title: "Welcome back!", description: "You have been logged in." });
         onOpenChange(false);
-        if (data.role === "admin") setLocation("/admin");
+        if (data.role === "admin") setLocation("/admin/cms");
         else if (data.role === "therapist") setLocation("/therapist");
         else setLocation("/");
       },

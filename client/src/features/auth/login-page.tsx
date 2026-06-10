@@ -34,7 +34,7 @@ export default function LoginPage() {
 
   function redirectByRole(role: string) {
     if (role === "admin") {
-      setLocation("/admin");
+      setLocation("/admin/cms");
     } else if (role === "therapist") {
       setLocation("/therapist");
     } else {

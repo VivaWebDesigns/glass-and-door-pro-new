@@ -337,7 +337,7 @@ export function AdminSidebar({ children }: AdminSidebarProps) {
                     collapsed ? "opacity-0 w-0" : "opacity-100",
                   )}
                 >
-                  Admin Dashboard
+                  Admin
                 </h2>
               </div>
             </div>
