@@ -1023,6 +1023,13 @@ function BrandingImageCard({
 }) {
   const { toast } = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
+  const transparencyPreviewStyle = {
+    backgroundColor: "#fff",
+    backgroundImage:
+      "linear-gradient(45deg, #e2e8f0 25%, transparent 25%), linear-gradient(-45deg, #e2e8f0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e2e8f0 75%), linear-gradient(-45deg, transparent 75%, #e2e8f0 75%)",
+    backgroundPosition: "0 0, 0 8px, 8px -8px, -8px 0",
+    backgroundSize: "16px 16px",
+  };
 
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
@@ -1074,14 +1081,17 @@ function BrandingImageCard({
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex min-h-[120px] items-center justify-center rounded-xl border border-dashed bg-muted/20 p-4">
+        <div
+          className="flex min-h-[120px] items-center justify-center rounded-xl border border-dashed p-4"
+          style={transparencyPreviewStyle}
+        >
           {currentUrl ? (
             <img src={currentUrl} alt={title} className="max-h-16 w-auto object-contain" />
           ) : (
             <div className="text-center text-sm text-muted-foreground">
               <p>No image uploaded yet.</p>
               <p className="mt-1 text-xs">
-                Images uploaded here are stored in R2 under the `branding/` directory.
+                Transparent PNG and WebP files are preserved during upload.
               </p>
             </div>
           )}

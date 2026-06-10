@@ -77,12 +77,12 @@ export async function optimizeImage(
       } else if (inputMime === "image/gif") {
         outputBuffer = inputBuffer;
       } else {
-        outputBuffer = await pipeline.webp({ quality }).toBuffer();
+        outputBuffer = await pipeline.webp({ quality, alphaQuality: 100 }).toBuffer();
       }
       outputMimeType = inputMime;
       outputExtension = mimeToExtension(inputMime);
     } else {
-      outputBuffer = await pipeline.webp({ quality }).toBuffer();
+      outputBuffer = await pipeline.webp({ quality, alphaQuality: 100 }).toBuffer();
       outputMimeType = "image/webp";
       outputExtension = ".webp";
     }
