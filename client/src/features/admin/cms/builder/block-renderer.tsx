@@ -397,7 +397,7 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
               src={str(props.imageUrl)}
               alt={str(props.imageAlt)}
               style={mobileImageStyles}
-              className="w-full rounded-xl [height:var(--mobile-image-height)] [object-fit:var(--mobile-image-fit)] [object-position:var(--mobile-image-position)] md:absolute md:inset-0 md:h-full md:w-full md:object-cover md:object-center"
+              className="w-full rounded-xl [height:var(--mobile-image-height)] [object-fit:var(--mobile-image-fit)] [object-position:var(--image-position)] md:absolute md:inset-0 md:h-full md:w-full md:object-cover"
             />
             {(badgeValue || badgeLabel) && (
               <div className="absolute -bottom-4 -right-3 rounded-lg bg-primary px-5 py-4 text-primary-foreground shadow-xl sm:-right-4">
@@ -905,7 +905,12 @@ function ImageBlockRenderer({ props }: { props: Record<string, unknown> }) {
     return (
       <section className="relative h-[50vh] min-h-[360px] overflow-hidden py-0">
         {hasImage ? (
-          <img src={str(props.imageUrl)} alt={str(props.alt)} className="h-full w-full object-cover" />
+          <img
+            src={str(props.imageUrl)}
+            alt={str(props.alt)}
+            style={mobileImageStyles}
+            className="h-full w-full object-cover [object-position:var(--image-position)]"
+          />
         ) : (
           <div className="flex h-full items-center justify-center bg-muted/40 text-sm text-muted-foreground">
             Image placeholder
@@ -930,7 +935,7 @@ function ImageBlockRenderer({ props }: { props: Record<string, unknown> }) {
             src={str(props.imageUrl)}
             alt={str(props.alt)}
             style={mobileImageStyles}
-            className="w-full rounded-xl [height:var(--mobile-image-height)] [object-fit:var(--mobile-image-fit)] [object-position:var(--mobile-image-position)] md:h-auto md:object-cover md:object-center"
+            className="w-full rounded-xl [height:var(--mobile-image-height)] [object-fit:var(--mobile-image-fit)] [object-position:var(--image-position)] md:h-auto md:object-cover"
           />
           {str(props.caption) && <p className="text-xs text-muted-foreground text-center mt-2">{str(props.caption)}</p>}
         </div>

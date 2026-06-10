@@ -36,6 +36,7 @@ export function getMobileImageStyles(props: Record<string, unknown>): CSSPropert
   return {
     ["--mobile-image-fit" as string]: fit,
     ["--mobile-image-height" as string]: height,
+    ["--image-position" as string]: `${positionX}% ${positionY}%`,
     ["--mobile-image-position" as string]: `${positionX}% ${positionY}%`,
   };
 }
