@@ -21,9 +21,15 @@ import { BRANDING_OPTIONS, isImageMime, optimizeImage } from "../services/image-
 import {
   ensureLocalUploadDirectory,
   getLocalUploadPublicUrl,
+  resolveLocalUploadUrlOrFallback,
 } from "../services/local-upload-storage";
 
 const router = Router();
+
+const DEFAULT_BRANDING_IMAGE_URLS: Record<string, string> = {
+  frontend_logo_url: "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp",
+  favicon_url: "/favicon-32x32.png?v=large-2",
+};
 
 const MAX_BRANDING_IMAGE_SIZE = 10 * 1024 * 1024;
 
@@ -58,8 +64,12 @@ router.get(
 
     for (const s of settings) {
       if (!grouped[s.category]) grouped[s.category] = {};
+      const value =
+        s.category === "branding" && DEFAULT_BRANDING_IMAGE_URLS[s.key]
+          ? resolveLocalUploadUrlOrFallback(s.value, DEFAULT_BRANDING_IMAGE_URLS[s.key])
+          : s.value;
       grouped[s.category][s.key] = {
-        value: s.isSecret ? "••••••••" : s.value,
+        value: s.isSecret ? "••••••••" : value,
         isSecret: s.isSecret,
       };
     }

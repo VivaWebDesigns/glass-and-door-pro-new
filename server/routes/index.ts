@@ -33,6 +33,10 @@ import {
   DEFAULT_DIRECTORY_SETTINGS,
   getDirectorySettings,
 } from "../services/directory-settings.service";
+import { resolveLocalUploadUrlOrFallback } from "../services/local-upload-storage";
+
+const DEFAULT_FRONTEND_LOGO_URL = "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
+const DEFAULT_FAVICON_URL = "/favicon-32x32.png?v=large-2";
 
 function escapeXml(str: string): string {
   return str
@@ -82,10 +86,11 @@ export function registerApiRoutes(app: Express) {
     try {
       const branding = await storage.settings.getDecryptedCategory("branding");
       res.json({
-        frontendLogoUrl:
-          branding.frontend_logo_url ||
-          "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp",
-        faviconUrl: branding.favicon_url || "/favicon-32x32.png?v=large-2",
+        frontendLogoUrl: resolveLocalUploadUrlOrFallback(
+          branding.frontend_logo_url,
+          DEFAULT_FRONTEND_LOGO_URL,
+        ),
+        faviconUrl: resolveLocalUploadUrlOrFallback(branding.favicon_url, DEFAULT_FAVICON_URL),
         companyName: branding.company_name || "Glass & Door Pro",
         companyAddress: branding.company_address || "2341 Waverly Dr\nMonroe, NC 28112",
         companyPhoneNumbers: branding.company_phone_numbers || "(704) 771-6111",
@@ -118,8 +123,8 @@ export function registerApiRoutes(app: Express) {
         error: err instanceof Error ? err.message : String(err),
       });
       res.json({
-        frontendLogoUrl: "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp",
-        faviconUrl: "/favicon-32x32.png?v=large-2",
+        frontendLogoUrl: DEFAULT_FRONTEND_LOGO_URL,
+        faviconUrl: DEFAULT_FAVICON_URL,
         companyName: "Glass & Door Pro",
         companyAddress: "2341 Waverly Dr\nMonroe, NC 28112",
         companyPhoneNumbers: "(704) 771-6111",

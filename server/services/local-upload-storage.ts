@@ -51,3 +51,18 @@ export function resolveLocalUploadPathFromUrl(url: string) {
 
   return resolvedPath;
 }
+
+export function localUploadExists(url: string | null | undefined) {
+  if (!url) return false;
+  const localPath = resolveLocalUploadPathFromUrl(url);
+  return localPath ? fs.existsSync(localPath) : false;
+}
+
+export function resolveLocalUploadUrlOrFallback(
+  url: string | null | undefined,
+  fallbackUrl: string,
+) {
+  if (!url) return fallbackUrl;
+  if (url.startsWith("/uploads/") && !localUploadExists(url)) return fallbackUrl;
+  return url;
+}

@@ -1,11 +1,13 @@
 import nodemailer from "nodemailer";
 import { logger } from "../utils/logger";
+import { resolveLocalUploadUrlOrFallback } from "./local-upload-storage";
 
 const SMTP_HOST = process.env.SMTP_HOST;
 const SMTP_PORT = parseInt(process.env.SMTP_PORT || "587", 10);
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
 const SMTP_FROM = process.env.SMTP_FROM || "Core Platform <noreply@coreplatform.com>";
+const DEFAULT_EMAIL_LOGO_URL = "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
 
 const isSmtpConfigured = !!(SMTP_HOST && SMTP_USER && SMTP_PASS);
 
@@ -74,7 +76,9 @@ async function getEmailLogoUrl(): Promise<string | null> {
   try {
     const { storage } = await import("../storage/index");
     const branding = await storage.settings.getDecryptedCategory("branding");
-    cachedEmailLogoUrl = resolveAbsoluteAssetUrl(branding.frontend_logo_url);
+    cachedEmailLogoUrl = resolveAbsoluteAssetUrl(
+      resolveLocalUploadUrlOrFallback(branding.frontend_logo_url, DEFAULT_EMAIL_LOGO_URL),
+    );
     emailBrandingFetched = true;
   } catch (err) {
     logger.email.warn("Failed to load branding for email shell", {
