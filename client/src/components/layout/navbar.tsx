@@ -25,7 +25,6 @@ import { useBranding } from "@/components/shared/branding-provider";
 import { useAuth } from "@/hooks/use-auth";
 import { UserProfileDialog } from "@/components/shared/user-profile-dialog";
 import { NotificationBell } from "@/components/shared/notification-bell";
-import { NavbarSearchPopover } from "@/components/layout/navbar-search-popover";
 import type { CmsMenu, MenuItem, PublicMenuLocation } from "@shared/schema";
 
 const defaultNavLinks = [
@@ -248,7 +247,6 @@ export function Navbar() {
         </div>
 
         <div className="hidden items-center gap-3 md:flex md:flex-wrap">
-          <NavbarSearchPopover />
           {isLoading ? null : user ? (
             <>
               <DropdownMenu>
