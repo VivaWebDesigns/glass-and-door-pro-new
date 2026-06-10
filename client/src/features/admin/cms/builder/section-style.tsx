@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 
 export const DEFAULT_SECTION_LINEAR_GRADIENT = "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)";
 export const DEFAULT_SECTION_PADDING = "md";
+const CMS_MISSING_IMAGE_PLACEHOLDER_URL = "/images/cms-media-missing.svg";
 
 const SECTION_PADDING_CLASS_MAP: Record<string, string> = {
   none: "0",
@@ -81,7 +82,7 @@ export function hexToRgba(hex: string, alpha: number): string {
 
 export function getSectionStyleConfig(
   props: Record<string, unknown>,
-  options?: { resolveAssetUrl?: (url: string) => string }
+  options?: { resolveAssetUrl?: (url: string) => string },
 ): SectionStyleConfig {
   const resolveAssetUrl = options?.resolveAssetUrl ?? ((url: string) => url);
   const backgroundImageUrl = resolveAssetUrl(str(props.sectionBackgroundImageUrl));
@@ -91,11 +92,13 @@ export function getSectionStyleConfig(
     backgroundImageUrl,
     backgroundPositionX: clampPercent(num(props.sectionBackgroundPositionX, 50)),
     backgroundPositionY: clampPercent(num(props.sectionBackgroundPositionY, 50)),
-    backgroundOverlayColor: normalizeHexColor(str(props.sectionBackgroundOverlayColor)) || "#000000",
+    backgroundOverlayColor:
+      normalizeHexColor(str(props.sectionBackgroundOverlayColor)) || "#000000",
     backgroundOverlayOpacity: clampPercent(num(props.sectionBackgroundOverlayOpacity, 0)),
     showRadialGradient: Boolean(props.sectionShowRadialGradient),
     radialGradientColor: normalizeHexColor(str(props.sectionRadialGradientColor)) || "#89cda1",
-    radialGradientPosition: str(props.sectionRadialGradientPosition) === "bottom" ? "bottom" : "top",
+    radialGradientPosition:
+      str(props.sectionRadialGradientPosition) === "bottom" ? "bottom" : "top",
     borderTopWidth: clampBorderWidth(num(props.sectionBorderTopWidth, 0)),
     borderTopColor: normalizeHexColor(str(props.sectionBorderTopColor)) || "#d9e2dc",
     borderBottomWidth: clampBorderWidth(num(props.sectionBorderBottomWidth, 0)),
@@ -107,21 +110,28 @@ export function getSectionStyleConfig(
 
 export function hasSectionStyleConfig(config: SectionStyleConfig) {
   return Boolean(
-      config.backgroundColor ||
-      config.backgroundImageUrl ||
-      config.showRadialGradient ||
-      config.borderTopWidth > 0 ||
-      config.borderBottomWidth > 0 ||
-      config.paddingTop !== DEFAULT_SECTION_PADDING ||
-      config.paddingBottom !== DEFAULT_SECTION_PADDING
+    config.backgroundColor ||
+    config.backgroundImageUrl ||
+    config.showRadialGradient ||
+    config.borderTopWidth > 0 ||
+    config.borderBottomWidth > 0 ||
+    config.paddingTop !== DEFAULT_SECTION_PADDING ||
+    config.paddingBottom !== DEFAULT_SECTION_PADDING,
   );
 }
 
-export function getRadialGradientStyle(color: string, position: "top" | "bottom" = "top"): CSSProperties {
+export function getRadialGradientStyle(
+  color: string,
+  position: "top" | "bottom" = "top",
+): CSSProperties {
   const anchor = position === "bottom" ? "50% 100%" : "50% 0%";
   return {
     background: `radial-gradient(ellipse at ${anchor}, ${hexToRgba(color, 0.28)} 0%, ${hexToRgba(color, 0.16)} 36%, transparent 72%)`,
   };
+}
+
+function backgroundImageWithFallback(url: string) {
+  return `url(${JSON.stringify(url)}), url(${JSON.stringify(CMS_MISSING_IMAGE_PLACEHOLDER_URL)})`;
 }
 
 export function getSectionPaddingClasses(props: Record<string, unknown>) {
@@ -134,7 +144,9 @@ export function getSectionPaddingClasses(props: Record<string, unknown>) {
       return size ? `${breakpoint}:${axis}-${size}` : `${axis}-${breakpoint}`;
     });
 
-  return [...expandPaddingTokens(topValue, "pt"), ...expandPaddingTokens(bottomValue, "pb")].join(" ");
+  return [...expandPaddingTokens(topValue, "pt"), ...expandPaddingTokens(bottomValue, "pb")].join(
+    " ",
+  );
 }
 
 export function SectionStyleWrapper({
@@ -152,22 +164,24 @@ export function SectionStyleWrapper({
   }
 
   const defaultBackgroundColor =
-    !config.backgroundColor && !config.backgroundImageUrl && config.showRadialGradient ? "#ffffff" : "";
+    !config.backgroundColor && !config.backgroundImageUrl && config.showRadialGradient
+      ? "#ffffff"
+      : "";
 
   const wrapperStyle: CSSProperties = {
-    ...((config.backgroundColor || defaultBackgroundColor)
+    ...(config.backgroundColor || defaultBackgroundColor
       ? { backgroundColor: config.backgroundColor || defaultBackgroundColor }
       : {}),
     ...(config.backgroundImageUrl
       ? {
-          backgroundImage: `url(${config.backgroundImageUrl})`,
+          backgroundImage: backgroundImageWithFallback(config.backgroundImageUrl),
           backgroundSize: "cover",
           backgroundPosition: `${config.backgroundPositionX}% ${config.backgroundPositionY}%`,
           backgroundRepeat: "no-repeat",
         }
-          : !config.backgroundColor && !defaultBackgroundColor
-      ? { background: DEFAULT_SECTION_LINEAR_GRADIENT }
-      : {}),
+      : !config.backgroundColor && !defaultBackgroundColor
+        ? { background: DEFAULT_SECTION_LINEAR_GRADIENT }
+        : {}),
     ...(config.borderTopWidth > 0
       ? {
           borderTopStyle: "solid",
@@ -186,7 +200,11 @@ export function SectionStyleWrapper({
   const overlayOpacity = config.backgroundImageUrl ? config.backgroundOverlayOpacity / 100 : 0;
 
   return (
-    <section id={id} className={`relative overflow-hidden rounded-2xl ${className ?? ""}`.trim()} style={wrapperStyle}>
+    <section
+      id={id}
+      className={`relative overflow-hidden rounded-2xl ${className ?? ""}`.trim()}
+      style={wrapperStyle}
+    >
       {overlayOpacity > 0 && (
         <div
           className="pointer-events-none absolute inset-0"
@@ -194,11 +212,12 @@ export function SectionStyleWrapper({
         />
       )}
       {config.showRadialGradient && (
-        <div className="pointer-events-none absolute inset-0" style={getRadialGradientStyle(config.radialGradientColor, config.radialGradientPosition)} />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={getRadialGradientStyle(config.radialGradientColor, config.radialGradientPosition)}
+        />
       )}
-      <div className={`relative z-10 ${contentClassName ?? ""}`.trim()}>
-        {children}
-      </div>
+      <div className={`relative z-10 ${contentClassName ?? ""}`.trim()}>{children}</div>
     </section>
   );
 }

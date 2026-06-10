@@ -71,6 +71,12 @@ const LEGACY_CMS_ASSET_MAP: Record<string, string> = {
 
 export const CMS_MISSING_IMAGE_PLACEHOLDER_URL = "/images/cms-media-missing.svg";
 
+export function cmsBackgroundImageValue(url: string): string {
+  const resolvedUrl = resolveCmsAssetUrl(url);
+  if (!resolvedUrl) return "";
+  return `url(${JSON.stringify(resolvedUrl)}), url(${JSON.stringify(CMS_MISSING_IMAGE_PLACEHOLDER_URL)})`;
+}
+
 export function handleCmsPreviewImageError(event: SyntheticEvent<HTMLImageElement>) {
   const image = event.currentTarget;
   if (image.src.endsWith(CMS_MISSING_IMAGE_PLACEHOLDER_URL)) return;

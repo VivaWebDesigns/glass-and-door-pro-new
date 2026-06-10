@@ -103,6 +103,7 @@ import {
 } from "@/lib/blog-post-categories";
 import {
   arr,
+  cmsBackgroundImageValue,
   colorStyle,
   getMobileImageStyles,
   getVimeoId,
@@ -250,13 +251,13 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
           : {}),
         ...(bg && !videoBg
           ? {
-              backgroundImage: `url(${bg})`,
+              backgroundImage: cmsBackgroundImageValue(bg),
               backgroundSize: "cover",
               backgroundPosition: `${bgPosX}% ${bgPosY}%`,
             }
           : bg && videoBg
             ? {
-                backgroundImage: `url(${bg})`,
+                backgroundImage: cmsBackgroundImageValue(bg),
                 backgroundSize: "cover",
                 backgroundPosition: `${bgPosX}% ${bgPosY}%`,
               }

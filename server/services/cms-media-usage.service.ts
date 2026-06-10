@@ -1,4 +1,5 @@
 import { storage } from "../storage";
+import { createHash } from "crypto";
 import type {
   BlogPost,
   CmsMediaAsset,
@@ -15,6 +16,91 @@ function isImageMimeType(mimeType: string) {
 
 function assetKind(asset: CmsMediaAsset): "image" | "document" {
   return isImageMimeType(asset.mimeType) ? "image" : "document";
+}
+
+const IMAGE_URL_PATTERN =
+  /(?:https?:\/\/[^\s"'<>]+|\/(?:uploads|images|r2)\/[^\s"'<>]+)\.(?:avif|gif|jpe?g|png|svg|webp)(?:\?[^"'\s<>]*)?/gi;
+
+function isImageUrl(value: string) {
+  return /^(?:https?:\/\/|\/(?:uploads|images|r2)\/).+\.(?:avif|gif|jpe?g|png|svg|webp)(?:\?.*)?$/i.test(
+    value,
+  );
+}
+
+function normalizeUrlKey(url: string) {
+  try {
+    const parsed = new URL(url);
+    return parsed.pathname;
+  } catch {
+    return url;
+  }
+}
+
+function collectImageUrls(value: unknown, urls = new Set<string>()) {
+  if (!value) return urls;
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (isImageUrl(trimmed)) {
+      urls.add(trimmed);
+    }
+    for (const match of trimmed.matchAll(IMAGE_URL_PATTERN)) {
+      urls.add(match[0]);
+    }
+    return urls;
+  }
+
+  if (Array.isArray(value)) {
+    for (const entry of value) collectImageUrls(entry, urls);
+    return urls;
+  }
+
+  if (typeof value === "object") {
+    for (const entry of Object.values(value as Record<string, unknown>)) {
+      collectImageUrls(entry, urls);
+    }
+  }
+
+  return urls;
+}
+
+function inferMimeType(url: string) {
+  const pathname = normalizeUrlKey(url).toLowerCase();
+  if (pathname.endsWith(".png")) return "image/png";
+  if (pathname.endsWith(".jpg") || pathname.endsWith(".jpeg")) return "image/jpeg";
+  if (pathname.endsWith(".gif")) return "image/gif";
+  if (pathname.endsWith(".svg")) return "image/svg+xml";
+  if (pathname.endsWith(".avif")) return "image/avif";
+  return "image/webp";
+}
+
+function displayNameFromUrl(url: string) {
+  const path = normalizeUrlKey(url);
+  const filename = decodeURIComponent(path.split("/").filter(Boolean).pop() || "site-image");
+  return filename || "site-image";
+}
+
+function createDiscoveredAsset(url: string): CmsMediaAsset {
+  const originalName = displayNameFromUrl(url);
+  return {
+    id: `site-image:${createHash("sha1").update(url).digest("hex").slice(0, 16)}`,
+    filename: originalName,
+    originalName,
+    title: originalName.replace(/\.[^.]+$/, ""),
+    url,
+    mimeType: inferMimeType(url),
+    fileSize: 0,
+    r2Key: null,
+    alt: "",
+    caption: null,
+    description: null,
+    seoTitle: null,
+    seoDescription: null,
+    ogTitle: null,
+    ogDescription: null,
+    uploadedBy: null,
+    createdAt: null,
+  };
 }
 
 function buildAssetNeedles(asset: CmsMediaAsset): string[] {
@@ -47,7 +133,9 @@ function valueReferencesAsset(value: unknown, asset: CmsMediaAsset): boolean {
     return value.some((entry) => valueReferencesAsset(entry, asset));
   }
   if (typeof value === "object") {
-    return Object.values(value as Record<string, unknown>).some((entry) => valueReferencesAsset(entry, asset));
+    return Object.values(value as Record<string, unknown>).some((entry) =>
+      valueReferencesAsset(entry, asset),
+    );
   }
   return false;
 }
@@ -56,7 +144,7 @@ function addUsageReference(
   usageMap: Map<string, CmsMediaUsageReference[]>,
   dedupe: Set<string>,
   assetId: string,
-  reference: CmsMediaUsageReference
+  reference: CmsMediaUsageReference,
 ) {
   const dedupeKey = `${assetId}:${reference.entityType}:${reference.entityId}:${reference.field}`;
   if (dedupe.has(dedupeKey)) {
@@ -79,7 +167,7 @@ function addDirectFieldUsage<T extends { id: string }>(
   field: string,
   fieldValue: string | null | undefined,
   isLive: boolean,
-  statusLabel: string
+  statusLabel: string,
 ) {
   if (!fieldValue) return;
   for (const asset of assets) {
@@ -106,7 +194,7 @@ function addContentUsage<T extends { id: string }>(
   path: string | undefined,
   content: unknown,
   isLive: boolean,
-  statusLabel: string
+  statusLabel: string,
 ) {
   for (const asset of assets) {
     if (!valueReferencesAsset(content, asset)) continue;
@@ -123,7 +211,9 @@ function addContentUsage<T extends { id: string }>(
 }
 
 function pageStatusLabel(page: CmsPage) {
-  return page.status === "published" ? "Published page" : `${page.status[0].toUpperCase()}${page.status.slice(1)} page`;
+  return page.status === "published"
+    ? "Published page"
+    : `${page.status[0].toUpperCase()}${page.status.slice(1)} page`;
 }
 
 function postStatusLabel(post: BlogPost) {
@@ -139,7 +229,7 @@ function eventStatusLabel(event: Event) {
 }
 
 export async function buildCmsMediaLibraryAssets(
-  assets: CmsMediaAsset[]
+  assets: CmsMediaAsset[],
 ): Promise<CmsMediaLibraryAsset[]> {
   const [pages, posts, events, seoSettings] = await Promise.all([
     storage.cmsPages.getAllPages(),
@@ -148,37 +238,158 @@ export async function buildCmsMediaLibraryAssets(
     storage.seoSettings.get(),
   ]);
 
+  const discoveredUrls = new Set<string>();
+  for (const page of pages) {
+    collectImageUrls(page.ogImageUrl, discoveredUrls);
+    collectImageUrls(page.content, discoveredUrls);
+  }
+  for (const post of posts) {
+    collectImageUrls(post.coverImageUrl, discoveredUrls);
+    collectImageUrls(post.ogImageUrl, discoveredUrls);
+    collectImageUrls(post.content, discoveredUrls);
+  }
+  for (const event of events) {
+    collectImageUrls(event.imageUrl, discoveredUrls);
+    collectImageUrls(event.speakerImageUrl, discoveredUrls);
+    collectImageUrls(event.description, discoveredUrls);
+  }
+  if (seoSettings) {
+    collectImageUrls(seoSettings.defaultOgImageUrl, discoveredUrls);
+    collectImageUrls(seoSettings.organizationLogoUrl, discoveredUrls);
+  }
+
+  const managedUrlKeys = new Set(
+    assets.flatMap((asset) => buildAssetNeedles(asset).map((needle) => normalizeUrlKey(needle))),
+  );
+  const discoveredAssets = Array.from(discoveredUrls)
+    .filter((url) => !managedUrlKeys.has(normalizeUrlKey(url)))
+    .map(createDiscoveredAsset);
+  const allAssets = [...assets, ...discoveredAssets];
+
   const usageMap = new Map<string, CmsMediaUsageReference[]>();
   const dedupe = new Set<string>();
 
   for (const page of pages) {
     const isLive = page.status === "published";
     const path = page.slug ? `/${page.slug}` : undefined;
-    addDirectFieldUsage(assets, usageMap, dedupe, page, "page", page.title, path, "ogImageUrl", page.ogImageUrl, isLive, pageStatusLabel(page));
-    addContentUsage(assets, usageMap, dedupe, page, "page", page.title, path, page.content, isLive, pageStatusLabel(page));
+    addDirectFieldUsage(
+      allAssets,
+      usageMap,
+      dedupe,
+      page,
+      "page",
+      page.title,
+      path,
+      "ogImageUrl",
+      page.ogImageUrl,
+      isLive,
+      pageStatusLabel(page),
+    );
+    addContentUsage(
+      allAssets,
+      usageMap,
+      dedupe,
+      page,
+      "page",
+      page.title,
+      path,
+      page.content,
+      isLive,
+      pageStatusLabel(page),
+    );
   }
 
   for (const post of posts) {
     const isLive = Boolean(post.isPublished);
     const path = post.slug ? `/insights/${post.slug}` : undefined;
-    addDirectFieldUsage(assets, usageMap, dedupe, post, "blog_post", post.title, path, "coverImageUrl", post.coverImageUrl, isLive, postStatusLabel(post));
-    addDirectFieldUsage(assets, usageMap, dedupe, post, "blog_post", post.title, path, "ogImageUrl", post.ogImageUrl, isLive, postStatusLabel(post));
-    addContentUsage(assets, usageMap, dedupe, post, "blog_post", post.title, path, post.content, isLive, postStatusLabel(post));
+    addDirectFieldUsage(
+      allAssets,
+      usageMap,
+      dedupe,
+      post,
+      "blog_post",
+      post.title,
+      path,
+      "coverImageUrl",
+      post.coverImageUrl,
+      isLive,
+      postStatusLabel(post),
+    );
+    addDirectFieldUsage(
+      allAssets,
+      usageMap,
+      dedupe,
+      post,
+      "blog_post",
+      post.title,
+      path,
+      "ogImageUrl",
+      post.ogImageUrl,
+      isLive,
+      postStatusLabel(post),
+    );
+    addContentUsage(
+      allAssets,
+      usageMap,
+      dedupe,
+      post,
+      "blog_post",
+      post.title,
+      path,
+      post.content,
+      isLive,
+      postStatusLabel(post),
+    );
   }
 
   for (const event of events) {
     const isLive = event.status === "published" && event.visibility === "public";
     const path = `/events`;
-    addDirectFieldUsage(assets, usageMap, dedupe, event, "event", event.title, path, "imageUrl", event.imageUrl, isLive, eventStatusLabel(event));
-    addDirectFieldUsage(assets, usageMap, dedupe, event, "event", event.title, path, "speakerImageUrl", event.speakerImageUrl, isLive, eventStatusLabel(event));
-    addContentUsage(assets, usageMap, dedupe, event, "event", event.title, path, event.description, isLive, eventStatusLabel(event));
+    addDirectFieldUsage(
+      allAssets,
+      usageMap,
+      dedupe,
+      event,
+      "event",
+      event.title,
+      path,
+      "imageUrl",
+      event.imageUrl,
+      isLive,
+      eventStatusLabel(event),
+    );
+    addDirectFieldUsage(
+      allAssets,
+      usageMap,
+      dedupe,
+      event,
+      "event",
+      event.title,
+      path,
+      "speakerImageUrl",
+      event.speakerImageUrl,
+      isLive,
+      eventStatusLabel(event),
+    );
+    addContentUsage(
+      allAssets,
+      usageMap,
+      dedupe,
+      event,
+      "event",
+      event.title,
+      path,
+      event.description,
+      isLive,
+      eventStatusLabel(event),
+    );
   }
 
   if (seoSettings) {
     const globalSeo = seoSettings as SeoSettings;
     const seoEntity = { id: globalSeo.id };
     addDirectFieldUsage(
-      assets,
+      allAssets,
       usageMap,
       dedupe,
       seoEntity,
@@ -188,10 +399,10 @@ export async function buildCmsMediaLibraryAssets(
       "defaultOgImageUrl",
       globalSeo.defaultOgImageUrl,
       true,
-      "Global setting"
+      "Global setting",
     );
     addDirectFieldUsage(
-      assets,
+      allAssets,
       usageMap,
       dedupe,
       seoEntity,
@@ -201,11 +412,11 @@ export async function buildCmsMediaLibraryAssets(
       "organizationLogoUrl",
       globalSeo.organizationLogoUrl,
       true,
-      "Global setting"
+      "Global setting",
     );
   }
 
-  return assets.map((asset) => {
+  return allAssets.map((asset) => {
     const usageRefs = (usageMap.get(asset.id) ?? []).sort((a, b) => {
       if (a.isLive !== b.isLive) {
         return a.isLive ? -1 : 1;
@@ -221,6 +432,8 @@ export async function buildCmsMediaLibraryAssets(
       usageCount: usageRefs.length,
       liveUsageCount,
       isInUse: liveUsageCount > 0,
+      isManaged: !asset.id.startsWith("site-image:"),
+      sourceLabel: asset.id.startsWith("site-image:") ? "Discovered on site" : "Managed upload",
     };
   });
 }

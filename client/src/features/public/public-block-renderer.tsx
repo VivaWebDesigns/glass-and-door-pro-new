@@ -27,6 +27,7 @@ import {
 } from "@/features/admin/cms/builder/section-style";
 import {
   arr,
+  cmsBackgroundImageValue,
   colorStyle,
   getMobileImageStyles,
   getVimeoId,
@@ -37,7 +38,10 @@ import {
   SPACING_MAP,
   str,
 } from "@/features/admin/cms/builder/block-renderer.shared";
-import { renderPublicDisplayText, SectionHeading } from "@/features/admin/cms/builder/section-heading";
+import {
+  renderPublicDisplayText,
+  SectionHeading,
+} from "@/features/admin/cms/builder/section-heading";
 import { getEventPath } from "@shared/event-url";
 import {
   Globe,
@@ -203,19 +207,19 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
           : {}),
         ...(bg && !videoBg
           ? {
-              backgroundImage: `url(${bg})`,
+              backgroundImage: cmsBackgroundImageValue(bg),
               backgroundSize: "cover",
               backgroundPosition: `${bgPosX}% ${bgPosY}%`,
             }
           : bg && videoBg
             ? {
-                backgroundImage: `url(${bg})`,
+                backgroundImage: cmsBackgroundImageValue(bg),
                 backgroundSize: "cover",
                 backgroundPosition: `${bgPosX}% ${bgPosY}%`,
               }
             : !videoBg && !sectionStyleConfig.backgroundColor
-            ? {}
-            : {}),
+              ? {}
+              : {}),
       }}
     >
       {videoBg && (
@@ -511,9 +515,13 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
               />
               {(badgeValue || badgeLabel) && (
                 <div className="absolute -bottom-4 -right-3 rounded-lg bg-primary px-5 py-4 text-primary-foreground shadow-xl sm:-right-4">
-                  {badgeValue && <div className="text-2xl font-bold leading-none">{badgeValue}</div>}
+                  {badgeValue && (
+                    <div className="text-2xl font-bold leading-none">{badgeValue}</div>
+                  )}
                   {badgeLabel && (
-                    <div className="mt-1 text-xs font-semibold uppercase tracking-wide">{badgeLabel}</div>
+                    <div className="mt-1 text-xs font-semibold uppercase tracking-wide">
+                      {badgeLabel}
+                    </div>
                   )}
                 </div>
               )}
@@ -539,10 +547,9 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
   const isGlassService =
     variant === "glass-service" ||
     (variant === "dark" && str(props.secondaryText).toLowerCase() === "back to home");
-  const bgClass =
-    isGlassService
-      ? "bg-[#1a8ead] text-white"
-      : variant === "dark"
+  const bgClass = isGlassService
+    ? "bg-[#1a8ead] text-white"
+    : variant === "dark"
       ? "bg-foreground text-background"
       : variant === "accent"
         ? "bg-accent text-accent-foreground"
@@ -631,10 +638,14 @@ function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
               className={`public-section-card-hover h-full overflow-hidden rounded-lg border-border/70 text-center shadow-sm ${variant === "service-links" ? "border-none bg-white" : ""}`}
             >
               <CardContent className="flex h-full flex-col px-4 pb-5 pt-6 sm:px-6 sm:pb-6 sm:pt-8">
-                <div className={`mx-auto mb-4 flex items-center justify-center rounded-full bg-accent/10 ring-1 ring-accent/20 ${variant === "service-links" ? "h-16 w-16" : "h-12 w-12"}`}>
+                <div
+                  className={`mx-auto mb-4 flex items-center justify-center rounded-full bg-accent/10 ring-1 ring-accent/20 ${variant === "service-links" ? "h-16 w-16" : "h-12 w-12"}`}
+                >
                   <LucideIcon
                     name={card.icon || "Globe"}
-                    className={variant === "service-links" ? "h-8 w-8 text-primary" : "h-6 w-6 text-accent"}
+                    className={
+                      variant === "service-links" ? "h-8 w-8 text-primary" : "h-6 w-6 text-accent"
+                    }
                   />
                 </div>
                 <h3 className="mb-2 text-base font-semibold leading-snug break-words">
@@ -716,14 +727,27 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
           fill="#4285F4"
           d="M44.5 20H24v8.5h11.8C34.7 34 30 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.3 0 6.3 1.2 8.6 3.3l6-6C34.8 4.9 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21c10.8 0 20.5-7.8 20.5-21 0-1.4-.1-2.7-.3-4Z"
         />
-        <path fill="#34A853" d="M6.1 14.1 13.1 19.2C15 14.3 19.2 11 24 11c3.3 0 6.3 1.2 8.6 3.3l6-6C34.8 4.9 29.6 3 24 3 16.1 3 9.2 7.5 5.7 14Z" />
-        <path fill="#FBBC05" d="M24 45c5.5 0 10.3-1.8 14-5l-6.5-5.4C29.5 36.1 26.9 37 24 37c-5.9 0-10.9-4-12.6-9.4l-7.1 5.5C7.8 40.1 15.2 45 24 45Z" />
-        <path fill="#EA4335" d="M11.4 27.6A13 13 0 0 1 11 24c0-1.3.2-2.6.6-3.8l-7.3-5.6A21 21 0 0 0 3 24c0 3.3.8 6.4 2.2 9.1Z" />
+        <path
+          fill="#34A853"
+          d="M6.1 14.1 13.1 19.2C15 14.3 19.2 11 24 11c3.3 0 6.3 1.2 8.6 3.3l6-6C34.8 4.9 29.6 3 24 3 16.1 3 9.2 7.5 5.7 14Z"
+        />
+        <path
+          fill="#FBBC05"
+          d="M24 45c5.5 0 10.3-1.8 14-5l-6.5-5.4C29.5 36.1 26.9 37 24 37c-5.9 0-10.9-4-12.6-9.4l-7.1 5.5C7.8 40.1 15.2 45 24 45Z"
+        />
+        <path
+          fill="#EA4335"
+          d="M11.4 27.6A13 13 0 0 1 11 24c0-1.3.2-2.6.6-3.8l-7.3-5.6A21 21 0 0 0 3 24c0 3.3.8 6.4 2.2 9.1Z"
+        />
       </svg>
     );
   }
 
-  function SourceBadge({ item }: { item: { source?: string; sourceIcon?: string; date?: string } }) {
+  function SourceBadge({
+    item,
+  }: {
+    item: { source?: string; sourceIcon?: string; date?: string };
+  }) {
     const source = item.source || "Google";
     const showGoogleIcon = (item.sourceIcon || source).toLowerCase() === "google";
 
@@ -749,14 +773,19 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
     },
     i: number,
   ) => (
-    <Card key={i} className={`public-section-card h-full rounded-lg ${variant === "google-carousel" ? "border-none bg-white shadow-lg" : ""}`}>
+    <Card
+      key={i}
+      className={`public-section-card h-full rounded-lg ${variant === "google-carousel" ? "border-none bg-white shadow-lg" : ""}`}
+    >
       <CardContent className="pt-6">
         {variant === "google-carousel" ? (
           <div className="mb-4 flex items-center justify-between gap-3">
             <div className="flex text-yellow-400">
-              {Array.from({ length: Math.max(1, Math.min(5, num(item.rating, 5))) }).map((_, index) => (
-                <Star key={index} className="h-4 w-4 fill-current" />
-              ))}
+              {Array.from({ length: Math.max(1, Math.min(5, num(item.rating, 5))) }).map(
+                (_, index) => (
+                  <Star key={index} className="h-4 w-4 fill-current" />
+                ),
+              )}
             </div>
             <SourceBadge item={item} />
           </div>
@@ -808,7 +837,11 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
           </Carousel>
           {ctaText && ctaLink ? (
             <div className="mt-7 flex justify-center">
-              <Button asChild variant="outline" className="border-[#1a8ead] bg-white text-[#1a8ead] hover:bg-[#1a8ead] hover:text-white">
+              <Button
+                asChild
+                variant="outline"
+                className="border-[#1a8ead] bg-white text-[#1a8ead] hover:bg-[#1a8ead] hover:text-white"
+              >
                 <a href={ctaLink} target="_blank" rel="noopener noreferrer">
                   {ctaText}
                   <ExternalLink className="ml-2 h-4 w-4" aria-hidden="true" />
@@ -824,7 +857,11 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
       )}
       {!shouldCarousel && ctaText && ctaLink ? (
         <div className="mt-7 flex justify-center">
-          <Button asChild variant="outline" className="border-[#1a8ead] bg-white text-[#1a8ead] hover:bg-[#1a8ead] hover:text-white">
+          <Button
+            asChild
+            variant="outline"
+            className="border-[#1a8ead] bg-white text-[#1a8ead] hover:bg-[#1a8ead] hover:text-white"
+          >
             <a href={ctaLink} target="_blank" rel="noopener noreferrer">
               {ctaText}
               <ExternalLink className="ml-2 h-4 w-4" aria-hidden="true" />
@@ -1490,7 +1527,13 @@ function ImageGridBlock({ props }: { props: Record<string, unknown> }) {
           <p className="text-sm text-muted-foreground">Add images to display here</p>
         </div>
       ) : (
-        <div className={variant === "gallery-strip" ? "grid grid-cols-2 gap-3 md:grid-cols-4" : `grid grid-cols-1 ${colsClass} ${gapClass}`}>
+        <div
+          className={
+            variant === "gallery-strip"
+              ? "grid grid-cols-2 gap-3 md:grid-cols-4"
+              : `grid grid-cols-1 ${colsClass} ${gapClass}`
+          }
+        >
           {images.map((img, i) => (
             <div
               key={i}
@@ -1507,7 +1550,9 @@ function ImageGridBlock({ props }: { props: Record<string, unknown> }) {
                 src={img.url}
                 alt={img.alt}
                 className={`w-full rounded-lg object-cover ${
-                  isProjectGallery ? "aspect-[4/3] transition-transform duration-300 group-hover:scale-105" : "aspect-square"
+                  isProjectGallery
+                    ? "aspect-[4/3] transition-transform duration-300 group-hover:scale-105"
+                    : "aspect-square"
                 } ${variant === "gallery-strip" ? "h-full transition-transform duration-300 hover:scale-105" : ""}`}
               />
               {img.caption && (

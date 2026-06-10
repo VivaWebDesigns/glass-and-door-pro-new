@@ -132,6 +132,8 @@ export function CmsImageUpload({
                 usageCount: 0,
                 liveUsageCount: 0,
                 isInUse: false,
+                isManaged: true,
+                sourceLabel: "Managed upload",
               });
             } catch {
               reject(new Error("Invalid server response"));

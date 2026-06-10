@@ -230,8 +230,10 @@ export default function CmsMediaPage() {
   const totalDraftOnly = assets.filter((asset) => !asset.isInUse && asset.usageCount > 0).length;
   const totalUnused = assets.filter((asset) => asset.usageCount === 0).length;
   const totalDocuments = assets.filter((asset) => asset.assetKind === "document").length;
+  const totalDiscovered = assets.filter((asset) => asset.isManaged === false).length;
 
   const formatBytes = (bytes: number) => {
+    if (bytes === 0) return "Unknown size";
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
@@ -287,9 +289,12 @@ export default function CmsMediaPage() {
               Media Library
             </h1>
             <p className="text-muted-foreground mt-1">
-              {assets.length} media item{assets.length !== 1 ? "s" : ""} uploaded · {totalInUse}{" "}
-              live · {totalDraftOnly} draft-only · {totalUnused} unused · {totalDocuments} document
+              {assets.length} media item{assets.length !== 1 ? "s" : ""} · {totalInUse} live ·{" "}
+              {totalDraftOnly} draft-only · {totalUnused} unused · {totalDocuments} document
               {totalDocuments !== 1 ? "s" : ""}
+              {totalDiscovered > 0
+                ? ` · ${totalDiscovered} discovered site image${totalDiscovered !== 1 ? "s" : ""}`
+                : ""}
             </p>
           </div>
           <Button
@@ -434,7 +439,7 @@ export default function CmsMediaPage() {
                   )}
                 </div>
                 <div className="absolute right-2 top-2 rounded-full bg-background/90 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground shadow-sm">
-                  {asset.assetKind}
+                  {asset.isManaged === false ? "site image" : asset.assetKind}
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                   <p className="text-white text-[10px] font-medium truncate leading-tight">
@@ -488,6 +493,7 @@ export default function CmsMediaPage() {
               <DialogTitle className="truncate">{selectedAsset.originalName}</DialogTitle>
               <DialogDescription>
                 {formatBytes(selectedAsset.fileSize)} · {selectedAsset.mimeType}
+                {selectedAsset.sourceLabel && <> · {selectedAsset.sourceLabel}</>}
                 {selectedAsset.createdAt && (
                   <> · Uploaded {format(new Date(selectedAsset.createdAt), "MMM d, yyyy")}</>
                 )}
@@ -557,6 +563,11 @@ export default function CmsMediaPage() {
                     {selectedAsset.usageCount} total reference
                     {selectedAsset.usageCount !== 1 ? "s" : ""}
                   </span>
+                  {selectedAsset.isManaged === false && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-1 text-xs font-medium text-sky-700">
+                      Discovered from site content
+                    </span>
+                  )}
                 </div>
                 {selectedAsset.usageRefs.length > 0 ? (
                   <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
@@ -595,6 +606,7 @@ export default function CmsMediaPage() {
                     value={metadataForm.originalName}
                     onChange={(e) => updateMetadataField("originalName", e.target.value)}
                     placeholder="hero-image.webp"
+                    disabled={selectedAsset.isManaged === false}
                     data-testid="input-media-original-name"
                   />
                   <p className="text-xs text-muted-foreground">
@@ -608,6 +620,7 @@ export default function CmsMediaPage() {
                     value={metadataForm.title}
                     onChange={(e) => updateMetadataField("title", e.target.value)}
                     placeholder="Human-friendly media title"
+                    disabled={selectedAsset.isManaged === false}
                     data-testid="input-media-title"
                   />
                 </div>
@@ -618,6 +631,7 @@ export default function CmsMediaPage() {
                     value={metadataForm.alt}
                     onChange={(e) => updateMetadataField("alt", e.target.value)}
                     placeholder="Describe the image for accessibility and SEO"
+                    disabled={selectedAsset.isManaged === false}
                     data-testid="input-media-alt"
                   />
                 </div>
@@ -629,6 +643,7 @@ export default function CmsMediaPage() {
                     onChange={(e) => updateMetadataField("caption", e.target.value)}
                     placeholder="Optional caption shown alongside the image"
                     rows={2}
+                    disabled={selectedAsset.isManaged === false}
                     data-testid="textarea-media-caption"
                   />
                 </div>
@@ -640,6 +655,7 @@ export default function CmsMediaPage() {
                     onChange={(e) => updateMetadataField("description", e.target.value)}
                     placeholder="Internal notes or fuller editorial context"
                     rows={3}
+                    disabled={selectedAsset.isManaged === false}
                     data-testid="textarea-media-description"
                   />
                 </div>
@@ -661,6 +677,7 @@ export default function CmsMediaPage() {
                       value={metadataForm.seoTitle}
                       onChange={(e) => updateMetadataField("seoTitle", e.target.value)}
                       placeholder="Search-friendly image title"
+                      disabled={selectedAsset.isManaged === false}
                       data-testid="input-media-seo-title"
                     />
                   </div>
@@ -671,6 +688,7 @@ export default function CmsMediaPage() {
                       value={metadataForm.ogTitle}
                       onChange={(e) => updateMetadataField("ogTitle", e.target.value)}
                       placeholder="Social sharing title"
+                      disabled={selectedAsset.isManaged === false}
                       data-testid="input-media-og-title"
                     />
                   </div>
@@ -682,6 +700,7 @@ export default function CmsMediaPage() {
                       onChange={(e) => updateMetadataField("seoDescription", e.target.value)}
                       placeholder="Short metadata description for search contexts"
                       rows={3}
+                      disabled={selectedAsset.isManaged === false}
                       data-testid="textarea-media-seo-description"
                     />
                   </div>
@@ -693,6 +712,7 @@ export default function CmsMediaPage() {
                       onChange={(e) => updateMetadataField("ogDescription", e.target.value)}
                       placeholder="Short description for social previews"
                       rows={3}
+                      disabled={selectedAsset.isManaged === false}
                       data-testid="textarea-media-og-description"
                     />
                   </div>
@@ -709,6 +729,7 @@ export default function CmsMediaPage() {
                     onClick={prepareCropper}
                     disabled={
                       selectedAsset.assetKind !== "image" ||
+                      selectedAsset.isManaged === false ||
                       isPreparingCrop ||
                       replaceImageMutation.isPending
                     }
@@ -741,6 +762,7 @@ export default function CmsMediaPage() {
                     }
                     disabled={
                       !hasMetadataChanges ||
+                      selectedAsset.isManaged === false ||
                       metadataMutation.isPending ||
                       replaceImageMutation.isPending
                     }
@@ -756,7 +778,7 @@ export default function CmsMediaPage() {
                   size="sm"
                   className="gap-1.5"
                   onClick={() => setDeletingId(selectedAsset.id)}
-                  disabled={replaceImageMutation.isPending}
+                  disabled={selectedAsset.isManaged === false || replaceImageMutation.isPending}
                   data-testid="button-delete-asset"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
