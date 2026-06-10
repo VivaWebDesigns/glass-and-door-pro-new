@@ -228,6 +228,18 @@ export function CmsSitemapTab() {
     }
   };
 
+  const handleCopySitemapUrl = async () => {
+    const origin = siteUrl || window.location.origin;
+    const sitemapUrl = `${origin.replace(/\/$/, "")}/sitemap.xml`;
+
+    try {
+      await navigator.clipboard.writeText(sitemapUrl);
+      toast({ title: "Sitemap URL copied" });
+    } catch {
+      toast({ title: "Could not copy sitemap URL", variant: "destructive" });
+    }
+  };
+
   const handleUseGeneratedVersion = () => {
     saveRobotsMutation.mutate(null);
   };
@@ -264,9 +276,23 @@ export function CmsSitemapTab() {
               View robots.txt
             </Button>
             {siteUrl && (
-              <code className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground">
-                {siteUrl}/sitemap.xml
-              </code>
+              <div className="flex items-center gap-1">
+                <code className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground">
+                  {siteUrl}/sitemap.xml
+                </code>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={handleCopySitemapUrl}
+                  aria-label="Copy sitemap URL"
+                  title="Copy sitemap URL"
+                  data-testid="button-copy-sitemap-url"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                </Button>
+              </div>
             )}
           </div>
 
