@@ -320,15 +320,7 @@ export function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
-          ) : (
-            <>
-              <Link href="/auth/login">
-                <Button variant="ghost" data-testid="link-login">
-                  Login
-                </Button>
-              </Link>
-            </>
-          )}
+          ) : null}
         </div>
 
         <div className="flex md:hidden items-center gap-2">
@@ -512,19 +504,7 @@ export function Navbar() {
                       Logout
                     </Button>
                   </>
-                ) : (
-                  <>
-                    <Link href="/auth/login" onClick={() => setMobileOpen(false)}>
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start"
-                        data-testid="link-mobile-login"
-                      >
-                        Login
-                      </Button>
-                    </Link>
-                  </>
-                )}
+                ) : null}
               </div>
             </SheetContent>
           </Sheet>
