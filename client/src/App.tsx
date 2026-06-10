@@ -5,7 +5,6 @@ import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrandingProvider } from "@/components/shared/branding-provider";
-import { CookieConsentBanner } from "@/components/shared/cookie-consent-banner";
 import { ProtectedRoute } from "@/components/shared/protected-route";
 import { useAuth } from "@/hooks/use-auth";
 import NotFound from "@/pages/not-found";
@@ -432,7 +431,6 @@ function App() {
             <RouteAdminModeManager />
             <RouteScrollManager />
             <Router />
-            <CookieConsentBanner />
           </SetupGuard>
         </TooltipProvider>
       </BrandingProvider>
