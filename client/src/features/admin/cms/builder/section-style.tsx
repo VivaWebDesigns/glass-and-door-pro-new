@@ -131,7 +131,7 @@ export function getRadialGradientStyle(
 }
 
 function backgroundImageWithFallback(url: string) {
-  return `url(${JSON.stringify(url)}), url(${JSON.stringify(CMS_MISSING_IMAGE_PLACEHOLDER_URL)})`;
+  return `url(${JSON.stringify(url)})`;
 }
 
 export function getSectionPaddingClasses(props: Record<string, unknown>) {

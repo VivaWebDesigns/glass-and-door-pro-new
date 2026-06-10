@@ -76,7 +76,7 @@ export const CMS_MISSING_IMAGE_PLACEHOLDER_URL = "/images/cms-media-missing.svg"
 export function cmsBackgroundImageValue(url: string): string {
   const resolvedUrl = resolveCmsAssetUrl(url);
   if (!resolvedUrl) return "";
-  return `url(${JSON.stringify(resolvedUrl)}), url(${JSON.stringify(CMS_MISSING_IMAGE_PLACEHOLDER_URL)})`;
+  return `url(${JSON.stringify(resolvedUrl)})`;
 }
 
 export function handleCmsPreviewImageError(event: SyntheticEvent<HTMLImageElement>) {
