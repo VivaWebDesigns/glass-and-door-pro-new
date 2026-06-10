@@ -27,7 +27,6 @@ import { searchPublicSite } from "../services/public-search.service";
 import { buildRobotsTxtPayload } from "../services/robots-txt.service";
 import { storage } from "../storage/index";
 import { DEFAULT_SITE_FEATURES, normalizeBooleanSetting } from "@shared/site-features";
-import { getEventPath } from "@shared/event-url";
 import { getCmsPublicPath } from "@shared/glass-seo";
 import { BRANDING_COLOR_DEFAULTS, resolveBrandingColor } from "@shared/branding-colors";
 import {
@@ -257,11 +256,9 @@ export function registerApiRoutes(app: Express) {
 
   app.get("/sitemap.xml", async (_req, res) => {
     try {
-      const [seoSettings, pages, posts, events] = await Promise.all([
+      const [seoSettings, pages] = await Promise.all([
         storage.seoSettings.get(),
         storage.cmsPages.getAllPages(),
-        storage.blog.getAllPosts(),
-        storage.events.getAllEvents(),
       ]);
 
       const base = seoSettings?.siteUrl?.replace(/\/$/, "") || "";
@@ -273,12 +270,7 @@ export function registerApiRoutes(app: Express) {
 
       const staticRoutes = [
         { path: "/about", changefreq: "monthly", priority: "0.7" },
-        { path: "/insights", changefreq: "weekly", priority: "0.8" },
-        { path: "/events", changefreq: "daily", priority: "0.8" },
-        { path: "/recordings", changefreq: "weekly", priority: "0.7" },
-        { path: "/directory", changefreq: "daily", priority: "0.9" },
-        { path: "/join", changefreq: "monthly", priority: "0.6" },
-        { path: "/contact", changefreq: "monthly", priority: "0.5" },
+        { path: "/contact", changefreq: "monthly", priority: "0.7" },
       ];
       for (const r of staticRoutes) {
         urls.push({ loc: `${base}${r.path}`, changefreq: r.changefreq, priority: r.priority });
@@ -299,34 +291,21 @@ export function registerApiRoutes(app: Express) {
           ].includes(page.slug)
         )
           continue;
+        const publicPath = getCmsPublicPath(page.slug);
+        const priority = publicPath.startsWith("/services/")
+          ? "0.8"
+          : publicPath.startsWith("/areas-served/")
+            ? "0.75"
+            : ["privacy-policy", "terms-of-service", "disclaimer"].includes(page.slug)
+              ? "0.3"
+              : "0.6";
         urls.push({
-          loc: page.canonicalUrl || `${base}${getCmsPublicPath(page.slug)}`,
+          loc: page.canonicalUrl || `${base}${publicPath}`,
           lastmod: page.updatedAt
             ? new Date(page.updatedAt).toISOString().split("T")[0]
             : undefined,
           changefreq: "monthly",
-          priority: "0.6",
-        });
-      }
-
-      for (const post of posts) {
-        if (!post.isPublished || post.noindex) continue;
-        urls.push({
-          loc: `${base}/insights/${post.slug}`,
-          lastmod: post.updatedAt
-            ? new Date(post.updatedAt).toISOString().split("T")[0]
-            : undefined,
-          changefreq: "monthly",
-          priority: "0.7",
-        });
-      }
-
-      for (const event of events) {
-        if (event.status === "draft" || event.visibility !== "public") continue;
-        urls.push({
-          loc: `${base}${getEventPath(event)}`,
-          changefreq: "weekly",
-          priority: "0.7",
+          priority,
         });
       }
 
