@@ -268,14 +268,6 @@ export function registerApiRoutes(app: Express) {
 
       urls.push({ loc: base || "/", changefreq: "weekly", priority: "1.0" });
 
-      const staticRoutes = [
-        { path: "/about", changefreq: "monthly", priority: "0.7" },
-        { path: "/contact", changefreq: "monthly", priority: "0.7" },
-      ];
-      for (const r of staticRoutes) {
-        urls.push({ loc: `${base}${r.path}`, changefreq: r.changefreq, priority: r.priority });
-      }
-
       for (const page of pages) {
         if (page.status !== "published" || page.noindex) continue;
         if (
