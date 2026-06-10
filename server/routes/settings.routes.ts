@@ -18,10 +18,13 @@ import * as r2Service from "../services/r2.service";
 import { ensureSystemEmailTemplates } from "../services/system-email-templates.service";
 import { testMailchimpConnection } from "../services/mailchimp.service";
 import { BRANDING_OPTIONS, isImageMime, optimizeImage } from "../services/image-optimizer";
+import {
+  ensureLocalUploadDirectory,
+  getLocalUploadPublicUrl,
+} from "../services/local-upload-storage";
 
 const router = Router();
 
-const LOCAL_BRANDING_DIR = path.resolve(process.cwd(), "uploads", "branding");
 const MAX_BRANDING_IMAGE_SIZE = 10 * 1024 * 1024;
 
 const brandingUpload = multer({
@@ -35,12 +38,6 @@ const brandingUpload = multer({
     cb(new Error("Accepted file types: PNG, JPEG, WebP, and GIF"));
   },
 });
-
-function ensureBrandingDir() {
-  if (!fs.existsSync(LOCAL_BRANDING_DIR)) {
-    fs.mkdirSync(LOCAL_BRANDING_DIR, { recursive: true });
-  }
-}
 
 function stripExtension(filename: string) {
   return filename.replace(/\.[^.]+$/, "");
@@ -144,13 +141,15 @@ router.post(
 
     if (r2Configured) {
       publicUrl = await r2Service.uploadFile(r2Key, optimized.buffer, optimized.mimeType);
+      if (!publicUrl) {
+        return res.status(500).json({ error: "Failed to upload branding image to Cloudflare R2" });
+      }
     }
 
     if (!publicUrl) {
-      ensureBrandingDir();
-      const localPath = path.join(LOCAL_BRANDING_DIR, filename);
+      const localPath = path.join(ensureLocalUploadDirectory("branding"), filename);
       fs.writeFileSync(localPath, optimized.buffer);
-      publicUrl = `/uploads/branding/${filename}`;
+      publicUrl = getLocalUploadPublicUrl("branding", filename);
     }
 
     await storage.settings.upsertSetting(parsed.data.settingKey, publicUrl, "branding", false);

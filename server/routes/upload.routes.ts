@@ -7,6 +7,10 @@ import { asyncHandler } from "../middleware/error-handler";
 import { storage } from "../storage/index";
 import * as r2Service from "../services/r2.service";
 import { optimizeImage, isImageMime, AVATAR_OPTIONS, ATTACHMENT_OPTIONS } from "../services/image-optimizer";
+import {
+  ensureLocalUploadDirectory,
+  getLocalUploadPublicUrl,
+} from "../services/local-upload-storage";
 
 const router = Router();
 const upload = multer({
@@ -21,14 +25,6 @@ const upload = multer({
     }
   },
 });
-
-const LOCAL_UPLOAD_DIR = path.resolve(process.cwd(), "uploads", "avatars");
-
-function ensureUploadDir() {
-  if (!fs.existsSync(LOCAL_UPLOAD_DIR)) {
-    fs.mkdirSync(LOCAL_UPLOAD_DIR, { recursive: true });
-  }
-}
 
 router.use(authenticateToken);
 
@@ -53,13 +49,16 @@ router.post(
     if (r2Configured) {
       const key = `avatars/${filename}`;
       publicUrl = await r2Service.uploadFile(key, optimized.buffer, optimized.mimeType);
+      if (!publicUrl) {
+        res.status(500).json({ message: "Failed to upload avatar to Cloudflare R2" });
+        return;
+      }
     }
 
     if (!publicUrl) {
-      ensureUploadDir();
-      const localPath = path.join(LOCAL_UPLOAD_DIR, filename);
+      const localPath = path.join(ensureLocalUploadDirectory("avatars"), filename);
       fs.writeFileSync(localPath, optimized.buffer);
-      publicUrl = `/uploads/avatars/${filename}`;
+      publicUrl = getLocalUploadPublicUrl("avatars", filename);
     }
 
     await storage.users.updateUser(targetUserId, { profileImageUrl: publicUrl });
@@ -100,14 +99,6 @@ const attachmentUpload = multer({
   },
 });
 
-const LOCAL_ATTACHMENT_DIR = path.resolve(process.cwd(), "uploads", "attachments");
-
-function ensureAttachmentDir() {
-  if (!fs.existsSync(LOCAL_ATTACHMENT_DIR)) {
-    fs.mkdirSync(LOCAL_ATTACHMENT_DIR, { recursive: true });
-  }
-}
-
 router.post(
   "/attachment",
   attachmentUpload.single("file"),
@@ -140,13 +131,16 @@ router.post(
     if (r2Configured) {
       const key = `attachments/${filename}`;
       publicUrl = await r2Service.uploadFile(key, fileBuffer, fileMime);
+      if (!publicUrl) {
+        res.status(500).json({ message: "Failed to upload attachment to Cloudflare R2" });
+        return;
+      }
     }
 
     if (!publicUrl) {
-      ensureAttachmentDir();
-      const localPath = path.join(LOCAL_ATTACHMENT_DIR, filename);
+      const localPath = path.join(ensureLocalUploadDirectory("attachments"), filename);
       fs.writeFileSync(localPath, fileBuffer);
-      publicUrl = `/uploads/attachments/${filename}`;
+      publicUrl = getLocalUploadPublicUrl("attachments", filename);
     }
 
     res.json({

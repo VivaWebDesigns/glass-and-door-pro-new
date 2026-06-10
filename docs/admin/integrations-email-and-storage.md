@@ -11,6 +11,8 @@ Cloudflare R2 is used for media storage. Confirm the following when troubleshoot
 - uploaded images are visible in the media library
 - rendered pages can resolve the published asset URL
 
+If Cloudflare R2 is not configured in Admin > System > Settings > Integrations, uploads are stored on the production host under the configured `UPLOADS_DIR` path, or `uploads/` in the app working directory when no upload root is configured. Production hosts should point `UPLOADS_DIR` at persistent storage.
+
 ## Mailgun
 
 Mailgun is used for transactional email and test-connection workflows. Unauthorized errors usually point to:

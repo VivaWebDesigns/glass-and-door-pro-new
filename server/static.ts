@@ -50,6 +50,10 @@ export function serveStatic(app: Express) {
   app.use("/{*path}", async (req, res) => {
     const template = await getIndexTemplate();
     const { pathname, search } = getRequestPathAndSearch(req.originalUrl || req.url || "/");
+    if (pathname.startsWith("/uploads")) {
+      res.status(404).type("text").send("Not found");
+      return;
+    }
     const snapshot = await getPublicHtmlSnapshot(pathname, search);
     const shouldInjectPublicHead =
       !pathname.startsWith("/admin") &&

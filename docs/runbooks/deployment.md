@@ -30,6 +30,7 @@
 | `SENDGRID_API_KEY` | Email | SendGrid API key |
 | `APP_URL` | Security | Base URL of the application |
 | `TRUSTED_ORIGINS` | Security | Comma-separated list of trusted origins |
+| `UPLOADS_DIR` | Uploads | Optional persistent host path for local upload storage when Cloudflare R2 is not configured |
 | `METRICS_ENABLED` | Metrics | Set to "true" to enable metrics endpoint |
 | `LOG_LEVEL` | Logging | Pino log level (default: "info") |
 

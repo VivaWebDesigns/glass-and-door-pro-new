@@ -9,6 +9,11 @@ import * as r2Service from "../../services/r2.service";
 import { paramString } from "../../utils/params";
 import { optimizeImage, CMS_OPTIONS, isImageMime } from "../../services/image-optimizer";
 import { buildCmsMediaLibraryAssets } from "../../services/cms-media-usage.service";
+import {
+  ensureLocalUploadDirectory,
+  getLocalUploadPublicUrl,
+  resolveLocalUploadPathFromUrl,
+} from "../../services/local-upload-storage";
 
 const router = Router();
 
@@ -63,14 +68,6 @@ const cmsUpload = multer({
     }
   },
 });
-
-const LOCAL_CMS_DIR = path.resolve(process.cwd(), "uploads", "cms");
-
-function ensureCmsDir() {
-  if (!fs.existsSync(LOCAL_CMS_DIR)) {
-    fs.mkdirSync(LOCAL_CMS_DIR, { recursive: true });
-  }
-}
 
 function ensureParentDir(filePath: string) {
   const directory = path.dirname(filePath);
@@ -148,13 +145,15 @@ router.post(
 
     if (r2Configured) {
       publicUrl = await r2Service.uploadFile(r2Key, fileBuffer, fileMimeType);
+      if (!publicUrl) {
+        return res.status(500).json({ error: "Failed to upload media to Cloudflare R2" });
+      }
     }
 
     if (!publicUrl) {
-      ensureCmsDir();
-      const localPath = path.join(LOCAL_CMS_DIR, filename);
+      const localPath = path.join(ensureLocalUploadDirectory("cms"), filename);
       fs.writeFileSync(localPath, fileBuffer);
-      publicUrl = `/uploads/cms/${filename}`;
+      publicUrl = getLocalUploadPublicUrl("cms", filename);
     }
 
     const asset = await storage.cmsMedia.createMedia({
@@ -205,7 +204,10 @@ router.get(
       fileBuffer = downloaded.buffer;
       contentType = downloaded.contentType ?? asset.mimeType;
     } else if (asset.url.startsWith("/uploads/cms/")) {
-      const localPath = path.resolve(process.cwd(), asset.url.slice(1));
+      const localPath = resolveLocalUploadPathFromUrl(asset.url);
+      if (!localPath) {
+        return res.status(400).json({ error: "Invalid local media path" });
+      }
       if (!fs.existsSync(localPath)) {
         return res.status(404).json({ error: "Media file not found" });
       }
@@ -290,7 +292,10 @@ router.post(
       }
       publicUrl = uploadedUrl;
     } else if (asset.url.startsWith("/uploads/cms/")) {
-      const localPath = path.resolve(process.cwd(), asset.url.slice(1));
+      const localPath = resolveLocalUploadPathFromUrl(asset.url);
+      if (!localPath) {
+        return res.status(400).json({ error: "Invalid local media path" });
+      }
       ensureParentDir(localPath);
       fs.writeFileSync(localPath, optimized.buffer);
       publicUrl = asset.url;
@@ -340,7 +345,10 @@ router.delete(
     if (asset.r2Key) {
       await r2Service.deleteFile(asset.r2Key);
     } else if (asset.url.startsWith("/uploads/cms/")) {
-      const localPath = path.resolve(process.cwd(), asset.url.slice(1));
+      const localPath = resolveLocalUploadPathFromUrl(asset.url);
+      if (!localPath) {
+        return res.status(400).json({ error: "Invalid local media path" });
+      }
       if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
     }
 

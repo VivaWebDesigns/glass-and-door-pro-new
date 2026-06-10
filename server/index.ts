@@ -1,6 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
-import path from "path";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
@@ -17,6 +16,7 @@ import { startScheduledPublishService } from "./services/scheduled-publish.servi
 import { startEventReminderService } from "./services/event-reminder.service";
 import { startSystemBackupService } from "./services/system-backup.service";
 import { startDirectoryMembershipLifecycleService } from "./services/directory-membership-lifecycle.service";
+import { getLocalUploadsRoot } from "./services/local-upload-storage";
 
 declare const __APP_VERSION__: string;
 const pkgVersion = typeof __APP_VERSION__ === "string" ? __APP_VERSION__ : "unknown";
@@ -107,7 +107,7 @@ app.get("/api/health/metrics", (req, res) => {
 app.use("/api", apiLimiter);
 app.use(originCheck);
 
-app.use("/uploads", express.static(path.resolve(process.cwd(), "uploads")));
+app.use("/uploads", express.static(getLocalUploadsRoot()));
 
 const REDACTED_KEYS = [
   "password", "currentPassword", "newPassword",
