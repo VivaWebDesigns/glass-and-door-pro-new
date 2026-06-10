@@ -1,3 +1,5 @@
+import { BRANDING_COLOR_DEFAULTS, normalizeBrandingHexColor } from "@shared/branding-colors";
+
 export interface BrandingSettings {
   frontendLogoUrl: string | null;
   faviconUrl: string | null;
@@ -36,30 +38,154 @@ export interface BrandingFontOption {
 }
 
 export const BRANDING_FONT_OPTIONS: BrandingFontOption[] = [
-  { value: "inter", label: "Inter", family: "'Inter', sans-serif", category: "sans", preview: "Clean, modern, and highly readable." },
-  { value: "roboto", label: "Roboto", family: "'Roboto', sans-serif", category: "sans", preview: "Balanced UI type with a familiar feel." },
-  { value: "open-sans", label: "Open Sans", family: "'Open Sans', sans-serif", category: "sans", preview: "Friendly and easy to scan for body copy." },
-  { value: "lato", label: "Lato", family: "'Lato', sans-serif", category: "sans", preview: "Warm shapes with a professional tone." },
-  { value: "montserrat", label: "Montserrat", family: "'Montserrat', sans-serif", category: "sans", preview: "Geometric headings with strong presence." },
-  { value: "poppins", label: "Poppins", family: "'Poppins', sans-serif", category: "sans", preview: "Rounded and contemporary with clear rhythm." },
-  { value: "source-sans-3", label: "Source Sans 3", family: "'Source Sans 3', sans-serif", category: "sans", preview: "Versatile editorial sans for interfaces." },
-  { value: "nunito-sans", label: "Nunito Sans", family: "'Nunito Sans', sans-serif", category: "sans", preview: "Soft, approachable forms for welcoming brands." },
-  { value: "work-sans", label: "Work Sans", family: "'Work Sans', sans-serif", category: "sans", preview: "Practical and crisp across sizes." },
-  { value: "raleway", label: "Raleway", family: "'Raleway', sans-serif", category: "sans", preview: "Elegant sans suited to polished headings." },
-  { value: "merriweather", label: "Merriweather", family: "'Merriweather', serif", category: "serif", preview: "Readable serif designed for long-form copy." },
-  { value: "playfair-display", label: "Playfair Display", family: "'Playfair Display', serif", category: "serif", preview: "High-contrast display serif with personality." },
-  { value: "lora", label: "Lora", family: "'Lora', serif", category: "serif", preview: "Contemporary serif with a literary feel." },
-  { value: "libre-baskerville", label: "Libre Baskerville", family: "'Libre Baskerville', serif", category: "serif", preview: "Classic proportions for timeless editorial tone." },
-  { value: "cormorant-garamond", label: "Cormorant Garamond", family: "'Cormorant Garamond', serif", category: "serif", preview: "Refined and expressive for elegant headings." },
-  { value: "eb-garamond", label: "EB Garamond", family: "'EB Garamond', serif", category: "serif", preview: "Bookish serif with traditional warmth." },
-  { value: "crimson-text", label: "Crimson Text", family: "'Crimson Text', serif", category: "serif", preview: "Humanist serif suited to thoughtful content." },
-  { value: "pt-serif", label: "PT Serif", family: "'PT Serif', serif", category: "serif", preview: "Versatile serif that pairs well with sans headings." },
-  { value: "bitter", label: "Bitter", family: "'Bitter', serif", category: "serif", preview: "Structured slab serif with strong readability." },
-  { value: "source-serif-4", label: "Source Serif 4", family: "'Source Serif 4', serif", category: "serif", preview: "Contemporary serif with dependable text performance." },
+  {
+    value: "inter",
+    label: "Inter",
+    family: "'Inter', sans-serif",
+    category: "sans",
+    preview: "Clean, modern, and highly readable.",
+  },
+  {
+    value: "roboto",
+    label: "Roboto",
+    family: "'Roboto', sans-serif",
+    category: "sans",
+    preview: "Balanced UI type with a familiar feel.",
+  },
+  {
+    value: "open-sans",
+    label: "Open Sans",
+    family: "'Open Sans', sans-serif",
+    category: "sans",
+    preview: "Friendly and easy to scan for body copy.",
+  },
+  {
+    value: "lato",
+    label: "Lato",
+    family: "'Lato', sans-serif",
+    category: "sans",
+    preview: "Warm shapes with a professional tone.",
+  },
+  {
+    value: "montserrat",
+    label: "Montserrat",
+    family: "'Montserrat', sans-serif",
+    category: "sans",
+    preview: "Geometric headings with strong presence.",
+  },
+  {
+    value: "poppins",
+    label: "Poppins",
+    family: "'Poppins', sans-serif",
+    category: "sans",
+    preview: "Rounded and contemporary with clear rhythm.",
+  },
+  {
+    value: "source-sans-3",
+    label: "Source Sans 3",
+    family: "'Source Sans 3', sans-serif",
+    category: "sans",
+    preview: "Versatile editorial sans for interfaces.",
+  },
+  {
+    value: "nunito-sans",
+    label: "Nunito Sans",
+    family: "'Nunito Sans', sans-serif",
+    category: "sans",
+    preview: "Soft, approachable forms for welcoming brands.",
+  },
+  {
+    value: "work-sans",
+    label: "Work Sans",
+    family: "'Work Sans', sans-serif",
+    category: "sans",
+    preview: "Practical and crisp across sizes.",
+  },
+  {
+    value: "raleway",
+    label: "Raleway",
+    family: "'Raleway', sans-serif",
+    category: "sans",
+    preview: "Elegant sans suited to polished headings.",
+  },
+  {
+    value: "merriweather",
+    label: "Merriweather",
+    family: "'Merriweather', serif",
+    category: "serif",
+    preview: "Readable serif designed for long-form copy.",
+  },
+  {
+    value: "playfair-display",
+    label: "Playfair Display",
+    family: "'Playfair Display', serif",
+    category: "serif",
+    preview: "High-contrast display serif with personality.",
+  },
+  {
+    value: "lora",
+    label: "Lora",
+    family: "'Lora', serif",
+    category: "serif",
+    preview: "Contemporary serif with a literary feel.",
+  },
+  {
+    value: "libre-baskerville",
+    label: "Libre Baskerville",
+    family: "'Libre Baskerville', serif",
+    category: "serif",
+    preview: "Classic proportions for timeless editorial tone.",
+  },
+  {
+    value: "cormorant-garamond",
+    label: "Cormorant Garamond",
+    family: "'Cormorant Garamond', serif",
+    category: "serif",
+    preview: "Refined and expressive for elegant headings.",
+  },
+  {
+    value: "eb-garamond",
+    label: "EB Garamond",
+    family: "'EB Garamond', serif",
+    category: "serif",
+    preview: "Bookish serif with traditional warmth.",
+  },
+  {
+    value: "crimson-text",
+    label: "Crimson Text",
+    family: "'Crimson Text', serif",
+    category: "serif",
+    preview: "Humanist serif suited to thoughtful content.",
+  },
+  {
+    value: "pt-serif",
+    label: "PT Serif",
+    family: "'PT Serif', serif",
+    category: "serif",
+    preview: "Versatile serif that pairs well with sans headings.",
+  },
+  {
+    value: "bitter",
+    label: "Bitter",
+    family: "'Bitter', serif",
+    category: "serif",
+    preview: "Structured slab serif with strong readability.",
+  },
+  {
+    value: "source-serif-4",
+    label: "Source Serif 4",
+    family: "'Source Serif 4', serif",
+    category: "serif",
+    preview: "Contemporary serif with dependable text performance.",
+  },
 ];
 
-export const BRANDING_SANS_FONT_OPTIONS = BRANDING_FONT_OPTIONS.filter((option) => option.category === "sans");
-export const BRANDING_SERIF_FONT_OPTIONS = BRANDING_FONT_OPTIONS.filter((option) => option.category === "serif");
+export const BRANDING_SANS_FONT_OPTIONS = BRANDING_FONT_OPTIONS.filter(
+  (option) => option.category === "sans",
+);
+export const BRANDING_SERIF_FONT_OPTIONS = BRANDING_FONT_OPTIONS.filter(
+  (option) => option.category === "serif",
+);
 
 export const DEFAULT_BRANDING_SETTINGS: BrandingSettings = {
   frontendLogoUrl: "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp",
@@ -70,24 +196,24 @@ export const DEFAULT_BRANDING_SETTINGS: BrandingSettings = {
   companyGoogleBusinessUrl: null,
   bodyFont: null,
   headingFont: null,
-  primaryColor: "#0F172A",
-  secondaryColor: "#E2E8F0",
-  tertiaryColor: "#0F766E",
-  quaternaryColor: "#A8623A",
-  h1Color: null,
-  h2Color: null,
-  h3ToH6Color: null,
-  bodyTextColor: null,
-  headingSubtextColor: null,
-  supportingCopyColor: null,
-  helperTextColor: null,
-  metaTextColor: null,
-  linkColor: null,
-  linkHoverColor: null,
-  inverseTextColor: null,
-  primaryTextColor: null,
-  secondaryTextColor: null,
-  tertiaryTextColor: null,
+  primaryColor: BRANDING_COLOR_DEFAULTS.brand_primary_color,
+  secondaryColor: BRANDING_COLOR_DEFAULTS.brand_secondary_color,
+  tertiaryColor: BRANDING_COLOR_DEFAULTS.brand_tertiary_color,
+  quaternaryColor: BRANDING_COLOR_DEFAULTS.brand_quaternary_color,
+  h1Color: BRANDING_COLOR_DEFAULTS.text_h1_color,
+  h2Color: BRANDING_COLOR_DEFAULTS.text_h2_color,
+  h3ToH6Color: BRANDING_COLOR_DEFAULTS.text_h3_h6_color,
+  bodyTextColor: BRANDING_COLOR_DEFAULTS.text_body_color,
+  headingSubtextColor: BRANDING_COLOR_DEFAULTS.text_heading_subtext_color,
+  supportingCopyColor: BRANDING_COLOR_DEFAULTS.text_supporting_copy_color,
+  helperTextColor: BRANDING_COLOR_DEFAULTS.text_helper_text_color,
+  metaTextColor: BRANDING_COLOR_DEFAULTS.text_meta_color,
+  linkColor: BRANDING_COLOR_DEFAULTS.text_link_color,
+  linkHoverColor: BRANDING_COLOR_DEFAULTS.text_link_hover_color,
+  inverseTextColor: BRANDING_COLOR_DEFAULTS.text_inverse_color,
+  primaryTextColor: BRANDING_COLOR_DEFAULTS.text_primary_foreground_color,
+  secondaryTextColor: BRANDING_COLOR_DEFAULTS.text_secondary_foreground_color,
+  tertiaryTextColor: BRANDING_COLOR_DEFAULTS.text_tertiary_foreground_color,
 };
 
 export function fontFamilyForBrandingOption(value: string | null | undefined): string | null {
@@ -96,10 +222,7 @@ export function fontFamilyForBrandingOption(value: string | null | undefined): s
 }
 
 export function normalizeHexColor(value: string | null | undefined): string | null {
-  if (!value) return null;
-  const trimmed = value.trim();
-  const normalized = trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
-  return /^#([0-9a-fA-F]{6})$/.test(normalized) ? normalized.toUpperCase() : null;
+  return normalizeBrandingHexColor(value);
 }
 
 export function hexToHslToken(hex: string | null | undefined): string | null {

@@ -23,6 +23,11 @@ import {
   getLocalUploadPublicUrl,
   resolveLocalUploadUrlOrFallback,
 } from "../services/local-upload-storage";
+import {
+  BRANDING_COLOR_DEFAULTS,
+  resolveBrandingColor,
+  type BrandingColorSettingKey,
+} from "@shared/branding-colors";
 
 const router = Router();
 
@@ -64,18 +69,30 @@ router.get(
 
     for (const s of settings) {
       if (!grouped[s.category]) grouped[s.category] = {};
-      const value =
-        s.category === "branding" && DEFAULT_BRANDING_IMAGE_URLS[s.key]
-          ? resolveLocalUploadUrlOrFallback(s.value, DEFAULT_BRANDING_IMAGE_URLS[s.key])
-          : s.value;
+      let value = s.value;
+
+      if (s.category === "branding" && DEFAULT_BRANDING_IMAGE_URLS[s.key]) {
+        value = resolveLocalUploadUrlOrFallback(s.value, DEFAULT_BRANDING_IMAGE_URLS[s.key]);
+      } else if (s.category === "branding" && s.key in BRANDING_COLOR_DEFAULTS) {
+        value = resolveBrandingColor(s.key as BrandingColorSettingKey, s.value);
+      }
+
       grouped[s.category][s.key] = {
         value: s.isSecret ? "••••••••" : value,
         isSecret: s.isSecret,
       };
     }
 
+    grouped.branding ??= {};
+    for (const [key, value] of Object.entries(BRANDING_COLOR_DEFAULTS)) {
+      grouped.branding[key] ??= {
+        value,
+        isSecret: false,
+      };
+    }
+
     res.json(grouped);
-  })
+  }),
 );
 
 const upsertSettingSchema = z.object({
@@ -97,7 +114,7 @@ router.put(
       data.key,
       data.value,
       data.category,
-      data.isSecret
+      data.isSecret,
     );
 
     if (data.category === "stripe") {
@@ -124,7 +141,7 @@ router.put(
       ...setting,
       value: setting.isSecret ? "••••••••" : setting.value,
     });
-  })
+  }),
 );
 
 router.post(
@@ -171,7 +188,7 @@ router.post(
       key: parsed.data.settingKey,
       url: publicUrl,
     });
-  })
+  }),
 );
 
 router.delete(
@@ -179,7 +196,7 @@ router.delete(
   asyncHandler(async (req, res) => {
     await storage.settings.deleteSetting(paramString(req.params.key));
     res.json({ message: "Setting deleted" });
-  })
+  }),
 );
 
 const testConnectionSchema = z.object({
@@ -222,7 +239,7 @@ router.post(
     }
 
     res.status(400).json({ success: false, message: "Unknown integration" });
-  })
+  }),
 );
 
 router.get(
@@ -230,7 +247,7 @@ router.get(
   asyncHandler(async (_req, res) => {
     const templates = await storage.emailTemplates.getAllTemplates();
     res.json(templates);
-  })
+  }),
 );
 
 router.post(
@@ -242,7 +259,7 @@ router.post(
       restored: result.total,
       templates,
     });
-  })
+  }),
 );
 
 const updateTemplateSchema = z.object({
@@ -257,14 +274,14 @@ router.put(
     const data = updateTemplateSchema.parse(req.body);
     const template = await storage.emailTemplates.updateTemplate(
       paramString(req.params.slug),
-      data
+      data,
     );
     if (!template) {
       res.status(404).json({ message: "Template not found" });
       return;
     }
     res.json(template);
-  })
+  }),
 );
 
 const previewTemplateSchema = z.object({
@@ -275,7 +292,9 @@ const previewTemplateSchema = z.object({
 router.post(
   "/email-templates/:slug/preview",
   asyncHandler(async (req, res) => {
-    const { htmlBody: overrideBody, subject: overrideSubject } = previewTemplateSchema.parse(req.body);
+    const { htmlBody: overrideBody, subject: overrideSubject } = previewTemplateSchema.parse(
+      req.body,
+    );
     const template = await storage.emailTemplates.getTemplate(paramString(req.params.slug));
     if (!template) {
       res.status(404).json({ message: "Template not found" });
@@ -305,7 +324,7 @@ router.post(
     const html = await renderEmailShell("", renderedBody);
 
     res.json({ subject: renderedSubject, html });
-  })
+  }),
 );
 
 router.post(
@@ -345,7 +364,7 @@ router.post(
         ? `Test email sent to ${adminEmail}`
         : "Email not sent — no email provider configured",
     });
-  })
+  }),
 );
 
 export default router;

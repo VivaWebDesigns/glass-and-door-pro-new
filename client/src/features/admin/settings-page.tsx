@@ -77,6 +77,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useEditorLock } from "@/hooks/use-editor-lock";
 import { DEFAULT_SITE_FEATURES, normalizeBooleanSetting } from "@shared/site-features";
+import { resolveBrandingColor } from "@shared/branding-colors";
 
 type SettingsData = Record<string, Record<string, { value: string; isSecret: boolean }>>;
 
@@ -107,7 +108,11 @@ type BrandingColorSettingKey =
   | "text_secondary_foreground_color"
   | "text_tertiary_foreground_color";
 
-type SystemConfigurationSettingKey = "enable_directory" | "enable_blog" | "enable_events" | "enable_crm";
+type SystemConfigurationSettingKey =
+  | "enable_directory"
+  | "enable_blog"
+  | "enable_events"
+  | "enable_crm";
 
 const BRANDING_CORE_COLOR_FIELDS: Array<{
   key: BrandingColorSettingKey;
@@ -431,7 +436,8 @@ const INTEGRATIONS: IntegrationConfig[] = [
   {
     category: "crm",
     title: "CRM Inbound API",
-    description: "API key used by external lead sources like social ads, Zapier, and landing-page tools",
+    description:
+      "API key used by external lead sources like social ads, Zapier, and landing-page tools",
     icon: Plug,
     accountUrl: "https://core-platform-production-0848.up.railway.app/admin/settings",
     docsUrl: "https://core-platform-production-0848.up.railway.app/admin/settings",
@@ -1134,34 +1140,42 @@ export function BrandingTab({
     company_phone_numbers: brandingSettings.company_phone_numbers?.value || "",
     company_google_business_url: brandingSettings.company_google_business_url?.value || "",
   });
+
+  const getBrandingColor = (key: BrandingColorSettingKey, fallbackValue?: string | null): string =>
+    resolveBrandingColor(key, brandingSettings[key]?.value || fallbackValue);
+
+  const getBrandingColorValues = (): Record<BrandingColorSettingKey, string> => ({
+    brand_primary_color: getBrandingColor("brand_primary_color"),
+    brand_secondary_color: getBrandingColor("brand_secondary_color"),
+    brand_tertiary_color: getBrandingColor("brand_tertiary_color"),
+    brand_quaternary_color: getBrandingColor("brand_quaternary_color"),
+    text_h1_color: getBrandingColor("text_h1_color"),
+    text_h2_color: getBrandingColor("text_h2_color"),
+    text_h3_h6_color: getBrandingColor("text_h3_h6_color"),
+    text_body_color: getBrandingColor("text_body_color"),
+    text_heading_subtext_color: getBrandingColor(
+      "text_heading_subtext_color",
+      brandingSettings.text_muted_color?.value,
+    ),
+    text_supporting_copy_color: getBrandingColor(
+      "text_supporting_copy_color",
+      brandingSettings.text_muted_color?.value,
+    ),
+    text_helper_text_color: getBrandingColor(
+      "text_helper_text_color",
+      brandingSettings.text_muted_color?.value,
+    ),
+    text_meta_color: getBrandingColor("text_meta_color"),
+    text_link_color: getBrandingColor("text_link_color"),
+    text_link_hover_color: getBrandingColor("text_link_hover_color"),
+    text_inverse_color: getBrandingColor("text_inverse_color"),
+    text_primary_foreground_color: getBrandingColor("text_primary_foreground_color"),
+    text_secondary_foreground_color: getBrandingColor("text_secondary_foreground_color"),
+    text_tertiary_foreground_color: getBrandingColor("text_tertiary_foreground_color"),
+  });
+
   const [colorValues, setColorValues] = useState<Record<BrandingColorSettingKey, string>>({
-    brand_primary_color: brandingSettings.brand_primary_color?.value || "",
-    brand_secondary_color: brandingSettings.brand_secondary_color?.value || "",
-    brand_tertiary_color: brandingSettings.brand_tertiary_color?.value || "",
-    brand_quaternary_color: brandingSettings.brand_quaternary_color?.value || "#A8623A",
-    text_h1_color: brandingSettings.text_h1_color?.value || "",
-    text_h2_color: brandingSettings.text_h2_color?.value || "",
-    text_h3_h6_color: brandingSettings.text_h3_h6_color?.value || "",
-    text_body_color: brandingSettings.text_body_color?.value || "",
-    text_heading_subtext_color:
-      brandingSettings.text_heading_subtext_color?.value ||
-      brandingSettings.text_muted_color?.value ||
-      "",
-    text_supporting_copy_color:
-      brandingSettings.text_supporting_copy_color?.value ||
-      brandingSettings.text_muted_color?.value ||
-      "",
-    text_helper_text_color:
-      brandingSettings.text_helper_text_color?.value ||
-      brandingSettings.text_muted_color?.value ||
-      "",
-    text_meta_color: brandingSettings.text_meta_color?.value || "",
-    text_link_color: brandingSettings.text_link_color?.value || "",
-    text_link_hover_color: brandingSettings.text_link_hover_color?.value || "",
-    text_inverse_color: brandingSettings.text_inverse_color?.value || "",
-    text_primary_foreground_color: brandingSettings.text_primary_foreground_color?.value || "",
-    text_secondary_foreground_color: brandingSettings.text_secondary_foreground_color?.value || "",
-    text_tertiary_foreground_color: brandingSettings.text_tertiary_foreground_color?.value || "",
+    ...getBrandingColorValues(),
   });
 
   useEffect(() => {
@@ -1173,36 +1187,7 @@ export function BrandingTab({
       company_phone_numbers: brandingSettings.company_phone_numbers?.value || "",
       company_google_business_url: brandingSettings.company_google_business_url?.value || "",
     });
-    setColorValues({
-      brand_primary_color: brandingSettings.brand_primary_color?.value || "",
-      brand_secondary_color: brandingSettings.brand_secondary_color?.value || "",
-      brand_tertiary_color: brandingSettings.brand_tertiary_color?.value || "",
-      brand_quaternary_color: brandingSettings.brand_quaternary_color?.value || "#A8623A",
-      text_h1_color: brandingSettings.text_h1_color?.value || "",
-      text_h2_color: brandingSettings.text_h2_color?.value || "",
-      text_h3_h6_color: brandingSettings.text_h3_h6_color?.value || "",
-      text_body_color: brandingSettings.text_body_color?.value || "",
-      text_heading_subtext_color:
-        brandingSettings.text_heading_subtext_color?.value ||
-        brandingSettings.text_muted_color?.value ||
-        "",
-      text_supporting_copy_color:
-        brandingSettings.text_supporting_copy_color?.value ||
-        brandingSettings.text_muted_color?.value ||
-        "",
-      text_helper_text_color:
-        brandingSettings.text_helper_text_color?.value ||
-        brandingSettings.text_muted_color?.value ||
-        "",
-      text_meta_color: brandingSettings.text_meta_color?.value || "",
-      text_link_color: brandingSettings.text_link_color?.value || "",
-      text_link_hover_color: brandingSettings.text_link_hover_color?.value || "",
-      text_inverse_color: brandingSettings.text_inverse_color?.value || "",
-      text_primary_foreground_color: brandingSettings.text_primary_foreground_color?.value || "",
-      text_secondary_foreground_color:
-        brandingSettings.text_secondary_foreground_color?.value || "",
-      text_tertiary_foreground_color: brandingSettings.text_tertiary_foreground_color?.value || "",
-    });
+    setColorValues(getBrandingColorValues());
   }, [
     brandingSettings.frontend_body_font?.value,
     brandingSettings.frontend_heading_font?.value,
@@ -1345,7 +1330,7 @@ export function BrandingTab({
   });
 
   const hasColorChanges = BRANDING_COLOR_FIELDS.some(
-    (field) => colorValues[field.key] !== (brandingSettings[field.key]?.value || ""),
+    (field) => colorValues[field.key] !== getBrandingColor(field.key),
   );
 
   const previewBodyStyle = {
