@@ -310,7 +310,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
         ctaAction: "internal-link",
         ctaSecondaryText: "",
         ctaSecondaryLink: "",
-        backgroundImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.jpg",
+        backgroundImageUrl: "/images/glass-door-pro/hero/gallery-shower1-hero-1280w.webp",
         videoBackgroundUrl: "/videos/glass-door-pro/hero-video.mp4",
         overlayColor: "#0f172a",
         overlayOpacity: 50,
@@ -1024,7 +1024,7 @@ const month1FramelessContent: InsertCmsPage["content"] = {
       heading: "Frameless Glass Shower Doors in Charlotte, Monroe & Surrounding NC",
       subheading:
         "Custom frameless shower enclosures, measured, fabricated, and installed personally by Doug — owner-operator with 15+ years of experience. Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and the surrounding greater Charlotte area.",
-      imageUrl: "/images/glass-door-pro/frameless-parallax.jpg",
+      imageUrl: "/images/glass-door-pro/hero/frameless-parallax-hero-1024w.webp",
       imagePositionY: 25,
     }),
     block("rich-text", {
@@ -1319,7 +1319,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         heading: "Residential Window Installation",
         subheading:
           "Upgrade your home with energy-efficient windows that improve comfort, reduce energy costs, and enhance curb appeal. Professional installation throughout the Charlotte area.",
-        imageUrl: "/images/glass-door-pro/window-parallax.jpg",
+        imageUrl: "/images/glass-door-pro/hero/window-parallax-hero-1024w.webp",
         imagePositionY: 45,
       },
       cardsTitle: "Benefits of New Windows",
@@ -1429,7 +1429,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         heading: "Door Installation Services",
         subheading:
           "Enhance your home's security, efficiency, and curb appeal with professionally installed entry, patio, and exterior doors.",
-        imageUrl: "/images/glass-door-pro/door-parallax.jpg",
+        imageUrl: "/images/glass-door-pro/hero/door-parallax-hero-1024w.webp",
         imagePositionY: 45,
       },
       cardsTitle: "Why Replace or Install a New Door?",
@@ -1543,7 +1543,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         heading: "Window Repair Services",
         subheading:
           "Broken glass, foggy windows, seal failures, and storm damage can often be fixed without replacing the full window. Get reliable repair help from a local glass pro.",
-        imageUrl: "/images/glass-door-pro/window-repair-parallax.jpg",
+        imageUrl: "/images/glass-door-pro/hero/window-repair-parallax-hero-1365w.webp",
         imagePositionY: 45,
       },
       cardsTitle: "Common Window Problems We Repair",
@@ -1652,7 +1652,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         heading: "Commercial Glass Services",
         subheading:
           "Professional commercial glass installation and repair for storefronts, offices, restaurants, retail spaces, and business properties across the Charlotte area.",
-        imageUrl: "/images/glass-door-pro/commercial-hero-1280w.webp",
+        imageUrl: "/images/glass-door-pro/hero/commercial-hero-1280w.webp",
         imagePositionY: 50,
       },
       intro: {

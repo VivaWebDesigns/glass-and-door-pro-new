@@ -27,9 +27,9 @@ import {
 } from "@/features/admin/cms/builder/section-style";
 import {
   arr,
-  cmsBackgroundImageValue,
   colorStyle,
   getMobileImageStyles,
+  getResponsiveCmsHeroImage,
   getVimeoId,
   getYouTubeId,
   IMAGE_WIDTH_MAP,
@@ -173,7 +173,8 @@ function DynamicFallback() {
 }
 
 function HeroBlock({ props }: { props: Record<string, unknown> }) {
-  const bg = resolveCmsAssetUrl(str(props.backgroundImageUrl));
+  const responsiveHeroImage = getResponsiveCmsHeroImage(str(props.backgroundImageUrl));
+  const bg = responsiveHeroImage.fallback;
   const videoBg = str(props.videoBackgroundUrl);
   const variant = str(props.variant);
   const isGlassService = variant === "glass-service";
@@ -205,33 +206,46 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
         ...(sectionStyleConfig.backgroundColor
           ? { backgroundColor: sectionStyleConfig.backgroundColor }
           : {}),
-        ...(bg && !videoBg
-          ? {
-              backgroundImage: cmsBackgroundImageValue(bg),
-              backgroundSize: "cover",
-              backgroundPosition: `${bgPosX}% ${bgPosY}%`,
-            }
-          : bg && videoBg
-            ? {
-                backgroundImage: cmsBackgroundImageValue(bg),
-                backgroundSize: "cover",
-                backgroundPosition: `${bgPosX}% ${bgPosY}%`,
-              }
-            : !videoBg && !sectionStyleConfig.backgroundColor
-              ? {}
-              : {}),
       }}
     >
+      {bg && (
+        <picture aria-hidden="true" className="absolute inset-0 block h-full w-full">
+          {responsiveHeroImage.avifSrcSet && (
+            <source
+              type="image/avif"
+              srcSet={responsiveHeroImage.avifSrcSet}
+              sizes="100vw"
+            />
+          )}
+          {responsiveHeroImage.webpSrcSet && (
+            <source
+              type="image/webp"
+              srcSet={responsiveHeroImage.webpSrcSet}
+              sizes="100vw"
+            />
+          )}
+          <img
+            src={bg}
+            alt=""
+            className="h-full w-full object-cover"
+            style={{ objectPosition: `${bgPosX}% ${bgPosY}%` }}
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+          />
+        </picture>
+      )}
       {videoBg && (
         <video
           autoPlay
           muted
           loop
           playsInline
+          preload="none"
           poster={bg || undefined}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 hidden h-full w-full object-cover md:block"
         >
-          <source src={videoBg} type="video/mp4" />
+          <source src={videoBg} type="video/mp4" media="(min-width: 769px)" />
         </video>
       )}
       {isGlassReviews ? (

@@ -73,6 +73,38 @@ const LEGACY_CMS_ASSET_MAP: Record<string, string> = {
 
 export const CMS_MISSING_IMAGE_PLACEHOLDER_URL = "/images/cms-media-missing.svg";
 
+type ResponsiveHeroImage = {
+  fallback: string;
+  avifSrcSet: string;
+  webpSrcSet: string;
+};
+
+function heroImage(base: string, widths: number[], fallbackWidth: number): ResponsiveHeroImage {
+  const src = (width: number, format: "avif" | "webp") =>
+    `/images/glass-door-pro/hero/${base}-${width}w.${format}`;
+
+  return {
+    fallback: src(fallbackWidth, "webp"),
+    avifSrcSet: widths.map((width) => `${src(width, "avif")} ${width}w`).join(", "),
+    webpSrcSet: widths.map((width) => `${src(width, "webp")} ${width}w`).join(", "),
+  };
+}
+
+const RESPONSIVE_HERO_IMAGE_MAP: Record<string, ResponsiveHeroImage> = {
+  "/images/glass-door-pro/gallery-shower1-1280w.jpg": heroImage("gallery-shower1-hero", [640, 960, 1280], 1280),
+  "/images/glass-door-pro/hero/gallery-shower1-hero-1280w.webp": heroImage("gallery-shower1-hero", [640, 960, 1280], 1280),
+  "/images/glass-door-pro/frameless-parallax.jpg": heroImage("frameless-parallax-hero", [640, 768, 1024], 1024),
+  "/images/glass-door-pro/hero/frameless-parallax-hero-1024w.webp": heroImage("frameless-parallax-hero", [640, 768, 1024], 1024),
+  "/images/glass-door-pro/window-parallax.jpg": heroImage("window-parallax-hero", [640, 768, 1024], 1024),
+  "/images/glass-door-pro/hero/window-parallax-hero-1024w.webp": heroImage("window-parallax-hero", [640, 768, 1024], 1024),
+  "/images/glass-door-pro/door-parallax.jpg": heroImage("door-parallax-hero", [640, 768, 1024], 1024),
+  "/images/glass-door-pro/hero/door-parallax-hero-1024w.webp": heroImage("door-parallax-hero", [640, 768, 1024], 1024),
+  "/images/glass-door-pro/window-repair-parallax.jpg": heroImage("window-repair-parallax-hero", [640, 960, 1365], 1365),
+  "/images/glass-door-pro/hero/window-repair-parallax-hero-1365w.webp": heroImage("window-repair-parallax-hero", [640, 960, 1365], 1365),
+  "/images/glass-door-pro/commercial-hero-1280w.webp": heroImage("commercial-hero", [640, 960, 1280], 1280),
+  "/images/glass-door-pro/hero/commercial-hero-1280w.webp": heroImage("commercial-hero", [640, 960, 1280], 1280),
+};
+
 export function cmsBackgroundImageValue(url: string): string {
   const resolvedUrl = resolveCmsAssetUrl(url);
   if (!resolvedUrl) return "";
@@ -84,6 +116,17 @@ export function handleCmsPreviewImageError(event: SyntheticEvent<HTMLImageElemen
   if (image.src.endsWith(CMS_MISSING_IMAGE_PLACEHOLDER_URL)) return;
   image.onerror = null;
   image.src = CMS_MISSING_IMAGE_PLACEHOLDER_URL;
+}
+
+export function getResponsiveCmsHeroImage(url: string): ResponsiveHeroImage {
+  const resolvedUrl = resolveCmsAssetUrl(url);
+  return (
+    RESPONSIVE_HERO_IMAGE_MAP[resolvedUrl] ?? {
+      fallback: resolvedUrl,
+      avifSrcSet: "",
+      webpSrcSet: "",
+    }
+  );
 }
 
 export function resolveCmsAssetUrl(url: string): string {
