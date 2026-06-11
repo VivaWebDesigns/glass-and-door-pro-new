@@ -28,6 +28,7 @@ import { NotificationBell } from "@/components/shared/notification-bell";
 import type { CmsMenu, MenuItem, PublicMenuLocation } from "@shared/schema";
 
 const defaultNavLinks = [
+  { label: "Home", href: "/" },
   { label: "About", href: "/#about" },
   { label: "Services", href: "/#services" },
   { label: "Reviews", href: "/reviews" },
@@ -51,6 +52,23 @@ function normalizePublicMenuItems(items: MenuItem[]): MenuItem[] {
     url: normalizePublicMenuUrl(item),
     children: item.children?.length ? normalizePublicMenuItems(item.children) : item.children,
   }));
+}
+
+function ensureHomeMenuItem(items: MenuItem[]): MenuItem[] {
+  if (items.some((item) => item.url === "/" || /^home$/i.test(item.label))) {
+    return items;
+  }
+
+  return [
+    {
+      id: "home",
+      label: "Home",
+      url: "/",
+      openInNewTab: false,
+      children: [],
+    },
+    ...items,
+  ];
 }
 
 function flattenItems(items: MenuItem[], depth = 0): { item: MenuItem; depth: number }[] {
@@ -143,7 +161,7 @@ export function Navbar() {
     const headerMenu = publicMenus?.main_navigation ?? publicMenus?.header;
     if (!headerMenu?.items) return null;
     const items = normalizePublicMenuItems(headerMenu.items as MenuItem[]);
-    return items.length > 0 ? items : null;
+    return items.length > 0 ? ensureHomeMenuItem(items) : null;
   }, [publicMenus]);
 
   const isClient = user && user.role === "client";
