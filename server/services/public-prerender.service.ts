@@ -9,6 +9,7 @@ import {
   getCmsPublicPath,
   getCmsSlugForPublicPath,
 } from "@shared/glass-seo";
+import { googleFontStylesheetHrefForBrandingOptions } from "@shared/branding-fonts";
 import { storage } from "../storage";
 
 interface PublicHtmlSnapshot {
@@ -222,9 +223,20 @@ function buildOrganizationSchema(seo: SeoSettings | null, siteUrl: string) {
 }
 
 export async function getPublicHeadAdditions(): Promise<string | null> {
-  const headHtml = await storage.settings.getSetting("public_head_html");
+  const [headHtml, branding] = await Promise.all([
+    storage.settings.getSetting("public_head_html"),
+    storage.settings.getDecryptedCategory("branding").catch(() => null),
+  ]);
   const normalized = normalizeHeadMarkup(headHtml);
-  return normalized ? normalized : null;
+  const brandingFontHref = googleFontStylesheetHrefForBrandingOptions([
+    branding?.frontend_body_font,
+    branding?.frontend_heading_font,
+  ]);
+  const fontLink = brandingFontHref
+    ? `<link id="branding-dynamic-fonts" rel="stylesheet" href="${escapeHtml(brandingFontHref)}" />`
+    : "";
+  const headParts = [fontLink, normalized].filter(Boolean);
+  return headParts.length > 0 ? headParts.join("\n") : null;
 }
 
 function normalizeHeadMarkup(value?: string | null) {

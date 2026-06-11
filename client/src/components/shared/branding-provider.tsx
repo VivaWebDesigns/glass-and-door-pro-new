@@ -4,11 +4,13 @@ import { useLocation } from "wouter";
 import {
   DEFAULT_BRANDING_SETTINGS,
   fontFamilyForBrandingOption,
+  googleFontStylesheetHrefForBrandingOptions,
   hexToHslToken,
   type BrandingSettings,
 } from "@/lib/branding";
 
 const BrandingContext = createContext<BrandingSettings>(DEFAULT_BRANDING_SETTINGS);
+const BRANDING_FONT_STYLESHEET_ID = "branding-dynamic-fonts";
 
 function resolveFaviconUrl(value: string | null | undefined) {
   if (!value) return "/favicon-32x32.png?v=large-2";
@@ -67,6 +69,31 @@ export function BrandingProvider({ children }: { children: React.ReactNode }) {
   );
   const pathname = location.split(/[?#]/)[0] || "/";
   const isAdminRoute = pathname.startsWith("/admin");
+
+  useEffect(() => {
+    const href = isAdminRoute
+      ? null
+      : googleFontStylesheetHrefForBrandingOptions([branding.bodyFont, branding.headingFont]);
+    const existing = document.getElementById(BRANDING_FONT_STYLESHEET_ID) as HTMLLinkElement | null;
+
+    if (!href) {
+      existing?.remove();
+      return;
+    }
+
+    if (existing) {
+      if (existing.href !== href) {
+        existing.href = href;
+      }
+      return;
+    }
+
+    const link = document.createElement("link");
+    link.id = BRANDING_FONT_STYLESHEET_ID;
+    link.rel = "stylesheet";
+    link.href = href;
+    document.head.appendChild(link);
+  }, [branding.bodyFont, branding.headingFont, isAdminRoute]);
 
   useEffect(() => {
     const root = document.documentElement;

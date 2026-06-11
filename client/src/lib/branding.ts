@@ -1,4 +1,5 @@
 import { BRANDING_COLOR_DEFAULTS, normalizeBrandingHexColor } from "@shared/branding-colors";
+export { googleFontStylesheetHrefForBrandingOptions } from "@shared/branding-fonts";
 
 export interface BrandingSettings {
   frontendLogoUrl: string | null;

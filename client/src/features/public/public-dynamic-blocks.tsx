@@ -341,7 +341,17 @@ function FeaturedBlogCard({
       <div className={layout === "stacked" ? "grid grid-cols-1" : "grid grid-cols-1 md:grid-cols-2"}>
         {post.coverImageUrl && (
           <div className="aspect-[16/9] md:aspect-auto overflow-hidden">
-            <img src={post.coverImageUrl} alt={post.title} className="w-full h-full object-cover" style={getImageObjectPositionStyle(post.coverImagePositionX, post.coverImagePositionY)} data-blog-card-image loading="lazy" decoding="async" />
+            <img
+              src={post.coverImageUrl}
+              alt={post.title}
+              width={1200}
+              height={675}
+              className="w-full h-full object-cover"
+              style={getImageObjectPositionStyle(post.coverImagePositionX, post.coverImagePositionY)}
+              data-blog-card-image
+              loading="lazy"
+              decoding="async"
+            />
           </div>
         )}
         <CardContent className="p-6 flex flex-col justify-center">
@@ -489,7 +499,17 @@ function BlogFeedGrid({
             <Card className={`h-full cursor-pointer ${getBlogCardMotionClass(enableHoverMotion)}`} data-testid={`blog-feed-card-${p.id}`}>
               {p.coverImageUrl && (
                 <div className="aspect-[16/9] overflow-hidden rounded-t-lg">
-                  <img src={p.coverImageUrl} alt={p.title} className="w-full h-full object-cover" style={getImageObjectPositionStyle(p.coverImagePositionX, p.coverImagePositionY)} data-blog-card-image loading="lazy" decoding="async" />
+                  <img
+                    src={p.coverImageUrl}
+                    alt={p.title}
+                    width={1200}
+                    height={675}
+                    className="w-full h-full object-cover"
+                    style={getImageObjectPositionStyle(p.coverImagePositionX, p.coverImagePositionY)}
+                    data-blog-card-image
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
               )}
               <CardContent className="p-4">

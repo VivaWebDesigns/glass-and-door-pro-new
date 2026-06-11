@@ -330,7 +330,13 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
       </div>
       {isSplit && bg && !isGlassService && (
         <div className="hidden md:block absolute right-0 top-0 bottom-0 w-1/3">
-          <img src={bg} alt="" className="w-full h-full object-cover" />
+          <img
+            src={bg}
+            alt=""
+            className="w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
       )}
     </section>
@@ -524,6 +530,8 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
               <img
                 src={str(props.imageUrl)}
                 alt={str(props.imageAlt)}
+                width={900}
+                height={675}
                 style={mobileImageStyles}
                 className="w-full rounded-lg shadow-xl [height:var(--mobile-image-height)] [object-fit:var(--mobile-image-fit)] [object-position:var(--image-position)] md:absolute md:inset-0 md:h-full md:w-full md:object-cover"
                 loading="lazy"
@@ -967,6 +975,8 @@ function EventsPreviewBlock({ props }: { props: Record<string, unknown> }) {
             <img
               src={e.imageUrl}
               alt={e.title}
+              width={800}
+              height={500}
               className="h-full w-full object-cover"
               style={getImageObjectPositionStyle(e.imagePositionX, e.imagePositionY)}
               loading="lazy"
@@ -1081,6 +1091,8 @@ function BlogPreviewBlock({ props }: { props: Record<string, unknown> }) {
             <img
               src={p.coverImageUrl}
               alt={p.title}
+              width={800}
+              height={500}
               className="h-full w-full object-cover"
               style={getImageObjectPositionStyle(p.coverImagePositionX, p.coverImagePositionY)}
               data-blog-card-image
@@ -1227,6 +1239,8 @@ function ImageBlockRenderer({ props }: { props: Record<string, unknown> }) {
           <img
             src={str(props.imageUrl)}
             alt={str(props.alt)}
+            width={1600}
+            height={900}
             style={mobileImageStyles}
             className="h-full w-full object-cover [object-position:var(--image-position)]"
             loading="lazy"
@@ -1255,6 +1269,8 @@ function ImageBlockRenderer({ props }: { props: Record<string, unknown> }) {
           <img
             src={str(props.imageUrl)}
             alt={str(props.alt)}
+            width={1200}
+            height={800}
             style={mobileImageStyles}
             className="w-full rounded-xl [height:var(--mobile-image-height)] [object-fit:var(--mobile-image-fit)] [object-position:var(--image-position)] md:h-auto md:object-cover"
             loading="lazy"
@@ -1575,6 +1591,8 @@ function ImageGridBlock({ props }: { props: Record<string, unknown> }) {
               <img
                 src={img.url}
                 alt={img.alt}
+                width={isProjectGallery ? 800 : 600}
+                height={isProjectGallery ? 600 : 600}
                 className={`w-full rounded-lg object-cover ${
                   isProjectGallery
                     ? "aspect-[4/3] transition-transform duration-300 group-hover:scale-105"
@@ -1624,6 +1642,8 @@ function SliderBlock({ props }: { props: Record<string, unknown> }) {
           <img
             src={slide.imageUrl}
             alt={slide.heading}
+            width={1600}
+            height={900}
             className="w-full aspect-[16/9] object-cover"
             loading="lazy"
             decoding="async"

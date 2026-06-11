@@ -3,6 +3,7 @@ import type { BlogPost, CmsPage, Event, SeoSettings } from "@shared/schema";
 
 const mockGetSeo = vi.fn();
 const mockGetSetting = vi.fn();
+const mockGetDecryptedCategory = vi.fn();
 const mockGetPageBySlug = vi.fn();
 const mockGetPostBySlug = vi.fn();
 const mockGetEventByIdentifier = vi.fn();
@@ -15,6 +16,7 @@ vi.mock("../storage", () => ({
     },
     settings: {
       getSetting: mockGetSetting,
+      getDecryptedCategory: mockGetDecryptedCategory,
     },
     cmsPages: {
       getPageBySlug: mockGetPageBySlug,
@@ -157,6 +159,7 @@ describe("public-prerender.service", () => {
     vi.clearAllMocks();
     mockGetSeo.mockResolvedValue(seoSettings);
     mockGetSetting.mockResolvedValue(null);
+    mockGetDecryptedCategory.mockResolvedValue({});
     mockGetPageBySlug.mockResolvedValue(undefined);
     mockGetPostBySlug.mockResolvedValue(undefined);
     mockGetEventByIdentifier.mockResolvedValue(undefined);
@@ -283,6 +286,20 @@ describe("public-prerender.service", () => {
 
     expect(headHtml).toBe('<meta name="custom-test" content="enabled" />');
     expect(html).toContain('<meta name="custom-test" content="enabled" />');
+  });
+
+  it("adds selected non-core branding fonts to public head additions", async () => {
+    mockGetDecryptedCategory.mockResolvedValue({
+      frontend_body_font: "nunito-sans",
+      frontend_heading_font: "playfair-display",
+    });
+    const { getPublicHeadAdditions } = await import("../services/public-prerender.service");
+
+    const headHtml = await getPublicHeadAdditions();
+
+    expect(headHtml).toContain('id="branding-dynamic-fonts"');
+    expect(headHtml).toContain("Playfair+Display");
+    expect(headHtml).not.toContain("Nunito+Sans");
   });
 
   it("repairs malformed closing script tags in custom head additions", async () => {

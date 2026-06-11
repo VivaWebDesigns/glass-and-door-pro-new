@@ -697,9 +697,12 @@ export default function EventDetailPage() {
                 <img
                   src={event.imageUrl}
                   alt={event.title}
+                  width={1400}
+                  height={600}
                   className="w-full h-full object-cover"
                   style={getImageObjectPositionStyle(event.imagePositionX, event.imagePositionY)}
                   data-testid="img-event-cover"
+                  decoding="async"
                 />
               </div>
             )}
