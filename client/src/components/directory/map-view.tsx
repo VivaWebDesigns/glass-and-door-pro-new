@@ -4,6 +4,7 @@ import L from "leaflet";
 import { Link } from "wouter";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getFirstSentence } from "@/lib/html";
+import { useLeafletStylesheet } from "@/hooks/use-leaflet-stylesheet";
 import type { TherapistProfile } from "@shared/schema/therapist-profiles";
 import type { User } from "@shared/schema/users";
 
@@ -74,6 +75,7 @@ function MapSizeInvalidator() {
 }
 
 export function MapView({ therapists, height = "500px", interactive = true, zoom: zoomProp, center: centerProp, highlightedId }: MapViewProps) {
+  const leafletStylesReady = useLeafletStylesheet();
   const markered = useMemo(
     () =>
       therapists.filter(
@@ -104,6 +106,16 @@ export function MapView({ therapists, height = "500px", interactive = true, zoom
     : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
 
   const hasPercentHeight = typeof height === "string" && height.includes("%");
+
+  if (!leafletStylesReady) {
+    return (
+      <div
+        style={{ height, minHeight: hasPercentHeight ? "420px" : height }}
+        className="rounded-md overflow-hidden border isolate bg-muted/20"
+        data-testid="map-container"
+      />
+    );
+  }
 
   return (
     <div

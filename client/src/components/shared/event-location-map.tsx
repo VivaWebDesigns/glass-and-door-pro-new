@@ -1,5 +1,6 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
+import { useLeafletStylesheet } from "@/hooks/use-leaflet-stylesheet";
 
 const pinSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="40" viewBox="0 0 28 40" fill="none">
   <path d="M14 0C6.268 0 0 6.268 0 14c0 10.5 14 26 14 26s14-15.5 14-26C28 6.268 21.732 0 14 0z" fill="#1e3a5f"/>
@@ -22,10 +23,20 @@ interface EventLocationMapProps {
 }
 
 export function EventLocationMap({ latitude, longitude, locationName }: EventLocationMapProps) {
+  const leafletStylesReady = useLeafletStylesheet();
   const lat = parseFloat(latitude);
   const lng = parseFloat(longitude);
 
   if (isNaN(lat) || isNaN(lng)) return null;
+
+  if (!leafletStylesReady) {
+    return (
+      <div
+        className="aspect-video max-h-[300px] rounded-xl overflow-hidden border bg-muted/20"
+        data-testid="map-event-location"
+      />
+    );
+  }
 
   return (
     <div className="aspect-video max-h-[300px] rounded-xl overflow-hidden border" data-testid="map-event-location">

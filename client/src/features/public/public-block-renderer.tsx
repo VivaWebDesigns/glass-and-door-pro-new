@@ -526,6 +526,8 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
                 alt={str(props.imageAlt)}
                 style={mobileImageStyles}
                 className="w-full rounded-lg shadow-xl [height:var(--mobile-image-height)] [object-fit:var(--mobile-image-fit)] [object-position:var(--image-position)] md:absolute md:inset-0 md:h-full md:w-full md:object-cover"
+                loading="lazy"
+                decoding="async"
               />
               {(badgeValue || badgeLabel) && (
                 <div className="absolute -bottom-4 -right-3 rounded-lg bg-primary px-5 py-4 text-primary-foreground shadow-xl sm:-right-4">
@@ -967,6 +969,8 @@ function EventsPreviewBlock({ props }: { props: Record<string, unknown> }) {
               alt={e.title}
               className="h-full w-full object-cover"
               style={getImageObjectPositionStyle(e.imagePositionX, e.imagePositionY)}
+              loading="lazy"
+              decoding="async"
             />
           </div>
         )}
@@ -1081,6 +1085,8 @@ function BlogPreviewBlock({ props }: { props: Record<string, unknown> }) {
               style={getImageObjectPositionStyle(p.coverImagePositionX, p.coverImagePositionY)}
               data-blog-card-image
               data-testid={`img-blog-preview-${p.id}`}
+              loading="lazy"
+              decoding="async"
             />
           </div>
         )}
@@ -1223,6 +1229,8 @@ function ImageBlockRenderer({ props }: { props: Record<string, unknown> }) {
             alt={str(props.alt)}
             style={mobileImageStyles}
             className="h-full w-full object-cover [object-position:var(--image-position)]"
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="flex h-full items-center justify-center bg-muted/40 text-sm text-muted-foreground">
@@ -1249,6 +1257,8 @@ function ImageBlockRenderer({ props }: { props: Record<string, unknown> }) {
             alt={str(props.alt)}
             style={mobileImageStyles}
             className="w-full rounded-xl [height:var(--mobile-image-height)] [object-fit:var(--mobile-image-fit)] [object-position:var(--image-position)] md:h-auto md:object-cover"
+            loading="lazy"
+            decoding="async"
           />
           {str(props.caption) && (
             <p className="text-xs text-muted-foreground text-center mt-2">{str(props.caption)}</p>
@@ -1472,6 +1482,8 @@ function PressMentionsBlock({ props }: { props: Record<string, unknown> }) {
               src={item.logoUrl}
               alt={item.name}
               className="h-8 sm:h-10 object-contain opacity-60 hover:opacity-100 transition-opacity"
+              loading="lazy"
+              decoding="async"
             />
           ) : (
             <span className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
@@ -1568,6 +1580,8 @@ function ImageGridBlock({ props }: { props: Record<string, unknown> }) {
                     ? "aspect-[4/3] transition-transform duration-300 group-hover:scale-105"
                     : "aspect-square"
                 } ${variant === "gallery-strip" ? "h-full transition-transform duration-300 hover:scale-105" : ""}`}
+                loading="lazy"
+                decoding="async"
               />
               {img.caption && (
                 <p
@@ -1611,6 +1625,8 @@ function SliderBlock({ props }: { props: Record<string, unknown> }) {
             src={slide.imageUrl}
             alt={slide.heading}
             className="w-full aspect-[16/9] object-cover"
+            loading="lazy"
+            decoding="async"
           />
         )}
         <div
