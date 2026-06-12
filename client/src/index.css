@@ -303,6 +303,19 @@
     overflow-x: hidden;
   }
 
+  #root {
+    position: relative;
+    z-index: 1;
+  }
+
+  #seo-prerender {
+    position: absolute;
+    inset: 0 0 auto;
+    width: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
   a,
   button,
   [role="button"] {
