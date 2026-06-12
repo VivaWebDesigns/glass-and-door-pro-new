@@ -26,7 +26,7 @@ if (typeof window !== "undefined") {
   window.sessionStorage.removeItem(VITE_PRELOAD_RECOVERY_KEY);
 
   if (seoPrerenderElement) {
-    rootElement.style.visibility = "hidden";
+    rootElement.style.display = "none";
   }
 }
 
@@ -40,7 +40,7 @@ function Root() {
       if (cleanedUp) return;
       cleanedUp = true;
       prerender.remove();
-      rootElement.style.visibility = "";
+      rootElement.style.display = "";
     };
 
     const timeout = window.setTimeout(cleanup, PRERENDER_CLEANUP_TIMEOUT_MS);
