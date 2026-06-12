@@ -65,15 +65,6 @@ export default defineConfig({
         manualChunks(id) {
           if (!id.includes("node_modules")) return undefined;
 
-          if (
-            id.includes("/react/") ||
-            id.includes("/react-dom/") ||
-            id.includes("/scheduler/") ||
-            id.includes("/use-sync-external-store/")
-          ) {
-            return "react-vendor";
-          }
-
           if (id.includes("/@tanstack/react-query/") || id.includes("/@tanstack/query-core/")) {
             return "query-vendor";
           }
