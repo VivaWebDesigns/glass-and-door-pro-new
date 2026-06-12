@@ -50,7 +50,6 @@ export default defineConfig({
           "dnd-vendor",
           "form-vendor",
           "interaction-vendor",
-          "map-vendor",
           "motion-vendor",
           "prosemirror",
           "tiptap",
@@ -94,10 +93,6 @@ export default defineConfig({
             id.includes("/drizzle-zod/")
           ) {
             return "form-vendor";
-          }
-
-          if (id.includes("/leaflet/") || id.includes("/react-leaflet/")) {
-            return "map-vendor";
           }
 
           if (id.includes("/lucide-react/")) {
