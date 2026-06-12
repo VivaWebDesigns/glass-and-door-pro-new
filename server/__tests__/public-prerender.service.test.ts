@@ -418,6 +418,7 @@ describe("public-prerender.service", () => {
 
     expect(headHtml).toContain('id="branding-dynamic-fonts"');
     expect(headHtml).toContain("Playfair+Display");
+    expect(headHtml).toContain("display=optional");
     expect(headHtml).not.toContain("Nunito+Sans");
   });
 

@@ -39,6 +39,6 @@ export function googleFontStylesheetHrefForBrandingOptions(
 
   const params = new URLSearchParams();
   families.forEach((family) => params.append("family", family));
-  params.set("display", "swap");
+  params.set("display", "optional");
   return `https://fonts.googleapis.com/css2?${params.toString()}`;
 }
