@@ -61,7 +61,14 @@ const cmsPage: CmsPage = {
   sidebarId: null,
   content: {
     blocks: [
-      { id: "b1", type: "hero", props: { title: "The Application Process", subtitle: "Submit your application and complete credential verification." } },
+      {
+        id: "b1",
+        type: "hero",
+        props: {
+          title: "The Application Process",
+          subtitle: "Submit your application and complete credential verification.",
+        },
+      },
     ],
   },
   seoTitle: null,
@@ -177,6 +184,39 @@ describe("public-prerender.service", () => {
     expect(snapshot?.canonicalUrl).toBe("https://coreplatform.com/join");
   });
 
+  it("adds a responsive hero image preload for CMS hero pages", async () => {
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      slug: "services-frameless-showers",
+      content: {
+        blocks: [
+          {
+            id: "hero-1",
+            type: "hero",
+            props: {
+              heading: "Frameless Showers",
+              backgroundImageUrl: "/images/glass-door-pro/frameless-parallax.jpg",
+            },
+          },
+        ],
+      },
+    });
+    const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } =
+      await import("../services/public-prerender.service");
+
+    const snapshot = await getPublicHtmlSnapshot("/services/frameless-showers");
+    const template =
+      '<html><head><title>Default</title><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--><div id="root"></div></body></html>';
+    const html = injectPublicHtmlSnapshot(template, snapshot);
+
+    expect(snapshot?.preloads?.[0]).toContain('rel="preload"');
+    expect(html).toContain('href="/images/glass-door-pro/hero/frameless-parallax-hero-640w.avif"');
+    expect(html).toContain("imagesrcset=");
+    expect(html).toContain("frameless-parallax-hero-1024w.avif 1024w");
+    expect(html).toContain('imagesizes="100vw"');
+    expect(html).toContain('fetchpriority="high"');
+  });
+
   it("emits CMS FAQPage schema and maps nested public routes to CMS slugs", async () => {
     mockGetSeo.mockResolvedValue({
       ...seoSettings,
@@ -208,13 +248,12 @@ describe("public-prerender.service", () => {
         ],
       },
     });
-    const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } = await import(
-      "../services/public-prerender.service"
-    );
+    const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } =
+      await import("../services/public-prerender.service");
 
     const snapshot = await getPublicHtmlSnapshot("/services/frameless-showers");
     const html = injectPublicHtmlSnapshot(
-      "<html><head><title>Default</title><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--><div id=\"root\"></div></body></html>",
+      '<html><head><title>Default</title><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--><div id="root"></div></body></html>',
       snapshot,
     );
 
@@ -259,12 +298,16 @@ describe("public-prerender.service", () => {
 
     expect(postSnapshot?.bodyHtml).toContain("This article explains the application process");
     expect(eventSnapshot?.bodyHtml).toContain("Application Process Webinar");
-    expect(eventSnapshot?.canonicalUrl).toBe("https://coreplatform.com/events/application-process-webinar");
+    expect(eventSnapshot?.canonicalUrl).toBe(
+      "https://coreplatform.com/events/application-process-webinar",
+    );
   });
 
   it("marks search result pages as noindex in the injected head", async () => {
-    const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } = await import("../services/public-prerender.service");
-    const template = "<html><head><title>Default</title><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--><div id=\"root\"></div></body></html>";
+    const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } =
+      await import("../services/public-prerender.service");
+    const template =
+      '<html><head><title>Default</title><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--><div id="root"></div></body></html>';
 
     const snapshot = await getPublicHtmlSnapshot("/search", "?query=application+process");
     const html = injectPublicHtmlSnapshot(template, snapshot);
@@ -275,11 +318,10 @@ describe("public-prerender.service", () => {
 
   it("retrieves and injects custom public head additions", async () => {
     mockGetSetting.mockResolvedValue('<meta name="custom-test" content="enabled" />');
-    const { getPublicHeadAdditions, injectPublicHtmlSnapshot } = await import(
-      "../services/public-prerender.service"
-    );
+    const { getPublicHeadAdditions, injectPublicHtmlSnapshot } =
+      await import("../services/public-prerender.service");
     const template =
-      "<html><head><title>Default</title><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--><div id=\"root\"></div></body></html>";
+      '<html><head><title>Default</title><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--><div id="root"></div></body></html>';
 
     const headHtml = await getPublicHeadAdditions();
     const html = injectPublicHtmlSnapshot(template, null, headHtml);
@@ -306,15 +348,15 @@ describe("public-prerender.service", () => {
     mockGetSetting.mockResolvedValue(
       [
         '<script async src="https://www.googletagmanager.com/gtag/js?id=G-TEST"></script',
-        '<script>window.dataLayer = window.dataLayer || [];</script',
+        "<script>window.dataLayer = window.dataLayer || [];</script",
       ].join("\n"),
     );
     const { getPublicHeadAdditions } = await import("../services/public-prerender.service");
 
     const headHtml = await getPublicHeadAdditions();
 
-    expect(headHtml).toContain('</script>');
-    expect(headHtml).not.toContain('</script\n');
-    expect(headHtml).not.toContain('</script<');
+    expect(headHtml).toContain("</script>");
+    expect(headHtml).not.toContain("</script\n");
+    expect(headHtml).not.toContain("</script<");
   });
 });

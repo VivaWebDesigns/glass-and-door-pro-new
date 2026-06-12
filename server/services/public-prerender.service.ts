@@ -18,9 +18,16 @@ interface PublicHtmlSnapshot {
   canonicalUrl: string;
   ogImageUrl?: string | null;
   robots?: string | null;
+  preloads?: string[];
   bodyHtml: string;
   jsonLd?: Array<Record<string, unknown>>;
 }
+
+type ResponsiveHeroImage = {
+  fallback: string;
+  avifSrcSet: string;
+  webpSrcSet: string;
+};
 
 const DEFAULT_TITLE = "Glass & Door Pro | Charlotte Glass, Windows & Doors";
 const DEFAULT_DESCRIPTION =
@@ -34,92 +41,77 @@ const FALLBACK_STATIC_PAGES: Record<
     title: "Home",
     description:
       "Explore frameless showers, window installation, door installation, window repair, and commercial glass from Glass & Door Pro.",
-    body:
-      "Glass & Door Pro serves greater Charlotte with frameless showers, windows, doors, window repair, and commercial glass.",
+    body: "Glass & Door Pro serves greater Charlotte with frameless showers, windows, doors, window repair, and commercial glass.",
   },
   "/about": {
     title: "About",
     description:
       "Learn what it means for a provider to be vetted and how Core Platform supports cross-cultural mental health care.",
-    body:
-      "Learn what it means for a provider to be vetted and how Core Platform supports cross-cultural mental health care.",
+    body: "Learn what it means for a provider to be vetted and how Core Platform supports cross-cultural mental health care.",
   },
   "/contact": {
     title: "Contact Us",
     description:
       "Get in touch with Core Platform through the contact form and company information.",
-    body:
-      "Contact Core Platform with questions, feedback, or partnership inquiries through the contact form and company information.",
+    body: "Contact Core Platform with questions, feedback, or partnership inquiries through the contact form and company information.",
   },
   "/join": {
     title: "Join the Network",
     description:
       "Learn about membership, the application process, and how Core Platform-informed mental health professionals can join the network.",
-    body:
-      "Join the network to learn about membership benefits and the application process, including submitting your application, credential verification, Core Platform competency review, profile setup, and going live in the directory.",
+    body: "Join the network to learn about membership benefits and the application process, including submitting your application, credential verification, Core Platform competency review, profile setup, and going live in the directory.",
   },
   "/directory": {
     title: "Find a Mental Health Professional",
     description:
       "Search for Core Platform-informed mental health professionals by specialty, location, language, or session format.",
-    body:
-      "Find a mental health professional by searching specialties, locations, languages, and session formats in the Core Platform directory.",
+    body: "Find a mental health professional by searching specialties, locations, languages, and session formats in the Core Platform directory.",
   },
   "/gallery": {
     title: "Gallery",
     description:
       "Browse recent frameless shower, glass, window, and door installation projects from Glass & Door Pro in the Charlotte area.",
-    body:
-      "Browse recent Glass & Door Pro project photos, including frameless shower installations across Charlotte, Monroe, Indian Trail, and nearby communities.",
+    body: "Browse recent Glass & Door Pro project photos, including frameless shower installations across Charlotte, Monroe, Indian Trail, and nearby communities.",
   },
   "/reviews": {
     title: "Customer Reviews",
     description:
       "Read customer reviews for Glass & Door Pro glass, shower, window, door, and commercial glass work in the Charlotte area.",
-    body:
-      "Read Glass & Door Pro customer reviews from homeowners and businesses across Charlotte, Monroe, Indian Trail, and nearby communities.",
+    body: "Read Glass & Door Pro customer reviews from homeowners and businesses across Charlotte, Monroe, Indian Trail, and nearby communities.",
   },
   "/insights": {
     title: "Insights & Articles",
     description:
       "Browse articles, guidance, and insights focused on Third Culture Kids and culturally informed care.",
-    body:
-      "Browse insights and articles focused on Third Culture Kids, culturally informed care, and mental health support.",
+    body: "Browse insights and articles focused on Third Culture Kids, culturally informed care, and mental health support.",
   },
   "/events": {
     title: "Events",
-    description:
-      "Explore public events, trainings, and community gatherings from Core Platform.",
-    body:
-      "Explore public events, trainings, and community gatherings from Core Platform.",
+    description: "Explore public events, trainings, and community gatherings from Core Platform.",
+    body: "Explore public events, trainings, and community gatherings from Core Platform.",
   },
   "/recordings": {
     title: "Recording Archives",
-    description:
-      "Watch archived event recordings and educational content from Core Platform.",
-    body:
-      "Watch archived event recordings and educational content from Core Platform.",
+    description: "Watch archived event recordings and educational content from Core Platform.",
+    body: "Watch archived event recordings and educational content from Core Platform.",
   },
   "/privacy-policy": {
     title: "Privacy Policy",
     description:
       "Review how Core Platform collects, uses, stores, and protects information across the website and related services.",
-    body:
-      "Review how Core Platform collects, uses, stores, and protects information across the website and related services.",
+    body: "Review how Core Platform collects, uses, stores, and protects information across the website and related services.",
   },
   "/terms-of-service": {
     title: "Terms of Service",
     description:
       "Review the terms governing use of the Core Platform website, directory, events, and related services.",
-    body:
-      "Review the terms governing use of the Core Platform website, directory, events, and related services.",
+    body: "Review the terms governing use of the Core Platform website, directory, events, and related services.",
   },
   "/disclaimer": {
     title: "Disclaimer",
     description:
       "Review emergency guidance, directory vetting limitations, and important information about using the Core Platform directory and related services.",
-    body:
-      "Review emergency guidance, directory vetting limitations, and important information about using the Core Platform directory and related services.",
+    body: "Review emergency guidance, directory vetting limitations, and important information about using the Core Platform directory and related services.",
   },
 };
 
@@ -133,7 +125,10 @@ function escapeHtml(value: string) {
 }
 
 function stripHtml(value: string) {
-  return value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  return value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function truncate(value: string, length = 240) {
@@ -170,20 +165,7 @@ function uniqueFragments(fragments: string[]) {
 
 function sanitizeRichHtml(value: string) {
   return sanitizeHtml(value, {
-    allowedTags: [
-      "p",
-      "br",
-      "strong",
-      "em",
-      "ul",
-      "ol",
-      "li",
-      "blockquote",
-      "a",
-      "h2",
-      "h3",
-      "h4",
-    ],
+    allowedTags: ["p", "br", "strong", "em", "ul", "ol", "li", "blockquote", "a", "h2", "h3", "h4"],
     allowedAttributes: {
       a: ["href", "target", "rel"],
     },
@@ -202,8 +184,158 @@ function absoluteUrl(path: string | null | undefined, siteUrl: string) {
   return `${siteUrl}${path.startsWith("/") ? "" : "/"}${path}`;
 }
 
+function resolveCmsAssetUrl(url: string): string {
+  const legacyCmsAssetMap: Record<string, string> = {
+    "/images/hero-therapy-session.png": "/images/hero-therapy-session-1920w.webp",
+    "/uploads/cms/1781107243034-monroe.webp": "/images/glass-door-pro/city-monroe-hero.webp",
+    "/uploads/cms/1781107218199-charlotte1.webp": "/images/glass-door-pro/city-charlotte-hero.webp",
+  };
+
+  return legacyCmsAssetMap[url] ?? url;
+}
+
+function heroImage(base: string, widths: number[], fallbackWidth: number): ResponsiveHeroImage {
+  const src = (width: number, format: "avif" | "webp") =>
+    `/images/glass-door-pro/hero/${base}-${width}w.${format}`;
+
+  return {
+    fallback: src(fallbackWidth, "webp"),
+    avifSrcSet: widths.map((width) => `${src(width, "avif")} ${width}w`).join(", "),
+    webpSrcSet: widths.map((width) => `${src(width, "webp")} ${width}w`).join(", "),
+  };
+}
+
+const RESPONSIVE_HERO_IMAGE_MAP: Record<string, ResponsiveHeroImage> = {
+  "/images/glass-door-pro/gallery-shower1-1280w.jpg": heroImage(
+    "gallery-shower1-hero",
+    [640, 960, 1280],
+    1280,
+  ),
+  "/images/glass-door-pro/hero/gallery-shower1-hero-1280w.webp": heroImage(
+    "gallery-shower1-hero",
+    [640, 960, 1280],
+    1280,
+  ),
+  "/images/glass-door-pro/frameless-parallax.jpg": heroImage(
+    "frameless-parallax-hero",
+    [640, 768, 1024],
+    1024,
+  ),
+  "/images/glass-door-pro/hero/frameless-parallax-hero-1024w.webp": heroImage(
+    "frameless-parallax-hero",
+    [640, 768, 1024],
+    1024,
+  ),
+  "/images/glass-door-pro/window-parallax.jpg": heroImage(
+    "window-parallax-hero",
+    [640, 768, 1024],
+    1024,
+  ),
+  "/images/glass-door-pro/hero/window-parallax-hero-1024w.webp": heroImage(
+    "window-parallax-hero",
+    [640, 768, 1024],
+    1024,
+  ),
+  "/images/glass-door-pro/door-parallax.jpg": heroImage(
+    "door-parallax-hero",
+    [640, 768, 1024],
+    1024,
+  ),
+  "/images/glass-door-pro/hero/door-parallax-hero-1024w.webp": heroImage(
+    "door-parallax-hero",
+    [640, 768, 1024],
+    1024,
+  ),
+  "/images/glass-door-pro/window-repair-parallax.jpg": heroImage(
+    "window-repair-parallax-hero",
+    [640, 960, 1365],
+    1365,
+  ),
+  "/images/glass-door-pro/hero/window-repair-parallax-hero-1365w.webp": heroImage(
+    "window-repair-parallax-hero",
+    [640, 960, 1365],
+    1365,
+  ),
+  "/images/glass-door-pro/commercial-hero-1280w.webp": heroImage(
+    "commercial-hero",
+    [640, 960, 1280],
+    1280,
+  ),
+  "/images/glass-door-pro/hero/commercial-hero-1280w.webp": heroImage(
+    "commercial-hero",
+    [640, 960, 1280],
+    1280,
+  ),
+};
+
+function isPreloadableImageUrl(url: string) {
+  return /\.(avif|webp|jpe?g|png)(?:[?#].*)?$/i.test(url);
+}
+
+function getResponsiveCmsHeroImage(url: string): ResponsiveHeroImage {
+  const resolvedUrl = resolveCmsAssetUrl(url);
+  return (
+    RESPONSIVE_HERO_IMAGE_MAP[resolvedUrl] ?? {
+      fallback: resolvedUrl,
+      avifSrcSet: "",
+      webpSrcSet: "",
+    }
+  );
+}
+
+function getFirstCmsHeroBackgroundImage(content: unknown): string {
+  if (!content || typeof content !== "object") return "";
+  const blocks = (content as { blocks?: unknown }).blocks;
+  if (!Array.isArray(blocks)) return "";
+
+  for (const block of blocks) {
+    if (!block || typeof block !== "object") continue;
+    const candidate = block as { type?: unknown; props?: Record<string, unknown> };
+    if (candidate.type !== "hero") continue;
+    const url = candidate.props?.backgroundImageUrl;
+    return typeof url === "string" ? url : "";
+  }
+
+  return "";
+}
+
+function buildHeroImagePreload(content: unknown): string | null {
+  const backgroundImageUrl = getFirstCmsHeroBackgroundImage(content);
+  if (!backgroundImageUrl) return null;
+
+  const responsiveHeroImage = getResponsiveCmsHeroImage(backgroundImageUrl);
+  const href = responsiveHeroImage.avifSrcSet
+    ? responsiveHeroImage.avifSrcSet.split(/\s+/)[0]
+    : responsiveHeroImage.fallback;
+
+  if (!href || !isPreloadableImageUrl(href)) return null;
+
+  const attrs = [
+    `rel="preload"`,
+    `as="image"`,
+    `href="${escapeHtml(href)}"`,
+    `fetchpriority="high"`,
+  ];
+
+  if (responsiveHeroImage.avifSrcSet) {
+    attrs.push(`type="image/avif"`);
+    attrs.push(`imagesrcset="${escapeHtml(responsiveHeroImage.avifSrcSet)}"`);
+    attrs.push(`imagesizes="100vw"`);
+  } else if (responsiveHeroImage.webpSrcSet) {
+    attrs.push(`type="image/webp"`);
+    attrs.push(`imagesrcset="${escapeHtml(responsiveHeroImage.webpSrcSet)}"`);
+    attrs.push(`imagesizes="100vw"`);
+  }
+
+  return `<link ${attrs.join(" ")} />`;
+}
+
 function buildHeadTitle(rawTitle: string, seo?: SeoSettings | null) {
-  return formatBrandFirstTitle(rawTitle, seo?.titleSuffix ?? " | Glass & Door Pro", seo?.siteName ?? "Glass & Door Pro");
+  return formatBrandFirstTitle(
+    rawTitle,
+    seo?.titleSuffix ?? " | Glass & Door Pro",
+    seo?.siteName ?? "Glass & Door Pro",
+  );
 }
 
 function buildOrganizationSchema(seo: SeoSettings | null, siteUrl: string) {
@@ -242,10 +374,12 @@ export async function getPublicHeadAdditions(): Promise<string | null> {
 function normalizeHeadMarkup(value?: string | null) {
   if (!value) return null;
 
-  return value
-    .trim()
-    // Repair a common paste mistake where </script is missing its closing angle bracket.
-    .replace(/<\/script(?!>)(?=(\s*<)|\s*$)/gi, "</script>");
+  return (
+    value
+      .trim()
+      // Repair a common paste mistake where </script is missing its closing angle bracket.
+      .replace(/<\/script(?!>)(?=(\s*<)|\s*$)/gi, "</script>")
+  );
 }
 
 function buildWebsiteSchema(seo: SeoSettings | null, siteUrl: string) {
@@ -324,7 +458,11 @@ function buildSimplePageBody(title: string, description: string, fragments: stri
   ].join("");
 }
 
-function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: string): PublicHtmlSnapshot {
+function buildCmsSnapshot(
+  page: CmsPage,
+  seo: SeoSettings | null,
+  siteUrl: string,
+): PublicHtmlSnapshot {
   const title = page.seoTitle || page.title || "Page";
   const description =
     page.seoDescription ||
@@ -349,6 +487,7 @@ function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: strin
     canonicalUrl,
     ogImageUrl: page.ogImageUrl || seo?.defaultOgImageUrl || null,
     robots: page.noindex ? "noindex,nofollow" : null,
+    preloads: [buildHeroImagePreload(page.content)].filter(Boolean) as string[],
     bodyHtml,
     jsonLd: [
       buildGlassLocalBusinessLd(siteUrl),
@@ -359,11 +498,18 @@ function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: strin
   };
 }
 
-function buildPostSnapshot(post: BlogPost, seo: SeoSettings | null, siteUrl: string): PublicHtmlSnapshot {
+function buildPostSnapshot(
+  post: BlogPost,
+  seo: SeoSettings | null,
+  siteUrl: string,
+): PublicHtmlSnapshot {
   const canonicalUrl = `${siteUrl}/insights/${post.slug}`;
   const title = post.seoTitle || post.title;
   const description =
-    post.seoDescription || post.excerpt || truncate(stripHtml(post.content), 180) || DEFAULT_DESCRIPTION;
+    post.seoDescription ||
+    post.excerpt ||
+    truncate(stripHtml(post.content), 180) ||
+    DEFAULT_DESCRIPTION;
   const bodyHtml = [
     `<main class="seo-prerender-content">`,
     `<article>`,
@@ -409,7 +555,11 @@ function buildPostSnapshot(post: BlogPost, seo: SeoSettings | null, siteUrl: str
   };
 }
 
-function buildEventSnapshot(event: Event, seo: SeoSettings | null, siteUrl: string): PublicHtmlSnapshot {
+function buildEventSnapshot(
+  event: Event,
+  seo: SeoSettings | null,
+  siteUrl: string,
+): PublicHtmlSnapshot {
   const canonicalUrl = `${siteUrl}${getEventPath(event)}`;
   const title = event.title;
   const description = truncate(stripHtml(event.description || ""), 180) || DEFAULT_DESCRIPTION;
@@ -481,7 +631,11 @@ async function buildTherapistSnapshot(
   const canonicalUrl = `${siteUrl}/directory/${profile.id}`;
   const description =
     truncate(
-      stripHtml(profile.bio || profile.title || "View this Core Platform-informed mental health professional profile."),
+      stripHtml(
+        profile.bio ||
+          profile.title ||
+          "View this Core Platform-informed mental health professional profile.",
+      ),
       180,
     ) || "View this Core Platform-informed mental health professional profile.";
 
@@ -516,7 +670,11 @@ async function buildTherapistSnapshot(
   };
 }
 
-function buildSearchSnapshot(query: string, seo: SeoSettings | null, siteUrl: string): PublicHtmlSnapshot {
+function buildSearchSnapshot(
+  query: string,
+  seo: SeoSettings | null,
+  siteUrl: string,
+): PublicHtmlSnapshot {
   const term = query.trim();
   const title = term ? `Search Results for "${term}"` : "Site Search";
   const description = term
@@ -526,7 +684,9 @@ function buildSearchSnapshot(query: string, seo: SeoSettings | null, siteUrl: st
   return {
     title: buildHeadTitle(title, seo),
     description,
-    canonicalUrl: term ? `${siteUrl}/search?query=${encodeURIComponent(term)}` : `${siteUrl}/search`,
+    canonicalUrl: term
+      ? `${siteUrl}/search?query=${encodeURIComponent(term)}`
+      : `${siteUrl}/search`,
     robots: "noindex,follow",
     bodyHtml: buildSimplePageBody(title, description, [
       "Search the site for pages, articles, and events.",
@@ -576,9 +736,7 @@ export async function getPublicHtmlSnapshot(
   }
 
   const seo = (await storage.seoSettings.get()) ?? null;
-  const siteUrl =
-    (seo?.siteUrl || "").replace(/\/$/, "") ||
-    "https://glassanddoorpro.com";
+  const siteUrl = (seo?.siteUrl || "").replace(/\/$/, "") || "https://glassanddoorpro.com";
 
   if (pathname === "/search") {
     const params = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
@@ -655,6 +813,7 @@ export function injectPublicHtmlSnapshot(
     snapshot.ogImageUrl
       ? `<meta property="og:image" content="${escapeHtml(snapshot.ogImageUrl)}" />`
       : "",
+    ...(snapshot.preloads ?? []),
     customHeadHtml || "",
     ...(snapshot.jsonLd ?? []).map(
       (schema) =>
