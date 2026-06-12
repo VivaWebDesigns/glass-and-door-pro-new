@@ -194,8 +194,23 @@ describe("public-prerender.service", () => {
             id: "hero-1",
             type: "hero",
             props: {
+              anchorId: "hero",
+              variant: "glass-service",
+              layout: "split",
               heading: "Frameless Showers",
+              subheading: "<p>Custom frameless shower glass for Charlotte homes.</p>",
+              ctaText: "Request a Free Quote",
+              ctaAction: "form-modal",
+              ctaSecondaryText: "Call (704) 771-6111",
+              ctaSecondaryLink: "tel:+17047716111",
               backgroundImageUrl: "/images/glass-door-pro/frameless-parallax.jpg",
+              overlayColor: "#000000",
+              overlayOpacity: 28,
+              minHeight: "700",
+              backgroundPositionX: 50,
+              backgroundPositionY: 35,
+              headingColor: "#ffffff",
+              subheadingColor: "#ffffff",
             },
           },
         ],
@@ -215,6 +230,68 @@ describe("public-prerender.service", () => {
     expect(html).toContain("frameless-parallax-hero-1024w.avif 1024w");
     expect(html).toContain('imagesizes="100vw"');
     expect(html).toContain('fetchpriority="high"');
+    expect(html).toContain('<section id="hero"');
+    expect(html).toContain('<picture aria-hidden="true"');
+    expect(html).toContain('type="image/avif"');
+    expect(html).toContain('srcset="/images/glass-door-pro/hero/frameless-parallax-hero-640w.avif');
+    expect(html).toContain('src="/images/glass-door-pro/hero/frameless-parallax-hero-1024w.webp"');
+    expect(html).toContain('loading="eager"');
+    expect(html).toContain('decoding="async"');
+    expect(html).toContain('fetchpriority="high"');
+    expect(html).toContain("object-position: 50% 35%");
+    expect(html).toContain("rgba(0, 0, 0, 0.28)");
+    expect(html).toContain("Custom frameless shower glass for Charlotte homes.");
+    expect(html).toContain('href="#contact"');
+    expect(html).toContain("Request a Free Quote");
+    expect(html).toContain('href="tel:+17047716111"');
+    expect(html).toContain("Call (704) 771-6111");
+  });
+
+  it("escapes prerendered CMS hero text and URLs", async () => {
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      slug: "home",
+      content: {
+        blocks: [
+          {
+            id: "hero-1",
+            type: "hero",
+            props: {
+              anchorId: 'hero" onclick="alert(1)',
+              variant: "glass-home",
+              heading: 'Glass <script>alert("x")</script>',
+              accentHeading: "<strong>unsafe</strong>",
+              subheading:
+                '<p>Safe copy</p><script>alert("x")</script><a href="javascript:alert(1)">bad link</a>',
+              ctaText: "Click <now>",
+              ctaLink: "javascript:alert(1)",
+              ctaAction: "custom-link",
+              ctaSecondaryText: "Call <now>",
+              ctaSecondaryLink: "tel:+17047716111",
+              backgroundImageUrl: "/images/glass-door-pro/hero/gallery-shower1-hero-1280w.webp",
+            },
+          },
+        ],
+      },
+    });
+    const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } =
+      await import("../services/public-prerender.service");
+
+    const snapshot = await getPublicHtmlSnapshot("/");
+    const html = injectPublicHtmlSnapshot(
+      '<html><head><title>Default</title><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--><div id="root"></div></body></html>',
+      snapshot,
+    );
+
+    expect(html).toContain('id="hero&quot; onclick=&quot;alert(1)"');
+    expect(html).toContain("Glass &lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;");
+    expect(html).toContain("&lt;strong&gt;unsafe&lt;/strong&gt;");
+    expect(html).toContain("<p>Safe copy</p>");
+    expect(html).not.toContain("<script>");
+    expect(html).not.toContain("javascript:");
+    expect(html).not.toContain("Call <now>");
+    expect(html).toContain("Call &lt;now&gt;");
+    expect(html).toContain('href="tel:+17047716111"');
   });
 
   it("emits CMS FAQPage schema and maps nested public routes to CMS slugs", async () => {

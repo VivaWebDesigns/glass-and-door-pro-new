@@ -330,6 +330,212 @@ function buildHeroImagePreload(content: unknown): string | null {
   return `<link ${attrs.join(" ")} />`;
 }
 
+function stringValue(value: unknown) {
+  return typeof value === "string" ? value : "";
+}
+
+function numberValue(value: unknown, fallback: number) {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function safeUrl(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (/^(https?:|mailto:|tel:)/i.test(trimmed)) return trimmed;
+  if (trimmed.startsWith("/") || trimmed.startsWith("#")) return trimmed;
+  return "";
+}
+
+function normalizeHexColorValue(value: string) {
+  const trimmed = value.trim();
+  if (/^#[0-9a-f]{3}$/i.test(trimmed) || /^#[0-9a-f]{6}$/i.test(trimmed)) return trimmed;
+  return "";
+}
+
+function hexToRgbaValue(hex: string, alpha: number) {
+  const normalized = normalizeHexColorValue(hex) || "#000000";
+  const value = normalized.slice(1);
+  const expanded =
+    value.length === 3
+      ? value
+          .split("")
+          .map((char) => `${char}${char}`)
+          .join("")
+      : value;
+  const numeric = Number.parseInt(expanded, 16);
+  const r = (numeric >> 16) & 255;
+  const g = (numeric >> 8) & 255;
+  const b = numeric & 255;
+  return `rgba(${r}, ${g}, ${b}, ${clamp(alpha, 0, 1)})`;
+}
+
+function safeStyleValue(value: string) {
+  return value.replace(/[;"'<>]/g, "");
+}
+
+function safeObjectPosition(value: unknown, fallback: number) {
+  return clamp(numberValue(value, fallback), 0, 100);
+}
+
+function getFirstPrerenderHeroProps(content: unknown): Record<string, unknown> | null {
+  if (!content || typeof content !== "object") return null;
+  const blocks = (content as { blocks?: unknown }).blocks;
+  if (!Array.isArray(blocks)) return null;
+
+  for (const block of blocks) {
+    if (!block || typeof block !== "object") continue;
+    const candidate = block as { type?: unknown; props?: unknown };
+    if (candidate.type !== "hero" || !candidate.props || typeof candidate.props !== "object") {
+      continue;
+    }
+
+    const props = candidate.props as Record<string, unknown>;
+    const variant = stringValue(props.variant);
+    if (variant === "glass-home" || variant === "glass-service") {
+      return props;
+    }
+  }
+
+  return null;
+}
+
+function buildHeroPictureHtml(props: Record<string, unknown>) {
+  const backgroundImageUrl = stringValue(props.backgroundImageUrl);
+  if (!backgroundImageUrl) return "";
+
+  const responsiveHeroImage = getResponsiveCmsHeroImage(backgroundImageUrl);
+  const fallback = safeUrl(responsiveHeroImage.fallback);
+  if (!fallback) return "";
+
+  const bgPosX = safeObjectPosition(props.backgroundPositionX, 50);
+  const bgPosY = safeObjectPosition(props.backgroundPositionY, 50);
+  const sources = [
+    responsiveHeroImage.avifSrcSet
+      ? `<source type="image/avif" srcset="${escapeHtml(responsiveHeroImage.avifSrcSet)}" sizes="100vw" />`
+      : "",
+    responsiveHeroImage.webpSrcSet
+      ? `<source type="image/webp" srcset="${escapeHtml(responsiveHeroImage.webpSrcSet)}" sizes="100vw" />`
+      : "",
+  ].filter(Boolean);
+
+  return [
+    `<picture aria-hidden="true" class="absolute inset-0 block h-full w-full">`,
+    ...sources,
+    `<img src="${escapeHtml(fallback)}" alt="" class="h-full w-full object-cover" style="object-position: ${bgPosX}% ${bgPosY}%" loading="eager" decoding="async" fetchpriority="high" />`,
+    `</picture>`,
+  ].join("");
+}
+
+function ctaHrefForProps(props: Record<string, unknown>, prefix: "cta" | "ctaSecondary") {
+  const directHref = safeUrl(stringValue(props[`${prefix}Link`]));
+  if (directHref) return directHref;
+
+  const action = stringValue(props[`${prefix}Action`]);
+  if (action === "form-modal") return "#contact";
+  return "";
+}
+
+function buildHeroCtaHtml(props: Record<string, unknown>, prefix: "cta" | "ctaSecondary") {
+  const textKey = prefix === "cta" ? "ctaText" : "ctaSecondaryText";
+  const text = stringValue(props[textKey]);
+  if (!text) return "";
+
+  const href = ctaHrefForProps(props, prefix);
+  if (!href) return "";
+
+  const isSecondary = prefix === "ctaSecondary";
+  const openInNewTab = props[`${prefix}OpenInNewTab`] === true;
+  const className = [
+    "inline-flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-8 text-sm font-medium transition-colors sm:w-auto",
+    isSecondary
+      ? "border border-white bg-transparent text-white shadow-sm hover:bg-white/10 hover:text-white"
+      : "border border-white bg-[#1a8ead] text-white shadow-sm hover:bg-[#167f9b] hover:text-white",
+  ].join(" ");
+  const targetAttrs = openInNewTab ? ` target="_blank" rel="noopener noreferrer"` : "";
+
+  return `<a class="${className}" href="${escapeHtml(href)}"${targetAttrs}>${escapeHtml(text)}</a>`;
+}
+
+function buildHeroHtml(content: unknown) {
+  const props = getFirstPrerenderHeroProps(content);
+  if (!props) return "";
+
+  const pictureHtml = buildHeroPictureHtml(props);
+  if (!pictureHtml) return "";
+
+  const variant = stringValue(props.variant);
+  const layout = stringValue(props.layout) || "stacked";
+  const isSplit = layout === "split" || variant === "glass-service";
+  const minHeight =
+    stringValue(props.minHeight) === "100vh"
+      ? "100vh"
+      : `${stringValue(props.minHeight) || "420"}px`;
+  const overlayColor = normalizeHexColorValue(stringValue(props.overlayColor)) || "#000000";
+  const overlayOpacity = clamp(numberValue(props.overlayOpacity, 50), 0, 100) / 100;
+  const heading = stringValue(props.heading) || stringValue(props.title) || "Hero Heading";
+  const accentHeading = stringValue(props.accentHeading);
+  const subheading = stringValue(props.subheading) || stringValue(props.subtitle);
+  const body = stringValue(props.body);
+  const badge = stringValue(props.badge);
+  const anchorId = stringValue(props.anchorId);
+  const headingColor = normalizeHexColorValue(stringValue(props.headingColor));
+  const accentHeadingColor = normalizeHexColorValue(stringValue(props.accentHeadingColor));
+  const subheadingColor = normalizeHexColorValue(stringValue(props.subheadingColor));
+  const primaryCta = buildHeroCtaHtml(props, "cta");
+  const secondaryCta = buildHeroCtaHtml(props, "ctaSecondary");
+  const sectionClass = `public-hero-pattern relative flex items-center overflow-hidden ${
+    isSplit ? "justify-start text-left" : "justify-center text-center"
+  }`;
+  const contentClass = `relative z-10 px-6 py-20 sm:px-8 sm:py-24 md:py-28 ${
+    isSplit ? "max-w-3xl lg:ml-[max(2rem,calc((100vw-80rem)/2))]" : "max-w-4xl mx-auto"
+  }`;
+  const headingClass = `mb-5 font-heading font-bold leading-tight text-white ${
+    variant === "glass-home"
+      ? "text-4xl sm:text-5xl md:text-6xl lg:text-7xl"
+      : "text-4xl sm:text-5xl md:text-6xl"
+  }`;
+  const subheadingClass = `mb-9 text-base leading-8 text-white/85 sm:text-lg [&_a]:text-white [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-white/80 [&_p]:m-0 ${
+    isSplit ? "max-w-2xl" : "max-w-2xl mx-auto"
+  }`;
+  const ctaClass = `flex flex-col gap-3 sm:flex-row sm:flex-wrap ${
+    isSplit ? "sm:justify-start" : "sm:justify-center"
+  }`;
+  const headingStyle = headingColor ? ` style="color: ${safeStyleValue(headingColor)}"` : "";
+  const accentStyle = accentHeadingColor
+    ? ` style="color: ${safeStyleValue(accentHeadingColor)}"`
+    : "";
+  const subheadingStyle = subheadingColor
+    ? ` style="color: ${safeStyleValue(subheadingColor)}"`
+    : "";
+
+  return [
+    `<section${anchorId ? ` id="${escapeHtml(anchorId)}"` : ""} class="${sectionClass}" style="min-height: ${safeStyleValue(minHeight)}">`,
+    pictureHtml,
+    `<div class="absolute inset-0" style="background-color: ${hexToRgbaValue(overlayColor, overlayOpacity)}"></div>`,
+    `<div class="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-background/35 to-transparent"></div>`,
+    `<div class="${contentClass}">`,
+    badge
+      ? `<span class="mb-5 inline-flex rounded-full border border-white/25 bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-white shadow-sm backdrop-blur">${escapeHtml(badge)}</span>`
+      : "",
+    `<h1 class="${headingClass}"${headingStyle}>${escapeHtml(heading)}${
+      accentHeading
+        ? ` <span class="text-accent"${accentStyle}>${escapeHtml(accentHeading)}</span>`
+        : ""
+    }</h1>`,
+    subheading
+      ? `<div class="${subheadingClass}"${subheadingStyle}>${sanitizeRichHtml(subheading)}</div>`
+      : "",
+    body ? `<div class="${subheadingClass}"${subheadingStyle}>${sanitizeRichHtml(body)}</div>` : "",
+    primaryCta || secondaryCta ? `<div class="${ctaClass}">${primaryCta}${secondaryCta}</div>` : "",
+    `</div>`,
+    `</section>`,
+  ].join("");
+}
+
 function buildHeadTitle(rawTitle: string, seo?: SeoSettings | null) {
   return formatBrandFirstTitle(
     rawTitle,
@@ -443,17 +649,35 @@ function buildFaqPageSchema(items: Array<{ question: string; answer: string }>) 
   };
 }
 
-function buildSimplePageBody(title: string, description: string, fragments: string[] = []) {
+function buildSimplePageArticle(title: string, description: string, fragments: string[] = []) {
   const paragraphs = uniqueFragments([description, ...fragments])
     .filter((fragment) => fragment && fragment.toLowerCase() !== title.trim().toLowerCase())
     .slice(0, 8);
 
   return [
-    `<main class="seo-prerender-content">`,
     `<article>`,
     `<h1>${escapeHtml(title)}</h1>`,
     ...paragraphs.map((paragraph) => `<p>${escapeHtml(truncate(paragraph, 340))}</p>`),
     `</article>`,
+  ].join("");
+}
+
+function buildSimplePageBody(title: string, description: string, fragments: string[] = []) {
+  return [
+    `<main class="seo-prerender-content">`,
+    buildSimplePageArticle(title, description, fragments),
+    `</main>`,
+  ].join("");
+}
+
+function buildCmsPageBody(title: string, description: string, content: unknown) {
+  const fragments = uniqueFragments(collectTextFragments(content));
+  const heroHtml = buildHeroHtml(content);
+
+  return [
+    `<main class="seo-prerender-content">`,
+    heroHtml,
+    buildSimplePageArticle(title, description, fragments),
     `</main>`,
   ].join("");
 }
@@ -471,11 +695,7 @@ function buildCmsSnapshot(
   const publicPath = getCmsPublicPath(page.slug);
   const canonicalUrl =
     page.canonicalUrl || (publicPath === "/" ? siteUrl : `${siteUrl}${publicPath}`);
-  const bodyHtml = buildSimplePageBody(
-    page.title,
-    description,
-    uniqueFragments(collectTextFragments(page.content)),
-  );
+  const bodyHtml = buildCmsPageBody(page.title, description, page.content);
 
   const breadcrumbs =
     page.slug === "home" ? null : buildBreadcrumbSchema(buildGlassBreadcrumbItems(page, siteUrl));

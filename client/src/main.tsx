@@ -1,4 +1,5 @@
 import { createRoot } from "react-dom/client";
+import { useEffect } from "react";
 import App from "./App";
 import "./index.css";
 
@@ -19,8 +20,14 @@ if (typeof window !== "undefined") {
   });
 
   window.sessionStorage.removeItem(VITE_PRELOAD_RECOVERY_KEY);
-
-  document.getElementById("seo-prerender")?.remove();
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+function Root() {
+  useEffect(() => {
+    document.getElementById("seo-prerender")?.remove();
+  }, []);
+
+  return <App />;
+}
+
+createRoot(document.getElementById("root")!).render(<Root />);
