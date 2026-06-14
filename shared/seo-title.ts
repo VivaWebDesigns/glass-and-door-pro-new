@@ -10,6 +10,19 @@ function cleanBrand(value: string | null | undefined, fallbackBrand: string) {
   return cleaned || fallbackBrand;
 }
 
+function brandAliases(brand: string) {
+  const aliases = new Set([brand]);
+
+  if (brand.includes("&")) {
+    aliases.add(brand.replace(/\s*&\s*/g, " and "));
+  }
+  if (/\sand\s/i.test(brand)) {
+    aliases.add(brand.replace(/\s+and\s+/gi, " & "));
+  }
+
+  return [...aliases];
+}
+
 export function formatBrandFirstTitle(
   rawTitle: string | null | undefined,
   titleSuffix: string | null | undefined,
@@ -22,14 +35,18 @@ export function formatBrandFirstTitle(
   if (title === brand) return title;
 
   const separators = [" | ", " - ", " – ", " — "];
-  if (separators.some((separator) => title.startsWith(`${brand}${separator}`))) {
-    return title;
+  for (const alias of brandAliases(brand)) {
+    if (separators.some((separator) => title.startsWith(`${alias}${separator}`))) {
+      return alias === brand ? title : `${brand}${title.slice(alias.length)}`;
+    }
   }
 
-  for (const separator of separators) {
-    const brandSuffix = `${separator}${brand}`;
-    if (title.endsWith(brandSuffix)) {
-      return `${brand}${separator}${title.slice(0, -brandSuffix.length).trim()}`;
+  for (const alias of brandAliases(brand)) {
+    for (const separator of separators) {
+      const brandSuffix = `${separator}${alias}`;
+      if (title.endsWith(brandSuffix)) {
+        return `${brand}${separator}${title.slice(0, -brandSuffix.length).trim()}`;
+      }
     }
   }
 

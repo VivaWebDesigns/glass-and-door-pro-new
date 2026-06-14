@@ -9,10 +9,34 @@ function canonicalizeSchema(text: string | null) {
   if (!text) return null;
 
   try {
-    return JSON.stringify(JSON.parse(text));
+    return JSON.parse(text) as JsonLdObject;
   } catch {
     return null;
   }
+}
+
+function schemaIdentity(schema: JsonLdObject) {
+  const type = schema["@type"];
+  if (typeof type !== "string") return null;
+
+  const id = schema["@id"];
+  if (typeof id === "string" && id) return `${type}:id:${id}`;
+
+  const url = schema.url;
+  if (typeof url === "string" && url) return `${type}:url:${url}`;
+
+  if (type === "BreadcrumbList") {
+    const items = schema.itemListElement;
+    if (Array.isArray(items)) {
+      const last = items[items.length - 1] as { item?: unknown } | undefined;
+      if (typeof last?.item === "string" && last.item) return `${type}:item:${last.item}`;
+    }
+  }
+
+  if (type === "FAQPage") return type;
+
+  const name = schema.name;
+  return typeof name === "string" && name ? `${type}:name:${name}` : null;
 }
 
 export function JsonLd({ schemas }: JsonLdProps) {
@@ -23,12 +47,13 @@ export function JsonLd({ schemas }: JsonLdProps) {
   useEffect(() => {
     if (valid.length === 0) return;
 
-    const schemaSet = new Set(valid.map((schema) => JSON.stringify(schema)));
+    const schemaSet = new Set(valid.map(schemaIdentity).filter((key): key is string => !!key));
     document
       .querySelectorAll<HTMLScriptElement>('script[type="application/ld+json"]')
       .forEach((script) => {
-        const canonical = canonicalizeSchema(script.textContent);
-        if (canonical && schemaSet.has(canonical)) {
+        const parsed = canonicalizeSchema(script.textContent);
+        const identity = parsed ? schemaIdentity(parsed) : null;
+        if (identity && schemaSet.has(identity)) {
           script.remove();
         }
       });

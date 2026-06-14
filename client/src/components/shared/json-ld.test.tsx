@@ -23,6 +23,14 @@ const faqSchema = {
   ],
 };
 
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "@id": "https://glassanddoorpro.com/#business",
+  name: "Glass and Door Pro",
+  priceRange: "$$",
+};
+
 let root: Root | null = null;
 let container: HTMLDivElement | null = null;
 
@@ -37,13 +45,13 @@ afterEach(() => {
   document.body.innerHTML = "";
 });
 
-function renderJsonLd() {
+function renderJsonLd(schemas = [faqSchema]) {
   container = document.createElement("div");
   document.body.appendChild(container);
   root = createRoot(container);
 
   act(() => {
-    root?.render(<JsonLd schemas={[faqSchema]} />);
+    root?.render(<JsonLd schemas={schemas} />);
   });
 }
 
@@ -64,5 +72,22 @@ describe("JsonLd", () => {
     expect(scripts).toHaveLength(1);
     expect(scripts[0].id).toMatch(/^ld-json-/);
     expect(JSON.parse(scripts[0].textContent || "{}")).toEqual(faqSchema);
+  });
+
+  it("replaces equivalent prerendered schema when non-identity fields differ", () => {
+    const prerendered = document.createElement("script");
+    prerendered.type = "application/ld+json";
+    prerendered.textContent = JSON.stringify({
+      ...localBusinessSchema,
+      priceRange: "$",
+    });
+    document.head.appendChild(prerendered);
+
+    renderJsonLd([localBusinessSchema]);
+
+    const scripts = jsonLdScripts();
+    expect(scripts).toHaveLength(1);
+    expect(scripts[0].id).toMatch(/^ld-json-/);
+    expect(JSON.parse(scripts[0].textContent || "{}")).toEqual(localBusinessSchema);
   });
 });
