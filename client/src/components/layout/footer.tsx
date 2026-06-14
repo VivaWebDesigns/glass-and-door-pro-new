@@ -6,12 +6,12 @@ import { useBranding } from "@/components/shared/branding-provider";
 import type { CmsMenu, MenuItem, PublicMenuLocation } from "@shared/schema";
 
 const defaultPlatformLinks = [
-  { href: "/#services", label: "Frameless Showers", testId: "link-footer-frameless-showers" },
-  { href: "/#services", label: "Window Installation", testId: "link-footer-window-installation" },
-  { href: "/#services", label: "Door Installation", testId: "link-footer-door-installation" },
-  { href: "/#services", label: "Window Repair", testId: "link-footer-window-repair" },
-  { href: "/#services", label: "Commercial Glass", testId: "link-footer-commercial-glass" },
-  { href: "/#gallery", label: "Gallery", testId: "link-footer-gallery" },
+  { href: "/services/frameless-showers", label: "Frameless Showers", testId: "link-footer-frameless-showers" },
+  { href: "/services/window-installation", label: "Window Installation", testId: "link-footer-window-installation" },
+  { href: "/services/door-installation", label: "Door Installation", testId: "link-footer-door-installation" },
+  { href: "/services/window-repair", label: "Window Repair", testId: "link-footer-window-repair" },
+  { href: "/services/commercial-glass", label: "Commercial Glass", testId: "link-footer-commercial-glass" },
+  { href: "/gallery", label: "Gallery", testId: "link-footer-gallery" },
   { href: "/reviews", label: "Reviews", testId: "link-footer-reviews" },
 ];
 

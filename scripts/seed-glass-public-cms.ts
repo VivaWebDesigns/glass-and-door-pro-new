@@ -2208,7 +2208,7 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
     location: "main_navigation",
     items: [
       item("About", "/#about"),
-      item("Services", "/#services", [
+      item("Services", "/services/frameless-showers", [
         item("Frameless Showers", "/services/frameless-showers"),
         item("Window Installation", "/services/window-installation"),
         item("Door Installation", "/services/door-installation"),
@@ -2277,7 +2277,7 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
     location: "header",
     items: [
       item("About", "/#about"),
-      item("Services", "/#services", [
+      item("Services", "/services/frameless-showers", [
         item("Frameless Showers", "/services/frameless-showers"),
         item("Window Installation", "/services/window-installation"),
         item("Door Installation", "/services/door-installation"),

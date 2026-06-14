@@ -50,6 +50,11 @@ export function serveStatic(app: Express) {
   app.use("/{*path}", async (req, res) => {
     const template = await getIndexTemplate();
     const { pathname, search } = getRequestPathAndSearch(req.originalUrl || req.url || "/");
+    if (pathname.length > 1 && pathname.endsWith("/")) {
+      const canonicalPath = pathname.replace(/\/+$/, "");
+      res.redirect(301, `${canonicalPath}${search}`);
+      return;
+    }
     if (pathname.startsWith("/uploads")) {
       res.status(404).type("text").send("Not found");
       return;
@@ -67,7 +72,10 @@ export function serveStatic(app: Express) {
 
     res.setHeader(
       "Cache-Control",
-      pathname.startsWith("/admin") || pathname.startsWith("/auth") || pathname.startsWith("/therapist")
+      pathname.startsWith("/admin") ||
+        pathname.startsWith("/auth") ||
+        pathname.startsWith("/setup") ||
+        pathname.startsWith("/therapist")
         ? "private, no-store, max-age=0"
         : "no-cache",
     );

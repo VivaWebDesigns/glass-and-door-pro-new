@@ -29,7 +29,11 @@ import type { CmsMenu, MenuItem, PublicMenuLocation } from "@shared/schema";
 
 const defaultNavLinks = [
   { label: "About", href: "/#about" },
-  { label: "Services", href: "/#services" },
+  { label: "Frameless Showers", href: "/services/frameless-showers" },
+  { label: "Window Installation", href: "/services/window-installation" },
+  { label: "Door Installation", href: "/services/door-installation" },
+  { label: "Window Repair", href: "/services/window-repair" },
+  { label: "Commercial Glass", href: "/services/commercial-glass" },
   { label: "Reviews", href: "/reviews" },
 ];
 
