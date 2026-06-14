@@ -217,6 +217,9 @@ describe("public-prerender.service", () => {
     );
 
     expect(mockGetPageBySlug).toHaveBeenCalledWith("services-frameless-showers");
+    expect(snapshot?.title).toBe(
+      "Frameless Shower Doors in Charlotte, Monroe & Indian Trail NC | Glass & Door Pro",
+    );
     expect(snapshot?.jsonLd?.map((schema) => schema["@type"])).toEqual([
       "LocalBusiness",
       "Service",

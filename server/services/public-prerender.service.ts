@@ -1,7 +1,7 @@
 import sanitizeHtml from "sanitize-html";
 import type { BlogPost, CmsPage, Event, SeoSettings } from "@shared/schema";
 import { getEventPath } from "@shared/event-url";
-import { formatBrandFirstTitle } from "@shared/seo-title";
+import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
 import {
   buildGlassBreadcrumbItems,
   buildGlassLocalBusinessLd,
@@ -9,6 +9,7 @@ import {
   getGlassServiceSeoOverride,
   getCmsPublicPath,
   getCmsSlugForPublicPath,
+  isGlassServicePageSlug,
 } from "@shared/glass-seo";
 import { storage } from "../storage";
 
@@ -217,8 +218,12 @@ function serializeJsonForHtml(value: unknown) {
     .replace(/\u2029/g, "\\u2029");
 }
 
-function buildHeadTitle(rawTitle: string, seo?: SeoSettings | null) {
-  return formatBrandFirstTitle(rawTitle, seo?.titleSuffix ?? " | Glass & Door Pro", seo?.siteName ?? "Glass & Door Pro");
+function buildHeadTitle(rawTitle: string, seo?: SeoSettings | null, options?: { brandLast?: boolean }) {
+  const titleSuffix = seo?.titleSuffix ?? " | Glass & Door Pro";
+  const siteName = seo?.siteName ?? "Glass & Door Pro";
+  return options?.brandLast
+    ? formatBrandLastTitle(rawTitle, titleSuffix, siteName)
+    : formatBrandFirstTitle(rawTitle, titleSuffix, siteName);
 }
 
 function buildOrganizationSchema(seo: SeoSettings | null, siteUrl: string) {
@@ -350,7 +355,7 @@ function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: strin
   const faqItems = extractFaqItems(page.content);
 
   return {
-    title: buildHeadTitle(title, seo),
+    title: buildHeadTitle(title, seo, { brandLast: isGlassServicePageSlug(page.slug) }),
     description,
     canonicalUrl,
     ogImageUrl: absoluteUrl(page.ogImageUrl || seo?.defaultOgImageUrl, siteUrl) || null,

@@ -1711,15 +1711,15 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Commercial Glass",
     slug: "services-commercial-glass",
-    seoTitle: "Commercial Glass Services in Charlotte & Monroe, NC",
+    seoTitle: "Commercial Glass Services in Charlotte, NC",
     seoDescription:
-      "Commercial glass installation and repair for storefronts, office partitions, glass doors, and business properties in Charlotte, Monroe and nearby areas. Call for a free quote.",
+      "Commercial glass installation and repair for storefronts, office partitions, glass doors, restaurants, retail spaces, and property managers in Charlotte and nearby areas. Call for a free quote.",
     seoKeywords:
       "commercial glass Charlotte NC, storefront glass, office glass partitions, glass doors, curtain wall systems",
     ogImageUrl: "/images/glass-door-pro/commercial-hero-1280w.webp",
     content: servicePageContent({
       hero: {
-        heading: "Commercial Glass Services",
+        heading: "Commercial Glass Services in Charlotte, NC",
         subheading:
           "Professional commercial glass installation and repair for storefronts, offices, restaurants, retail spaces, and business properties across the Charlotte area.",
         imageUrl: "/images/glass-door-pro/commercial-hero-1280w.webp",
@@ -1728,7 +1728,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       intro: {
         title: "Commercial Glass Solutions for Your Business",
         content:
-          "<p>Your business space needs glass that looks professional, performs reliably, and supports the way your team and customers use the building. Glass & Door Pro provides commercial glass installation and repair with clear communication, careful workmanship, and responsive service.</p>",
+          "<p>Your business space needs glass that looks professional, performs reliably, and supports the way your team and customers use the building. Glass & Door Pro provides commercial glass installation and repair with clear communication, careful workmanship, and responsive service.</p><p>We help with broken storefront glass, commercial glass doors, office glass partitions, interior glass, safety-focused replacement glass, and repairs that need to be handled with as little disruption as possible. Doug reviews the opening, measurements, hardware, access, and business schedule before recommending the right next step.</p><p>Whether you manage a retail storefront, restaurant, office, service business, or multi-tenant property, we keep the process practical: assess the issue, explain the options, provide a clear quote, and complete the work with attention to security, appearance, and daily operations.</p>",
       },
       cardsTitle: "Our Commercial Glass Services",
       cards: [
@@ -1809,7 +1809,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         {
           icon: "MapPin",
           title: "Local Experience",
-          description: "Hands-on glass experience throughout Charlotte, Monroe, Indian Trail, and nearby areas.",
+          description: "Hands-on commercial glass experience throughout Charlotte and nearby areas.",
         },
         {
           icon: "ShieldCheck",
@@ -1819,24 +1819,34 @@ const glassServicePages: GlassServicePageSeed[] = [
       ],
       faqs: [
         {
-          question: "What types of businesses do you serve?",
+          question: "Do you replace broken storefront glass?",
           answer:
-            "<p>We serve offices, retail spaces, restaurants, service businesses, property managers, and other commercial spaces.</p>",
+            "<p>Yes. We assess broken storefront glass, measure the opening, review safety and security needs, and recommend the right replacement path for your business.</p>",
         },
         {
-          question: "Can you repair broken storefront glass?",
+          question: "Can you install commercial glass doors?",
           answer:
-            "<p>Yes. We can assess damaged storefront glass and recommend a replacement or repair path based on safety and business needs.</p>",
+            "<p>Yes. We install and replace commercial glass doors for offices, retail spaces, restaurants, and service businesses, including hardware considerations when needed.</p>",
         },
         {
-          question: "Do you install office glass partitions?",
+          question: "Do you work with property managers and business owners?",
           answer:
-            "<p>Yes. Glass partitions can create separation while keeping offices bright, open, and professional.</p>",
+            "<p>Yes. We work with business owners, property managers, landlords, and tenant improvement contacts who need clear communication and reliable commercial glass service.</p>",
         },
         {
-          question: "Do you offer emergency commercial glass service?",
+          question: "Do you handle after-hours commercial glass work?",
           answer:
-            "<p>We respond as quickly as possible for urgent commercial glass needs. Contact us with the project details and location.</p>",
+            "<p>After-hours and weekend scheduling may be available depending on the project and urgency. Contact us with the location, photos if possible, and what access is available.</p>",
+        },
+        {
+          question: "What commercial glass services do you offer in Charlotte?",
+          answer:
+            "<p>We help with storefront glass, commercial glass doors, office partitions, interior glass, replacement glass, and repair work for Charlotte-area businesses.</p>",
+        },
+        {
+          question: "Do you provide glass for restaurants, offices, and retail spaces?",
+          answer:
+            "<p>Yes. We serve restaurants, offices, retail storefronts, service businesses, and other commercial properties that need durable, professional glass installation or repair.</p>",
         },
       ],
       cta: {

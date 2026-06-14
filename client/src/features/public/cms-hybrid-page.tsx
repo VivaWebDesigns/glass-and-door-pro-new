@@ -13,13 +13,14 @@ import {
   buildFaqPageLd,
   extractFaqItems,
 } from "@/lib/structured-data";
-import { formatBrandFirstTitle } from "@shared/seo-title";
+import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
 import {
   buildGlassBreadcrumbItems,
   buildGlassLocalBusinessLd,
   buildGlassServiceLdForCmsPage,
   getGlassServiceSeoOverride,
   getCmsPublicPath,
+  isGlassServicePageSlug,
 } from "@shared/glass-seo";
 import { getPrerenderedCmsPage } from "@/lib/cms-prerender";
 
@@ -101,7 +102,10 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
     const seoOverride = getGlassServiceSeoOverride(page.slug);
     const effectiveTitle = seoOverride?.title || page.seoTitle || page.title;
     const titleSuffix = globalSeo?.titleSuffix ?? " | Core Platform";
-    const headTitle = formatBrandFirstTitle(effectiveTitle, titleSuffix, globalSeo?.siteName ?? "Core Platform");
+    const titleFormatter = isGlassServicePageSlug(page.slug)
+      ? formatBrandLastTitle
+      : formatBrandFirstTitle;
+    const headTitle = titleFormatter(effectiveTitle, titleSuffix, globalSeo?.siteName ?? "Core Platform");
     const effectiveDescription =
       seoOverride?.description || page.seoDescription || globalSeo?.defaultMetaDescription || "";
     const origin =
@@ -266,6 +270,10 @@ export function CmsHybridPage({ slug, fallback }: CmsHybridPageProps) {
   }
 
   if (error) {
+    if (prerenderedPage?.status === "published") {
+      return <CmsPageView page={prerenderedPage} globalSeo={globalSeo} />;
+    }
+
     if (import.meta.env.DEV && !(error instanceof CmsNotFoundError)) {
       console.warn(
         `[CmsHybridPage] Transient error for slug "${slug}", showing fallback:`,
@@ -276,6 +284,10 @@ export function CmsHybridPage({ slug, fallback }: CmsHybridPageProps) {
   }
 
   if (!page || page.status !== "published") {
+    if (prerenderedPage?.status === "published") {
+      return <CmsPageView page={prerenderedPage} globalSeo={globalSeo} />;
+    }
+
     return <>{fallback}</>;
   }
 

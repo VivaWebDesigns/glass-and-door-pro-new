@@ -4,6 +4,7 @@ import L from "leaflet";
 import { Link } from "wouter";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getFirstSentence } from "@/lib/html";
+import { ensureLeafletCss } from "@/lib/leaflet-css";
 import type { TherapistProfile } from "@shared/schema/therapist-profiles";
 import type { User } from "@shared/schema/users";
 
@@ -74,6 +75,10 @@ function MapSizeInvalidator() {
 }
 
 export function MapView({ therapists, height = "500px", interactive = true, zoom: zoomProp, center: centerProp, highlightedId }: MapViewProps) {
+  useEffect(() => {
+    ensureLeafletCss();
+  }, []);
+
   const markered = useMemo(
     () =>
       therapists.filter(

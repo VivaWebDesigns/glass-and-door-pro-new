@@ -52,3 +52,33 @@ export function formatBrandFirstTitle(
 
   return `${brand}${DEFAULT_SEPARATOR}${title}`;
 }
+
+export function formatBrandLastTitle(
+  rawTitle: string | null | undefined,
+  titleSuffix: string | null | undefined,
+  fallbackBrand = "Glass & Door Pro",
+) {
+  let title = (rawTitle || "").trim();
+  const brand = cleanBrand(titleSuffix, fallbackBrand);
+
+  if (!title) return brand;
+  if (title === brand) return title;
+
+  const separators = [" | ", " - ", " – ", " — "];
+  for (const alias of brandAliases(brand)) {
+    for (const separator of separators) {
+      const brandPrefix = `${alias}${separator}`;
+      if (title.startsWith(brandPrefix)) {
+        title = title.slice(brandPrefix.length).trim();
+      }
+
+      const brandSuffix = `${separator}${alias}`;
+      if (title.endsWith(brandSuffix)) {
+        title = title.slice(0, -brandSuffix.length).trim();
+      }
+    }
+  }
+
+  if (!title) return brand;
+  return `${title}${DEFAULT_SEPARATOR}${brand}`;
+}

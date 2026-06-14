@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
+import { ensureLeafletCss } from "@/lib/leaflet-css";
 
 const pinSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="40" viewBox="0 0 28 40" fill="none">
   <path d="M14 0C6.268 0 0 6.268 0 14c0 10.5 14 26 14 26s14-15.5 14-26C28 6.268 21.732 0 14 0z" fill="#1e3a5f"/>
@@ -22,6 +24,10 @@ interface EventLocationMapProps {
 }
 
 export function EventLocationMap({ latitude, longitude, locationName }: EventLocationMapProps) {
+  useEffect(() => {
+    ensureLeafletCss();
+  }, []);
+
   const lat = parseFloat(latitude);
   const lng = parseFloat(longitude);
 

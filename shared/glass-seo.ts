@@ -84,9 +84,11 @@ const servicePageNames: Record<
   "services-commercial-glass": {
     serviceType: "Commercial Glass Services",
     name: "Commercial Glass Services",
-    seoTitle: "Commercial Glass Services in Charlotte & Monroe, NC",
+    seoTitle: "Commercial Glass Services in Charlotte, NC",
     seoDescription:
-      "Commercial glass installation and repair for storefronts, office partitions, glass doors, and business properties in Charlotte, Monroe and nearby areas. Call for a free quote.",
+      "Commercial glass installation and repair for storefronts, office partitions, glass doors, restaurants, retail spaces, and property managers in Charlotte and nearby areas. Call for a free quote.",
+    description:
+      "Commercial glass installation and repair for storefronts, office partitions, glass doors, restaurants, retail spaces, offices, and property managers in Charlotte, NC and nearby areas.",
   },
 };
 
@@ -140,6 +142,10 @@ export function getGlassServiceSeoOverride(slug: string) {
     title: serviceData.seoTitle,
     description: serviceData.seoDescription,
   };
+}
+
+export function isGlassServicePageSlug(slug: string) {
+  return Boolean(servicePageNames[slug]);
 }
 
 export function buildGlassLocalBusinessLd(siteUrl = GLASS_SITE_URL): JsonLdObject {

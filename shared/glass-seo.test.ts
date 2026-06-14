@@ -22,4 +22,11 @@ describe("glass SEO helpers", () => {
       title: "Residential Window Installation in Charlotte & Monroe, NC",
     });
   });
+
+  it("keeps commercial glass SEO focused on Charlotte instead of Monroe", () => {
+    expect(getGlassServiceSeoOverride("services-commercial-glass")).toMatchObject({
+      title: "Commercial Glass Services in Charlotte, NC",
+      description: expect.stringContaining("Charlotte and nearby areas"),
+    });
+  });
 });
