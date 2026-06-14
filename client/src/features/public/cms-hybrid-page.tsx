@@ -18,6 +18,7 @@ import {
   buildGlassBreadcrumbItems,
   buildGlassLocalBusinessLd,
   buildGlassServiceLdForCmsPage,
+  getGlassServiceSeoOverride,
   getCmsPublicPath,
 } from "@shared/glass-seo";
 
@@ -123,10 +124,12 @@ function absoluteUrl(path: string, origin: string) {
 function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSettings }) {
   useEffect(() => {
     const prevTitle = document.title;
-    const effectiveTitle = page.seoTitle || page.title;
+    const seoOverride = getGlassServiceSeoOverride(page.slug);
+    const effectiveTitle = seoOverride?.title || page.seoTitle || page.title;
     const titleSuffix = globalSeo?.titleSuffix ?? " | Core Platform";
     const headTitle = formatBrandFirstTitle(effectiveTitle, titleSuffix, globalSeo?.siteName ?? "Core Platform");
-    const effectiveDescription = page.seoDescription || globalSeo?.defaultMetaDescription || "";
+    const effectiveDescription =
+      seoOverride?.description || page.seoDescription || globalSeo?.defaultMetaDescription || "";
     const origin =
       globalSeo?.siteUrl || (typeof window !== "undefined" ? window.location.origin : "");
     const effectiveOgImage = absoluteUrl(page.ogImageUrl || globalSeo?.defaultOgImageUrl || "", origin);

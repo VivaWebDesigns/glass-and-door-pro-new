@@ -14,28 +14,79 @@ const cityServiceOffers = [
   ["Commercial Glass", "/services/commercial-glass"],
 ] as const;
 
-const servicePageNames: Record<string, { serviceType: string; name: string; description?: string }> = {
+const glassServiceAreas = [
+  ["Charlotte", "North Carolina"],
+  ["Monroe", "North Carolina"],
+  ["Indian Trail", "North Carolina"],
+  ["Matthews", "North Carolina"],
+  ["Mint Hill", "North Carolina"],
+  ["Waxhaw", "North Carolina"],
+  ["Weddington", "North Carolina"],
+  ["Wesley Chapel", "North Carolina"],
+  ["Stallings", "North Carolina"],
+  ["Pineville", "North Carolina"],
+  ["Fort Mill", "South Carolina"],
+  ["Indian Land", "South Carolina"],
+  ["Huntersville", "North Carolina"],
+  ["Cornelius", "North Carolina"],
+  ["Davidson", "North Carolina"],
+  ["Concord", "North Carolina"],
+  ["Tega Cay", "South Carolina"],
+  ["Rock Hill", "South Carolina"],
+] as const;
+
+function city(name: string, state = "North Carolina") {
+  return {
+    "@type": "City",
+    name,
+    containedInPlace: { "@type": "State", name: state },
+  };
+}
+
+function buildGlassServiceAreaServed() {
+  return glassServiceAreas.map(([name, state]) => city(name, state));
+}
+
+const servicePageNames: Record<
+  string,
+  { serviceType: string; name: string; description?: string; seoTitle?: string; seoDescription?: string }
+> = {
   "services-frameless-showers": {
     serviceType: "Frameless Glass Shower Door Installation",
     name: "Custom Frameless Shower Door Installation",
+    seoTitle: "Frameless Shower Doors in Charlotte, Monroe & Indian Trail NC",
+    seoDescription:
+      "Custom frameless glass shower doors installed by an owner-operator with 15+ years of experience. Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw and nearby NC areas. Call for a free quote.",
     description:
       'Custom frameless glass shower door design, fabrication, and installation. Tempered safety glass in 3/8" and 1/2" thicknesses, low-iron glass available, premium hardware in multiple finishes. Serving the greater Charlotte, NC metro and surrounding areas.',
   },
   "services-window-installation": {
     serviceType: "Window Installation",
     name: "Residential Window Installation",
+    seoTitle: "Residential Window Installation in Charlotte & Monroe, NC",
+    seoDescription:
+      "Residential window installation and replacement in Charlotte, Monroe, Indian Trail, Matthews, Waxhaw and nearby areas. Owner-operated with 15+ years of experience. Call for a free quote.",
   },
   "services-door-installation": {
     serviceType: "Door Installation",
     name: "Door Installation Services",
+    seoTitle: "Door Installation in Charlotte & Monroe, NC",
+    seoDescription:
+      "Entry door, patio door, and exterior door installation in Charlotte, Monroe, Indian Trail, Matthews, Waxhaw and nearby areas. Owner-operated with 15+ years of experience. Call for a free quote.",
   },
   "services-window-repair": {
     serviceType: "Window Repair",
     name: "Window Repair Services",
+    seoTitle: "Window Repair in Charlotte & Monroe, NC",
+    seoDescription:
+      "Window repair for broken panes, foggy glass, seal failure, storm damage, and glass-only replacement in Charlotte, Monroe, Indian Trail and nearby areas. Call for a free quote.",
   },
   "services-commercial-glass": {
     serviceType: "Commercial Glass Services",
     name: "Commercial Glass Services",
+    seoTitle: "Commercial Glass Services in Charlotte & Monroe, NC",
+    seoDescription:
+      "Commercial glass installation and repair for storefronts, office partitions, glass doors, and business properties in Charlotte, Monroe and nearby areas. Call for a free quote.",
   },
 };
 
@@ -82,13 +133,16 @@ export function getCmsSlugForPublicPath(pathname: string) {
   return slug && !slug.includes("/") ? slug : null;
 }
 
-export function buildGlassLocalBusinessLd(siteUrl = GLASS_SITE_URL): JsonLdObject {
-  const city = (name: string, state = "North Carolina") => ({
-    "@type": "City",
-    name,
-    containedInPlace: { "@type": "State", name: state },
-  });
+export function getGlassServiceSeoOverride(slug: string) {
+  const serviceData = servicePageNames[slug];
+  if (!serviceData?.seoTitle && !serviceData?.seoDescription) return null;
+  return {
+    title: serviceData.seoTitle,
+    description: serviceData.seoDescription,
+  };
+}
 
+export function buildGlassLocalBusinessLd(siteUrl = GLASS_SITE_URL): JsonLdObject {
   return {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
@@ -113,20 +167,7 @@ export function buildGlassLocalBusinessLd(siteUrl = GLASS_SITE_URL): JsonLdObjec
         closes: "18:00",
       },
     ],
-    areaServed: [
-      city("Charlotte"),
-      city("Monroe"),
-      city("Indian Trail"),
-      city("Matthews"),
-      city("Mint Hill"),
-      city("Waxhaw"),
-      city("Weddington"),
-      city("Wesley Chapel"),
-      city("Stallings"),
-      city("Pineville"),
-      city("Fort Mill", "South Carolina"),
-      city("Indian Land", "South Carolina"),
-    ],
+    areaServed: buildGlassServiceAreaServed(),
   };
 }
 
@@ -165,7 +206,6 @@ export function buildGlassServiceLdForCmsPage(
   const serviceData = servicePageNames[page.slug];
   if (!serviceData) return null;
 
-  const isFrameless = page.slug === "services-frameless-showers";
   return {
     "@context": "https://schema.org",
     "@type": "Service",
@@ -173,28 +213,7 @@ export function buildGlassServiceLdForCmsPage(
     name: serviceData.name,
     description: serviceData.description || page.seoDescription || undefined,
     provider: { "@id": GLASS_BUSINESS_ID },
-    areaServed: isFrameless
-      ? [
-          "Charlotte, NC",
-          "Monroe, NC",
-          "Indian Trail, NC",
-          "Matthews, NC",
-          "Mint Hill, NC",
-          "Waxhaw, NC",
-          "Weddington, NC",
-          "Wesley Chapel, NC",
-          "Stallings, NC",
-          "Pineville, NC",
-          "Fort Mill, SC",
-          "Indian Land, SC",
-          "Huntersville, NC",
-          "Cornelius, NC",
-          "Davidson, NC",
-          "Concord, NC",
-          "Tega Cay, SC",
-          "Rock Hill, SC",
-        ]
-      : undefined,
+    areaServed: buildGlassServiceAreaServed(),
     offers: {
       "@type": "Offer",
       availability: "https://schema.org/InStock",

@@ -6,6 +6,7 @@ import {
   buildGlassBreadcrumbItems,
   buildGlassLocalBusinessLd,
   buildGlassServiceLdForCmsPage,
+  getGlassServiceSeoOverride,
   getCmsPublicPath,
   getCmsSlugForPublicPath,
 } from "@shared/glass-seo";
@@ -78,6 +79,13 @@ const FALLBACK_STATIC_PAGES: Record<
       "Read customer reviews for Glass & Door Pro glass, shower, window, door, and commercial glass work in the Charlotte area.",
     body:
       "Read Glass & Door Pro customer reviews from homeowners and businesses across Charlotte, Monroe, Indian Trail, and nearby communities.",
+  },
+  "/services": {
+    title: "Glass and Door Services",
+    description:
+      "Explore frameless showers, window installation, door installation, window repair, and commercial glass services from Glass & Door Pro in Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas.",
+    body:
+      "Glass & Door Pro provides frameless shower doors, residential window installation, door installation, window repair, and commercial glass services across Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby communities.",
   },
   "/insights": {
     title: "Insights & Articles",
@@ -321,8 +329,10 @@ function buildSimplePageBody(title: string, description: string, fragments: stri
 }
 
 function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: string): PublicHtmlSnapshot {
-  const title = page.seoTitle || page.title || "Page";
+  const seoOverride = getGlassServiceSeoOverride(page.slug);
+  const title = seoOverride?.title || page.seoTitle || page.title || "Page";
   const description =
+    seoOverride?.description ||
     page.seoDescription ||
     truncate(uniqueFragments(collectTextFragments(page.content)).join(" "), 180) ||
     DEFAULT_DESCRIPTION;

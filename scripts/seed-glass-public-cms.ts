@@ -1293,13 +1293,83 @@ function servicePageContent(props: {
   return { blocks };
 }
 
+const glassServicesContent: InsertCmsPage["content"] = {
+  blocks: [
+    serviceHero({
+      heading: "Glass and Door Services",
+      subheading:
+        "Frameless showers, residential windows, door installation, window repair, and commercial glass services across Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby communities.",
+      imageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
+      imagePositionY: 42,
+      primaryText: "Request a Free Quote",
+    }),
+    cardsGrid({
+      title: "Services",
+      subtitle: "Choose the project type you need help with.",
+      columns: "3",
+      backgroundColor: "#ffffff",
+      cards: [
+        {
+          icon: "Droplets",
+          title: "Frameless Showers",
+          description: "Custom frameless shower doors and glass enclosures measured and installed personally.",
+          link: "/services/frameless-showers",
+          buttonText: "View frameless showers",
+        },
+        {
+          icon: "Grid3X3",
+          title: "Window Installation",
+          description: "Residential window installation and replacement for homes across the Charlotte area.",
+          link: "/services/window-installation",
+          buttonText: "View window installation",
+        },
+        {
+          icon: "DoorOpen",
+          title: "Door Installation",
+          description: "Entry, patio, storm, and exterior door installation with clean fit and finish.",
+          link: "/services/door-installation",
+          buttonText: "View door installation",
+        },
+        {
+          icon: "Wrench",
+          title: "Window Repair",
+          description: "Broken glass, foggy panes, seal failure, and glass-only replacement when possible.",
+          link: "/services/window-repair",
+          buttonText: "View window repair",
+        },
+        {
+          icon: "Building2",
+          title: "Commercial Glass",
+          description: "Storefront glass, office glass, glass doors, and commercial repair support.",
+          link: "/services/commercial-glass",
+          buttonText: "View commercial glass",
+        },
+      ],
+    }),
+    block("rich-text", {
+      title: "Owner-Operated Glass and Door Work",
+      alignment: "left",
+      content:
+        "<p>Glass & Door Pro is based in Monroe and serves homeowners and businesses throughout the greater Charlotte area. Doug handles measurements, planning, and installation personally, so you work directly with the person responsible for the finished result.</p><p>Whether you need a custom frameless shower, replacement windows, a better-fitting exterior door, foggy window repair, or commercial glass support, the process starts with a clear in-home or on-site quote.</p>",
+      sectionBackgroundColor: "#f8fafc",
+      sectionPaddingTop: "lg",
+      sectionPaddingBottom: "lg",
+    }),
+    quoteCtaBlock(
+      "Ready to Get Started?",
+      "Call, text, or fill out the form for a free quote. Doug will review the project personally and give you clear next steps.",
+      "Mon-Sat: 7am - 6pm | Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas",
+    ),
+  ],
+};
+
 const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Frameless Showers",
     slug: "services-frameless-showers",
-    seoTitle: "Frameless Shower Doors in Charlotte, Monroe & Indian Trail NC | Glass and Door Pro",
+    seoTitle: "Frameless Shower Doors in Charlotte, Monroe & Indian Trail NC",
     seoDescription:
-      "Custom frameless glass shower doors installed by an owner-operator with 15+ years of experience. Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw & surrounding NC. Free quotes. Call (704) 771-6111.",
+      "Custom frameless glass shower doors installed by an owner-operator with 15+ years of experience. Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw and nearby NC areas. Call for a free quote.",
     seoKeywords:
       "frameless shower doors Charlotte NC, glass shower installation, custom shower enclosure, shower glass Monroe NC",
     ogImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
@@ -1308,9 +1378,9 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Window Installation",
     slug: "services-window-installation",
-    seoTitle: "Residential Window Installation in Charlotte, NC",
+    seoTitle: "Residential Window Installation in Charlotte & Monroe, NC",
     seoDescription:
-      "Energy-efficient residential window installation and replacement for homes in Charlotte, Monroe, Indian Trail, and surrounding areas.",
+      "Residential window installation and replacement in Charlotte, Monroe, Indian Trail, Matthews, Waxhaw and nearby areas. Owner-operated with 15+ years of experience. Call for a free quote.",
     seoKeywords:
       "window installation Charlotte NC, window replacement Monroe NC, residential windows, energy efficient windows",
     ogImageUrl: "/images/glass-door-pro/window-parallax.jpg",
@@ -1418,9 +1488,9 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Door Installation",
     slug: "services-door-installation",
-    seoTitle: "Door Installation Services in Charlotte, NC",
+    seoTitle: "Door Installation in Charlotte & Monroe, NC",
     seoDescription:
-      "Entry door, patio door, and exterior door installation for homeowners in Charlotte, Monroe, Indian Trail, and surrounding areas.",
+      "Entry door, patio door, and exterior door installation in Charlotte, Monroe, Indian Trail, Matthews, Waxhaw and nearby areas. Owner-operated with 15+ years of experience. Call for a free quote.",
     seoKeywords:
       "door installation Charlotte NC, entry doors Monroe NC, patio door replacement, exterior door installer",
     ogImageUrl: "/images/glass-door-pro/door-parallax.jpg",
@@ -1532,9 +1602,9 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Window Repair",
     slug: "services-window-repair",
-    seoTitle: "Window Repair Services in Charlotte, NC",
+    seoTitle: "Window Repair in Charlotte & Monroe, NC",
     seoDescription:
-      "Fast window glass repair for broken panes, foggy glass, seal failure, storm damage, and glass-only replacement in the Charlotte area.",
+      "Window repair for broken panes, foggy glass, seal failure, storm damage, and glass-only replacement in Charlotte, Monroe, Indian Trail and nearby areas. Call for a free quote.",
     seoKeywords:
       "window repair Charlotte NC, broken window glass, foggy window repair, seal failure repair, glass replacement",
     ogImageUrl: "/images/glass-door-pro/window-repair-parallax.jpg",
@@ -1641,9 +1711,9 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Commercial Glass",
     slug: "services-commercial-glass",
-    seoTitle: "Commercial Glass Services in Charlotte, NC",
+    seoTitle: "Commercial Glass Services in Charlotte & Monroe, NC",
     seoDescription:
-      "Commercial storefront glass, office glass partitions, curtain wall systems, security glass, glass doors, and emergency repairs in Charlotte, NC.",
+      "Commercial glass installation and repair for storefronts, office partitions, glass doors, and business properties in Charlotte, Monroe and nearby areas. Call for a free quote.",
     seoKeywords:
       "commercial glass Charlotte NC, storefront glass, office glass partitions, glass doors, curtain wall systems",
     ogImageUrl: "/images/glass-door-pro/commercial-hero-1280w.webp",
@@ -2208,7 +2278,7 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
     location: "main_navigation",
     items: [
       item("About", "/#about"),
-      item("Services", "/services/frameless-showers", [
+      item("Services", "/services", [
         item("Frameless Showers", "/services/frameless-showers"),
         item("Window Installation", "/services/window-installation"),
         item("Door Installation", "/services/door-installation"),
@@ -2277,7 +2347,7 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
     location: "header",
     items: [
       item("About", "/#about"),
-      item("Services", "/services/frameless-showers", [
+      item("Services", "/services", [
         item("Frameless Showers", "/services/frameless-showers"),
         item("Window Installation", "/services/window-installation"),
         item("Door Installation", "/services/door-installation"),
@@ -2517,6 +2587,32 @@ async function seedGlassPublicCms() {
   } else {
     const page = await storage.cmsPages.createPage(reviewsPayload);
     console.log(`  [created] reviews page (${page.id})`);
+  }
+
+  const existingServices = await storage.cmsPages.getPageBySlug("services");
+  const servicesPayload: InsertCmsPage = {
+    title: "Glass and Door Services",
+    slug: "services",
+    pageType: "service",
+    status: "published",
+    template: "full-width",
+    content: glassServicesContent,
+    seoTitle: "Glass and Door Services in Charlotte & Monroe, NC",
+    seoDescription:
+      "Explore frameless showers, window installation, door installation, window repair, and commercial glass services in Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas.",
+    seoKeywords:
+      "glass and door services Charlotte NC, Monroe glass company, frameless showers, window installation, door installation, window repair, commercial glass",
+    ogImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
+    canonicalUrl: "https://glassanddoorpro.com/services",
+    publishedAt: new Date(),
+  };
+
+  if (existingServices) {
+    await storage.cmsPages.updatePage(existingServices.id, servicesPayload);
+    console.log(`  [updated] services page (${existingServices.id})`);
+  } else {
+    const page = await storage.cmsPages.createPage(servicesPayload);
+    console.log(`  [created] services page (${page.id})`);
   }
 
   for (const servicePage of glassServicePages) {

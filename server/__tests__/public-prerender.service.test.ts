@@ -223,6 +223,13 @@ describe("public-prerender.service", () => {
       "BreadcrumbList",
       "FAQPage",
     ]);
+    const serviceSchema = snapshot?.jsonLd?.find((schema) => schema["@type"] === "Service");
+    expect(serviceSchema?.areaServed).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: "Charlotte" }),
+        expect.objectContaining({ name: "Monroe" }),
+      ]),
+    );
     expect(snapshot?.ogImageUrl).toBe(
       "https://glassanddoorpro.com/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
     );
@@ -253,6 +260,16 @@ describe("public-prerender.service", () => {
     expect(snapshot?.title).toContain("Customer Reviews");
     expect(snapshot?.canonicalUrl).toBe("https://coreplatform.com/reviews");
     expect(snapshot?.bodyHtml).toContain("Glass &amp; Door Pro customer reviews");
+  });
+
+  it("returns a services fallback snapshot when the CMS services hub is not seeded", async () => {
+    const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
+
+    const snapshot = await getPublicHtmlSnapshot("/services");
+
+    expect(snapshot?.title).toContain("Glass and Door Services");
+    expect(snapshot?.canonicalUrl).toBe("https://coreplatform.com/services");
+    expect(snapshot?.bodyHtml).toContain("frameless shower doors");
   });
 
   it("returns a prerender snapshot for blog posts and event detail pages", async () => {
