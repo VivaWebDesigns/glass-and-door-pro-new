@@ -2024,7 +2024,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         heading: "Glass & Door Services in Monroe, NC",
         subheading:
           "Frameless shower doors, window and door installation, window repair, and commercial glass — installed personally by Doug, your Monroe-based owner-operator with 15+ years of experience. Same-week appointments. Saturday hours available.",
-        imageUrl: "/images/glass-door-pro/family-1280w.webp",
+        imageUrl: "/images/glass-door-pro/city-monroe-hero.webp",
         imagePositionY: 45,
       },
       introTitle: "Your Local Glass & Door Company in Monroe",
