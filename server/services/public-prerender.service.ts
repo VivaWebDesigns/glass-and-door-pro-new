@@ -150,18 +150,102 @@ function truncate(value: string, length = 240) {
   return `${value.slice(0, length).trimEnd()}...`;
 }
 
-function collectTextFragments(value: unknown): string[] {
+const PUBLIC_TEXT_KEYS = new Set([
+  "alt",
+  "answer",
+  "areasClosing",
+  "areasIntro",
+  "badgeLabel",
+  "badgeValue",
+  "body",
+  "caption",
+  "content",
+  "ctaBody",
+  "ctaFooter",
+  "ctaHeading",
+  "description",
+  "eyebrow",
+  "formTitle",
+  "heading",
+  "imageAlt",
+  "introContent",
+  "introTitle",
+  "label",
+  "name",
+  "question",
+  "quote",
+  "sectionEyebrow",
+  "servicesIntro",
+  "servicesTitle",
+  "subheading",
+  "subtitle",
+  "text",
+  "title",
+  "value",
+]);
+
+const NON_CONTENT_KEYS = new Set([
+  "anchorId",
+  "backgroundImageUrl",
+  "canonicalUrl",
+  "columns",
+  "createdAt",
+  "createdBy",
+  "ctaAction",
+  "ctaLink",
+  "ctaSecondaryLink",
+  "externalUrl",
+  "formSlug",
+  "gap",
+  "href",
+  "icon",
+  "id",
+  "imagePosition",
+  "imagePositionX",
+  "imagePositionY",
+  "imageUrl",
+  "layout",
+  "link",
+  "location",
+  "noindex",
+  "ogImageUrl",
+  "overlayColor",
+  "overlayOpacity",
+  "pageType",
+  "publishedAt",
+  "scheduledAt",
+  "sectionBackgroundColor",
+  "sectionPaddingBottom",
+  "sectionPaddingTop",
+  "seoDescription",
+  "seoKeywords",
+  "seoTitle",
+  "sidebarId",
+  "slug",
+  "status",
+  "template",
+  "type",
+  "updatedAt",
+  "updatedBy",
+  "url",
+  "variant",
+  "videoBackgroundUrl",
+  "width",
+]);
+
+function collectTextFragments(value: unknown, key?: string): string[] {
   if (!value) return [];
   if (typeof value === "string") {
+    if (!key || !PUBLIC_TEXT_KEYS.has(key)) return [];
     const normalized = stripHtml(value);
     return normalized ? [normalized] : [];
   }
   if (Array.isArray(value)) {
-    return value.flatMap((entry) => collectTextFragments(entry));
+    return value.flatMap((entry) => collectTextFragments(entry, key));
   }
   if (typeof value === "object") {
-    return Object.values(value as Record<string, unknown>).flatMap((entry) =>
-      collectTextFragments(entry),
+    return Object.entries(value as Record<string, unknown>).flatMap(([entryKey, entry]) =>
+      NON_CONTENT_KEYS.has(entryKey) ? [] : collectTextFragments(entry, entryKey),
     );
   }
   return [];
@@ -333,6 +417,14 @@ function buildSimplePageBody(title: string, description: string, fragments: stri
   ].join("");
 }
 
+function getPrerenderHeading(page: Pick<CmsPage, "slug" | "title">, effectiveTitle: string) {
+  if (page.slug === "home") {
+    return effectiveTitle || "Glass & Door Services in Charlotte & Monroe, NC";
+  }
+
+  return page.title;
+}
+
 function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: string): PublicHtmlSnapshot {
   const seoOverride = getGlassServiceSeoOverride(page.slug);
   const title = seoOverride?.title || page.seoTitle || page.title || "Page";
@@ -345,7 +437,7 @@ function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: strin
   const canonicalUrl =
     page.canonicalUrl || (publicPath === "/" ? siteUrl : `${siteUrl}${publicPath}`);
   const bodyHtml = buildSimplePageBody(
-    page.title,
+    getPrerenderHeading(page, title),
     description,
     uniqueFragments(collectTextFragments(page.content)),
   );
@@ -355,7 +447,9 @@ function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: strin
   const faqItems = extractFaqItems(page.content);
 
   return {
-    title: buildHeadTitle(title, seo, { brandLast: isGlassServicePageSlug(page.slug) }),
+    title: buildHeadTitle(title, seo, {
+      brandLast: page.slug === "home" || isGlassServicePageSlug(page.slug),
+    }),
     description,
     canonicalUrl,
     ogImageUrl: absoluteUrl(page.ogImageUrl || seo?.defaultOgImageUrl, siteUrl) || null,

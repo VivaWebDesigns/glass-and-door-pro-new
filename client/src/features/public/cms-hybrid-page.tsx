@@ -102,7 +102,7 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
     const seoOverride = getGlassServiceSeoOverride(page.slug);
     const effectiveTitle = seoOverride?.title || page.seoTitle || page.title;
     const titleSuffix = globalSeo?.titleSuffix ?? " | Core Platform";
-    const titleFormatter = isGlassServicePageSlug(page.slug)
+    const titleFormatter = page.slug === "home" || isGlassServicePageSlug(page.slug)
       ? formatBrandLastTitle
       : formatBrandFirstTitle;
     const headTitle = titleFormatter(effectiveTitle, titleSuffix, globalSeo?.siteName ?? "Core Platform");

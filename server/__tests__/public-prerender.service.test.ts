@@ -245,6 +245,59 @@ describe("public-prerender.service", () => {
     expect(html).toContain("Most frameless shower installations are completed in 2-4 hours.");
   });
 
+  it("keeps CMS internals out of the home prerender body", async () => {
+    mockGetSeo.mockResolvedValue({
+      ...seoSettings,
+      siteName: "Glass & Door Pro",
+      siteUrl: "https://glassanddoorpro.com",
+      titleSuffix: " | Glass & Door Pro",
+      organizationName: "Glass & Door Pro",
+    });
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      title: "Home",
+      slug: "home",
+      pageType: "home",
+      seoTitle: "Glass & Door Services in Charlotte & Monroe, NC",
+      seoDescription:
+        "Glass & Door Pro serves Charlotte and Monroe, NC with frameless shower doors, window installation, door replacement, window repair, and commercial glass.",
+      content: {
+        blocks: [
+          {
+            id: "cc1dbbbe-906e-4e1d-8731-62c3f9d3f993",
+            type: "hero",
+            props: {
+              anchorId: "hero",
+              variant: "glass-home",
+              heading: "We've got your glass & door needs covered.",
+              subheading: "<p>Specializing in frameless glass showers, windows, and doors.</p>",
+              ctaText: "Get a Free Quote",
+              ctaLink: "#contact",
+              ctaAction: "internal-link",
+              backgroundImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.jpg",
+            },
+          },
+        ],
+      },
+    });
+    const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
+
+    const snapshot = await getPublicHtmlSnapshot("/");
+
+    expect(snapshot?.title).toBe(
+      "Glass & Door Services in Charlotte & Monroe, NC | Glass & Door Pro",
+    );
+    expect(snapshot?.bodyHtml).toContain(
+      "<h1>Glass &amp; Door Services in Charlotte &amp; Monroe, NC</h1>",
+    );
+    expect(snapshot?.bodyHtml).toContain("We&#39;ve got your glass &amp; door needs covered.");
+    expect(snapshot?.bodyHtml).not.toContain("cc1dbbbe");
+    expect(snapshot?.bodyHtml).not.toContain("hero</p>");
+    expect(snapshot?.bodyHtml).not.toContain("#contact");
+    expect(snapshot?.bodyHtml).not.toContain("glass-home");
+    expect(snapshot?.bodyHtml).not.toContain("internal-link");
+  });
+
   it("returns a gallery fallback snapshot when the CMS gallery page is not seeded", async () => {
     const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
 
