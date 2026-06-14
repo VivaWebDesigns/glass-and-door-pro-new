@@ -2157,7 +2157,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         heading: "Glass & Door Services in Charlotte, NC",
         subheading:
           "Personal, owner-operated frameless shower doors, window and door installation, window repair, and commercial glass — for homeowners and businesses throughout Charlotte, NC. 15+ years of experience. Saturday appointments available.",
-        imageUrl: "/images/glass-door-pro/reviews-hero-1920w.webp",
+        imageUrl: "/images/glass-door-pro/city-charlotte-hero.webp",
         imagePositionY: 45,
       },
       introTitle: "Personal Service for Charlotte Homeowners",
