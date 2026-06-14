@@ -16,6 +16,11 @@ export function buildDefaultRobotsTxt(seoSettings?: SeoSettings | null) {
     lines.push("Disallow: /");
   } else {
     lines.push("Disallow: /admin");
+    lines.push("Allow: /api/branding");
+    lines.push("Allow: /api/site-config");
+    lines.push("Allow: /api/seo/global");
+    lines.push("Allow: /api/cms/menus");
+    lines.push("Allow: /api/cms/pages/by-slug/");
     lines.push("Disallow: /api");
     if (siteUrl) {
       lines.push("");
