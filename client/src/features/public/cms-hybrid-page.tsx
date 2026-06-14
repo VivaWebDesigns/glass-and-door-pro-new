@@ -32,6 +32,12 @@ interface CmsPageViewProps {
   previewLabel?: string;
 }
 
+declare global {
+  interface Window {
+    __CMS_PRERENDER_PAGE__?: CmsPage;
+  }
+}
+
 class CmsNotFoundError extends Error {
   constructor(slug: string) {
     super(`CMS page not found: ${slug}`);
@@ -48,6 +54,27 @@ function isValidCmsPage(data: unknown): data is CmsPage {
     typeof obj.title === "string" &&
     typeof obj.status === "string"
   );
+}
+
+export function getPrerenderedCmsPage(slug: string): CmsPage | undefined {
+  if (typeof window === "undefined") return undefined;
+
+  if (window.__CMS_PRERENDER_PAGE__) {
+    const page = window.__CMS_PRERENDER_PAGE__;
+    return page.slug === slug && page.status === "published" ? page : undefined;
+  }
+
+  const payload = document.getElementById("__CMS_PRERENDER_PAGE__")?.textContent;
+  if (!payload) return undefined;
+
+  try {
+    const page = JSON.parse(payload);
+    if (!isValidCmsPage(page)) return undefined;
+    window.__CMS_PRERENDER_PAGE__ = page;
+    return page.slug === slug && page.status === "published" ? page : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 function parseCmsContent(content: unknown): BlockInstance[] {
@@ -220,6 +247,7 @@ export function CmsPageView({ page, globalSeo, previewLabel }: CmsPageViewProps)
 }
 
 export function CmsHybridPage({ slug, fallback }: CmsHybridPageProps) {
+  const prerenderedPage = getPrerenderedCmsPage(slug);
   const {
     data: page,
     isLoading,
@@ -247,6 +275,7 @@ export function CmsHybridPage({ slug, fallback }: CmsHybridPageProps) {
       if (err instanceof CmsNotFoundError) return false;
       return failureCount < 2;
     },
+    initialData: prerenderedPage,
     staleTime: 5 * 60 * 1000,
   });
 

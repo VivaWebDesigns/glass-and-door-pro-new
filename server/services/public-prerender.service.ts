@@ -19,6 +19,7 @@ interface PublicHtmlSnapshot {
   robots?: string | null;
   bodyHtml: string;
   jsonLd?: Array<Record<string, unknown>>;
+  cmsPage?: CmsPage;
 }
 
 const DEFAULT_TITLE = "Glass & Door Pro | Charlotte Glass, Windows & Doors";
@@ -201,6 +202,13 @@ function absoluteUrl(path: string | null | undefined, siteUrl: string) {
   return `${siteUrl}${path.startsWith("/") ? "" : "/"}${path}`;
 }
 
+function serializeJsonForHtml(value: unknown) {
+  return JSON.stringify(value)
+    .replace(/</g, "\\u003c")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+}
+
 function buildHeadTitle(rawTitle: string, seo?: SeoSettings | null) {
   return formatBrandFirstTitle(rawTitle, seo?.titleSuffix ?? " | Glass & Door Pro", seo?.siteName ?? "Glass & Door Pro");
 }
@@ -338,6 +346,7 @@ function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: strin
     ogImageUrl: absoluteUrl(page.ogImageUrl || seo?.defaultOgImageUrl, siteUrl) || null,
     robots: page.noindex ? "noindex,nofollow" : null,
     bodyHtml,
+    cmsPage: page,
     jsonLd: [
       buildGlassLocalBusinessLd(siteUrl),
       buildGlassServiceLdForCmsPage(page, siteUrl),
@@ -646,15 +655,19 @@ export function injectPublicHtmlSnapshot(
     customHeadHtml || "",
     ...(snapshot.jsonLd ?? []).map(
       (schema) =>
-        `<script type="application/ld+json">${JSON.stringify(schema).replace(/</g, "\\u003c")}</script>`,
+        `<script type="application/ld+json">${serializeJsonForHtml(schema)}</script>`,
     ),
   ].filter(Boolean);
+
+  const prerenderPayload = snapshot.cmsPage
+    ? `<script id="__CMS_PRERENDER_PAGE__" type="application/json">${serializeJsonForHtml(snapshot.cmsPage)}</script>`
+    : "";
 
   return normalizedTemplate
     .replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(snapshot.title)}</title>`)
     .replace("<!--APP_DYNAMIC_HEAD-->", headParts.join("\n"))
     .replace(
       "<!--APP_PRERENDER_CONTENT-->",
-      snapshot.bodyHtml ? `<div id="seo-prerender">${snapshot.bodyHtml}</div>` : "",
+      `${prerenderPayload}${snapshot.bodyHtml ? `<div id="seo-prerender">${snapshot.bodyHtml}</div>` : ""}`,
     );
 }
