@@ -1933,8 +1933,7 @@ const glassCityPages: GlassCityPageSeed[] = [
     title: "Monroe, NC",
     slug: "areas-served-monroe-nc",
     path: "/areas-served/monroe-nc",
-    seoTitle:
-      "Glass & Door Services in Monroe, NC | Frameless Showers, Windows & Doors | Glass and Door Pro",
+    seoTitle: "Glass & Door Services in Monroe, NC | Glass & Door Pro",
     seoDescription:
       "Monroe, NC's local glass and door company. Frameless showers, window installation, door installation, window repair, and commercial glass. Owner-operator with 15+ years of experience. Call (704) 771-6111.",
     seoKeywords:
@@ -2067,8 +2066,7 @@ const glassCityPages: GlassCityPageSeed[] = [
     title: "Charlotte, NC",
     slug: "areas-served-charlotte-nc",
     path: "/areas-served/charlotte-nc",
-    seoTitle:
-      "Glass & Door Services in Charlotte, NC | Frameless Showers, Windows & Doors | Glass and Door Pro",
+    seoTitle: "Glass & Door Services in Charlotte, NC | Glass & Door Pro",
     seoDescription:
       "Personal, owner-operated glass and door services for Charlotte, NC homeowners. Frameless showers, window installation, door installation, window repair, and commercial glass. 15+ years of experience. Call (704) 771-6111.",
     seoKeywords:

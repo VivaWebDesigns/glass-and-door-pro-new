@@ -88,6 +88,11 @@ function removeLink(rel: string) {
   if (el) el.remove();
 }
 
+function absoluteUrl(path: string, origin: string) {
+  if (!path || /^https?:\/\//i.test(path)) return path;
+  return `${origin.replace(/\/$/, "")}${path.startsWith("/") ? "" : "/"}${path}`;
+}
+
 function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSettings }) {
   useEffect(() => {
     const prevTitle = document.title;
@@ -95,9 +100,9 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
     const titleSuffix = globalSeo?.titleSuffix ?? " | Core Platform";
     const headTitle = formatBrandFirstTitle(effectiveTitle, titleSuffix, globalSeo?.siteName ?? "Core Platform");
     const effectiveDescription = page.seoDescription || globalSeo?.defaultMetaDescription || "";
-    const effectiveOgImage = page.ogImageUrl || globalSeo?.defaultOgImageUrl || "";
     const origin =
       globalSeo?.siteUrl || (typeof window !== "undefined" ? window.location.origin : "");
+    const effectiveOgImage = absoluteUrl(page.ogImageUrl || globalSeo?.defaultOgImageUrl || "", origin);
 
     if (effectiveTitle) document.title = headTitle;
 

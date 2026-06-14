@@ -187,6 +187,7 @@ describe("public-prerender.service", () => {
       title: "Frameless Showers",
       slug: "services-frameless-showers",
       pageType: "service",
+      ogImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
       canonicalUrl: "https://glassanddoorpro.com/services/frameless-showers",
       content: {
         blocks: [
@@ -222,7 +223,13 @@ describe("public-prerender.service", () => {
       "BreadcrumbList",
       "FAQPage",
     ]);
+    expect(snapshot?.ogImageUrl).toBe(
+      "https://glassanddoorpro.com/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
+    );
     expect(html).toContain('"@type":"FAQPage"');
+    expect(html).toContain(
+      'property="og:image" content="https://glassanddoorpro.com/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png"',
+    );
     expect(html).toContain("Most frameless shower installations are completed in 2-4 hours.");
   });
 

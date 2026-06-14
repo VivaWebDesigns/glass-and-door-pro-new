@@ -335,7 +335,7 @@ function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: strin
     title: buildHeadTitle(title, seo),
     description,
     canonicalUrl,
-    ogImageUrl: page.ogImageUrl || seo?.defaultOgImageUrl || null,
+    ogImageUrl: absoluteUrl(page.ogImageUrl || seo?.defaultOgImageUrl, siteUrl) || null,
     robots: page.noindex ? "noindex,nofollow" : null,
     bodyHtml,
     jsonLd: [
@@ -366,7 +366,7 @@ function buildPostSnapshot(post: BlogPost, seo: SeoSettings | null, siteUrl: str
     title: buildHeadTitle(title, seo),
     description,
     canonicalUrl,
-    ogImageUrl: post.ogImageUrl || post.coverImageUrl || seo?.defaultOgImageUrl || null,
+    ogImageUrl: absoluteUrl(post.ogImageUrl || post.coverImageUrl || seo?.defaultOgImageUrl, siteUrl) || null,
     robots: post.noindex ? "noindex,nofollow" : null,
     bodyHtml,
     jsonLd: [
@@ -416,7 +416,7 @@ function buildEventSnapshot(event: Event, seo: SeoSettings | null, siteUrl: stri
     title: buildHeadTitle(title, seo),
     description,
     canonicalUrl,
-    ogImageUrl: event.imageUrl || seo?.defaultOgImageUrl || null,
+    ogImageUrl: absoluteUrl(event.imageUrl || seo?.defaultOgImageUrl, siteUrl) || null,
     bodyHtml: [
       `<main class="seo-prerender-content">`,
       `<article>`,
@@ -477,7 +477,7 @@ async function buildTherapistSnapshot(
     title: buildHeadTitle(displayName, seo),
     description,
     canonicalUrl,
-    ogImageUrl: profile.user?.profileImageUrl || seo?.defaultOgImageUrl || null,
+    ogImageUrl: absoluteUrl(profile.user?.profileImageUrl || seo?.defaultOgImageUrl, siteUrl) || null,
     bodyHtml: [
       `<main class="seo-prerender-content">`,
       `<article>`,
@@ -538,7 +538,7 @@ function buildFallbackSnapshot(
     title: buildHeadTitle(fallback.title, seo),
     description: fallback.description,
     canonicalUrl: pathname === "/" ? siteUrl : `${siteUrl}${pathname}`,
-    ogImageUrl: seo?.defaultOgImageUrl || null,
+    ogImageUrl: absoluteUrl(seo?.defaultOgImageUrl, siteUrl) || null,
     robots: fallback.noindex ? "noindex,nofollow" : null,
     bodyHtml: buildSimplePageBody(fallback.title, fallback.body),
     jsonLd: [buildOrganizationSchema(seo, siteUrl), buildWebsiteSchema(seo, siteUrl)].filter(

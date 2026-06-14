@@ -25,6 +25,16 @@ function removeMeta(name: string, property = false) {
   if (el) el.remove();
 }
 
+function absoluteUrl(path: string, base?: string) {
+  if (!path || /^https?:\/\//i.test(path)) return path;
+  const origin = base
+    ? new URL(base, typeof window !== "undefined" ? window.location.origin : undefined).origin
+    : typeof window !== "undefined"
+      ? window.location.origin
+      : "";
+  return `${origin.replace(/\/$/, "")}${path.startsWith("/") ? "" : "/"}${path}`;
+}
+
 export function useSeo({ title, description, ogImage, canonical, noindex }: SeoOptions) {
   useEffect(() => {
     const prevTitle = document.title;
@@ -39,7 +49,7 @@ export function useSeo({ title, description, ogImage, canonical, noindex }: SeoO
     if (title) setMeta("og:title", title, true);
 
     if (ogImage) {
-      setMeta("og:image", ogImage, true);
+      setMeta("og:image", absoluteUrl(ogImage, canonical), true);
     } else {
       removeMeta("og:image", true);
     }
