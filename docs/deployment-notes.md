@@ -28,6 +28,15 @@
 
 ## Migration Notes
 
+## Local Development
+
+- This project is linked to Railway. To run the full app locally with the live environment variables, start it from the project directory with:
+  ```bash
+  railway run npm run dev
+  ```
+- Running `npm run dev` directly will fail unless `DATABASE_URL` is already exported in the local shell. Railway provides `DATABASE_URL` in production, but a plain local terminal does not.
+- The current Railway link points to the production environment for `Glass and Door Pro New`, so local runs through `railway run` can access production data. Use that for render verification only, and avoid admin/write actions unless you intentionally want to affect production.
+
 ### Database Schema
 
 - Migrations are managed by Drizzle ORM and stored in `migrations/` directory (with journal metadata in `migrations/meta/`)
