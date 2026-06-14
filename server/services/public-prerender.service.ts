@@ -744,8 +744,8 @@ export function injectPublicHtmlSnapshot(
 
   if (!snapshot) {
     return normalizedTemplate
-      .replace("<!--APP_DYNAMIC_HEAD-->", customHeadHtml || "")
-      .replace("<!--APP_PRERENDER_CONTENT-->", "");
+      .replace("<!--APP_DYNAMIC_HEAD-->", () => customHeadHtml || "")
+      .replace("<!--APP_PRERENDER_CONTENT-->", () => "");
   }
 
   const headParts = [
@@ -773,10 +773,11 @@ export function injectPublicHtmlSnapshot(
     : "";
 
   return normalizedTemplate
-    .replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(snapshot.title)}</title>`)
-    .replace("<!--APP_DYNAMIC_HEAD-->", headParts.join("\n"))
+    .replace(/<title>[\s\S]*?<\/title>/i, () => `<title>${escapeHtml(snapshot.title)}</title>`)
+    .replace("<!--APP_DYNAMIC_HEAD-->", () => headParts.join("\n"))
     .replace(
       "<!--APP_PRERENDER_CONTENT-->",
-      `${prerenderPayload}${snapshot.bodyHtml ? `<div id="seo-prerender">${snapshot.bodyHtml}</div>` : ""}`,
+      () =>
+        `${prerenderPayload}${snapshot.bodyHtml ? `<div id="seo-prerender">${snapshot.bodyHtml}</div>` : ""}`,
     );
 }

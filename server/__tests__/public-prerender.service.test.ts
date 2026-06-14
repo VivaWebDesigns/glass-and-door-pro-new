@@ -240,6 +240,8 @@ describe("public-prerender.service", () => {
     expect(html).toContain(
       'property="og:image" content="https://glassanddoorpro.com/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png"',
     );
+    expect(html).toContain('"priceRange":"$$"');
+    expect(html).not.toContain('"priceRange":"$"');
     expect(html).toContain('id="__CMS_PRERENDER_PAGE__" type="application/json"');
     expect(html).toContain('"slug":"services-frameless-showers"');
     expect(html).toContain("Most frameless shower installations are completed in 2-4 hours.");
