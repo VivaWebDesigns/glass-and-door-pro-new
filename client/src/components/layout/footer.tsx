@@ -6,6 +6,7 @@ import { useBranding } from "@/components/shared/branding-provider";
 import type { CmsMenu, MenuItem, PublicMenuLocation } from "@shared/schema";
 
 const defaultPlatformLinks = [
+  { href: "/services", label: "All Services", testId: "link-footer-services" },
   { href: "/services/frameless-showers", label: "Frameless Showers", testId: "link-footer-frameless-showers" },
   { href: "/services/window-installation", label: "Window Installation", testId: "link-footer-window-installation" },
   { href: "/services/door-installation", label: "Door Installation", testId: "link-footer-door-installation" },
@@ -35,6 +36,9 @@ type FooterLegalLink = {
 };
 
 function normalizeFooterMenuUrl(item: Pick<MenuItem, "label" | "url">) {
+  if (/services/i.test(item.label) && item.url === "/#services") {
+    return "/services";
+  }
   if (/gallery/i.test(item.label) && item.url === "/#gallery") {
     return "/gallery";
   }
@@ -117,6 +121,18 @@ function uniqueFooterLinks<T extends { href: string; label: string }>(links: T[]
   });
 }
 
+function ensureServicesHubLink<T extends FooterLegalLink>(links: T[]) {
+  if (links.some((link) => link.href === "/services")) return links;
+  return [
+    {
+      href: "/services",
+      label: "All Services",
+      testId: "link-footer-services",
+    } as T,
+    ...links,
+  ];
+}
+
 function FooterTextLink({ link }: { link: FooterLegalLink }) {
   const className = "text-slate-400 transition-colors hover:text-white";
   if (link.openInNewTab) {
@@ -190,7 +206,7 @@ export function Footer() {
     const cmsLinks = uniqueFooterLinks([...platformLinks, ...professionalLinks, ...galleryLinks])
       .filter((link) => !/quote/i.test(link.label));
 
-    return cmsLinks.length > 0 ? cmsLinks.slice(0, 6) : defaultPlatformLinks;
+    return cmsLinks.length > 0 ? ensureServicesHubLink(cmsLinks).slice(0, 6) : defaultPlatformLinks;
   }, [publicMenus]) as FooterLegalLink[];
 
   const companyLinks = useMemo(() => {

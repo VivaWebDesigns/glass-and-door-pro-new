@@ -29,6 +29,7 @@ import type { CmsMenu, MenuItem, PublicMenuLocation } from "@shared/schema";
 
 const defaultNavLinks = [
   { label: "About", href: "/#about" },
+  { label: "Services", href: "/services" },
   { label: "Frameless Showers", href: "/services/frameless-showers" },
   { label: "Window Installation", href: "/services/window-installation" },
   { label: "Door Installation", href: "/services/door-installation" },
@@ -40,6 +41,9 @@ const defaultNavLinks = [
 const allResourceLinks: { label: string; href: string; hideFromClients?: boolean }[] = [];
 
 function normalizePublicMenuUrl(item: Pick<MenuItem, "label" | "url">) {
+  if (/services/i.test(item.label) && item.url === "/#services") {
+    return "/services";
+  }
   if (/gallery/i.test(item.label) && item.url === "/#gallery") {
     return "/gallery";
   }
@@ -76,8 +80,18 @@ function isActiveRecursive(items: MenuItem[], currentPath: string): boolean {
   return false;
 }
 
+function getServicesOverviewLink(item: Pick<MenuItem, "label" | "url">) {
+  if (!/^services$/i.test(item.label.trim())) return null;
+  return {
+    label: "Services Overview",
+    href: item.url === "/#services" ? "/services" : normalizePublicMenuUrl(item),
+  };
+}
+
 function DynamicDropdown({ item, location: currentPath }: { item: MenuItem; location: string }) {
-  const isActive = isActiveRecursive(item.children || [], currentPath);
+  const overviewLink = getServicesOverviewLink(item);
+  const isActive =
+    currentPath === overviewLink?.href || isActiveRecursive(item.children || [], currentPath);
   const flatChildren = flattenItems(item.children || []);
   return (
     <DropdownMenu>
@@ -93,6 +107,16 @@ function DynamicDropdown({ item, location: currentPath }: { item: MenuItem; loca
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="z-[1000]">
+        {overviewLink ? (
+          <>
+            <DropdownMenuItem asChild>
+              <Link href={overviewLink.href} data-testid="link-nav-child-services-overview">
+                {overviewLink.label}
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        ) : null}
         {flatChildren.map(({ item: child, depth }) => (
           <DropdownMenuItem
             key={child.id}
@@ -345,17 +369,34 @@ export function Navbar() {
               </SheetHeader>
               <div className="flex flex-col gap-1 mt-6">
                 {dynamicItems ? (
-                  flattenItems(dynamicItems).map(({ item, depth }) =>
-                    item.children && item.children.length > 0 ? (
-                      <p
-                        key={item.id}
-                        className="px-4 pt-3 pb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider"
-                        style={depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined}
-                        data-testid={`text-mobile-group-${item.id}`}
-                      >
-                        {item.label}
-                      </p>
-                    ) : item.openInNewTab ? (
+                  flattenItems(dynamicItems).map(({ item, depth }) => {
+                    const overviewLink = getServicesOverviewLink(item);
+                    return item.children && item.children.length > 0 ? (
+                        <div key={item.id}>
+                          <p
+                            className="px-4 pt-3 pb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider"
+                            style={depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined}
+                            data-testid={`text-mobile-group-${item.id}`}
+                          >
+                            {item.label}
+                          </p>
+                          {overviewLink ? (
+                            <Link href={overviewLink.href} onClick={() => setMobileOpen(false)}>
+                              <Button
+                                variant="ghost"
+                                className="w-full justify-start aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
+                                style={
+                                  depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined
+                                }
+                                data-testid="link-mobile-services-overview"
+                                aria-current={location === overviewLink.href ? "page" : undefined}
+                              >
+                                {overviewLink.label}
+                              </Button>
+                            </Link>
+                          ) : null}
+                        </div>
+                      ) : item.openInNewTab ? (
                       <a
                         key={item.id}
                         href={item.url}
@@ -384,8 +425,8 @@ export function Navbar() {
                           {item.label}
                         </Button>
                       </Link>
-                    ),
-                  )
+                    );
+                  })
                 ) : (
                   <>
                     {defaultNavLinks.map((link) => (
