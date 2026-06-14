@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
+import { bootstrapCmsPrerenderPage } from "@/lib/cms-prerender";
 
 const VITE_PRELOAD_RECOVERY_KEY = "vite-preload-recovery";
 
@@ -20,6 +21,7 @@ if (typeof window !== "undefined") {
 
   window.sessionStorage.removeItem(VITE_PRELOAD_RECOVERY_KEY);
 
+  bootstrapCmsPrerenderPage();
   document.getElementById("seo-prerender")?.remove();
 }
 

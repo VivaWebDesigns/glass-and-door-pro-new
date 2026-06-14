@@ -21,6 +21,7 @@ import {
   getGlassServiceSeoOverride,
   getCmsPublicPath,
 } from "@shared/glass-seo";
+import { getPrerenderedCmsPage } from "@/lib/cms-prerender";
 
 interface CmsHybridPageProps {
   slug: string;
@@ -33,12 +34,6 @@ interface CmsPageViewProps {
   previewLabel?: string;
 }
 
-declare global {
-  interface Window {
-    __CMS_PRERENDER_PAGE__?: CmsPage;
-  }
-}
-
 class CmsNotFoundError extends Error {
   constructor(slug: string) {
     super(`CMS page not found: ${slug}`);
@@ -46,7 +41,7 @@ class CmsNotFoundError extends Error {
   }
 }
 
-function isValidCmsPage(data: unknown): data is CmsPage {
+export function isValidCmsPage(data: unknown): data is CmsPage {
   if (!data || typeof data !== "object") return false;
   const obj = data as Record<string, unknown>;
   return (
@@ -55,27 +50,6 @@ function isValidCmsPage(data: unknown): data is CmsPage {
     typeof obj.title === "string" &&
     typeof obj.status === "string"
   );
-}
-
-export function getPrerenderedCmsPage(slug: string): CmsPage | undefined {
-  if (typeof window === "undefined") return undefined;
-
-  if (window.__CMS_PRERENDER_PAGE__) {
-    const page = window.__CMS_PRERENDER_PAGE__;
-    return page.slug === slug && page.status === "published" ? page : undefined;
-  }
-
-  const payload = document.getElementById("__CMS_PRERENDER_PAGE__")?.textContent;
-  if (!payload) return undefined;
-
-  try {
-    const page = JSON.parse(payload);
-    if (!isValidCmsPage(page)) return undefined;
-    window.__CMS_PRERENDER_PAGE__ = page;
-    return page.slug === slug && page.status === "published" ? page : undefined;
-  } catch {
-    return undefined;
-  }
 }
 
 function parseCmsContent(content: unknown): BlockInstance[] {

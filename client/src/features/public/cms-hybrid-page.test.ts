@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { CmsPage } from "@shared/schema";
-import { getPrerenderedCmsPage } from "./cms-hybrid-page";
+import { bootstrapCmsPrerenderPage, getPrerenderedCmsPage } from "@/lib/cms-prerender";
 
 const page: CmsPage = {
   id: "page-1",
@@ -37,5 +37,21 @@ describe("getPrerenderedCmsPage", () => {
       slug: "services-window-installation",
     });
     expect(getPrerenderedCmsPage("services-frameless-showers")).toBeUndefined();
+  });
+
+  it("bootstraps a valid embedded CMS payload before page rendering", () => {
+    const document = {
+      getElementById: vi.fn(() => ({
+        textContent: JSON.stringify(page),
+      })),
+    };
+    vi.stubGlobal("window", {});
+    vi.stubGlobal("document", document);
+
+    bootstrapCmsPrerenderPage();
+
+    expect(getPrerenderedCmsPage("services-window-installation")).toMatchObject({
+      slug: "services-window-installation",
+    });
   });
 });
