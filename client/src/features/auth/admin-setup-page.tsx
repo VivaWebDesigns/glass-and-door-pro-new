@@ -32,7 +32,7 @@ export default function AdminSetupPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const { data: setupStatus, isLoading: statusLoading } = useQuery<{ needsSetup: boolean }>({
+  const { data: setupStatus, isLoading: statusLoading, isError: statusError } = useQuery<{ needsSetup: boolean }>({
     queryKey: ["/api/setup/status"],
   });
 
@@ -93,6 +93,23 @@ export default function AdminSetupPage() {
       <PageLayout>
         <div className="flex items-center justify-center min-h-[50vh]" data-testid="setup-loading">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </PageLayout>
+    );
+  }
+
+  if (statusError || !setupStatus) {
+    return (
+      <PageLayout>
+        <div className="flex items-center justify-center py-12 px-4">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Setup Unavailable</CardTitle>
+              <CardDescription>
+                The setup status could not be verified. Please try again later or contact the site administrator.
+              </CardDescription>
+            </CardHeader>
+          </Card>
         </div>
       </PageLayout>
     );

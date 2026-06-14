@@ -330,28 +330,43 @@ function Router() {
   );
 }
 
+export function pathRequiresSetupStatus(pathname: string) {
+  return pathname === "/setup" || pathname.startsWith("/admin") || pathname.startsWith("/auth");
+}
+
+export function shouldRedirectToSetup(pathname: string, needsSetup: boolean) {
+  return pathRequiresSetupStatus(pathname) && needsSetup && pathname !== "/setup";
+}
+
 function SetupGuard({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();
+  const pathname = location.split(/[?#]/)[0] || "/";
+  const checksSetup = pathRequiresSetupStatus(pathname);
   const { data: setupStatus, isLoading, isError } = useQuery<{ needsSetup: boolean }>({
     queryKey: ["/api/setup/status"],
     staleTime: 60_000,
     retry: 2,
+    enabled: checksSetup,
   });
 
-  const needsSetup = setupStatus?.needsSetup === true || (isError && !setupStatus);
+  const needsSetup = setupStatus?.needsSetup === true;
 
   useEffect(() => {
-    if (needsSetup && location !== "/setup") {
+    if (shouldRedirectToSetup(pathname, needsSetup)) {
       setLocation("/setup");
     }
-  }, [needsSetup, location, setLocation]);
+  }, [needsSetup, pathname, setLocation]);
 
-  if (isLoading) {
+  if (checksSetup && isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen" data-testid="setup-guard-loading">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
+  }
+
+  if (checksSetup && isError && pathname === "/setup") {
+    return <NotFound />;
   }
 
   return <>{children}</>;
