@@ -381,13 +381,13 @@ export function Navbar() {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-80">
-              <SheetHeader>
+            <SheetContent side="right" className="w-80 max-w-[calc(100vw-1rem)] overflow-hidden">
+              <SheetHeader className="shrink-0">
                 <SheetTitle>
                   <img src={brandLogo} alt={brandName} className="h-12 w-auto" />
                 </SheetTitle>
               </SheetHeader>
-              <div className="flex flex-col gap-1 mt-6">
+              <div className="mt-6 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain pb-8 pr-1">
                 {dynamicItems ? (
                   flattenItems(dynamicItems).map(({ item, depth }) => {
                     const overviewLink = getServicesOverviewLink(item);
