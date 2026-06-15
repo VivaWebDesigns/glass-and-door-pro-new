@@ -2658,7 +2658,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         heading: "Apartment & Multi-Family Window Replacement in Charlotte, NC",
         subheading:
           "Wrong windows ordered. Unit damage mid-construction. A deadline that can't move. When an apartment or multi-family project in Charlotte has a window problem that needs to be resolved fast, Glass and Door Pro mobilizes quicker than larger companies — and Doug handles the project personally from first call through final installation.",
-        imageUrl: "/images/glass-door-pro/commercial-window-replacement-hero.webp",
+        imageUrl: "/images/glass-door-pro/commercial-window-replacement-hero-blue-sky.webp",
         imagePositionY: 45,
         primaryText: "Call (704) 771-6111",
         primaryAction: "custom-link",
