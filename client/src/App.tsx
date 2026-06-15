@@ -391,7 +391,7 @@ function SetupGuard({ children }: { children: React.ReactNode }) {
 
 function RouteScrollManager() {
   const [location] = useLocation();
-  const lastPathnameRef = useRef<string | null>(null);
+  const lastRouteRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined" || !("scrollRestoration" in window.history)) return;
@@ -405,33 +405,91 @@ function RouteScrollManager() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const pathname = location.split(/[?#]/)[0] || "/";
-    const lastPathname = lastPathnameRef.current;
-    lastPathnameRef.current = pathname;
+    const pathname = window.location.pathname || location.split(/[?#]/)[0] || "/";
+    const hash = window.location.hash;
+    const routeKey = `${pathname}${hash}`;
+    const lastRoute = lastRouteRef.current;
+    lastRouteRef.current = routeKey;
 
-    if (lastPathname === null || lastPathname === pathname) return;
+    if (lastRoute === null) {
+      if (hash) return scrollToHashTarget(hash);
+      return;
+    }
 
-    const scrollToTarget = () => {
-      const hash = window.location.hash;
-      if (hash) {
-        const target = document.getElementById(hash.slice(1));
-        if (target) {
-          target.scrollIntoView({ block: "start" });
-          return;
-        }
-      }
+    if (hash) return scrollToHashTarget(hash);
 
+    const lastPathname = lastRoute.split("#")[0] || "/";
+    if (lastPathname !== pathname) {
       window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-    };
-
-    const frame = window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(scrollToTarget);
-    });
-
-    return () => window.cancelAnimationFrame(frame);
+    }
   }, [location]);
 
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+
+    let cancelPendingScroll: (() => void) | undefined;
+
+    const scrollToCurrentHash = () => {
+      const hash = window.location.hash;
+      if (!hash) return;
+      cancelPendingScroll?.();
+      cancelPendingScroll = scrollToHashTarget(hash);
+    };
+
+    const handleHashChange = () => scrollToCurrentHash();
+    const handleClick = (event: MouseEvent) => {
+      const link = event.target instanceof Element ? event.target.closest("a[href]") : null;
+      const href = link?.getAttribute("href");
+      if (!href) return;
+
+      const url = new URL(href, window.location.href);
+      if (url.origin !== window.location.origin || !url.hash) return;
+
+      window.setTimeout(() => {
+        if (window.location.pathname === url.pathname && window.location.hash === url.hash) {
+          scrollToCurrentHash();
+        }
+      }, 0);
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+    document.addEventListener("click", handleClick);
+
+    return () => {
+      cancelPendingScroll?.();
+      window.removeEventListener("hashchange", handleHashChange);
+      document.removeEventListener("click", handleClick);
+    };
+  }, []);
+
   return null;
+}
+
+function scrollToHashTarget(hash: string) {
+  if (typeof window === "undefined") return undefined;
+
+  const targetId = decodeURIComponent(hash.replace(/^#/, ""));
+  if (!targetId) return undefined;
+
+  let frame = 0;
+  let attempts = 0;
+  const maxAttempts = 40;
+
+  const tryScroll = () => {
+    const target = document.getElementById(targetId);
+    if (target) {
+      target.scrollIntoView({ block: "start" });
+      return;
+    }
+
+    attempts += 1;
+    if (attempts < maxAttempts) {
+      frame = window.requestAnimationFrame(tryScroll);
+    }
+  };
+
+  frame = window.requestAnimationFrame(tryScroll);
+  return () => window.cancelAnimationFrame(frame);
 }
 
 function RouteAdminModeManager() {
