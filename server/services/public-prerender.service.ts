@@ -266,6 +266,30 @@ function uniqueFragments(fragments: string[]) {
   });
 }
 
+function sanitizeAnchorId(value: unknown) {
+  if (typeof value !== "string") return "";
+  const trimmed = value.trim();
+  return /^[A-Za-z][A-Za-z0-9_-]*$/.test(trimmed) ? trimmed : "";
+}
+
+function collectAnchoredSections(content: unknown) {
+  if (!content || typeof content !== "object") return [];
+  const blocks = (content as { blocks?: unknown }).blocks;
+  if (!Array.isArray(blocks)) return [];
+
+  return blocks
+    .map((block) => {
+      if (!block || typeof block !== "object") return null;
+      const props = (block as { props?: unknown }).props;
+      if (!props || typeof props !== "object") return null;
+      const anchorId = sanitizeAnchorId((props as { anchorId?: unknown }).anchorId);
+      if (!anchorId) return null;
+      const fragments = uniqueFragments(collectTextFragments(props)).slice(0, 3);
+      return fragments.length > 0 ? { anchorId, fragments } : null;
+    })
+    .filter((section): section is { anchorId: string; fragments: string[] } => Boolean(section));
+}
+
 function sanitizeRichHtml(value: string) {
   return sanitizeHtml(value, {
     allowedTags: [
@@ -411,16 +435,31 @@ function buildFaqPageSchema(items: Array<{ question: string; answer: string }>) 
   };
 }
 
-function buildSimplePageBody(title: string, description: string, fragments: string[] = []) {
+function buildSimplePageBody(
+  title: string,
+  description: string,
+  fragments: string[] = [],
+  anchoredSections: Array<{ anchorId: string; fragments: string[] }> = [],
+) {
   const paragraphs = uniqueFragments([description, ...fragments])
     .filter((fragment) => fragment && fragment.toLowerCase() !== title.trim().toLowerCase())
     .slice(0, 8);
+  const anchoredHtml = anchoredSections.map((section) => {
+    const [heading, ...body] = section.fragments;
+    return [
+      `<section id="${escapeHtml(section.anchorId)}">`,
+      heading ? `<h2>${escapeHtml(heading)}</h2>` : "",
+      ...body.map((paragraph) => `<p>${escapeHtml(truncate(paragraph, 340))}</p>`),
+      `</section>`,
+    ].join("");
+  });
 
   return [
     `<main class="seo-prerender-content">`,
     `<article>`,
     `<h1>${escapeHtml(title)}</h1>`,
     ...paragraphs.map((paragraph) => `<p>${escapeHtml(truncate(paragraph, 340))}</p>`),
+    ...anchoredHtml,
     `</article>`,
     `</main>`,
   ].join("");
@@ -450,6 +489,7 @@ function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: strin
     getPrerenderHeading(page, title),
     description,
     uniqueFragments(collectTextFragments(page.content)),
+    collectAnchoredSections(page.content),
   );
 
   const breadcrumbs =
