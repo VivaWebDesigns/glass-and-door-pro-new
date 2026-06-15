@@ -20,6 +20,20 @@ const defaultPlatformLinks = [
   { href: "/reviews", label: "Reviews", testId: "link-footer-reviews" },
 ];
 
+const defaultServiceAreaLinks = [
+  { href: "/service-areas/charlotte", label: "Charlotte", testId: "link-footer-service-area-charlotte" },
+  { href: "/service-areas/monroe", label: "Monroe", testId: "link-footer-service-area-monroe" },
+  { href: "/service-areas/indian-trail", label: "Indian Trail", testId: "link-footer-service-area-indian-trail" },
+  { href: "/service-areas/stallings", label: "Stallings", testId: "link-footer-service-area-stallings" },
+  { href: "/service-areas/wesley-chapel", label: "Wesley Chapel", testId: "link-footer-service-area-wesley-chapel" },
+  { href: "/service-areas/waxhaw", label: "Waxhaw", testId: "link-footer-service-area-waxhaw" },
+  { href: "/service-areas/matthews", label: "Matthews", testId: "link-footer-service-area-matthews" },
+  { href: "/service-areas/weddington", label: "Weddington", testId: "link-footer-service-area-weddington" },
+  { href: "/service-areas/indian-land", label: "Indian Land", testId: "link-footer-service-area-indian-land" },
+  { href: "/service-areas/fort-mill", label: "Fort Mill", testId: "link-footer-service-area-fort-mill" },
+  { href: "/service-areas/pineville", label: "Pineville", testId: "link-footer-service-area-pineville" },
+];
+
 const defaultCompanyLinks = [
   { href: "/#contact", label: "Contact", testId: "link-footer-contact" },
   { href: "tel:+17047716111", label: "(704) 771-6111", testId: "link-footer-phone" },
@@ -213,6 +227,12 @@ export function Footer() {
     return cmsLinks.length > 0 ? ensureServicesHubLink(cmsLinks) : defaultPlatformLinks;
   }, [publicMenus]) as FooterLegalLink[];
 
+  const serviceAreaLinks = useMemo(() => {
+    const links = menuItemsToLinks(publicMenus?.footer_resources?.items as MenuItem[] | undefined, "link-footer-service-areas")
+      .filter((link) => link.href.startsWith("/service-areas/"));
+    return links.length > 0 ? uniqueFooterLinks(links) : defaultServiceAreaLinks;
+  }, [publicMenus]) as FooterLegalLink[];
+
   const companyLinks = useMemo(() => {
     const links = menuItemsToLinks(publicMenus?.footer_company?.items as MenuItem[] | undefined, "link-footer-company");
     return links.length > 0 ? links : defaultCompanyLinks;
@@ -238,7 +258,7 @@ export function Footer() {
   return (
     <footer className="border-t border-slate-800 bg-slate-900 text-slate-200" data-testid="footer">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12">
-        <div className="grid gap-10 lg:grid-cols-[1.25fr_0.9fr_1.25fr] lg:gap-20">
+        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr_0.85fr_1.05fr] lg:gap-12">
           <div>
             <div className="mb-5 inline-flex bg-white p-1.5">
               <img src={brandLogo} alt={brandName} className="h-12 w-auto sm:h-11" />
@@ -288,6 +308,17 @@ export function Footer() {
                 <h4 className="mb-4 text-base font-bold text-white">Services</h4>
                 <ul className="space-y-2.5 text-sm sm:space-y-3">
                   {servicesLinks.map((link) => (
+                    <li key={link.testId}>
+                      <FooterTextLink link={link} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="mb-4 text-base font-bold text-white">Service Areas</h4>
+                <ul className="space-y-2.5 text-sm sm:space-y-3">
+                  {serviceAreaLinks.map((link) => (
                     <li key={link.testId}>
                       <FooterTextLink link={link} />
                     </li>

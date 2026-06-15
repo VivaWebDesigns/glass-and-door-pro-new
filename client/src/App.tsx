@@ -130,6 +130,17 @@ function Router() {
         <Route path="/services/commercial-door-installation" component={() => <CmsHybridPage slug="services-commercial-door-installation" fallback={<NotFound />} />} />
         <Route path="/services/commercial-door-replacement-repair" component={() => <CmsHybridPage slug="services-commercial-door-replacement-repair" fallback={<NotFound />} />} />
         <Route path="/services/commercial-window-replacement" component={() => <CmsHybridPage slug="services-commercial-window-replacement" fallback={<NotFound />} />} />
+        <Route path="/service-areas/charlotte" component={() => <CmsHybridPage slug="areas-served-charlotte-nc" fallback={<NotFound />} />} />
+        <Route path="/service-areas/monroe" component={() => <CmsHybridPage slug="areas-served-monroe-nc" fallback={<NotFound />} />} />
+        <Route path="/service-areas/indian-trail" component={() => <CmsHybridPage slug="service-areas-indian-trail" fallback={<NotFound />} />} />
+        <Route path="/service-areas/stallings" component={() => <CmsHybridPage slug="service-areas-stallings" fallback={<NotFound />} />} />
+        <Route path="/service-areas/wesley-chapel" component={() => <CmsHybridPage slug="service-areas-wesley-chapel" fallback={<NotFound />} />} />
+        <Route path="/service-areas/waxhaw" component={() => <CmsHybridPage slug="service-areas-waxhaw" fallback={<NotFound />} />} />
+        <Route path="/service-areas/matthews" component={() => <CmsHybridPage slug="service-areas-matthews" fallback={<NotFound />} />} />
+        <Route path="/service-areas/weddington" component={() => <CmsHybridPage slug="service-areas-weddington" fallback={<NotFound />} />} />
+        <Route path="/service-areas/indian-land" component={() => <CmsHybridPage slug="service-areas-indian-land" fallback={<NotFound />} />} />
+        <Route path="/service-areas/fort-mill" component={() => <CmsHybridPage slug="service-areas-fort-mill" fallback={<NotFound />} />} />
+        <Route path="/service-areas/pineville" component={() => <CmsHybridPage slug="service-areas-pineville" fallback={<NotFound />} />} />
         <Route path="/areas-served/monroe-nc" component={() => <CmsHybridPage slug="areas-served-monroe-nc" fallback={<NotFound />} />} />
         <Route path="/areas-served/charlotte-nc" component={() => <CmsHybridPage slug="areas-served-charlotte-nc" fallback={<NotFound />} />} />
         <Route path="/preview/cms/:id" component={CmsPreviewPage} />

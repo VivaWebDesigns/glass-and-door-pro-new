@@ -6,6 +6,7 @@ import {
   buildGlassBreadcrumbItems,
   buildGlassLocalBusinessLd,
   buildGlassServiceLdForCmsPage,
+  getGlassCityPageArea,
   getGlassServiceSeoOverride,
   getGlassServiceSocialMetadata,
   getCmsPublicPath,
@@ -454,6 +455,7 @@ function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: strin
   const breadcrumbs =
     page.slug === "home" ? null : buildBreadcrumbSchema(buildGlassBreadcrumbItems(page, siteUrl));
   const faqItems = extractFaqItems(page.content);
+  const cityArea = getGlassCityPageArea(page.slug);
 
   return {
     title: buildHeadTitle(title, seo, {
@@ -469,7 +471,7 @@ function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: strin
     bodyHtml,
     cmsPage: page,
     jsonLd: [
-      buildGlassLocalBusinessLd(siteUrl),
+      buildGlassLocalBusinessLd(siteUrl, cityArea),
       buildGlassServiceLdForCmsPage(page, siteUrl),
       breadcrumbs,
       buildFaqPageSchema(faqItems),

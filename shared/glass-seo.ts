@@ -85,6 +85,60 @@ const serviceSocialMetadata: Record<
       "Window replacement for apartment complexes and multi-family properties in Charlotte. Fast mobilization, project manager-friendly, owner-operated. When your timeline can't wait, call Glass and Door Pro.",
     twitterCard: "summary_large_image",
   },
+  "service-areas-indian-trail": {
+    ogTitle: "Glass & Door Services in Indian Trail, NC | Glass and Door Pro",
+    ogDescription:
+      "Local glass and door services in Indian Trail. Frameless shower doors, replacement windows, door installation, and more — measured and installed personally by Doug Adams.",
+    twitterCard: "summary_large_image",
+  },
+  "service-areas-stallings": {
+    ogTitle: "Glass & Door Services in Stallings, NC | Glass and Door Pro",
+    ogDescription:
+      "Local glass and door services in Stallings, NC. Frameless shower doors, replacement windows, and door installation measured and installed personally by Doug Adams.",
+    twitterCard: "summary_large_image",
+  },
+  "service-areas-wesley-chapel": {
+    ogTitle: "Glass & Door Services in Wesley Chapel, NC | Glass and Door Pro",
+    ogDescription:
+      "Glass and door services in Wesley Chapel, NC. Frameless showers, replacement windows, door installation — measured and installed personally by Doug Adams of Glass and Door Pro.",
+    twitterCard: "summary_large_image",
+  },
+  "service-areas-waxhaw": {
+    ogTitle: "Glass & Door Services in Waxhaw, NC | Glass and Door Pro",
+    ogDescription:
+      "Glass and door services for Waxhaw homeowners. Custom frameless showers, replacement windows, and door installation — personally measured and installed by Doug Adams.",
+    twitterCard: "summary_large_image",
+  },
+  "service-areas-matthews": {
+    ogTitle: "Glass & Door Services in Matthews, NC | Glass and Door Pro",
+    ogDescription:
+      "Glass and door services for Matthews homeowners. Frameless showers, replacement windows, door installation, and window repair — owner-operated and personally installed by Doug Adams.",
+    twitterCard: "summary_large_image",
+  },
+  "service-areas-weddington": {
+    ogTitle: "Glass & Door Services in Weddington, NC | Glass and Door Pro",
+    ogDescription:
+      "Custom glass and door work for Weddington homeowners. Frameless shower enclosures, replacement windows, and door installation — personally handled by Doug Adams of Glass and Door Pro.",
+    twitterCard: "summary_large_image",
+  },
+  "service-areas-indian-land": {
+    ogTitle: "Glass & Door Services in Indian Land, SC | Glass and Door Pro",
+    ogDescription:
+      "Glass and door services for Indian Land, SC homeowners. Frameless shower enclosures, replacement windows, and door installation — measured and installed personally by Doug Adams.",
+    twitterCard: "summary_large_image",
+  },
+  "service-areas-fort-mill": {
+    ogTitle: "Glass & Door Services in Fort Mill, SC | Glass and Door Pro",
+    ogDescription:
+      "Glass and door services for Fort Mill, SC homeowners. Frameless showers, replacement windows, and door installation — measured and installed personally by Doug Adams of Glass and Door Pro.",
+    twitterCard: "summary_large_image",
+  },
+  "service-areas-pineville": {
+    ogTitle: "Glass & Door Services in Pineville, NC | Glass and Door Pro",
+    ogDescription:
+      "Glass and door services for Pineville, NC homeowners. Frameless showers, replacement windows, door installation, and window repair — personally installed by Doug Adams.",
+    twitterCard: "summary_large_image",
+  },
 };
 
 const glassServiceAreas = [
@@ -311,6 +365,69 @@ const cityPageData: Record<string, { city: string; state: string; name: string; 
     description:
       "Frameless shower door installation, window installation, door installation, window repair, and commercial glass services for homes and businesses in Charlotte, North Carolina.",
   },
+  "service-areas-indian-trail": {
+    city: "Indian Trail",
+    state: "North Carolina",
+    name: "Glass and Door Services in Indian Trail, NC",
+    description:
+      "Frameless showers, window installation, window repair, door installation, and commercial glass services in Indian Trail, North Carolina.",
+  },
+  "service-areas-stallings": {
+    city: "Stallings",
+    state: "North Carolina",
+    name: "Glass and Door Services in Stallings, NC",
+    description:
+      "Frameless showers, window installation, window repair, and door installation in Stallings, North Carolina.",
+  },
+  "service-areas-wesley-chapel": {
+    city: "Wesley Chapel",
+    state: "North Carolina",
+    name: "Glass and Door Services in Wesley Chapel, NC",
+    description:
+      "Frameless shower doors, window installation, window repair, and door installation in Wesley Chapel, North Carolina.",
+  },
+  "service-areas-waxhaw": {
+    city: "Waxhaw",
+    state: "North Carolina",
+    name: "Glass and Door Services in Waxhaw, NC",
+    description:
+      "Frameless shower doors, window installation, window repair, and door installation in Waxhaw, North Carolina.",
+  },
+  "service-areas-matthews": {
+    city: "Matthews",
+    state: "North Carolina",
+    name: "Glass and Door Services in Matthews, NC",
+    description:
+      "Frameless shower doors, window installation, window repair, and door installation in Matthews, North Carolina.",
+  },
+  "service-areas-weddington": {
+    city: "Weddington",
+    state: "North Carolina",
+    name: "Glass and Door Services in Weddington, NC",
+    description:
+      "Custom frameless shower doors, window installation, door installation, and window repair in Weddington, North Carolina.",
+  },
+  "service-areas-indian-land": {
+    city: "Indian Land",
+    state: "South Carolina",
+    name: "Glass and Door Services in Indian Land, SC",
+    description:
+      "Frameless shower doors, window installation, window repair, and door installation in Indian Land, South Carolina.",
+  },
+  "service-areas-fort-mill": {
+    city: "Fort Mill",
+    state: "South Carolina",
+    name: "Glass and Door Services in Fort Mill, SC",
+    description:
+      "Frameless shower doors, window installation, window repair, and door installation in Fort Mill, South Carolina.",
+  },
+  "service-areas-pineville": {
+    city: "Pineville",
+    state: "North Carolina",
+    name: "Glass and Door Services in Pineville, NC",
+    description:
+      "Frameless shower doors, window installation, window repair, and door installation in Pineville, North Carolina.",
+  },
 };
 
 export function absoluteGlassUrl(path: string | null | undefined, siteUrl = GLASS_SITE_URL) {
@@ -322,6 +439,9 @@ export function absoluteGlassUrl(path: string | null | undefined, siteUrl = GLAS
 export function getCmsPublicPath(slug: string) {
   if (!slug || slug === "home") return "/";
   if (slug.startsWith("services-")) return `/services/${slug.replace(/^services-/, "")}`;
+  if (slug === "areas-served-charlotte-nc") return "/service-areas/charlotte";
+  if (slug === "areas-served-monroe-nc") return "/service-areas/monroe";
+  if (slug.startsWith("service-areas-")) return `/service-areas/${slug.replace(/^service-areas-/, "")}`;
   if (slug.startsWith("areas-served-")) return `/areas-served/${slug.replace(/^areas-served-/, "")}`;
   return `/${slug}`;
 }
@@ -331,6 +451,13 @@ export function getCmsSlugForPublicPath(pathname: string) {
 
   const serviceMatch = pathname.match(/^\/services\/([^/]+)$/);
   if (serviceMatch) return `services-${serviceMatch[1]}`;
+
+  const serviceAreaMatch = pathname.match(/^\/service-areas\/([^/]+)$/);
+  if (serviceAreaMatch) {
+    if (serviceAreaMatch[1] === "charlotte") return "areas-served-charlotte-nc";
+    if (serviceAreaMatch[1] === "monroe") return "areas-served-monroe-nc";
+    return `service-areas-${serviceAreaMatch[1]}`;
+  }
 
   const areaMatch = pathname.match(/^\/areas-served\/([^/]+)$/);
   if (areaMatch) return `areas-served-${areaMatch[1]}`;
@@ -356,7 +483,15 @@ export function isGlassServicePageSlug(slug: string) {
   return Boolean(servicePageNames[slug]);
 }
 
-export function buildGlassLocalBusinessLd(siteUrl = GLASS_SITE_URL): JsonLdObject {
+export function getGlassCityPageArea(slug: string) {
+  const data = cityPageData[slug];
+  return data ? { city: data.city, state: data.state } : null;
+}
+
+export function buildGlassLocalBusinessLd(
+  siteUrl = GLASS_SITE_URL,
+  area?: { city: string; state: string } | null,
+): JsonLdObject {
   return {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
@@ -383,7 +518,7 @@ export function buildGlassLocalBusinessLd(siteUrl = GLASS_SITE_URL): JsonLdObjec
         closes: "18:00",
       },
     ],
-    areaServed: buildGlassServiceAreaServed(),
+    areaServed: area ? city(area.city, area.state) : buildGlassServiceAreaServed(),
   };
 }
 
@@ -393,6 +528,8 @@ export function buildGlassServiceLdForCmsPage(
 ): JsonLdObject | null {
   const cityData = cityPageData[page.slug];
   if (cityData) {
+    if (page.slug.startsWith("service-areas-")) return null;
+
     return {
       "@context": "https://schema.org",
       "@type": "Service",
@@ -496,10 +633,10 @@ export function buildGlassBreadcrumbItems(page: Pick<CmsPage, "slug" | "title">,
     ];
   }
 
-  if (page.slug.startsWith("areas-served-")) {
+  if (page.slug.startsWith("areas-served-") || page.slug.startsWith("service-areas-")) {
     return [
       { name: "Home", url: `${siteUrl}/` },
-      { name: "Areas Served", url: `${siteUrl}/areas-served` },
+      { name: "Service Areas", url: `${siteUrl}/service-areas` },
       { name: page.title, url: canonicalUrl },
     ];
   }

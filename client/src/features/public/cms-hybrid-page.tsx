@@ -16,6 +16,7 @@ import {
 import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
 import {
   buildGlassBreadcrumbItems,
+  getGlassCityPageArea,
   buildGlassLocalBusinessLd,
   buildGlassServiceLdForCmsPage,
   getGlassServiceSeoOverride,
@@ -180,11 +181,12 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
     : buildBreadcrumbLd(buildGlassBreadcrumbItems(page, origin));
 
   const faqItems = extractFaqItems(page.content);
+  const cityArea = getGlassCityPageArea(page.slug);
 
   return (
     <JsonLd
       schemas={[
-        buildGlassLocalBusinessLd(origin),
+        buildGlassLocalBusinessLd(origin, cityArea),
         buildGlassServiceLdForCmsPage(page, origin),
         breadcrumbs,
         buildFaqPageLd(faqItems),

@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { buildGlassServiceLdForCmsPage, getGlassServiceSeoOverride } from "./glass-seo";
+import {
+  buildGlassLocalBusinessLd,
+  buildGlassServiceLdForCmsPage,
+  getGlassCityPageArea,
+  getGlassServiceSeoOverride,
+} from "./glass-seo";
 
 describe("glass SEO helpers", () => {
   it("adds service-level areaServed to non-frameless service pages", () => {
@@ -53,5 +58,20 @@ describe("glass SEO helpers", () => {
       ]),
     });
     expect((schema?.hasOfferCatalog as { itemListElement: unknown[] }).itemListElement).toHaveLength(9);
+  });
+
+  it("uses city-specific LocalBusiness schema for new service-area pages", () => {
+    const cityArea = getGlassCityPageArea("service-areas-indian-land");
+    const businessSchema = buildGlassLocalBusinessLd(undefined, cityArea);
+
+    expect(buildGlassServiceLdForCmsPage({
+      slug: "service-areas-indian-land",
+      seoDescription: "Indian Land service area",
+    })).toBeNull();
+    expect(businessSchema.areaServed).toMatchObject({
+      "@type": "City",
+      name: "Indian Land",
+      containedInPlace: { "@type": "State", name: "South Carolina" },
+    });
   });
 });
