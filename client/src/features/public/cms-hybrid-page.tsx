@@ -19,6 +19,7 @@ import {
   buildGlassLocalBusinessLd,
   buildGlassServiceLdForCmsPage,
   getGlassServiceSeoOverride,
+  getGlassServiceSocialMetadata,
   getCmsPublicPath,
   isGlassServicePageSlug,
 } from "@shared/glass-seo";
@@ -96,18 +97,28 @@ function absoluteUrl(path: string, origin: string) {
   return `${origin.replace(/\/$/, "")}${path.startsWith("/") ? "" : "/"}${path}`;
 }
 
+function hasBrandSuffix(title: string) {
+  return /\s[|–—-]\sGlass (?:&|and) Door Pro$/i.test(title.trim());
+}
+
 function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSettings }) {
   useEffect(() => {
     const prevTitle = document.title;
     const seoOverride = getGlassServiceSeoOverride(page.slug);
+    const socialOverride = getGlassServiceSocialMetadata(page.slug);
     const effectiveTitle = seoOverride?.title || page.seoTitle || page.title;
     const titleSuffix = globalSeo?.titleSuffix ?? " | Core Platform";
     const titleFormatter = page.slug === "home" || isGlassServicePageSlug(page.slug)
       ? formatBrandLastTitle
       : formatBrandFirstTitle;
-    const headTitle = titleFormatter(effectiveTitle, titleSuffix, globalSeo?.siteName ?? "Core Platform");
+    const headTitle =
+      effectiveTitle && hasBrandSuffix(effectiveTitle)
+        ? effectiveTitle
+        : titleFormatter(effectiveTitle, titleSuffix, globalSeo?.siteName ?? "Core Platform");
     const effectiveDescription =
       seoOverride?.description || page.seoDescription || globalSeo?.defaultMetaDescription || "";
+    const socialTitle = socialOverride?.ogTitle || headTitle;
+    const socialDescription = socialOverride?.ogDescription || effectiveDescription;
     const origin =
       globalSeo?.siteUrl || (typeof window !== "undefined" ? window.location.origin : "");
     const effectiveOgImage = absoluteUrl(page.ogImageUrl || globalSeo?.defaultOgImageUrl || "", origin);
@@ -116,15 +127,24 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
 
     if (effectiveDescription) {
       setMeta("description", effectiveDescription);
-      setMeta("og:description", effectiveDescription, true);
+      setMeta("og:description", socialDescription, true);
     }
 
-    if (effectiveTitle) setMeta("og:title", headTitle, true);
+    if (effectiveTitle) {
+      setMeta("og:title", socialTitle, true);
+      setMeta("twitter:title", socialTitle);
+    }
+
+    if (socialDescription) setMeta("twitter:description", socialDescription);
+    if (socialOverride?.twitterCard) setMeta("twitter:card", socialOverride.twitterCard);
+    if (socialOverride?.twitterSite) setMeta("twitter:site", socialOverride.twitterSite);
 
     if (effectiveOgImage) {
       setMeta("og:image", effectiveOgImage, true);
+      setMeta("twitter:image", effectiveOgImage);
     } else {
       removeMeta("og:image", true);
+      removeMeta("twitter:image");
     }
 
     const publicPath = getCmsPublicPath(page.slug);
@@ -142,6 +162,11 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
       document.title = prevTitle;
       removeLink("canonical");
       removeMeta("robots");
+      removeMeta("twitter:title");
+      removeMeta("twitter:description");
+      removeMeta("twitter:card");
+      removeMeta("twitter:site");
+      removeMeta("twitter:image");
     };
   }, [page, globalSeo]);
 

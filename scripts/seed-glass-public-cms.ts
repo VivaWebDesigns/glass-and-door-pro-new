@@ -867,6 +867,8 @@ function serviceHero(props: {
   imageUrl: string;
   imagePositionY?: number;
   primaryText?: string;
+  primaryAction?: string;
+  primaryLink?: string;
 }) {
   return block("hero", {
     variant: "glass-service",
@@ -874,7 +876,8 @@ function serviceHero(props: {
     heading: props.heading,
     subheading: `<p>${props.subheading}</p>`,
     ctaText: props.primaryText ?? "Request a Free Quote",
-    ctaAction: "form-modal",
+    ctaAction: props.primaryAction ?? "form-modal",
+    ctaLink: props.primaryLink ?? "",
     ctaFormSlug: "contact-form",
     ctaModalTitle: "Request a Free Quote",
     ctaModalDescription: "Tell us a little about your project and Doug will follow up with next steps.",
@@ -1293,6 +1296,106 @@ function servicePageContent(props: {
   return { blocks };
 }
 
+function expandedServicePageContent(props: {
+  hero: {
+    heading: string;
+    subheading: string;
+    imageUrl: string;
+    imagePositionY?: number;
+  };
+  intro: {
+    title: string;
+    content: string;
+  };
+  detailTitle: string;
+  detailCards: GlassCard[];
+  proseSections: Array<{
+    title: string;
+    content: string;
+    backgroundColor?: string;
+  }>;
+  benefitsTitle: string;
+  benefitsCards: GlassCard[];
+  serviceArea: {
+    title: string;
+    content: string;
+  };
+  faqTitle: string;
+  faqs: GlassFaq[];
+  cta: {
+    heading: string;
+    body: string;
+    footerLine: string;
+  };
+}): InsertCmsPage["content"] {
+  return {
+    blocks: [
+      serviceHero({
+        ...props.hero,
+        primaryText: "Request a Free Quote",
+        primaryAction: "internal-link",
+        primaryLink: "/contact",
+      }),
+      block("rich-text", {
+        title: props.intro.title,
+        alignment: "left",
+        content: props.intro.content,
+        sectionBackgroundColor: "#ffffff",
+        sectionPaddingTop: "lg",
+        sectionPaddingBottom: "lg",
+      }),
+      cardsGrid({
+        title: props.detailTitle,
+        cards: props.detailCards,
+        columns: "3",
+        backgroundColor: "#f8fafc",
+      }),
+      ...props.proseSections.map((section, index) =>
+        block("rich-text", {
+          title: section.title,
+          alignment: "left",
+          content: section.content,
+          sectionBackgroundColor: section.backgroundColor ?? (index % 2 === 0 ? "#ffffff" : "#f8fafc"),
+          sectionPaddingTop: "lg",
+          sectionPaddingBottom: "lg",
+        }),
+      ),
+      cardsGrid({
+        title: props.benefitsTitle,
+        cards: props.benefitsCards,
+        columns: "3",
+        backgroundColor: "#f8fafc",
+      }),
+      block("rich-text", {
+        title: props.serviceArea.title,
+        alignment: "left",
+        content: props.serviceArea.content,
+        sectionBackgroundColor: "#ffffff",
+        sectionPaddingTop: "lg",
+        sectionPaddingBottom: "lg",
+      }),
+      block("faq", {
+        title: props.faqTitle,
+        sectionBackgroundColor: "#f8fafc",
+        sectionPaddingTop: "lg",
+        sectionPaddingBottom: "lg",
+        items: props.faqs,
+      }),
+      block("cta", {
+        variant: "glass-service",
+        heading: props.cta.heading,
+        subheading: `<p>${props.cta.body}</p><p><strong>${props.cta.footerLine}</strong></p>`,
+        primaryText: "Get Your Free Estimate",
+        primaryAction: "internal-link",
+        primaryLink: "/contact",
+        secondaryText: "Call (704) 771-6111",
+        secondaryAction: "custom-link",
+        secondaryLink: "tel:+17047716111",
+      }),
+    ],
+  };
+}
+
 const glassServicesContent: InsertCmsPage["content"] = {
   blocks: [
     serviceHero({
@@ -1378,333 +1481,462 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Window Installation",
     slug: "services-window-installation",
-    seoTitle: "Residential Window Installation in Charlotte & Monroe, NC",
+    seoTitle: "Window Installation in Charlotte & Monroe, NC | Replacement Windows | Glass and Door Pro",
     seoDescription:
-      "Residential window installation and replacement in Charlotte, Monroe, Indian Trail, Matthews, Waxhaw and nearby areas. Owner-operated with 15+ years of experience. Call for a free quote.",
+      "Professional window installation and replacement for homes across Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Owner-operated, honest pricing, same-week appointments. Call (704) 771-6111.",
     seoKeywords:
       "window installation Charlotte NC, window replacement Monroe NC, residential windows, energy efficient windows",
-    ogImageUrl: "/images/glass-door-pro/window-parallax.jpg",
-    content: servicePageContent({
+    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    content: expandedServicePageContent({
       hero: {
-        heading: "Residential Window Installation",
+        heading: "Window Installation & Replacement in Charlotte, NC",
         subheading:
-          "Upgrade your home with energy-efficient windows that improve comfort, reduce energy costs, and enhance curb appeal. Professional installation throughout the Charlotte area.",
+          "Residential replacement windows measured, fitted, and installed personally by Doug Adams — owner-operator with 15+ years of experience. Serving Monroe, Charlotte, Indian Trail, Matthews, Waxhaw, and surrounding communities. Same-week appointments available.",
         imageUrl: "/images/glass-door-pro/window-parallax.jpg",
         imagePositionY: 45,
       },
-      cardsTitle: "Benefits of New Windows",
-      cards: [
+      intro: {
+        title: "Replacement Windows That Actually Fit",
+        content:
+          "<p>Most window problems come down to one thing: the wrong window in the wrong opening. Gaps around the frame, drafts that won't go away, moisture between panes — these aren't just nuisances, they're signs that installation wasn't done right the first time.</p><p>Glass and Door Pro handles residential window replacement from start to finish. Doug takes the measurements personally, sources the right window for your home's openings, and does the installation himself. There's no subcontractor showing up in an unmarked van. The person who gives you the quote is the person who does the work.</p><p>That matters more than most people realize. A window that fits correctly keeps your home comfortable, lowers energy bills, and doesn't leak. A window that doesn't fit — no matter how good the brand — causes problems within a few years.</p><p>We work with homeowners across the greater Charlotte area replacing single windows, full-room window sets, and whole-home window upgrades. Whether it's one fogged double-pane in a bedroom or every window in a 1990s ranch that's never been updated, this is the kind of work we do every week.</p>",
+      },
+      detailTitle: "What's Included in Our Window Installation Service",
+      detailCards: [
         {
-          icon: "BadgeCheck",
-          title: "Energy Efficiency",
-          description: "Modern windows help keep conditioned air inside and outdoor weather where it belongs.",
+          icon: "Search",
+          title: "In-Home Measurement",
+          description:
+            "Doug measures every opening on-site before ordering anything. Every home is different, and getting accurate measurements upfront is what prevents gaps, air leaks, and callbacks later.",
         },
         {
           icon: "CheckCircle",
-          title: "Lower Energy Bills",
-          description: "Better insulation can reduce heating and cooling costs over time.",
+          title: "Window Sourcing & Selection",
+          description:
+            "We help you choose the right window type for each opening — double-hung, casement, sliding, picture, bay — based on your home's style, ventilation needs, and budget. We don't upsell brands you don't need.",
         },
         {
-          icon: "Star",
-          title: "Natural Light",
-          description: "Fresh windows brighten rooms and make your home feel more open and comfortable.",
+          icon: "Wrench",
+          title: "Old Window Removal",
+          description:
+            "Existing windows are carefully removed and disposed of. We inspect the rough opening and frame condition before installing the replacement so there are no surprises mid-job.",
         },
         {
-          icon: "Lock",
-          title: "Enhanced Security",
-          description: "Updated locks, stronger glass, and better fit help improve home security.",
-        },
-        {
-          icon: "Building2",
-          title: "Curb Appeal",
-          description: "New windows refresh the exterior and add polish to your home's appearance.",
+          icon: "BadgeCheck",
+          title: "Professional Installation",
+          description:
+            "Each window is set level, plumb, and square. Flashing and sealant are applied correctly to prevent water intrusion. Interior and exterior trim is reinstalled clean and tight.",
         },
         {
           icon: "ShieldCheck",
-          title: "Noise Reduction",
-          description: "Quality windows can reduce outside noise for a quieter indoor environment.",
+          title: "Energy Efficiency Upgrades",
+          description:
+            "We install double-pane insulated glass units as standard. If your home has single-pane windows, the upgrade alone will make a noticeable difference in comfort and utility costs.",
+        },
+        {
+          icon: "CheckCircle",
+          title: "Cleanup & Walkthrough",
+          description:
+            "We leave the job site clean and walk you through every window before we pack up. If anything isn't right, we fix it before we leave.",
         },
       ],
-      galleryTitle: "Window Installation Projects",
-      gallery: [
+      proseSections: [
         {
-          url: "/images/glass-door-pro/gallery-windows-1280w.webp",
-          alt: "Residential windows installed by Glass & Door Pro",
-        },
-        {
-          url: "/images/glass-door-pro/gallery-sunroom-1280w.webp",
-          alt: "Sunroom windows installed in the Charlotte area",
-        },
-        ...windowGalleryImages,
-      ],
-      processTitle: "Window Installation Process",
-      process: [
-        {
-          title: "In-Home Consultation",
-          description: "We review your current windows, goals, and budget.",
-        },
-        {
-          title: "Window Selection",
-          description: "Choose efficient, attractive options that fit your home.",
-        },
-        {
-          title: "Professional Install",
-          description: "Your windows are installed carefully for a clean, lasting fit.",
-        },
-        {
-          title: "Final Inspection",
-          description: "We check operation, sealing, and finish details before wrapping up.",
+          title: "Window Types We Install",
+          content:
+            "<p>Not every window works in every opening. Here's what we regularly install and replace:</p><p><strong>Double-Hung Windows</strong> — The most common window type in the Charlotte area. Both sashes move up and down, making them easy to clean and ventilate. A good all-around choice for most rooms.</p><p><strong>Casement Windows</strong> — Hinged on one side and opened with a crank, casement windows seal tightly when closed and provide excellent ventilation. Popular in kitchens and bathrooms where you want airflow but not a full-open window.</p><p><strong>Sliding Windows</strong> — One sash slides horizontally past the other. A clean, low-profile option that works well in contemporary homes and in openings where a casement or double-hung wouldn't operate easily.</p><p><strong>Picture Windows</strong> — Fixed windows that don't open. Used where the goal is light and view, not ventilation. Often paired with operable windows on either side.</p><p><strong>Bay &amp; Bow Windows</strong> — A set of windows that project outward from the exterior wall, creating a shelf or seating area inside. More involved to install but a dramatic upgrade when done correctly.</p><p><strong>Awning Windows</strong> — Hinged at the top and open outward from the bottom. Good for basements or anywhere you want to leave a window open during light rain.</p><p>If you're not sure what type is right for your opening, we'll walk you through the options during the in-home quote.</p>",
         },
       ],
+      benefitsTitle: "Why Charlotte Homeowners Choose Glass and Door Pro for Window Installation",
+      benefitsCards: [
+        {
+          icon: "UserCheck",
+          title: "Owner Does the Work",
+          description:
+            "Doug handles every project personally — measurement, sourcing, and installation. You're not dealing with a franchise or a rotating crew of subcontractors.",
+        },
+        {
+          icon: "BadgeCheck",
+          title: "Honest, Itemized Quotes",
+          description:
+            "We give you a clear written quote before any work begins. No surprise charges after the job is done. No pressure to upgrade to products you don't need.",
+        },
+        {
+          icon: "CheckCircle",
+          title: "Correct Fit, Every Time",
+          description:
+            "We take our own measurements and don't cut corners on the rough opening inspection. Windows that fit correctly from day one don't cause problems later.",
+        },
+        {
+          icon: "Star",
+          title: "15+ Years of Experience",
+          description:
+            "Doug has been installing windows in the Charlotte metro area for over 15 years. He's seen every kind of opening, every kind of problem, and knows how to handle them.",
+        },
+        {
+          icon: "CalendarDays",
+          title: "Saturday Appointments Available",
+          description:
+            "Mon–Sat, 7am–6pm. We know most homeowners can't take a weekday off for a window quote, so Saturday appointments are available by default.",
+        },
+        {
+          icon: "MapPin",
+          title: "Local, Not a Franchise",
+          description:
+            "Glass and Door Pro is a Monroe-based, owner-operated business — not a national franchise with local name recognition and distant management. When you call, Doug answers.",
+        },
+      ],
+      serviceArea: {
+        title: "Areas We Serve for Window Installation",
+        content:
+          "<p>We install and replace residential windows throughout the greater Charlotte metro area, including:</p><p>Monroe, Charlotte, Indian Trail, Stallings, Matthews, Waxhaw, Weddington, Wesley Chapel, Indian Land, Fort Mill, Pineville, and surrounding Union and Mecklenburg County communities.</p><p>Not sure if we come to your neighborhood? Call or text (704) 771-6111 and we'll let you know. We almost certainly do.</p>",
+      },
+      faqTitle: "Frequently Asked Questions — Window Installation",
       faqs: [
         {
-          question: "Do I need to replace all my windows at once?",
+          question: "How much does window replacement cost in Charlotte, NC?",
           answer:
-            "<p>No. Many homeowners replace windows in phases. We can help prioritize the windows that need attention first.</p>",
+            "<p>Window replacement costs depend on window size, type, and how many you're replacing. A single standard double-hung replacement typically runs between $400–$800 installed. Full-home window replacements vary significantly based on window count and type. We provide a free, itemized written quote before any work begins so you know exactly what you're paying for.</p>",
         },
         {
-          question: "Can new windows improve energy efficiency?",
+          question: "How long does window installation take?",
           answer:
-            "<p>Yes. Properly installed modern windows can improve insulation, comfort, and overall home efficiency.</p>",
+            "<p>A single window replacement usually takes 1–2 hours. A full room or whole-home replacement depends on window count — most whole-home jobs are completed in one day. Doug will give you a realistic time estimate during the quote so you can plan accordingly.</p>",
         },
         {
-          question: "Do you remove the old windows?",
+          question: "Do I need a permit to replace windows in Charlotte or Monroe?",
           answer:
-            "<p>Yes. We remove existing units as part of the installation process and keep the job area clean.</p>",
+            "<p>For like-for-like window replacements in existing openings, permits are typically not required in Charlotte or Monroe. If you're changing the size of an opening or adding a window where there wasn't one, a permit may be required. We'll advise you on this during the quoting process.</p>",
         },
         {
-          question: "What areas do you serve?",
+          question: "What's the difference between window repair and window replacement?",
           answer:
-            "<p>We serve Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, Fort Mill, Rock Hill, and surrounding communities.</p>",
+            "<p>Window repair makes sense when the frame and sash are structurally sound but there's a specific problem — a broken sash lock, a failed seal causing fogging, or a damaged grid. Replacement makes more sense when the frame is warped, the window no longer operates correctly, or the window is old enough that energy performance is a concern. We'll give you an honest assessment of which makes more sense for your specific windows.</p>",
+        },
+        {
+          question: "How do I know if my windows need to be replaced?",
+          answer:
+            "<p>Common signs include fogging or condensation between panes (failed seal), drafts around the frame when windows are closed, difficulty opening or closing, visible rot or damage to the frame, or a noticeable difference in temperature near the window. Any of these are worth having looked at.</p>",
+        },
+        {
+          question: "Do you offer double-pane or energy-efficient windows?",
+          answer:
+            "<p>Yes — all of our replacement windows are double-pane insulated glass units as standard. If your home has older single-pane windows, replacing them with double-pane units makes a noticeable difference in comfort and energy costs. We can also discuss Low-E glass coatings for homes with significant sun exposure.</p>",
         },
       ],
       cta: {
-        heading: "Ready to Upgrade Your Windows?",
-        subheading:
-          "Schedule a free quote for residential window installation and replacement in the greater Charlotte area.",
+        heading: "Ready to Replace Your Windows?",
+        body:
+          "Call, text, or fill out the form for a free in-home quote. Doug will measure every opening personally and give you a clear, written estimate with no pressure and no surprises.",
+        footerLine:
+          "Mon–Sat, 7am–6pm | Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas",
       },
     }),
   },
   {
     title: "Door Installation",
     slug: "services-door-installation",
-    seoTitle: "Door Installation in Charlotte & Monroe, NC",
+    seoTitle: "Door Installation in Charlotte & Monroe, NC | Entry, Patio & Storm Doors | Glass and Door Pro",
     seoDescription:
-      "Entry door, patio door, and exterior door installation in Charlotte, Monroe, Indian Trail, Matthews, Waxhaw and nearby areas. Owner-operated with 15+ years of experience. Call for a free quote.",
+      "Residential door installation for entry doors, patio doors, storm doors, and exterior doors across Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Call (704) 771-6111.",
     seoKeywords:
       "door installation Charlotte NC, entry doors Monroe NC, patio door replacement, exterior door installer",
-    ogImageUrl: "/images/glass-door-pro/door-parallax.jpg",
-    content: servicePageContent({
+    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    content: expandedServicePageContent({
       hero: {
-        heading: "Door Installation Services",
+        heading: "Door Installation in Charlotte & Monroe, NC",
         subheading:
-          "Enhance your home's security, efficiency, and curb appeal with professionally installed entry, patio, and exterior doors.",
+          "Entry doors, patio doors, storm doors, and exterior doors installed correctly — level, plumb, weather-tight, and operating smoothly from day one. Owner-operated service across Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and surrounding communities.",
         imageUrl: "/images/glass-door-pro/door-parallax.jpg",
         imagePositionY: 45,
       },
-      cardsTitle: "Why Replace or Install a New Door?",
-      cards: [
+      intro: {
+        title: "Door Installation Done Right the First Time",
+        content:
+          "<p>A door that doesn't hang correctly causes problems for as long as it's on the house. It sticks in summer, drafts in winter, and puts stress on the frame and hardware every time it's used. Getting the installation right from the start isn't just about appearance — it's about how the door performs for the next 20 years.</p><p>Glass and Door Pro handles residential door installation throughout the greater Charlotte area. Doug takes the measurements, sources the door, and does the installation personally. The result is a door that opens and closes cleanly, seals tightly against the weather, and looks the way it should against your home's exterior.</p><p>We install entry doors, patio doors, storm doors, French doors, and other exterior doors for existing homes. Whether you're replacing a single door that's reached the end of its life, upgrading to a more energy-efficient unit, or improving your home's curb appeal before a sale, this is work we do every week across Monroe, Charlotte, and the surrounding area.</p>",
+      },
+      detailTitle: "Types of Doors We Install",
+      detailCards: [
         {
-          icon: "Lock",
-          title: "Enhanced Security",
-          description: "A properly fitted door improves security and peace of mind.",
+          icon: "DoorOpen",
+          title: "Entry Doors",
+          description:
+            "Your front door makes the first impression and handles the most use. We install steel, fiberglass, and wood entry doors with proper weatherstripping, threshold seals, and hardware installation. A correctly hung entry door is secure, weather-tight, and opens and closes without effort.",
         },
         {
-          icon: "BadgeCheck",
-          title: "Energy Efficiency",
-          description: "Reduce drafts and improve comfort with doors installed for a tight seal.",
+          icon: "Grid3X3",
+          title: "Patio Doors",
+          description:
+            "Sliding patio doors and hinged patio doors installed level and square, with correct track alignment (for sliding units) and proper clearance and swing (for hinged units). We handle single-panel, double-panel, and multi-panel configurations.",
         },
         {
-          icon: "Star",
-          title: "Curb Appeal",
-          description: "A new front or patio door can dramatically refresh your home's look.",
+          icon: "ShieldCheck",
+          title: "Storm Doors",
+          description:
+            "Storm doors add a layer of weather protection and extend the life of your entry door. We install full-view, ventilating, and retractable screen storm doors. Proper alignment is critical — a storm door that doesn't close flush is more of a nuisance than an asset.",
         },
         {
           icon: "CheckCircle",
-          title: "Increased Home Value",
-          description: "Quality door upgrades add everyday function and long-term value.",
+          title: "French Doors",
+          description:
+            "Double-door configurations with proper alignment between the two panels, correct astragal placement, and hardware that keeps both doors operating smoothly. French doors are as much about precision as they are about appearance.",
         },
         {
           icon: "DoorOpen",
-          title: "Wide Selection",
-          description: "Choose the style, glass, finish, and hardware that fits your home.",
+          title: "Exterior Side Doors & Back Doors",
+          description:
+            "Garage side doors, back entries, and utility doors installed with the same attention to fit and weatherproofing as a front entry. These doors often get less attention but take significant daily use.",
         },
         {
           icon: "Wrench",
-          title: "Professional Fit",
-          description: "Careful installation helps your door open, close, latch, and seal correctly.",
+          title: "Door Frame Repair & Replacement",
+          description:
+            "When a door's frame is damaged — rotted wood, warped framing, damage from forced entry — the frame needs to be repaired or replaced before a new door will hang correctly. We assess and address frame issues as part of the installation process.",
         },
       ],
-      galleryTitle: "Door Installation Projects",
-      gallery: [
+      proseSections: [
         {
-          url: "/images/glass-door-pro/gallery-door1-1280w.webp",
-          alt: "Wood entry door installed by Glass & Door Pro",
-        },
-        {
-          url: "/images/glass-door-pro/gallery-door2-1280w.webp",
-          alt: "Custom exterior door installation",
-        },
-        {
-          url: "/images/glass-door-pro/gallery-door3-1280w.webp",
-          alt: "Blue entry door installed in the Charlotte area",
-        },
-        ...doorGalleryImages,
-      ],
-      processTitle: "Our Door Installation Process",
-      process: [
-        {
-          title: "Consultation",
-          description: "We discuss style, performance, and fit for your project.",
-        },
-        {
-          title: "Selection",
-          description: "Choose the door and options that work for your home.",
-        },
-        {
-          title: "Installation",
-          description: "Doug installs your door with attention to detail and alignment.",
-        },
-        {
-          title: "Final Check",
-          description: "We test operation, hardware, locks, and weather sealing.",
+          title: "What's Included in Every Door Installation",
+          content:
+            "<p>Every door installation we do includes:</p><p><strong>Accurate Measurement</strong> — Doug measures the rough opening and existing frame before anything is ordered. Doors are not one-size-fits-all, and getting the measurements right is what prevents fitting problems at installation.</p><p><strong>Old Door Removal</strong> — The existing door, frame components, and weatherstripping are removed and disposed of. We inspect the rough opening for rot, damage, or framing issues before the new door goes in.</p><p><strong>Proper Shimming &amp; Leveling</strong> — The new door is set level and plumb using shims. This is what ensures the door swings freely, closes completely, and seals correctly against the weatherstripping.</p><p><strong>Weatherstripping &amp; Threshold Seal</strong> — All exterior doors are fitted with proper weatherstripping and threshold seals. This is what keeps air, water, and insects out.</p><p><strong>Hardware Installation</strong> — Locksets, deadbolts, hinges, and door closers installed correctly. We test operation before we leave.</p><p><strong>Interior &amp; Exterior Trim</strong> — Casing and trim reinstalled clean and tight. The finished installation should look like the door has always been there.</p><p><strong>Operational Walkthrough</strong> — We walk you through the door before we pack up. You'll see how it locks, how it swings, and how the weatherstripping engages. If anything isn't right, we fix it on the spot.</p>",
         },
       ],
+      benefitsTitle: "Why Charlotte Homeowners Choose Glass and Door Pro for Door Installation",
+      benefitsCards: [
+        {
+          icon: "UserCheck",
+          title: "Owner Does Every Installation",
+          description:
+            "Doug measures, sources, and installs every door himself. There's no crew of subcontractors. The person who quoted the job is the person who shows up.",
+        },
+        {
+          icon: "BadgeCheck",
+          title: "Fit and Finish That Lasts",
+          description:
+            "Doors that aren't hung correctly cause problems for years. We do the job right — level, plumb, weather-tight — so the door performs the way it should long after we leave.",
+        },
+        {
+          icon: "DoorOpen",
+          title: "All Exterior Door Types",
+          description:
+            "Entry doors, patio doors, storm doors, French doors, side doors — we handle the full range of residential exterior door installations, not just one category.",
+        },
+        {
+          icon: "CheckCircle",
+          title: "Honest Upfront Quotes",
+          description:
+            "We quote the full job in writing before any work begins. No surprise charges for disposal, hardware, or trim work.",
+        },
+        {
+          icon: "CalendarDays",
+          title: "Saturday Appointments Available",
+          description:
+            "Mon–Sat, 7am–6pm. Door installation doesn't have to wait for a weekday when you can take time off work.",
+        },
+        {
+          icon: "Star",
+          title: "15+ Years of Local Experience",
+          description:
+            "Doug has been hanging doors in the Charlotte metro area for over 15 years. He's installed every door type in every kind of home — from 1960s ranch houses to new construction in the Union County suburbs.",
+        },
+      ],
+      serviceArea: {
+        title: "Door Installation Service Area",
+        content:
+          "<p>We install residential doors throughout the greater Charlotte area, including:</p><p>Monroe, Charlotte, Indian Trail, Stallings, Matthews, Waxhaw, Weddington, Wesley Chapel, Indian Land, Fort Mill, Pineville, and surrounding Union and Mecklenburg County communities.</p><p>Not sure if we serve your neighborhood? Call or text (704) 771-6111 — we almost certainly do.</p>",
+      },
+      faqTitle: "Frequently Asked Questions — Door Installation",
       faqs: [
         {
-          question: "What types of doors do you install?",
+          question: "How much does door installation cost in Charlotte, NC?",
           answer:
-            "<p>We install entry doors, patio doors, storm doors, and other exterior door solutions for residential properties.</p>",
-        },
-        {
-          question: "Can a new door help with drafts?",
-          answer:
-            "<p>Yes. Proper door fit, weatherstripping, and sealing can reduce drafts and improve comfort.</p>",
-        },
-        {
-          question: "Do you help choose the right door?",
-          answer:
-            "<p>Yes. We can talk through style, material, glass, security, and budget considerations before installation.</p>",
+            "<p>Door installation costs depend on the door type, size, and condition of the existing frame. A standard entry door replacement typically runs $300–$600 for installation labor, not including the door itself. Patio doors and French doors vary based on size and configuration. We provide a free written quote that covers all labor, disposal, and hardware installation so you know the full cost before we start.</p>",
         },
         {
           question: "How long does door installation take?",
           answer:
-            "<p>Many standard door installations can be completed in a day, depending on the door type and existing opening.</p>",
+            "<p>Most single exterior door replacements take 2–4 hours from start to finish, including old door removal, installation, and trim work. Patio door and French door installations can take longer depending on the configuration. Doug will give you a realistic time estimate during the quote.</p>",
+        },
+        {
+          question: "Do I need a permit to replace an exterior door in Charlotte or Monroe?",
+          answer:
+            "<p>For like-for-like door replacements in existing openings, permits are typically not required. If you're modifying the size of the opening or adding a door where there wasn't one, a permit may be needed. We'll advise you on this during the quoting process.</p>",
+        },
+        {
+          question: "Can you install a door I've already purchased, or do you supply the door?",
+          answer:
+            "<p>Both. We can supply and install the door, or we can install a door you've already purchased. If you're supplying the door, let us know the brand and model during the quote so we can confirm it's appropriate for your opening and has everything needed for a proper installation.</p>",
+        },
+        {
+          question: "My existing door frame is damaged — can it still be replaced?",
+          answer:
+            "<p>Possibly. Minor frame damage — soft spots, surface rot, or small areas of deterioration — can often be repaired as part of the installation. Severe rot or structural damage to the rough framing may require more significant repairs first. Doug will assess the frame condition during the quote and give you an honest read on what's involved.</p>",
+        },
+        {
+          question: "What's the difference between a storm door and a screen door?",
+          answer:
+            "<p>A storm door is a full exterior door with glass panels, typically installed in front of your entry door to add weather protection and insulation. Many storm doors have retractable or interchangeable glass and screen panels so you can switch between full glass in winter and screened ventilation in summer. A screen door provides ventilation without weather protection and is typically lighter-duty. We install both.</p>",
         },
       ],
       cta: {
-        heading: "Ready for a New Door?",
-        subheading:
-          "Get a free quote for professional door installation in Charlotte, Monroe, Indian Trail, and nearby communities.",
+        heading: "Ready to Install or Replace a Door?",
+        body:
+          "Call, text, or fill out the form for a free quote. Doug will measure the opening personally and give you a clear written estimate — no pressure, no surprises.",
+        footerLine:
+          "Mon–Sat, 7am–6pm | Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas",
       },
     }),
   },
   {
     title: "Window Repair",
     slug: "services-window-repair",
-    seoTitle: "Window Repair in Charlotte & Monroe, NC",
+    seoTitle: "Window Repair in Charlotte & Monroe, NC | Foggy Glass, Broken Seals & More | Glass and Door Pro",
     seoDescription:
-      "Window repair for broken panes, foggy glass, seal failure, storm damage, and glass-only replacement in Charlotte, Monroe, Indian Trail and nearby areas. Call for a free quote.",
+      "Window repair for broken seals, foggy panes, failed IGUs, broken hardware, and cracked glass. Serving Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Call (704) 771-6111.",
     seoKeywords:
       "window repair Charlotte NC, broken window glass, foggy window repair, seal failure repair, glass replacement",
-    ogImageUrl: "/images/glass-door-pro/window-repair-parallax.jpg",
-    content: servicePageContent({
+    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    content: expandedServicePageContent({
       hero: {
-        heading: "Window Repair Services",
+        heading: "Window Repair in Charlotte & Monroe, NC",
         subheading:
-          "Broken glass, foggy windows, seal failures, and storm damage can often be fixed without replacing the full window. Get reliable repair help from a local glass pro.",
+          "Foggy panes, broken seals, failed IGUs, cracked glass, and stuck sashes — fixed without replacing the whole window when possible. Owner-operated service across Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and surrounding areas. Same-week appointments available.",
         imageUrl: "/images/glass-door-pro/window-repair-parallax.jpg",
         imagePositionY: 45,
       },
-      cardsTitle: "Common Window Problems We Repair",
-      cards: [
-        {
-          icon: "XCircle",
-          title: "Broken Glass",
-          description: "Repair cracked or shattered panes quickly and professionally.",
-        },
+      intro: {
+        title: "Window Repair Before You Commit to Replacement",
+        content:
+          "<p>A fogged-up window doesn't automatically mean you need a new window. In many cases, the frame and sash are perfectly fine — the only thing that's failed is the insulated glass unit (IGU) inside. Replacing just the glass is faster, less disruptive, and significantly less expensive than full window replacement.</p><p>Glass and Door Pro handles residential window repair throughout the greater Charlotte area. Doug assesses each window honestly — if repair is the right call, we repair it. If the frame is damaged, the window no longer operates correctly, or replacement makes more economic sense, we'll tell you that too. You won't get pushed toward a more expensive option just to pad the ticket.</p><p>Common repair jobs we handle include foggy or cloudy glass caused by seal failure, broken or damaged IGUs, cracked single panes, stuck or difficult-to-operate sashes, broken hardware (locks, cranks, balances), and failed weatherstripping that's letting air in around the frame.</p><p>If you're not sure whether your window can be repaired or needs to be replaced, call us. Doug will take a look and give you a straight answer.</p>",
+      },
+      detailTitle: "Window Problems We Fix",
+      detailCards: [
         {
           icon: "Droplets",
-          title: "Foggy Windows",
-          description: "Address failed seals that leave condensation trapped between panes.",
+          title: "Foggy & Cloudy Glass (Failed Seal)",
+          description:
+            "When you see fog, haze, or condensation between the panes of a double-pane window, the seal has failed and the inert gas inside the IGU has been replaced by humid air. We replace the IGU — the glass unit itself — without touching the frame or sash.",
         },
         {
-          icon: "ShieldCheck",
-          title: "Seal Failure",
-          description: "Restore comfort and visibility when insulated glass units fail.",
+          icon: "XCircle",
+          title: "Broken or Cracked Glass",
+          description:
+            "A cracked pane is a security and energy efficiency problem. We replace cracked single panes and failed insulated units. Glass-only replacement is often possible without removing the entire window.",
         },
         {
           icon: "Wrench",
-          title: "Storm Damage",
-          description: "Repair glass damage caused by weather, debris, and impact.",
+          title: "Stuck or Hard-to-Operate Sashes",
+          description:
+            "Windows that won't open, won't close, or take real effort to move are often suffering from worn balance systems, swollen frames, or damaged hardware. We diagnose and fix the specific issue rather than recommending replacement by default.",
         },
         {
-          icon: "Grid3X3",
-          title: "Single Pane Upgrade",
-          description: "Explore safer, clearer, and more efficient glass replacement options.",
+          icon: "Wrench",
+          title: "Broken Window Hardware",
+          description:
+            "Sash locks, cam locks, tilt latches, casement cranks, and balance springs all wear out over time. We source and replace hardware to restore proper operation.",
+        },
+        {
+          icon: "ShieldCheck",
+          title: "Failed Weatherstripping & Air Leaks",
+          description:
+            "Drafts around a closed window usually mean the weatherstripping has compressed, cracked, or pulled away. Replacing it is straightforward and makes a real difference in comfort and energy costs.",
         },
         {
           icon: "CheckCircle",
-          title: "Glass-Only Replacement",
-          description: "Fix the damaged glass while preserving the existing window frame when possible.",
+          title: "Broken Window Screens",
+          description:
+            "Torn, bent, or missing screens replaced with properly fitted new screens. We cut screens to fit and re-screen existing frames when the frame is in good shape.",
         },
       ],
-      galleryTitle: "Window Repair Work",
-      gallery: [
+      proseSections: [
         {
-          url: "/images/glass-door-pro/window-repair-broken-1280w.webp",
-          alt: "Broken window glass before repair",
-        },
-        {
-          url: "/images/glass-door-pro/window-repair-living-1280w.webp",
-          alt: "Living room window repaired by Glass & Door Pro",
+          title: "When to Repair — and When to Replace",
+          content:
+            "<p>Not every window problem requires a full replacement. Here's how we generally think about it:</p><p><strong>Repair usually makes sense when:</strong></p><ul><li>The frame and sash are structurally sound and operate correctly</li><li>The problem is a failed IGU (foggy glass) and the frame has years of life left</li><li>A single piece of hardware has failed (lock, crank, balance spring)</li><li>The weatherstripping has worn but the window itself is in good shape</li><li>You have one or two problem windows in an otherwise functioning set</li></ul><p><strong>Replacement usually makes more sense when:</strong></p><ul><li>The frame is warped, rotted, or structurally compromised</li><li>The window no longer opens, closes, or locks reliably after hardware repairs</li><li>The window is old enough that energy performance is a real concern and repair costs approach replacement costs</li><li>You're updating your home's appearance and want consistent window styles throughout</li></ul><p>We'll give you an honest assessment of which direction makes sense. If repair is viable, we'll repair it. If replacement is the better long-term value, we'll tell you that — and we can handle that too.</p>",
         },
       ],
-      processTitle: "Why Choose Us for Window Repair",
-      process: [
+      benefitsTitle: "Why Homeowners Trust Glass and Door Pro for Window Repair",
+      benefitsCards: [
         {
-          title: "Fast Response",
-          description: "We help you address broken or failed glass without unnecessary delay.",
+          icon: "BadgeCheck",
+          title: "Repair First Mentality",
+          description:
+            "We don't automatically recommend replacement to increase the ticket. If your window can be repaired properly, we'll repair it and tell you why.",
         },
         {
-          title: "Affordable Pricing",
-          description: "Glass-only replacement can often avoid the cost of a full window replacement.",
+          icon: "Grid3X3",
+          title: "Glass-Only Replacement Available",
+          description:
+            "When seal failure is the only problem, we can replace the IGU without disturbing the frame — faster, cleaner, and less expensive than full window replacement.",
         },
         {
-          title: "Quality Materials",
-          description: "We use reliable glass and seal solutions chosen for your window type.",
+          icon: "UserCheck",
+          title: "Owner Does the Diagnostic",
+          description:
+            "Doug assesses every repair job himself. You get an honest read on what's actually wrong and what it will take to fix it, not a sales pitch from a subcontractor on commission.",
         },
         {
-          title: "15+ Years Experience",
-          description: "Doug brings hands-on experience to every repair and replacement.",
+          icon: "CalendarDays",
+          title: "Same-Week Availability",
+          description:
+            "Window repairs don't have to wait weeks. We typically schedule within a few days, and Saturday appointments are available.",
+        },
+        {
+          icon: "CheckCircle",
+          title: "Honest, Upfront Pricing",
+          description:
+            "We quote the repair before we do it. No surprise invoices after the job is complete.",
+        },
+        {
+          icon: "MapPin",
+          title: "Serving the Full Charlotte Metro",
+          description:
+            "Monroe-based, serving Charlotte, Indian Trail, Matthews, Waxhaw, Weddington, and surrounding communities. No travel surcharges for nearby areas.",
         },
       ],
+      serviceArea: {
+        title: "Window Repair Service Area",
+        content:
+          "<p>We provide residential window repair throughout the greater Charlotte area, including:</p><p>Monroe, Charlotte, Indian Trail, Stallings, Matthews, Waxhaw, Weddington, Wesley Chapel, Indian Land, Fort Mill, Pineville, and surrounding Union and Mecklenburg County communities.</p><p>Not sure if we serve your area? Call or text (704) 771-6111 — we almost certainly do.</p>",
+      },
+      faqTitle: "Frequently Asked Questions — Window Repair",
       faqs: [
         {
-          question: "Can you replace just the glass?",
+          question: "Can a foggy window be repaired without replacing the whole window?",
           answer:
-            "<p>In many cases, yes. If the frame is in good condition, glass-only replacement can be a practical option.</p>",
+            "<p>In most cases, yes. Foggy or cloudy glass is caused by a failed seal in the insulated glass unit (IGU). If the window frame and sash are in good condition, we can replace just the IGU — the glass itself — without touching the frame. This is significantly less expensive than full window replacement and is the right call when the rest of the window is still functional.</p>",
         },
         {
-          question: "Can foggy windows be repaired?",
+          question: "How much does window repair cost in Charlotte, NC?",
           answer:
-            "<p>Fogging often means the insulated glass seal has failed. Replacing the glass unit can restore clarity.</p>",
+            "<p>Window repair costs vary by the type of repair. IGU replacement (for foggy glass) typically runs $150–$350 per window depending on size. Hardware repairs are generally less. We provide a free assessment and written quote before any work begins so you know the cost upfront.</p>",
         },
         {
-          question: "Do you repair storm-damaged windows?",
+          question: "How do I know if my window seal has failed?",
           answer:
-            "<p>Yes. We can assess storm or impact damage and recommend the right repair path.</p>",
+            "<p>The most obvious sign is fogging, haze, or condensation that appears between the panes and can't be wiped away. You may also notice the window looks streaky or discolored in a way that doesn't clean up. These are all signs the inert gas inside the IGU has escaped and humid air has taken its place.</p>",
         },
         {
-          question: "Should I replace the full window instead?",
+          question: "Can you replace just the glass in a window without replacing the frame?",
           answer:
-            "<p>It depends on the condition of the frame, age of the window, and your goals. We'll help you choose the sensible option.</p>",
+            "<p>Yes, in many cases. If the frame and sash are structurally sound, we can replace the glass unit (IGU) only. This works well for standard rectangular windows with intact frames. We'll assess the window during the quote and let you know if glass-only replacement is viable.</p>",
+        },
+        {
+          question: "My window won't open or close properly — is that repairable?",
+          answer:
+            "<p>Usually, yes. Stiff or stuck windows are often caused by worn balance systems (in double-hung windows), damaged cranks (in casement windows), or swollen frames. We diagnose the specific issue and repair what's actually broken rather than recommending replacement by default.</p>",
+        },
+        {
+          question: "Do you repair windows on upper floors or hard-to-reach areas?",
+          answer:
+            "<p>Yes. We work with windows throughout the home, including upper-floor windows. For particularly difficult access situations, Doug will assess during the quote and let you know if any special equipment is needed.</p>",
         },
       ],
       cta: {
-        heading: "Need Window Repair in Charlotte?",
-        subheading:
-          "Get help with broken glass, foggy panes, seal failure, and glass-only replacement throughout the Charlotte area.",
+        heading: "Have a Window That Needs Attention?",
+        body:
+          "Call, text, or fill out the form and Doug will take a look. Most window repair jobs can be diagnosed quickly and scheduled within the same week.",
+        footerLine:
+          "Mon–Sat, 7am–6pm | Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas",
       },
     }),
   },
@@ -2507,8 +2739,66 @@ async function upsertMenu(menu: InsertCmsMenu & { location: MenuLocation }) {
   await storage.cmsMenus.create(menu);
 }
 
+function getSeedOnlySlugs() {
+  const raw = process.env.GLASS_CMS_SEED_ONLY_SLUGS;
+  if (!raw) return null;
+
+  const slugs = raw
+    .split(",")
+    .map((slug) => slug.trim())
+    .filter(Boolean);
+
+  return slugs.length > 0 ? new Set(slugs) : null;
+}
+
+async function upsertGlassServicePage(servicePage: GlassServicePageSeed) {
+  const existingServicePage = await storage.cmsPages.getPageBySlug(servicePage.slug);
+  const servicePath = `/services/${servicePage.slug.replace("services-", "")}`;
+  const pagePayload: InsertCmsPage = {
+    title: servicePage.title,
+    slug: servicePage.slug,
+    pageType: "service",
+    status: "published",
+    template: "full-width",
+    content: servicePage.content,
+    seoTitle: servicePage.seoTitle,
+    seoDescription: servicePage.seoDescription,
+    seoKeywords: servicePage.seoKeywords,
+    ogImageUrl: servicePage.ogImageUrl,
+    canonicalUrl: `https://glassanddoorpro.com${servicePath}`,
+    publishedAt: new Date(),
+  };
+
+  if (existingServicePage) {
+    await storage.cmsPages.updatePage(existingServicePage.id, pagePayload);
+    console.log(`  [updated] ${servicePage.slug} page (${existingServicePage.id})`);
+  } else {
+    const page = await storage.cmsPages.createPage(pagePayload);
+    console.log(`  [created] ${servicePage.slug} page (${page.id})`);
+  }
+}
+
 async function seedGlassPublicCms() {
   console.log("Seeding Glass & Door Pro public CMS content...");
+  const seedOnlySlugs = getSeedOnlySlugs();
+
+  if (seedOnlySlugs) {
+    console.log(`  [targeted] limiting seed to slugs: ${[...seedOnlySlugs].join(", ")}`);
+    const matchedSlugs = new Set<string>();
+    for (const servicePage of glassServicePages) {
+      if (!seedOnlySlugs.has(servicePage.slug)) continue;
+      matchedSlugs.add(servicePage.slug);
+      await upsertGlassServicePage(servicePage);
+    }
+
+    const unmatchedSlugs = [...seedOnlySlugs].filter((slug) => !matchedSlugs.has(slug));
+    if (unmatchedSlugs.length > 0) {
+      throw new Error(`No supported targeted seed page found for: ${unmatchedSlugs.join(", ")}`);
+    }
+
+    console.log("Done.");
+    return;
+  }
 
   const existingHome = await storage.cmsPages.getPageBySlug("home");
   if (existingHome) {
@@ -2626,30 +2916,7 @@ async function seedGlassPublicCms() {
   }
 
   for (const servicePage of glassServicePages) {
-    const existingServicePage = await storage.cmsPages.getPageBySlug(servicePage.slug);
-    const servicePath = `/services/${servicePage.slug.replace("services-", "")}`;
-    const pagePayload: InsertCmsPage = {
-      title: servicePage.title,
-      slug: servicePage.slug,
-      pageType: "service",
-      status: "published",
-      template: "full-width",
-      content: servicePage.content,
-      seoTitle: servicePage.seoTitle,
-      seoDescription: servicePage.seoDescription,
-      seoKeywords: servicePage.seoKeywords,
-      ogImageUrl: servicePage.ogImageUrl,
-      canonicalUrl: `https://glassanddoorpro.com${servicePath}`,
-      publishedAt: new Date(),
-    };
-
-    if (existingServicePage) {
-      await storage.cmsPages.updatePage(existingServicePage.id, pagePayload);
-      console.log(`  [updated] ${servicePage.slug} page (${existingServicePage.id})`);
-    } else {
-      const page = await storage.cmsPages.createPage(pagePayload);
-      console.log(`  [created] ${servicePage.slug} page (${page.id})`);
-    }
+    await upsertGlassServicePage(servicePage);
   }
 
   for (const cityPage of glassCityPages) {

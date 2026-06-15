@@ -7,6 +7,7 @@ import {
   buildGlassLocalBusinessLd,
   buildGlassServiceLdForCmsPage,
   getGlassServiceSeoOverride,
+  getGlassServiceSocialMetadata,
   getCmsPublicPath,
   getCmsSlugForPublicPath,
   isGlassServicePageSlug,
@@ -17,7 +18,10 @@ interface PublicHtmlSnapshot {
   title: string;
   description: string;
   canonicalUrl: string;
+  ogTitle?: string | null;
+  ogDescription?: string | null;
   ogImageUrl?: string | null;
+  twitterSite?: string | null;
   robots?: string | null;
   bodyHtml: string;
   jsonLd?: Array<Record<string, unknown>>;
@@ -303,6 +307,10 @@ function serializeJsonForHtml(value: unknown) {
 }
 
 function buildHeadTitle(rawTitle: string, seo?: SeoSettings | null, options?: { brandLast?: boolean }) {
+  if (/\s[|–—-]\sGlass (?:&|and) Door Pro$/i.test(rawTitle.trim())) {
+    return rawTitle.trim();
+  }
+
   const titleSuffix = seo?.titleSuffix ?? " | Glass & Door Pro";
   const siteName = seo?.siteName ?? "Glass & Door Pro";
   return options?.brandLast
@@ -427,6 +435,7 @@ function getPrerenderHeading(page: Pick<CmsPage, "slug" | "title">, effectiveTit
 
 function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: string): PublicHtmlSnapshot {
   const seoOverride = getGlassServiceSeoOverride(page.slug);
+  const socialOverride = getGlassServiceSocialMetadata(page.slug);
   const title = seoOverride?.title || page.seoTitle || page.title || "Page";
   const description =
     seoOverride?.description ||
@@ -452,7 +461,10 @@ function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: strin
     }),
     description,
     canonicalUrl,
+    ogTitle: socialOverride?.ogTitle || null,
+    ogDescription: socialOverride?.ogDescription || null,
     ogImageUrl: absoluteUrl(page.ogImageUrl || seo?.defaultOgImageUrl, siteUrl) || null,
+    twitterSite: socialOverride?.twitterSite || null,
     robots: page.noindex ? "noindex,nofollow" : null,
     bodyHtml,
     cmsPage: page,
@@ -737,8 +749,10 @@ export function injectPublicHtmlSnapshot(
     .replace(/\s*<meta property="og:image"[^>]*>\s*/i, "\n")
     .replace(/\s*<meta property="og:url"[^>]*>\s*/i, "\n")
     .replace(/\s*<meta name="twitter:card"[^>]*>\s*/i, "\n")
+    .replace(/\s*<meta name="twitter:site"[^>]*>\s*/i, "\n")
     .replace(/\s*<meta name="twitter:title"[^>]*>\s*/i, "\n")
     .replace(/\s*<meta name="twitter:description"[^>]*>\s*/i, "\n")
+    .replace(/\s*<meta name="twitter:image"[^>]*>\s*/i, "\n")
     .replace(/\s*<meta name="robots"[^>]*>\s*/i, "\n")
     .replace(/\s*<link rel="canonical"[^>]*>\s*/i, "\n");
 
@@ -750,16 +764,20 @@ export function injectPublicHtmlSnapshot(
 
   const headParts = [
     `<meta name="description" content="${escapeHtml(snapshot.description)}" />`,
-    `<meta property="og:title" content="${escapeHtml(snapshot.title)}" />`,
-    `<meta property="og:description" content="${escapeHtml(snapshot.description)}" />`,
+    `<meta property="og:title" content="${escapeHtml(snapshot.ogTitle || snapshot.title)}" />`,
+    `<meta property="og:description" content="${escapeHtml(snapshot.ogDescription || snapshot.description)}" />`,
     `<meta property="og:url" content="${escapeHtml(snapshot.canonicalUrl)}" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
-    `<meta name="twitter:title" content="${escapeHtml(snapshot.title)}" />`,
-    `<meta name="twitter:description" content="${escapeHtml(snapshot.description)}" />`,
+    snapshot.twitterSite ? `<meta name="twitter:site" content="${escapeHtml(snapshot.twitterSite)}" />` : "",
+    `<meta name="twitter:title" content="${escapeHtml(snapshot.ogTitle || snapshot.title)}" />`,
+    `<meta name="twitter:description" content="${escapeHtml(snapshot.ogDescription || snapshot.description)}" />`,
     `<link rel="canonical" href="${escapeHtml(snapshot.canonicalUrl)}" />`,
     snapshot.robots ? `<meta name="robots" content="${escapeHtml(snapshot.robots)}" />` : "",
     snapshot.ogImageUrl
       ? `<meta property="og:image" content="${escapeHtml(snapshot.ogImageUrl)}" />`
+      : "",
+    snapshot.ogImageUrl
+      ? `<meta name="twitter:image" content="${escapeHtml(snapshot.ogImageUrl)}" />`
       : "",
     customHeadHtml || "",
     ...(snapshot.jsonLd ?? []).map(

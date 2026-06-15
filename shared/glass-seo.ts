@@ -14,6 +14,33 @@ const cityServiceOffers = [
   ["Commercial Glass", "/services/commercial-glass"],
 ] as const;
 
+const serviceSocialMetadata: Record<
+  string,
+  { ogTitle: string; ogDescription: string; twitterCard: string; twitterSite: string }
+> = {
+  "services-window-installation": {
+    ogTitle: "Window Installation & Replacement | Glass and Door Pro",
+    ogDescription:
+      "Owner-operated window installation serving Charlotte, Monroe, and the greater Union County area. Residential replacement windows, honest quotes, Saturday appointments available.",
+    twitterCard: "summary_large_image",
+    twitterSite: "@GlassDoorPro",
+  },
+  "services-window-repair": {
+    ogTitle: "Window Repair Services | Glass and Door Pro",
+    ogDescription:
+      "Fix foggy windows, broken seals, failed panes, and damaged hardware without replacing the whole window. Owner-operated window repair across Charlotte and Monroe, NC.",
+    twitterCard: "summary_large_image",
+    twitterSite: "@GlassDoorPro",
+  },
+  "services-door-installation": {
+    ogTitle: "Door Installation Services | Glass and Door Pro",
+    ogDescription:
+      "Entry doors, patio doors, storm doors, and exterior door installation. Owner-operated service across Charlotte, Monroe, and the greater Union County area. Honest pricing, clean finish.",
+    twitterCard: "summary_large_image",
+    twitterSite: "@GlassDoorPro",
+  },
+};
+
 const glassServiceAreas = [
   ["Charlotte", "North Carolina"],
   ["Monroe", "North Carolina"],
@@ -49,7 +76,16 @@ function buildGlassServiceAreaServed() {
 
 const servicePageNames: Record<
   string,
-  { serviceType: string; name: string; description?: string; seoTitle?: string; seoDescription?: string }
+  {
+    serviceType: string;
+    name: string;
+    description?: string;
+    seoTitle?: string;
+    seoDescription?: string;
+    offerCatalogName?: string;
+    offers?: string[];
+    schemaAreaServed?: string[];
+  }
 > = {
   "services-frameless-showers": {
     serviceType: "Frameless Glass Shower Door Installation",
@@ -61,25 +97,61 @@ const servicePageNames: Record<
       'Custom frameless glass shower door design, fabrication, and installation. Tempered safety glass in 3/8" and 1/2" thicknesses, low-iron glass available, premium hardware in multiple finishes. Serving the greater Charlotte, NC metro and surrounding areas.',
   },
   "services-window-installation": {
-    serviceType: "Window Installation",
-    name: "Residential Window Installation",
-    seoTitle: "Residential Window Installation in Charlotte & Monroe, NC",
+    serviceType: "Window Installation & Replacement",
+    name: "Window Installation & Replacement",
+    seoTitle: "Window Installation in Charlotte & Monroe, NC | Replacement Windows | Glass and Door Pro",
     seoDescription:
-      "Residential window installation and replacement in Charlotte, Monroe, Indian Trail, Matthews, Waxhaw and nearby areas. Owner-operated with 15+ years of experience. Call for a free quote.",
+      "Professional window installation and replacement for homes across Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Owner-operated, honest pricing, same-week appointments. Call (704) 771-6111.",
+    description:
+      "Professional residential window installation and replacement serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and surrounding communities in the greater Charlotte metro area.",
+    offerCatalogName: "Window Installation Services",
+    schemaAreaServed: ["Charlotte", "Monroe", "Indian Trail", "Matthews", "Waxhaw"],
+    offers: [
+      "Double-Hung Window Replacement",
+      "Casement Window Installation",
+      "Sliding Window Replacement",
+      "Picture Window Installation",
+      "Bay Window Installation",
+      "Energy-Efficient Window Replacement",
+    ],
   },
   "services-door-installation": {
     serviceType: "Door Installation",
-    name: "Door Installation Services",
-    seoTitle: "Door Installation in Charlotte & Monroe, NC",
+    name: "Door Installation",
+    seoTitle: "Door Installation in Charlotte & Monroe, NC | Entry, Patio & Storm Doors | Glass and Door Pro",
     seoDescription:
-      "Entry door, patio door, and exterior door installation in Charlotte, Monroe, Indian Trail, Matthews, Waxhaw and nearby areas. Owner-operated with 15+ years of experience. Call for a free quote.",
+      "Residential door installation for entry doors, patio doors, storm doors, and exterior doors across Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Call (704) 771-6111.",
+    description:
+      "Residential door installation services including entry doors, patio doors, storm doors, French doors, and exterior doors throughout Charlotte, Monroe, and the greater Charlotte metro area.",
+    offerCatalogName: "Door Installation Services",
+    schemaAreaServed: ["Charlotte", "Monroe", "Indian Trail", "Matthews", "Waxhaw"],
+    offers: [
+      "Entry Door Installation",
+      "Patio Door Installation",
+      "Storm Door Installation",
+      "French Door Installation",
+      "Exterior Door Replacement",
+      "Door Frame Repair & Replacement",
+    ],
   },
   "services-window-repair": {
     serviceType: "Window Repair",
-    name: "Window Repair Services",
-    seoTitle: "Window Repair in Charlotte & Monroe, NC",
+    name: "Window Repair",
+    seoTitle: "Window Repair in Charlotte & Monroe, NC | Foggy Glass, Broken Seals & More | Glass and Door Pro",
     seoDescription:
-      "Window repair for broken panes, foggy glass, seal failure, storm damage, and glass-only replacement in Charlotte, Monroe, Indian Trail and nearby areas. Call for a free quote.",
+      "Window repair for broken seals, foggy panes, failed IGUs, broken hardware, and cracked glass. Serving Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Call (704) 771-6111.",
+    description:
+      "Residential window repair services including foggy glass replacement, broken seal repair, IGU replacement, hardware repair, and weatherstripping. Serving Charlotte, Monroe, and the greater Charlotte metro area.",
+    offerCatalogName: "Window Repair Services",
+    schemaAreaServed: ["Charlotte", "Monroe", "Indian Trail", "Matthews", "Waxhaw"],
+    offers: [
+      "Foggy Window Repair",
+      "Insulated Glass Unit (IGU) Replacement",
+      "Broken Window Glass Replacement",
+      "Window Hardware Repair",
+      "Window Weatherstripping Replacement",
+      "Window Screen Replacement",
+    ],
   },
   "services-commercial-glass": {
     serviceType: "Commercial Glass Services",
@@ -144,6 +216,10 @@ export function getGlassServiceSeoOverride(slug: string) {
   };
 }
 
+export function getGlassServiceSocialMetadata(slug: string) {
+  return serviceSocialMetadata[slug] ?? null;
+}
+
 export function isGlassServicePageSlug(slug: string) {
   return Boolean(servicePageNames[slug]);
 }
@@ -161,8 +237,10 @@ export function buildGlassLocalBusinessLd(siteUrl = GLASS_SITE_URL): JsonLdObjec
     priceRange: "$$",
     address: {
       "@type": "PostalAddress",
+      streetAddress: "2341 Waverly Dr",
       addressLocality: "Monroe",
       addressRegion: "NC",
+      postalCode: "28112",
       addressCountry: "US",
     },
     openingHoursSpecification: [
@@ -215,16 +293,35 @@ export function buildGlassServiceLdForCmsPage(
   return {
     "@context": "https://schema.org",
     "@type": "Service",
+    "@id": `${absoluteGlassUrl(getCmsPublicPath(page.slug), siteUrl)}#service`,
     serviceType: serviceData.serviceType,
     name: serviceData.name,
     description: serviceData.description || page.seoDescription || undefined,
     provider: { "@id": GLASS_BUSINESS_ID },
-    areaServed: buildGlassServiceAreaServed(),
-    offers: {
-      "@type": "Offer",
-      availability: "https://schema.org/InStock",
-      url: absoluteGlassUrl(getCmsPublicPath(page.slug), siteUrl),
-    },
+    areaServed: serviceData.schemaAreaServed?.length
+      ? serviceData.schemaAreaServed.map((name) => city(name))
+      : buildGlassServiceAreaServed(),
+    ...(serviceData.offers?.length
+      ? {
+          hasOfferCatalog: {
+            "@type": "OfferCatalog",
+            name: serviceData.offerCatalogName || `${serviceData.name} Services`,
+            itemListElement: serviceData.offers.map((name) => ({
+              "@type": "Offer",
+              itemOffered: {
+                "@type": "Service",
+                name,
+              },
+            })),
+          },
+        }
+      : {
+          offers: {
+            "@type": "Offer",
+            availability: "https://schema.org/InStock",
+            url: absoluteGlassUrl(getCmsPublicPath(page.slug), siteUrl),
+          },
+        }),
   };
 }
 

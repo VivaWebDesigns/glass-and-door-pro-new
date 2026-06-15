@@ -19,7 +19,7 @@ describe("glass SEO helpers", () => {
 
   it("provides stronger service SEO defaults", () => {
     expect(getGlassServiceSeoOverride("services-window-installation")).toMatchObject({
-      title: "Residential Window Installation in Charlotte & Monroe, NC",
+      title: "Window Installation in Charlotte & Monroe, NC | Replacement Windows | Glass and Door Pro",
     });
   });
 
