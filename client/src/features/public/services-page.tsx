@@ -1,10 +1,17 @@
 import { Link } from "wouter";
-import { BadgeCheck, Building2, DoorOpen, Grid3X3, Wrench } from "lucide-react";
+import { BadgeCheck, Building2, DoorOpen, Grid3X3, Wrench, type LucideIcon } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 
-const services = [
+type ServiceCard = {
+  title: string;
+  description: string;
+  href: string;
+  icon: LucideIcon;
+};
+
+const residentialServices: ServiceCard[] = [
   {
     title: "Frameless Showers",
     description: "Custom frameless shower doors and glass enclosures measured and installed personally.",
@@ -29,12 +36,46 @@ const services = [
     href: "/services/window-repair",
     icon: Wrench,
   },
+];
+
+const commercialServices: ServiceCard[] = [
   {
-    title: "Commercial Glass",
-    description: "Storefront glass, office glass, glass doors, and commercial repair support.",
-    href: "/services/commercial-glass",
+    title: "Commercial Storefront Glass Installation",
+    description:
+      "Aluminum framing, fixed glass panels, and storefront doors for new construction, tenant buildouts, and commercial renovations.",
+    href: "/services/commercial-storefront-glass-installation",
     icon: Building2,
   },
+  {
+    title: "Commercial Storefront Glass Replacement & Repair",
+    description:
+      "Emergency board-up, broken panel replacement, and storefront glass repair for Charlotte businesses.",
+    href: "/services/commercial-storefront-glass-replacement-repair",
+    icon: Building2,
+  },
+  {
+    title: "Commercial Door Installation",
+    description: "Aluminum entry doors, glass storefront doors, and complete commercial entrance systems.",
+    href: "/services/commercial-door-installation",
+    icon: DoorOpen,
+  },
+  {
+    title: "Commercial Door Replacement & Repair",
+    description: "Broken glass panels, hardware failure, misaligned frames, and worn closers repaired or replaced fast.",
+    href: "/services/commercial-door-replacement-repair",
+    icon: Wrench,
+  },
+  {
+    title: "Commercial Window Replacement",
+    description: "Apartment and multi-family window replacement with fast mobilization.",
+    href: "/services/commercial-window-replacement",
+    icon: Building2,
+  },
+];
+
+const serviceGroups: Array<{ title: string; services: ServiceCard[] }> = [
+  { title: "Residential Services", services: residentialServices },
+  { title: "Commercial Services", services: commercialServices },
 ];
 
 export default function ServicesPage() {
@@ -49,30 +90,35 @@ export default function ServicesPage() {
                 Glass and Door Services
               </h1>
               <p className="mt-5 text-base leading-8 text-slate-600 sm:text-lg">
-                Glass & Door Pro installs and repairs showers, windows, doors, and commercial
-                glass throughout Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby
-                communities.
+                Frameless showers, residential windows, door installation, window repair, and commercial
+                glass and door services across Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and
+                nearby communities.
               </p>
             </div>
-            <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {services.map((service) => {
-                const Icon = service.icon;
-                return (
-                  <Link
-                    key={service.href}
-                    href={service.href}
-                    className="group rounded-lg bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
-                  >
-                    <Icon className="h-8 w-8 text-primary" aria-hidden="true" />
-                    <h2 className="mt-4 text-lg font-semibold text-slate-900">{service.title}</h2>
-                    <p className="mt-2 text-sm leading-6 text-slate-600">{service.description}</p>
-                    <span className="mt-5 inline-flex text-sm font-semibold text-primary group-hover:underline">
-                      View service
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
+            {serviceGroups.map((serviceGroup) => (
+              <section key={serviceGroup.title} className="mt-10">
+                <h2 className="font-heading text-2xl font-bold text-slate-900">{serviceGroup.title}</h2>
+                <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                  {serviceGroup.services.map((service) => {
+                    const Icon = service.icon;
+                    return (
+                      <Link
+                        key={service.href}
+                        href={service.href}
+                        className="group rounded-lg bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
+                      >
+                        <Icon className="h-8 w-8 text-primary" aria-hidden="true" />
+                        <h3 className="mt-4 text-lg font-semibold text-slate-900">{service.title}</h3>
+                        <p className="mt-2 text-sm leading-6 text-slate-600">{service.description}</p>
+                        <span className="mt-5 inline-flex text-sm font-semibold text-primary group-hover:underline">
+                          View service
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </section>
+            ))}
           </div>
         </section>
         <section className="bg-white px-4 py-12 text-center sm:px-6">

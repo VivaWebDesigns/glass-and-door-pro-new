@@ -125,7 +125,11 @@ function Router() {
         <Route path="/services/window-installation" component={() => <CmsHybridPage slug="services-window-installation" fallback={<NotFound />} />} />
         <Route path="/services/door-installation" component={() => <CmsHybridPage slug="services-door-installation" fallback={<NotFound />} />} />
         <Route path="/services/window-repair" component={() => <CmsHybridPage slug="services-window-repair" fallback={<NotFound />} />} />
-        <Route path="/services/commercial-glass" component={() => <CmsHybridPage slug="services-commercial-glass" fallback={<NotFound />} />} />
+        <Route path="/services/commercial-storefront-glass-installation" component={() => <CmsHybridPage slug="services-commercial-storefront-glass-installation" fallback={<NotFound />} />} />
+        <Route path="/services/commercial-storefront-glass-replacement-repair" component={() => <CmsHybridPage slug="services-commercial-storefront-glass-replacement-repair" fallback={<NotFound />} />} />
+        <Route path="/services/commercial-door-installation" component={() => <CmsHybridPage slug="services-commercial-door-installation" fallback={<NotFound />} />} />
+        <Route path="/services/commercial-door-replacement-repair" component={() => <CmsHybridPage slug="services-commercial-door-replacement-repair" fallback={<NotFound />} />} />
+        <Route path="/services/commercial-window-replacement" component={() => <CmsHybridPage slug="services-commercial-window-replacement" fallback={<NotFound />} />} />
         <Route path="/areas-served/monroe-nc" component={() => <CmsHybridPage slug="areas-served-monroe-nc" fallback={<NotFound />} />} />
         <Route path="/areas-served/charlotte-nc" component={() => <CmsHybridPage slug="areas-served-charlotte-nc" fallback={<NotFound />} />} />
         <Route path="/preview/cms/:id" component={CmsPreviewPage} />

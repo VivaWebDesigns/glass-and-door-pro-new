@@ -23,10 +23,35 @@ describe("glass SEO helpers", () => {
     });
   });
 
-  it("keeps commercial glass SEO focused on Charlotte instead of Monroe", () => {
-    expect(getGlassServiceSeoOverride("services-commercial-glass")).toMatchObject({
-      title: "Commercial Glass Services in Charlotte, NC",
-      description: expect.stringContaining("Charlotte and nearby areas"),
+  it("keeps commercial service SEO focused on Charlotte", () => {
+    expect(getGlassServiceSeoOverride("services-commercial-storefront-glass-installation")).toMatchObject({
+      title: "Commercial Storefront Glass Installation in Charlotte, NC | Glass and Door Pro",
+      description: expect.stringContaining("Charlotte, NC"),
     });
+  });
+
+  it("adds all service child pages to the services hub OfferCatalog", () => {
+    const schema = buildGlassServiceLdForCmsPage({
+      slug: "services",
+      seoDescription: "Glass and door services",
+    });
+
+    expect(schema?.hasOfferCatalog).toMatchObject({
+      itemListElement: expect.arrayContaining([
+        expect.objectContaining({
+          itemOffered: expect.objectContaining({
+            name: "Commercial Storefront Glass Installation",
+            url: "https://glassanddoorpro.com/services/commercial-storefront-glass-installation",
+          }),
+        }),
+        expect.objectContaining({
+          itemOffered: expect.objectContaining({
+            name: "Commercial Window Replacement",
+            url: "https://glassanddoorpro.com/services/commercial-window-replacement",
+          }),
+        }),
+      ]),
+    });
+    expect((schema?.hasOfferCatalog as { itemListElement: unknown[] }).itemListElement).toHaveLength(9);
   });
 });

@@ -380,9 +380,10 @@ const glassHomeContent: InsertCmsPage["content"] = {
           },
           {
             icon: "Building2",
-            title: "Commercial Glass",
-            description: "Professional storefront glass, office partitions, and commercial glass solutions for businesses.",
-            link: "/services/commercial-glass",
+            title: "Commercial Storefront Glass Installation",
+            description:
+              "Aluminum framing, fixed glass panels, and storefront doors for new construction, tenant buildouts, and commercial renovations.",
+            link: "/services/commercial-storefront-glass-installation",
             buttonText: "Learn More",
           },
         ],
@@ -869,6 +870,9 @@ function serviceHero(props: {
   primaryText?: string;
   primaryAction?: string;
   primaryLink?: string;
+  secondaryText?: string;
+  secondaryAction?: string;
+  secondaryLink?: string;
 }) {
   return block("hero", {
     variant: "glass-service",
@@ -881,9 +885,9 @@ function serviceHero(props: {
     ctaFormSlug: "contact-form",
     ctaModalTitle: "Request a Free Quote",
     ctaModalDescription: "Tell us a little about your project and Doug will follow up with next steps.",
-    ctaSecondaryText: "Call (704) 771-6111",
-    ctaSecondaryLink: "tel:+17047716111",
-    ctaSecondaryAction: "custom-link",
+    ctaSecondaryText: props.secondaryText ?? "Call (704) 771-6111",
+    ctaSecondaryLink: props.secondaryLink ?? "tel:+17047716111",
+    ctaSecondaryAction: props.secondaryAction ?? "custom-link",
     backgroundImageUrl: props.imageUrl,
     overlayColor: "#000000",
     overlayOpacity: 28,
@@ -1237,6 +1241,12 @@ function servicePageContent(props: {
     subheading: string;
     imageUrl: string;
     imagePositionY?: number;
+    primaryText?: string;
+    primaryAction?: string;
+    primaryLink?: string;
+    secondaryText?: string;
+    secondaryAction?: string;
+    secondaryLink?: string;
   };
   intro?: {
     title: string;
@@ -1326,15 +1336,24 @@ function expandedServicePageContent(props: {
     heading: string;
     body: string;
     footerLine: string;
+    primaryText?: string;
+    primaryAction?: string;
+    primaryLink?: string;
+    secondaryText?: string;
+    secondaryAction?: string;
+    secondaryLink?: string;
   };
 }): InsertCmsPage["content"] {
   return {
     blocks: [
       serviceHero({
         ...props.hero,
-        primaryText: "Request a Free Quote",
-        primaryAction: "internal-link",
-        primaryLink: "/contact",
+        primaryText: props.hero.primaryText ?? "Request a Free Quote",
+        primaryAction: props.hero.primaryAction ?? "internal-link",
+        primaryLink: props.hero.primaryLink ?? "/contact",
+        secondaryText: props.hero.secondaryText,
+        secondaryAction: props.hero.secondaryAction,
+        secondaryLink: props.hero.secondaryLink,
       }),
       block("rich-text", {
         title: props.intro.title,
@@ -1385,12 +1404,12 @@ function expandedServicePageContent(props: {
         variant: "glass-service",
         heading: props.cta.heading,
         subheading: `<p>${props.cta.body}</p><p><strong>${props.cta.footerLine}</strong></p>`,
-        primaryText: "Get Your Free Estimate",
-        primaryAction: "internal-link",
-        primaryLink: "/contact",
-        secondaryText: "Call (704) 771-6111",
-        secondaryAction: "custom-link",
-        secondaryLink: "tel:+17047716111",
+        primaryText: props.cta.primaryText ?? "Get Your Free Estimate",
+        primaryAction: props.cta.primaryAction ?? "internal-link",
+        primaryLink: props.cta.primaryLink ?? "/contact",
+        secondaryText: props.cta.secondaryText ?? "Call (704) 771-6111",
+        secondaryAction: props.cta.secondaryAction ?? "custom-link",
+        secondaryLink: props.cta.secondaryLink ?? "tel:+17047716111",
       }),
     ],
   };
@@ -1401,14 +1420,14 @@ const glassServicesContent: InsertCmsPage["content"] = {
     serviceHero({
       heading: "Glass and Door Services",
       subheading:
-        "Frameless showers, residential windows, door installation, window repair, and commercial glass services across Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby communities.",
+        "Frameless showers, residential windows, door installation, window repair, and commercial glass and door services across Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby communities.",
       imageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
       imagePositionY: 42,
       primaryText: "Request a Free Quote",
     }),
     cardsGrid({
-      title: "Services",
-      subtitle: "Choose the project type you need help with.",
+      title: "Residential Services",
+      subtitle: "Choose the residential project type you need help with.",
       columns: "3",
       backgroundColor: "#ffffff",
       cards: [
@@ -1440,12 +1459,50 @@ const glassServicesContent: InsertCmsPage["content"] = {
           link: "/services/window-repair",
           buttonText: "View window repair",
         },
+      ],
+    }),
+    cardsGrid({
+      title: "Commercial Services",
+      subtitle: "Choose the commercial project type you need help with.",
+      columns: "3",
+      backgroundColor: "#ffffff",
+      cards: [
         {
           icon: "Building2",
-          title: "Commercial Glass",
-          description: "Storefront glass, office glass, glass doors, and commercial repair support.",
-          link: "/services/commercial-glass",
-          buttonText: "View commercial glass",
+          title: "Commercial Storefront Glass Installation",
+          description:
+            "Aluminum framing, fixed glass panels, and storefront doors for new construction, tenant buildouts, and commercial renovations.",
+          link: "/services/commercial-storefront-glass-installation",
+          buttonText: "View commercial storefront glass installation",
+        },
+        {
+          icon: "Building2",
+          title: "Commercial Storefront Glass Replacement & Repair",
+          description:
+            "Emergency board-up, broken panel replacement, and storefront glass repair for Charlotte businesses.",
+          link: "/services/commercial-storefront-glass-replacement-repair",
+          buttonText: "View commercial storefront glass replacement and repair",
+        },
+        {
+          icon: "DoorOpen",
+          title: "Commercial Door Installation",
+          description: "Aluminum entry doors, glass storefront doors, and complete commercial entrance systems.",
+          link: "/services/commercial-door-installation",
+          buttonText: "View commercial door installation",
+        },
+        {
+          icon: "Wrench",
+          title: "Commercial Door Replacement & Repair",
+          description: "Broken glass panels, hardware failure, misaligned frames, and worn closers repaired or replaced fast.",
+          link: "/services/commercial-door-replacement-repair",
+          buttonText: "View commercial door replacement and repair",
+        },
+        {
+          icon: "Building2",
+          title: "Commercial Window Replacement",
+          description: "Apartment and multi-family window replacement with fast mobilization.",
+          link: "/services/commercial-window-replacement",
+          buttonText: "View commercial window replacement",
         },
       ],
     }),
@@ -1941,150 +1998,807 @@ const glassServicePages: GlassServicePageSeed[] = [
     }),
   },
   {
-    title: "Commercial Glass",
-    slug: "services-commercial-glass",
-    seoTitle: "Commercial Glass Services in Charlotte, NC",
+    title: "Commercial Storefront Glass Installation",
+    slug: "services-commercial-storefront-glass-installation",
+    seoTitle: "Commercial Storefront Glass Installation in Charlotte, NC | Glass and Door Pro",
     seoDescription:
-      "Commercial glass installation and repair for storefronts, office partitions, glass doors, restaurants, retail spaces, and property managers in Charlotte and nearby areas. Call for a free quote.",
+      "Professional commercial storefront glass installation for new construction and business buildouts in Charlotte, NC. Aluminum framing, glass systems, and storefront doors. Call (704) 771-6111.",
     seoKeywords:
-      "commercial glass Charlotte NC, storefront glass, office glass partitions, glass doors, curtain wall systems",
-    ogImageUrl: "/images/glass-door-pro/commercial-hero-1280w.webp",
-    content: servicePageContent({
+      "commercial storefront glass installation Charlotte NC, aluminum storefront framing, commercial glass doors, tenant buildout glazing",
+    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    content: expandedServicePageContent({
       hero: {
-        heading: "Commercial Glass Services in Charlotte, NC",
+        heading: "Commercial Storefront Glass Installation in Charlotte, NC",
         subheading:
-          "Professional commercial glass installation and repair for storefronts, offices, restaurants, retail spaces, and business properties across the Charlotte area.",
+          "Storefront glass systems, aluminum framing, and commercial glass doors installed for new construction, tenant buildouts, and commercial renovations across Charlotte. Reliable scheduling, clean execution, and a single point of contact from quote through completion.",
         imageUrl: "/images/glass-door-pro/commercial-hero-1280w.webp",
         imagePositionY: 50,
+        primaryText: "Request a Commercial Quote",
       },
       intro: {
-        title: "Commercial Glass Solutions for Your Business",
+        title: "Storefront Glass Installation That Stays on Your Timeline",
         content:
-          "<p>Your business space needs glass that looks professional, performs reliably, and supports the way your team and customers use the building. Glass & Door Pro provides commercial glass installation and repair with clear communication, careful workmanship, and responsive service.</p><p>We help with broken storefront glass, commercial glass doors, office glass partitions, interior glass, safety-focused replacement glass, and repairs that need to be handled with as little disruption as possible. Doug reviews the opening, measurements, hardware, access, and business schedule before recommending the right next step.</p><p>Whether you manage a retail storefront, restaurant, office, service business, or multi-tenant property, we keep the process practical: assess the issue, explain the options, provide a clear quote, and complete the work with attention to security, appearance, and daily operations.</p>",
+          "<p>When you're managing a commercial buildout or new construction project in Charlotte, the glazing contractor is one of the variables you can't afford to have go sideways. A missed installation window doesn't just affect one trade — it backs up everything behind it.</p><p>Glass and Door Pro handles commercial storefront glass installation for general contractors, project managers, and business owners across the Charlotte area. Every project is managed personally. When you call to discuss a project, you're talking to the person who will be on site. There's no project manager in the middle, no handoff to a crew you've never met, and no communication gaps between the person who took the measurements and the person doing the installation.</p><p>We install complete storefront glass systems for new commercial construction, tenant buildouts, retail renovations, and commercial property upgrades. That includes aluminum storefront framing, fixed glass panels, glass storefront doors, and entrance systems. Whether you're working on a single retail suite in a strip center, a full commercial renovation, or a new commercial building that needs its exterior glazing package completed, we bring the same attention to detail and schedule reliability to every project.</p><p>For GCs and project managers, working with an owner-operator changes the dynamic. You get direct access to the person accountable for the work — not a dispatcher, not an account manager. If there's a scheduling question, a field condition that needs a decision, or a specification that needs to be confirmed on site, you make one call. That level of responsiveness matters when a job site is moving fast and you need answers now.</p><p>Charlotte's commercial market is active — new retail, restaurant, and office buildouts are happening across the metro, and the demand for reliable commercial glazing contractors who can execute on schedule is real. Glass and Door Pro is positioned to serve that market with the responsiveness and accountability that larger glazing operations can't always deliver.</p>",
       },
-      cardsTitle: "Our Commercial Glass Services",
-      cards: [
+      detailTitle: "Commercial Storefront Glass Systems We Install",
+      detailCards: [
         {
           icon: "Building2",
-          title: "Storefront Glass",
-          description: "Clean, professional storefront glass installation and replacement for customer-facing spaces.",
+          title: "Aluminum Storefront Framing Systems",
+          description:
+            "The structural backbone of a commercial storefront. We install aluminum framing systems that are properly engineered for the opening, correctly anchored to the building structure, and set square and plumb before any glass goes in. The framing determines how the finished storefront looks and performs — we don't cut corners on it.",
         },
         {
           icon: "Grid3X3",
-          title: "Office Glass Partitions",
-          description: "Glass walls and partitions that add light, separation, and a polished commercial look.",
-        },
-        {
-          icon: "ShieldCheck",
-          title: "Curtain Wall Systems",
-          description: "Commercial glass solutions for larger building openings and modern exterior designs.",
-        },
-        {
-          icon: "Lock",
-          title: "Security Glass",
-          description: "Glass options selected for safety, durability, and business protection.",
-        },
-        {
-          icon: "Wrench",
-          title: "Emergency Repairs",
-          description: "Responsive repair support when broken commercial glass affects safety or operations.",
+          title: "Fixed Storefront Glass Panels",
+          description:
+            "Large fixed glass panels installed in aluminum framing for retail storefronts, restaurants, office lobbies, and commercial facades. Properly set, sealed, and glazed to prevent water intrusion and thermal movement issues over time.",
         },
         {
           icon: "DoorOpen",
-          title: "Glass Doors",
-          description: "Commercial glass door installation and replacement for offices, retail, and service businesses.",
-        },
-      ],
-      galleryTitle: "Commercial Glass Projects",
-      gallery: [
-        {
-          url: "/images/glass-door-pro/commercial-glass-interior-1280w.webp",
-          alt: "Commercial glass interior project",
+          title: "Commercial Glass Storefront Doors",
+          description:
+            "Aluminum-framed glass doors installed as part of a complete storefront system — single doors, pairs, and multi-door entrance configurations. Correctly hung, properly aligned with the frame, and fitted with commercial-grade hardware that holds up to daily business use.",
         },
         {
-          url: "/images/glass-door-pro/commercial-hero-1280w.webp",
-          alt: "Commercial storefront glass project",
-        },
-        ...commercialGlassGalleryImages,
-      ],
-      processTitle: "How We Work",
-      process: [
-        {
-          title: "Site Assessment",
-          description: "We review your space, measurements, access, and business needs.",
-        },
-        {
-          title: "Custom Quote",
-          description: "You receive a clear quote based on the glass, hardware, and installation scope.",
-        },
-        {
-          title: "Professional Install",
-          description: "Installation is handled carefully with respect for your property and business operations.",
-        },
-        {
-          title: "Final Walkthrough",
-          description: "We review the finished work and confirm everything is clean, secure, and ready to use.",
-        },
-      ],
-      whyTitle: "Why Charlotte Businesses Choose Us",
-      whyCards: [
-        {
-          icon: "Phone",
-          title: "Fast Response",
-          description: "Responsive communication when your business needs glass service quickly.",
+          icon: "Wrench",
+          title: "Tenant Buildout Glazing",
+          description:
+            "Interior and exterior glass work for tenant spaces in commercial buildings and strip centers. We work within the constraints of an existing building envelope and coordinate with GCs and property managers to hit lease commencement dates.",
         },
         {
           icon: "BadgeCheck",
-          title: "Licensed & Insured",
-          description: "Professional service with the credentials commercial properties expect.",
+          title: "Commercial Renovation Glass",
+          description:
+            "Replacing or upgrading the glass package on an existing commercial building — new aluminum framing, updated glass panels, modern entrance systems. A storefront renovation changes the appearance of a building significantly and Glass and Door Pro handles the full glazing scope.",
         },
         {
-          icon: "MapPin",
-          title: "Local Experience",
-          description: "Hands-on commercial glass experience throughout Charlotte and nearby areas.",
+          icon: "Lock",
+          title: "Entrance Systems & Hardware",
+          description:
+            "Door closers, panic hardware, floor pivots, pulls, and locks installed correctly for ADA compliance, security requirements, and daily operational durability. Commercial entrance hardware is specified for load — we use the right hardware for each application.",
+        },
+      ],
+      proseSections: [
+        {
+          title: "How Glass and Door Pro Works on Commercial Projects",
+          content:
+            "<p>Commercial storefront installation is a coordination-intensive scope. Here's how we approach it:</p><p><strong>Pre-Construction Consultation</strong><br>Before anything is ordered, we review the project drawings, confirm rough opening dimensions, and discuss the glass and framing specifications. Getting the specification right at this stage prevents costly changes later.</p><p><strong>Accurate Field Measurement</strong><br>We take field measurements from the actual rough opening — not from drawings alone. Commercial construction tolerances vary, and field conditions don't always match what's on paper. Measuring from the actual opening is what prevents fit issues at installation.</p><p><strong>Material Procurement</strong><br>We source aluminum framing systems and commercial glass through established supply relationships. Lead times are discussed at the time of order so the GC or PM has accurate information for scheduling downstream trades.</p><p><strong>Installation</strong><br>Installation is sequenced around the project schedule. We confirm the opening is ready before mobilizing — proper substrate, correct rough opening dimensions, structural support in place. We don't show up to a site that isn't ready, and we don't leave a site until the work is complete and clean.</p><p><strong>Punch List &amp; Closeout</strong><br>After installation, we walk the work with the GC or PM, address any punch list items on the spot, and provide documentation for the project file.</p>",
+        },
+      ],
+      benefitsTitle: "Why Charlotte Contractors Choose Glass and Door Pro for Storefront Installation",
+      benefitsCards: [
+        {
+          icon: "UserCheck",
+          title: "Single Point of Contact",
+          description:
+            "Doug handles every commercial project personally — from the initial scope conversation through installation and closeout. One call gets you the person responsible for the work, not a dispatcher or account manager.",
+        },
+        {
+          icon: "CalendarDays",
+          title: "Schedule Reliability",
+          description:
+            "We show up when we say we will and complete the work on the agreed timeline. On a commercial job site, a glazing contractor who misses their window creates problems for every trade behind them. We take that seriously.",
+        },
+        {
+          icon: "Phone",
+          title: "Field Responsiveness",
+          description:
+            "When a field condition requires a decision, we're reachable and we respond. GCs and PMs don't have time to chase subcontractors for answers — working with an owner-operator means you get fast, accountable communication throughout the project.",
+        },
+        {
+          icon: "Building2",
+          title: "Complete Storefront Scope",
+          description:
+            "Framing, glass panels, doors, and hardware — we handle the complete storefront glazing package rather than carving out portions of the scope. One contractor, one contract, one accountable party.",
         },
         {
           icon: "ShieldCheck",
-          title: "Quality Materials",
-          description: "Commercial glass and hardware selected for performance, safety, and appearance.",
+          title: "Commercial-Grade Materials",
+          description:
+            "We specify and install materials appropriate for commercial applications — the right aluminum systems, the right glass specifications, and the right hardware for the load and use requirements of each project.",
+        },
+        {
+          icon: "BadgeCheck",
+          title: "Competitive on Price",
+          description:
+            "Owner-operated means lower overhead than a large glazing company. That translates to competitive pricing on commercial projects without compromising on materials or execution quality.",
         },
       ],
+      serviceArea: {
+        title: "Commercial Storefront Glass Installation — Charlotte, NC",
+        content:
+          "<p>Glass and Door Pro provides commercial storefront glass installation throughout Charlotte and the surrounding metro area. For commercial project inquiries, call (704) 771-6111 or submit a project inquiry through the contact form.</p>",
+      },
+      faqTitle: "Frequently Asked Questions — Commercial Storefront Glass Installation",
       faqs: [
         {
-          question: "Do you replace broken storefront glass?",
+          question: "How far in advance should I schedule a commercial storefront glass installation?",
           answer:
-            "<p>Yes. We assess broken storefront glass, measure the opening, review safety and security needs, and recommend the right replacement path for your business.</p>",
+            "<p>Lead time depends on the scope and the materials specified. Standard aluminum storefront systems typically have material lead times of 2–4 weeks from order. We recommend reaching out as early in the project schedule as possible so we can confirm material availability and lock in the installation window. For projects with firm completion dates, earlier engagement gives us more scheduling flexibility.</p>",
         },
         {
-          question: "Can you install commercial glass doors?",
+          question: "Do you work directly with general contractors and project managers?",
           answer:
-            "<p>Yes. We install and replace commercial glass doors for offices, retail spaces, restaurants, and service businesses, including hardware considerations when needed.</p>",
+            "<p>Yes. Most of our commercial storefront work is coordinated with GCs and project managers. We're used to working within a construction schedule, coordinating with other trades, and communicating directly with whoever is managing the project. We can work from drawings or from field conditions — whatever the project requires.</p>",
         },
         {
-          question: "Do you work with property managers and business owners?",
+          question: "What types of commercial buildings do you install storefront glass for?",
           answer:
-            "<p>Yes. We work with business owners, property managers, landlords, and tenant improvement contacts who need clear communication and reliable commercial glass service.</p>",
+            "<p>We install storefront glass for retail spaces, restaurants, office buildings, strip centers, medical offices, and other commercial properties throughout Charlotte. If you have a commercial glazing scope and want to discuss it, call us and we'll tell you quickly whether it's a good fit.</p>",
         },
         {
-          question: "Do you handle after-hours commercial glass work?",
+          question: "Do you handle the permitting for commercial storefront glass installation?",
           answer:
-            "<p>After-hours and weekend scheduling may be available depending on the project and urgency. Contact us with the location, photos if possible, and what access is available.</p>",
+            "<p>Permitting requirements vary by project type, building, and jurisdiction. We advise on what's typically required for the scope of work and can assist with the process — but permit responsibility is typically coordinated between the GC and the building department. We'll discuss this during the initial project consultation.</p>",
         },
         {
-          question: "What commercial glass services do you offer in Charlotte?",
+          question: "Can you match existing aluminum framing on a renovation or expansion project?",
           answer:
-            "<p>We help with storefront glass, commercial glass doors, office partitions, interior glass, replacement glass, and repair work for Charlotte-area businesses.</p>",
+            "<p>In many cases, yes. We work to match existing framing systems when a renovation requires new glazing that needs to be consistent with the existing envelope. Bring us the existing specifications or let us take a look at the building, and we'll confirm what's achievable.</p>",
         },
         {
-          question: "Do you provide glass for restaurants, offices, and retail spaces?",
+          question: "What's the difference between a storefront system and a curtain wall?",
           answer:
-            "<p>Yes. We serve restaurants, offices, retail storefronts, service businesses, and other commercial properties that need durable, professional glass installation or repair.</p>",
+            "<p>A storefront system is a non-load-bearing aluminum and glass assembly typically used at ground level for retail and commercial entries — the most common commercial glazing system for the types of projects we work on. A curtain wall is a larger-scale exterior cladding system used on multi-story buildings. Glass and Door Pro specializes in storefront systems for commercial construction and renovation projects.</p>",
         },
       ],
       cta: {
-        heading: "Ready to Discuss Your Commercial Glass Project?",
+        heading: "Have a Commercial Storefront Project in Charlotte?",
+        body:
+          "Call or submit a project inquiry and Doug will follow up directly. We work with GCs, project managers, and business owners — and we respond fast.",
+        footerLine: "Mon–Sat, 7am–6pm | Charlotte, NC and surrounding metro area",
+        primaryText: "Request a Commercial Quote",
+      },
+    }),
+  },
+  {
+    title: "Commercial Storefront Glass Replacement & Repair",
+    slug: "services-commercial-storefront-glass-replacement-repair",
+    seoTitle: "Commercial Storefront Glass Replacement & Repair in Charlotte, NC | Glass and Door Pro",
+    seoDescription:
+      "Emergency storefront glass repair, board-up, and replacement for Charlotte businesses. Broken storefront glass secured and replaced fast. Owner-operated, same-day response. Call (704) 771-6111.",
+    seoKeywords:
+      "commercial storefront glass replacement Charlotte NC, storefront glass repair, emergency board-up, broken storefront glass",
+    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    content: expandedServicePageContent({
+      hero: {
+        heading: "Commercial Storefront Glass Replacement & Repair in Charlotte, NC",
         subheading:
-          "Tell us about your storefront, office, repair, or commercial glass installation needs and we'll help with the next step.",
+          "Broken storefront glass secured and replaced fast. Whether it's vandalism, an accident, or a failed panel — we board up to secure the building, then return to complete the permanent glass replacement. One call handles the whole situation.",
+        imageUrl: "/images/glass-door-pro/window-repair-parallax.jpg",
+        imagePositionY: 45,
+        primaryText: "Call (704) 771-6111",
+        primaryAction: "custom-link",
+        primaryLink: "tel:+17047716111",
+        secondaryText: "Request a Quote",
+        secondaryAction: "internal-link",
+        secondaryLink: "/contact",
+      },
+      intro: {
+        title: "When Your Storefront Glass Goes Down, You Need Fast and Reliable",
+        content:
+          "<p>A broken storefront glass panel creates two problems at once. The first is security — your building is open, your inventory or equipment is exposed, and you need it secured before you can leave for the night. The second is replacement — you need the glass back in place as quickly as possible so your business can operate normally and your storefront looks the way it should.</p><p>Glass and Door Pro handles both. When a Charlotte business owner calls about a broken storefront panel, we respond fast. If the situation requires it, we provide emergency board-up to secure the opening until the replacement glass is ready. Then we return to complete the permanent replacement — measured correctly, installed right, and finished clean.</p><p>That's important because the two-step process is often the only realistic option. Commercial storefront glass is typically tempered or laminated safety glass, cut to specific dimensions for the opening. It can't be picked up off a shelf. Board-up buys the time needed to source the correct glass, and permanent replacement follows as quickly as the material is available.</p><p>We also handle non-emergency storefront glass situations — a panel that has developed a crack, an older storefront with failing seals, or a business that wants to upgrade its glass as part of a renovation. Not every storefront glass call is an emergency, and we handle the full range from urgent response to planned replacement.</p><p>For Charlotte businesses, working with a local owner-operator means you're not calling a national dispatch center and waiting to hear back from a franchisee. You're calling the person who will show up, assess the situation, and tell you exactly what needs to happen and when.</p>",
+      },
+      detailTitle: "Storefront Glass Services We Provide",
+      detailCards: [
+        {
+          icon: "ShieldCheck",
+          title: "Emergency Storefront Glass Board-Up",
+          description:
+            "When a storefront glass panel is broken and the building needs to be secured immediately, we provide emergency board-up service. The opening is covered with plywood or board material, properly secured to protect the interior until permanent replacement glass is available. This is the first step when glass breaks outside of normal business hours or when the replacement glass requires fabrication lead time.",
+        },
+        {
+          icon: "Grid3X3",
+          title: "Storefront Glass Replacement",
+          description:
+            "Permanent replacement of broken, cracked, or failed storefront glass panels. We measure the opening, source the correct tempered or laminated safety glass to specification, and complete the installation cleanly. The framing is inspected as part of every replacement — if the frame sustained damage, we address it before the new glass goes in.",
+        },
+        {
+          icon: "XCircle",
+          title: "Cracked or Damaged Panel Repair",
+          description:
+            "Not every storefront glass situation is an emergency. Hairline cracks, edge damage, or developing seal failures can often be monitored and addressed on a scheduled basis. We assess the severity and advise on whether immediate replacement is warranted or whether the panel can be addressed on a planned timeline.",
+        },
+        {
+          icon: "Search",
+          title: "Storefront Frame Damage Assessment",
+          description:
+            "When glass breaks under impact, the aluminum framing often sustains damage as well. We inspect the frame as part of every glass replacement and address damage before installing new glass. Installing replacement glass in a damaged frame shortens the life of the new panel and creates ongoing problems.",
+        },
+        {
+          icon: "BadgeCheck",
+          title: "Glass Specification & Upgrade",
+          description:
+            "Businesses updating their storefront glass have options beyond standard clear tempered glass — low-E coatings for energy performance, tinted or reflective glass for solar control, laminated glass for enhanced security. We advise on appropriate specifications for the application and budget.",
+        },
+        {
+          icon: "CalendarDays",
+          title: "Scheduled Storefront Glass Maintenance",
+          description:
+            "For property managers and business owners with multiple locations or older storefronts, periodic glass condition assessment helps catch problems before they become emergencies. We can assess existing storefront glass and framing and provide a condition report.",
+        },
+      ],
+      proseSections: [
+        {
+          title: "Emergency Storefront Glass — What Happens When You Call",
+          content:
+            "<p>When you call Glass and Door Pro about a broken storefront panel, here's how it works:</p><p><strong>Step 1 — Immediate Assessment</strong><br>We talk through the situation with you: what happened, what's broken, whether the building is currently accessible or secured, and what your timeline looks like. We give you a realistic picture of what the response will involve.</p><p><strong>Step 2 — Board-Up if Required</strong><br>If the panel is broken and the building needs to be secured, we provide emergency board-up. The opening is properly covered and secured so you can leave the property without concern. Board-up is a temporary measure — its job is to protect the building while we source the replacement glass.</p><p><strong>Step 3 — Glass Sourcing</strong><br>Commercial storefront glass is cut to size — it's not stock material. We measure the opening precisely and place the order for the correct glass specification. We give you an accurate lead time so you know when to expect the permanent replacement.</p><p><strong>Step 4 — Permanent Replacement</strong><br>When the glass is ready, we return to complete the installation. The board-up comes down, the frame is inspected and addressed if needed, and the new glass goes in correctly — set, sealed, and finished clean.</p><p><strong>Step 5 — Walkthrough</strong><br>We walk the completed installation with you before we leave. The storefront should look right and the glass should be properly secured in the frame. If anything needs to be addressed, we handle it before we pack up.</p>",
+        },
+      ],
+      benefitsTitle: "Why Charlotte Businesses Call Glass and Door Pro for Storefront Glass",
+      benefitsCards: [
+        {
+          icon: "CheckCircle",
+          title: "One Call, Full Solution",
+          description:
+            "Board-up and permanent replacement handled by the same contractor. You don't manage two separate vendors for an emergency glass situation — we handle the complete scope from securing the opening through finished installation.",
+        },
+        {
+          icon: "UserCheck",
+          title: "Local Owner-Operator",
+          description:
+            "When you call, you reach the person who will handle your job. No national dispatch, no franchise call center, no waiting to hear back from whoever is available in your area.",
+        },
+        {
+          icon: "Phone",
+          title: "Fast Response",
+          description:
+            "Commercial glass emergencies don't wait for business hours. We respond fast and give you a straight answer on timeline and what's involved — no runaround.",
+        },
+        {
+          icon: "BadgeCheck",
+          title: "Correct Glass Specification",
+          description:
+            "Commercial storefront glass has specific requirements — tempered, laminated, correct thickness for the opening size. We source the right glass for your opening rather than substituting whatever is available.",
+        },
+        {
+          icon: "Search",
+          title: "Frame Inspection Included",
+          description:
+            "Every glass replacement includes an inspection of the existing aluminum framing. If the frame sustained damage, we address it before new glass goes in — not after.",
+        },
+        {
+          icon: "Star",
+          title: "Clean Finish",
+          description:
+            "The completed installation looks the way it should. Properly set glass, clean sealant lines, and framing that's in good condition. Your storefront is the face of your business — the replacement should be indistinguishable from new.",
+        },
+      ],
+      serviceArea: {
+        title: "Storefront Glass Replacement & Repair — Charlotte, NC",
+        content:
+          "<p>Glass and Door Pro provides commercial storefront glass replacement and emergency board-up services throughout Charlotte and the surrounding metro area. For emergency situations, call (704) 771-6111 directly.</p>",
+      },
+      faqTitle: "Frequently Asked Questions — Commercial Storefront Glass Replacement & Repair",
+      faqs: [
+        {
+          question: "My storefront glass is broken and I need it secured tonight — can you help?",
+          answer:
+            "<p>Yes. We provide emergency board-up service for broken commercial storefront glass. Call (704) 771-6111 directly and we'll assess the situation and respond as quickly as possible. Board-up secures the opening until the replacement glass can be sourced and installed.</p>",
+        },
+        {
+          question: "How long does it take to get replacement storefront glass after a break?",
+          answer:
+            "<p>Commercial storefront glass is cut to the specific dimensions of your opening — it's not stock material that can be picked up same day. Once we have the correct measurements and glass specification confirmed, typical lead time is 3–7 business days depending on the glass type and current supplier availability. We give you an accurate timeline when the order is placed.</p>",
+        },
+        {
+          question: "Does the aluminum framing need to be replaced when storefront glass breaks?",
+          answer:
+            "<p>Not always, but it needs to be inspected. When glass breaks under impact — vandalism, a vehicle strike, an accident — the aluminum frame often sustains damage that isn't immediately obvious. We inspect the frame as part of every glass replacement and address any damage before installing new glass. Installing new glass in a damaged frame causes premature failure.</p>",
+        },
+        {
+          question: "What type of glass is used for commercial storefronts?",
+          answer:
+            "<p>Commercial storefront glass is typically tempered safety glass — heat-treated to be significantly stronger than standard glass and to break into small, relatively safe fragments rather than large shards. Some applications use laminated glass, which holds together when broken. The correct specification depends on the opening size, local building codes, and the application. We advise on the right glass for your specific situation.</p>",
+        },
+        {
+          question: "Can you replace just one broken panel in an existing storefront?",
+          answer:
+            "<p>Yes. We can replace a single broken or damaged panel in an existing storefront system without disturbing the surrounding framing or glass. As long as the frame is in good condition, panel-only replacement is the standard approach.</p>",
+        },
+        {
+          question: "Do you work with property managers who oversee multiple commercial locations?",
+          answer:
+            "<p>Yes. Property managers with multiple Charlotte locations can work with us directly for storefront glass maintenance, replacement, and emergency response. We're familiar with the coordination requirements of multi-site property management and can work within your existing service request process.</p>",
+        },
+      ],
+      cta: {
+        heading: "Broken Storefront Glass in Charlotte?",
+        body:
+          "Call us directly for emergency response. For non-emergency replacement and repair, fill out the form and we'll follow up same day.",
+        footerLine: "Mon–Sat, 7am–6pm | Charlotte, NC and surrounding metro area",
+        primaryText: "Call (704) 771-6111",
+        primaryAction: "custom-link",
+        primaryLink: "tel:+17047716111",
+        secondaryText: "Request a Quote",
+        secondaryAction: "internal-link",
+        secondaryLink: "/contact",
+      },
+    }),
+  },
+  {
+    title: "Commercial Door Installation",
+    slug: "services-commercial-door-installation",
+    seoTitle: "Commercial Door Installation in Charlotte, NC | Storefront & Entry Doors | Glass and Door Pro",
+    seoDescription:
+      "Commercial door installation for new construction, tenant buildouts, and business renovations in Charlotte, NC. Aluminum entry doors, glass storefront doors, and commercial entrance systems. Call (704) 771-6111.",
+    seoKeywords:
+      "commercial door installation Charlotte NC, aluminum entry doors, glass storefront doors, commercial entrance systems",
+    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    content: expandedServicePageContent({
+      hero: {
+        heading: "Commercial Door Installation in Charlotte, NC",
+        subheading:
+          "Aluminum entry doors, glass storefront doors, and commercial entrance systems installed for new construction, tenant buildouts, and business renovations across Charlotte. Direct contact with the person doing the work — from scope through installation.",
+        imageUrl: "/images/glass-door-pro/door-parallax.jpg",
+        imagePositionY: 45,
+        primaryText: "Request a Commercial Quote",
+      },
+      intro: {
+        title: "Commercial Door Installation Built Around Your Project Schedule",
+        content:
+          "<p>A commercial door that isn't installed correctly creates problems that outlast the project. Misaligned frames, doors that don't close flush, hardware that fails early, thresholds that let weather in — these aren't cosmetic issues, they're functional failures that cost money to fix after the fact and reflect on whoever installed them.</p><p>Glass and Door Pro installs commercial doors for general contractors, project managers, and business owners throughout Charlotte. The work is managed personally by Doug — the same person who reviews the scope, takes the field measurements, sources the materials, and shows up for installation. There's no handoff between sales and installation, no crew you've never spoken to showing up to your job site. When you need a question answered or a schedule confirmed, one call gets you the person responsible.</p><p>We install aluminum storefront entry doors, glass commercial doors, and complete entrance systems as part of both new construction projects and tenant buildouts. For GCs managing multiple subcontractors on a commercial schedule, working with a glazing contractor who communicates clearly, shows up on time, and completes the scope correctly is the baseline — and it's something we take seriously on every project.</p><p>Commercial door installation is both a functional and aesthetic scope. The door is often the first physical interaction a customer or visitor has with a business — it needs to open easily, close completely, lock securely, and look right in the frame. We approach every commercial door installation with that standard in mind, whether it's a single storefront entry or a multi-door entrance system.</p><p>Charlotte's commercial construction and renovation activity means consistent demand for reliable commercial door contractors. Business owners opening new locations, landlords preparing tenant spaces, and GCs managing commercial fit-outs all need the same thing: a door contractor who delivers on scope and schedule without creating issues on the job site. That's what Glass and Door Pro provides.</p>",
+      },
+      detailTitle: "Commercial Doors We Install",
+      detailCards: [
+        {
+          icon: "DoorOpen",
+          title: "Aluminum Storefront Entry Doors",
+          description:
+            "The standard for retail, restaurant, and office entries — aluminum-framed glass doors that are durable, low-maintenance, and appropriate for high-traffic commercial use. We install single doors, pairs, and multi-door configurations as part of a complete storefront system or as standalone entry replacements.",
+        },
+        {
+          icon: "Grid3X3",
+          title: "Commercial Glass Doors",
+          description:
+            "Full-glass or predominantly glass commercial doors for office lobbies, retail entries, and interior commercial applications. Properly hung, aligned with the frame, and fitted with hardware specified for commercial use volumes.",
+        },
+        {
+          icon: "ShieldCheck",
+          title: "Panic Hardware & ADA-Compliant Entrance Systems",
+          description:
+            "Commercial entrances in occupied buildings must meet ADA accessibility requirements and may require panic hardware for egress compliance. We install entrance systems that meet code requirements and advise on what's required for the specific application and occupancy type.",
+        },
+        {
+          icon: "Building2",
+          title: "Tenant Buildout Entry Doors",
+          description:
+            "New tenant spaces in commercial buildings and strip centers require door installation as part of the buildout scope. We coordinate with GCs and property managers to install entry doors that fit within the existing building envelope and meet the landlord's specifications for the space.",
+        },
+        {
+          icon: "CheckCircle",
+          title: "Multi-Door Entrance Systems",
+          description:
+            "Larger commercial entries with multiple door openings — paired doors, doors with sidelites, vestibule configurations — require precise coordination between the door units, the framing, and the hardware. We handle multi-door entrance configurations with the same attention to alignment and operation as single-door installs.",
+        },
+        {
+          icon: "Wrench",
+          title: "Commercial Door Hardware",
+          description:
+            "Door closers, panic bars, floor pivots, pulls, locksets, and magnetic hold-opens installed correctly for the door type and use requirements. Commercial hardware is specified for load — the wrong hardware on a high-traffic commercial door fails fast. We specify and install hardware appropriate for each application.",
+        },
+      ],
+      proseSections: [
+        {
+          title: "How We Approach Commercial Door Projects",
+          content:
+            "<p><strong>Scope Review &amp; Specification</strong><br>Before anything is ordered, we review the project scope — door types, quantities, hardware specifications, opening dimensions, and any code requirements for the application. Getting the specification right before ordering prevents change orders and delays.</p><p><strong>Field Measurement</strong><br>We measure from the actual rough openings. Commercial construction tolerances vary, and relying on drawing dimensions alone for door orders creates fit problems. Field measurement is non-negotiable for commercial door work.</p><p><strong>Material Procurement</strong><br>Aluminum door systems and commercial hardware are ordered with confirmed lead times. We communicate material availability to the GC or PM so the installation window can be scheduled accurately within the project timeline.</p><p><strong>Installation</strong><br>Doors are installed level, plumb, and square. Hardware is mounted correctly and tested before we leave the site. We don't call a door complete until it opens freely, closes completely, latches properly, and locks as it should. Thresholds and weatherstripping are set to seal correctly against the floor and frame.</p><p><strong>Punch List</strong><br>We walk the completed installation with the GC or PM, address any punch list items on site, and provide documentation for the project closeout package if required.</p>",
+        },
+      ],
+      benefitsTitle: "Why Charlotte Contractors Choose Glass and Door Pro for Commercial Door Installation",
+      benefitsCards: [
+        {
+          icon: "UserCheck",
+          title: "Owner-Operated Accountability",
+          description:
+            "Doug manages every commercial door project personally. The person you call to discuss the scope is the person who shows up for installation. That accountability eliminates the communication gaps that create problems on commercial job sites.",
+        },
+        {
+          icon: "CalendarDays",
+          title: "Schedule Reliability",
+          description:
+            "We confirm the installation window in advance and show up when we say we will. On a commercial project, a door contractor who misses their window creates cascading delays. We don't do that.",
+        },
+        {
+          icon: "BadgeCheck",
+          title: "Correct Specification from the Start",
+          description:
+            "Commercial doors and hardware need to be specified correctly for the application — occupancy type, traffic volume, code requirements. We get the specification right before ordering rather than discovering problems at installation.",
+        },
+        {
+          icon: "DoorOpen",
+          title: "Complete Entrance Scope",
+          description:
+            "Frames, doors, hardware, thresholds — we handle the complete entrance installation rather than partial scopes that leave coordination gaps between contractors.",
+        },
+        {
+          icon: "Phone",
+          title: "Direct Communication",
+          description:
+            "GCs and PMs have direct access to Doug throughout the project. Field questions get answered fast. Schedule adjustments are communicated promptly. There's no account manager in the middle slowing down the exchange.",
+        },
+        {
+          icon: "Star",
+          title: "Clean, Finished Installation",
+          description:
+            "The completed door should look and function like it belongs in the building. Proper alignment, clean hardware installation, correct threshold fit — we finish the job the way a professional installation should look.",
+        },
+      ],
+      serviceArea: {
+        title: "Commercial Door Installation — Charlotte, NC",
+        content:
+          "<p>Glass and Door Pro provides commercial door installation throughout Charlotte and the surrounding metro area. For project inquiries, call (704) 771-6111 or submit a project inquiry through the contact form.</p>",
+      },
+      faqTitle: "Frequently Asked Questions — Commercial Door Installation",
+      faqs: [
+        {
+          question: "Do you work with general contractors on commercial construction projects?",
+          answer:
+            "<p>Yes. We regularly work with GCs on commercial construction and tenant buildout projects in Charlotte. We're familiar with the coordination requirements of a commercial job site — field measurement, confirmed lead times, scheduled installation windows, and punch list closeout. We communicate directly with whoever is managing the project and keep the schedule moving.</p>",
+        },
+        {
+          question: "What types of commercial doors do you install?",
+          answer:
+            "<p>We install aluminum storefront entry doors, commercial glass doors, and complete entrance systems for retail, restaurant, office, and other commercial applications. We handle single doors, paired doors, and multi-door entrance configurations with sidelites or vestibule framing.</p>",
+        },
+        {
+          question: "Do the commercial doors you install meet ADA requirements?",
+          answer:
+            "<p>ADA compliance for commercial entrances involves door width, hardware type, opening force, and threshold height requirements. We install doors that meet standard ADA accessibility requirements and advise on what's required for specific occupancy types. For projects with specific code requirements, we recommend reviewing the project documents with the GC or architect to confirm all compliance items are addressed.</p>",
+        },
+        {
+          question: "How long does commercial door installation take?",
+          answer:
+            "<p>Installation time depends on the number of doors and the complexity of the entrance configuration. A single commercial entry door typically takes 3–5 hours from start to finish including hardware. Multi-door entrance systems take longer. We provide a realistic time estimate at the time of scheduling so the GC can plan around the installation window.</p>",
+        },
+        {
+          question: "Can you supply the doors and hardware, or do you install only?",
+          answer:
+            "<p>Both. We can supply and install complete commercial door systems, or we can install doors and hardware that have been supplied by the GC or owner. If you're supplying the materials, share the product specifications with us before delivery so we can confirm everything needed for installation is included.</p>",
+        },
+        {
+          question: "What's the lead time for commercial door materials?",
+          answer:
+            "<p>Standard aluminum storefront door systems typically have lead times of 2–4 weeks from order depending on the manufacturer and current availability. We confirm lead times when the order is placed and communicate them to the project team so the installation window can be scheduled accurately.</p>",
+        },
+      ],
+      cta: {
+        heading: "Commercial Door Project in Charlotte?",
+        body:
+          "Call or submit a project inquiry and Doug will follow up directly. We work with GCs, project managers, and business owners — and we respond fast.",
+        footerLine: "Mon–Sat, 7am–6pm | Charlotte, NC and surrounding metro area",
+        primaryText: "Request a Commercial Quote",
+      },
+    }),
+  },
+  {
+    title: "Commercial Door Replacement & Repair",
+    slug: "services-commercial-door-replacement-repair",
+    seoTitle: "Commercial Door Replacement & Repair in Charlotte, NC | Glass and Door Pro",
+    seoDescription:
+      "Commercial door repair and replacement for Charlotte businesses. Broken glass panels, damaged hardware, misaligned frames, and worn closers fixed fast. Owner-operated. Call (704) 771-6111.",
+    seoKeywords:
+      "commercial door replacement Charlotte NC, commercial door repair, door closer repair, commercial door glass replacement",
+    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    content: expandedServicePageContent({
+      hero: {
+        heading: "Commercial Door Replacement & Repair in Charlotte, NC",
+        subheading:
+          "Broken glass panels, damaged hardware, misaligned frames, and doors that won't close or lock properly — repaired or replaced fast. Serving Charlotte businesses with honest assessments, same-week scheduling, and owner-operated service you can count on.",
+        imageUrl: "/images/glass-door-pro/gallery-door2-1280w.webp",
+        imagePositionY: 45,
+        primaryText: "Call (704) 771-6111",
+        primaryAction: "custom-link",
+        primaryLink: "tel:+17047716111",
+        secondaryText: "Request a Quote",
+        secondaryAction: "internal-link",
+        secondaryLink: "/contact",
+      },
+      intro: {
+        title: "Commercial Door Problems Don't Wait — Neither Should the Fix",
+        content:
+          "<p>A commercial door that doesn't work correctly is more than an inconvenience. It's a security risk, an accessibility problem, and a signal to every customer who walks up to it that something is wrong. Whether the glass panel is cracked, the closer is failing, the door won't latch, or the frame has shifted enough that the door drags on the floor — these are problems that need to be addressed, not worked around.</p><p>Glass and Door Pro handles commercial door repair and replacement for businesses throughout Charlotte. The approach is the same as our residential work: we assess honestly, we repair when repair is the right answer, and we recommend replacement when it isn't. A business owner shouldn't have to manage a door that needs to be lifted to close or pushed hard to latch — that's not a minor inconvenience, it's a daily friction point for every employee and customer who uses it.</p><p>Most commercial door problems fall into a predictable set of categories — broken glass, hardware failure, alignment issues, and frame damage. Each has a repair path and a replacement threshold. We diagnose which applies, explain what we find, and give you a clear picture of what the repair or replacement involves before any work starts.</p><p>For property managers overseeing commercial properties in Charlotte, we're a reliable service provider for door maintenance and repair across your portfolio. For individual business owners dealing with a door problem for the first time, we'll walk you through exactly what's happening and what it takes to fix it.</p>",
+      },
+      detailTitle: "Commercial Door Problems We Fix",
+      detailCards: [
+        {
+          icon: "XCircle",
+          title: "Broken Commercial Door Glass",
+          description:
+            "A cracked or shattered glass panel in a commercial door is a security and safety issue. We replace broken glass panels in existing commercial door frames — tempered glass cut to the correct specification for the door. If the frame sustained damage when the glass broke, we address that before installing new glass.",
+        },
+        {
+          icon: "Wrench",
+          title: "Door Closer Repair & Replacement",
+          description:
+            "A door that swings too fast, doesn't close completely, or slams shut has a failing closer. Commercial door closers are rated for traffic volume and wear out over time, particularly on high-use entries. We diagnose closer issues and replace with hardware rated for the door's use requirements.",
+        },
+        {
+          icon: "BadgeCheck",
+          title: "Misaligned & Dragging Doors",
+          description:
+            "Doors that drag on the floor, bind in the frame, or require significant force to open or close are usually suffering from frame shift, hinge wear, or installation movement over time. We diagnose the root cause and correct the alignment — adjusting hinges, shimming the frame, or addressing the underlying issue rather than treating the symptom.",
+        },
+        {
+          icon: "Lock",
+          title: "Lock & Latch Repair",
+          description:
+            "A commercial door that doesn't latch or lock reliably is a security issue. Worn latch mechanisms, misaligned strike plates, and failing locksets are repaired or replaced. We test the lock and latch function before we leave to confirm the door is secure.",
+        },
+        {
+          icon: "ShieldCheck",
+          title: "Threshold & Weatherstripping Replacement",
+          description:
+            "Worn thresholds and weatherstripping on commercial doors let in air, water, and pests. Commercial thresholds take significant daily impact from foot traffic and wear faster than residential units. We replace worn thresholds and weatherstripping to restore a proper seal.",
+        },
+        {
+          icon: "DoorOpen",
+          title: "Full Commercial Door Replacement",
+          description:
+            "When repair isn't the right answer — the frame is beyond adjustment, the door has sustained damage that affects its structural integrity, or the hardware failures are symptomatic of a door that's simply at the end of its service life — we handle full commercial door replacement. The old door comes out, the frame is inspected and addressed, and a new commercial door goes in correctly.",
+        },
+      ],
+      proseSections: [
+        {
+          title: "When to Repair a Commercial Door — and When to Replace It",
+          content:
+            "<p>The honest answer depends on what's actually wrong. Here's how we think about it:</p><p><strong>Repair is usually the right call when:</strong></p><ul><li>The door frame is in good condition and the door is properly aligned</li><li>The issue is a specific hardware failure — a closer, a latch, a lock</li><li>The glass panel is broken but the frame and door itself are undamaged</li><li>The weatherstripping or threshold has worn but the door functions correctly otherwise</li></ul><p><strong>Replacement makes more sense when:</strong></p><ul><li>The frame has shifted significantly and realignment isn't holding</li><li>The door has sustained impact damage that affects how it hangs or operates</li><li>Multiple hardware components have failed and the door is at the end of its service life</li><li>The door is old enough that repair costs approach or exceed the cost of a new door</li></ul><p>We'll give you a straight assessment of which situation you're in. If repair is viable and the right long-term call, we'll repair it. If replacement is the better value, we'll tell you that — and handle the replacement.</p>",
+        },
+      ],
+      benefitsTitle: "Why Charlotte Businesses Trust Glass and Door Pro for Commercial Door Repair",
+      benefitsCards: [
+        {
+          icon: "Search",
+          title: "Honest Assessment First",
+          description:
+            "We diagnose before we recommend. You'll get a clear explanation of what's wrong and what it takes to fix it — not a default recommendation to replace something that can be repaired.",
+        },
+        {
+          icon: "CalendarDays",
+          title: "Fast Scheduling",
+          description:
+            "Commercial door problems affect daily operations. We schedule commercial door repair and replacement quickly and give you an accurate arrival window so you can plan around it.",
+        },
+        {
+          icon: "UserCheck",
+          title: "Owner Does the Work",
+          description:
+            "Doug assesses and repairs every job personally. You're not dealing with a rotating service crew — the same person who talked you through the problem on the phone is the one who shows up to fix it.",
+        },
+        {
+          icon: "CheckCircle",
+          title: "Full Repair Scope",
+          description:
+            "Glass, hardware, alignment, thresholds — we handle the complete repair scope rather than addressing only one aspect and leaving the rest. A door that's been properly repaired works correctly across all its components.",
+        },
+        {
+          icon: "BadgeCheck",
+          title: "Commercial Hardware Specified Correctly",
+          description:
+            "Replacement hardware is specified for commercial use — the right closer rating, the right latch mechanism, the right lock grade for the application. Residential-grade hardware on a commercial door fails fast.",
+        },
+        {
+          icon: "Building2",
+          title: "Property Manager Friendly",
+          description:
+            "We work with property managers handling commercial door maintenance across multiple Charlotte locations. We can work within your service request process and provide documentation for your property records.",
+        },
+      ],
+      serviceArea: {
+        title: "Commercial Door Repair — Charlotte, NC",
+        content:
+          "<p>Glass and Door Pro provides commercial door repair and replacement throughout Charlotte and the surrounding metro area. Call (704) 771-6111 or submit a service request through the contact form.</p>",
+      },
+      faqTitle: "Frequently Asked Questions — Commercial Door Replacement & Repair",
+      faqs: [
+        {
+          question: "My commercial door won't close properly — can it be repaired or does it need to be replaced?",
+          answer:
+            "<p>In most cases, a commercial door that won't close properly can be repaired. The most common causes are hinge wear, frame shift, or a failing closer — all of which are repairable. We diagnose the specific issue first and give you a clear recommendation before any work starts. If the frame has shifted beyond what adjustment can correct or the door has structural damage, we'll tell you replacement makes more sense.</p>",
+        },
+        {
+          question: "How quickly can you respond to a commercial door problem in Charlotte?",
+          answer:
+            "<p>We schedule commercial door repairs quickly — typically within a few days for standard repairs. For situations where the door is non-functional or creating a security issue, call us directly at (704) 771-6111 and we'll discuss priority scheduling.</p>",
+        },
+        {
+          question: "Can you replace the glass panel in a commercial door without replacing the entire door?",
+          answer:
+            "<p>Yes, in most cases. If the door frame is in good condition and the door itself is structurally sound, we can replace just the broken glass panel. We source tempered safety glass cut to the correct specification for the door and install it without disturbing the surrounding frame.</p>",
+        },
+        {
+          question: "How long do commercial door closers last?",
+          answer:
+            "<p>Commercial door closer lifespan depends heavily on traffic volume. On a high-traffic commercial entry — a busy retail or restaurant door — closers may need replacement every 5–10 years. Lower-traffic entries last longer. Signs that a closer is failing include a door that swings too fast or too slow, doesn't close completely, or slams shut. We replace closers with units rated for the door's traffic volume.</p>",
+        },
+        {
+          question: "Do you service commercial doors for property management companies?",
+          answer:
+            "<p>Yes. We work with property managers overseeing commercial properties in Charlotte. We can handle door maintenance, repair, and replacement across multiple locations and work within your existing service request and documentation process.</p>",
+        },
+        {
+          question: "My commercial door hardware keeps failing — is this a hardware quality issue or an installation issue?",
+          answer:
+            "<p>It can be either. Commercial door hardware that fails repeatedly is often a specification problem — residential-grade or incorrectly rated hardware installed on a commercial door that sees more use than the hardware was designed for. It can also be an installation issue. We diagnose the root cause and specify replacement hardware correctly for the door's use requirements so the repair holds.</p>",
+        },
+      ],
+      cta: {
+        heading: "Commercial Door Not Working Right in Charlotte?",
+        body:
+          "Call us directly for fast scheduling. For non-urgent repairs and replacement quotes, fill out the form and we'll follow up same day.",
+        footerLine: "Mon–Sat, 7am–6pm | Charlotte, NC and surrounding metro area",
+        primaryText: "Call (704) 771-6111",
+        primaryAction: "custom-link",
+        primaryLink: "tel:+17047716111",
+        secondaryText: "Request a Quote",
+        secondaryAction: "internal-link",
+        secondaryLink: "/contact",
+      },
+    }),
+  },
+  {
+    title: "Commercial Window Replacement",
+    slug: "services-commercial-window-replacement",
+    seoTitle: "Apartment & Multi-Family Window Replacement in Charlotte, NC | Glass and Door Pro",
+    seoDescription:
+      "Fast apartment and multi-family window replacement in Charlotte, NC. Wrong windows ordered? Unit damage? Doug mobilizes faster than larger companies — keeping your project on schedule. Call (704) 771-6111.",
+    seoKeywords:
+      "apartment window replacement Charlotte NC, multi-family window replacement, commercial window replacement, property manager window replacement",
+    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    content: expandedServicePageContent({
+      hero: {
+        heading: "Apartment & Multi-Family Window Replacement in Charlotte, NC",
+        subheading:
+          "Wrong windows ordered. Unit damage mid-construction. A deadline that can't move. When an apartment or multi-family project in Charlotte has a window problem that needs to be resolved fast, Glass and Door Pro mobilizes quicker than larger companies — and Doug handles the project personally from first call through final installation.",
+        imageUrl: "/images/glass-door-pro/window-parallax.jpg",
+        imagePositionY: 45,
+        primaryText: "Call (704) 771-6111",
+        primaryAction: "custom-link",
+        primaryLink: "tel:+17047716111",
+        secondaryText: "Request a Quote",
+        secondaryAction: "internal-link",
+        secondaryLink: "/contact",
+      },
+      intro: {
+        title: "The Window Contractor That Shows Up When Your Schedule Can't Slip",
+        content:
+          "<p>Multi-family and apartment construction runs on tight timelines. Lease commencement dates are set months in advance, certificate of occupancy schedules are real constraints, and when a window problem surfaces mid-project — wrong units ordered, breakage during construction, units that don't meet spec — the project manager needs someone who can get there fast, assess the situation clearly, and execute the replacement without creating additional delays.</p><p>That's the problem Glass and Door Pro solves for apartment and multi-family projects in Charlotte. When a larger glazing company can't get to your site for two weeks and your schedule doesn't have two weeks to give, an owner-operator who can mobilize quickly changes the outcome of the project.</p><p>Doug handles every multi-family window replacement project personally. When you call about a window problem on an apartment project, you're talking to the person who will be on site — not a dispatcher routing the call to a crew you've never met. That direct access means faster decisions, faster mobilization, and a cleaner handoff from problem identification to resolution.</p><p>We work with property managers and project managers on apartment complexes and multi-family residential buildings throughout Charlotte. The scenarios we handle most often include windows that were incorrectly specified or ordered and need to be replaced before occupancy, unit windows that were broken during construction or move-in, and windows that fail during the warranty period and need to be addressed before they become a tenant issue.</p><p>In every case, the competitive advantage is the same: we move faster than larger companies, we communicate directly with whoever is managing the project, and we get the windows replaced correctly without adding to your problems.</p>",
+      },
+      detailTitle: "Multi-Family Window Situations We Resolve",
+      detailCards: [
+        {
+          icon: "XCircle",
+          title: "Wrong Windows Ordered",
+          description:
+            "Wrong size, wrong specification, wrong configuration — windows that arrive for a multi-family project and don't fit or don't meet the required spec create an immediate schedule problem. We assess the situation quickly, source the correct replacement windows, and execute the installation to keep the project moving. Speed of response is everything in this scenario.",
+        },
+        {
+          icon: "Wrench",
+          title: "Construction Damage Replacement",
+          description:
+            "Windows broken during the construction process — from other trades, from material handling, or from weather events during the build — need to be replaced before occupancy. We handle single-unit replacements and multi-unit damage situations, working around the active construction schedule to minimize interference with other trades.",
+        },
+        {
+          icon: "BadgeCheck",
+          title: "Pre-Occupancy Window Replacement",
+          description:
+            "Windows that fail inspection or don't meet specification before a building receives its certificate of occupancy need to be resolved fast. We work on compressed timelines to get replacement windows sourced, delivered, and installed before the CO date.",
+        },
+        {
+          icon: "ShieldCheck",
+          title: "Warranty Period Window Issues",
+          description:
+            "Windows that develop problems during the warranty period — seal failures, operational issues, damage from tenant move-in — need to be addressed promptly to avoid tenant disputes and lease complications. We handle warranty-period window replacement with the same speed and accountability as new construction situations.",
+        },
+        {
+          icon: "CalendarDays",
+          title: "Unit Turnover Window Replacement",
+          description:
+            "Apartment units with damaged windows need to be restored before the next tenant takes occupancy. Property managers dealing with unit turnover window damage need a contractor who can schedule quickly and complete the work on the turnover timeline.",
+        },
+        {
+          icon: "Building2",
+          title: "Multi-Unit Replacement Projects",
+          description:
+            "Apartment complexes with aging windows across multiple units or buildings can address the replacement systematically. We can scope multi-unit replacement projects, provide phased installation schedules that work around tenant occupancy, and execute the project with minimal disruption to residents.",
+        },
+      ],
+      proseSections: [
+        {
+          title: "Why Project Managers Call Glass and Door Pro Instead of a Larger Company",
+          content:
+            "<p>The math on this is straightforward. When a window problem surfaces on an apartment project, a project manager has two options: call a large glazing company and wait, or call an owner-operator who can mobilize fast.</p><p>Large glazing companies have more locations and more name recognition. They also have more jobs ahead of yours in the queue, more layers of scheduling coordination between the call and the crew, and less flexibility to reprioritize around a single project manager's deadline.</p><p>Glass and Door Pro operates differently. When you call about a window problem on an apartment project, Doug assesses the situation the same day. If the windows can be sourced quickly, installation can be scheduled within days. There's no account manager, no scheduler, no crew coordinator in the chain — it's a direct line from the problem to the solution.</p><p>That responsiveness has real value on a project where the schedule is the constraint. A window replacement that gets resolved in three days instead of three weeks is the difference between hitting your CO date and explaining to the owner why you missed it.</p>",
+        },
+      ],
+      benefitsTitle: "Why Charlotte Property Managers Choose Glass and Door Pro",
+      benefitsCards: [
+        {
+          icon: "CalendarDays",
+          title: "Faster Mobilization",
+          description:
+            "We move faster than larger glazing companies. When your project has a window problem and your schedule can't absorb a long queue, an owner-operator who can be on site in days — not weeks — is the right call.",
+        },
+        {
+          icon: "UserCheck",
+          title: "Direct Access to Decision-Maker",
+          description:
+            "When you call, you reach Doug. He assesses the situation, gives you an accurate timeline, and stays reachable throughout the project. No dispatcher, no account manager, no hold music.",
+        },
+        {
+          icon: "Building2",
+          title: "Apartment & Multi-Family Experience",
+          description:
+            "We understand how apartment and multi-family projects work — construction schedules, CO timelines, tenant move-in dates, and the pressure of a lease commencement that doesn't move. We work within those constraints.",
+        },
+        {
+          icon: "CheckCircle",
+          title: "Accurate Timelines",
+          description:
+            "We give you a realistic timeline from the first call — material lead time, installation window, and completion date. You won't get an optimistic promise that turns into a delay. If there's a constraint, we tell you upfront.",
+        },
+        {
+          icon: "Phone",
+          title: "Single Point of Contact",
+          description:
+            "One person manages the project start to finish. You make one call for updates, one call for schedule questions, and one call if anything changes. That simplicity reduces the coordination burden on your end.",
+        },
+        {
+          icon: "BadgeCheck",
+          title: "Clean, Documented Work",
+          description:
+            "Multi-family projects require documentation — installation records, product specifications, warranty information. We provide what you need for the project file and property records.",
+        },
+      ],
+      serviceArea: {
+        title: "Multi-Family Window Replacement — Charlotte, NC",
+        content:
+          "<p>Glass and Door Pro provides apartment and multi-family window replacement throughout Charlotte and the surrounding metro area. For project inquiries, call (704) 771-6111 directly — Doug will assess your situation and give you a straight answer on timeline and availability.</p>",
+      },
+      faqTitle: "Frequently Asked Questions — Apartment & Multi-Family Window Replacement",
+      faqs: [
+        {
+          question: "We ordered the wrong windows for an apartment project — how fast can you help?",
+          answer:
+            "<p>Call us directly at (704) 771-6111 and describe the situation. We'll assess what's needed — window type, quantity, dimensions, specification — and give you an accurate lead time for sourcing and installation. In situations where the project schedule is the constraint, we prioritize getting an accurate timeline to you immediately so you can make decisions. Speed of response starts with the first call.</p>",
+        },
+        {
+          question: "Can you handle window replacement on an occupied apartment building without disrupting tenants?",
+          answer:
+            "<p>Yes. We work around occupancy schedules and coordinate with property managers to minimize disruption to residents. Unit-by-unit replacement can be scheduled around tenant availability, and we communicate clearly about what the installation process involves for each unit so residents know what to expect.</p>",
+        },
+        {
+          question: "What types of windows do you replace in apartment and multi-family buildings?",
+          answer:
+            "<p>We replace the full range of window types common in apartment and multi-family construction — double-hung, sliding, casement, fixed, and combination configurations. We work from the existing window specifications or assess the opening directly if the original specs aren't available.</p>",
+        },
+        {
+          question: "How do you handle a situation where multiple units need window replacement?",
+          answer:
+            "<p>We scope the full project — total window count, unit locations, access requirements, and any constraints around tenant occupancy or construction schedule. We provide a phased installation schedule that works within your project timeline and execute unit by unit or in batches depending on what works best for the property.</p>",
+        },
+        {
+          question: "Do you work with property management companies on ongoing window maintenance and replacement?",
+          answer:
+            "<p>Yes. Property management companies with apartment portfolios in Charlotte can work with us on an ongoing basis for window maintenance, damage replacement, and unit turnover window repair. We're familiar with the documentation and communication requirements of property management operations.</p>",
+        },
+        {
+          question: "What's the typical lead time for apartment window replacement in Charlotte?",
+          answer:
+            "<p>Lead time depends on the window type and quantity. Standard residential window units for apartment replacement typically have lead times of 1–3 weeks from order depending on the specification and supplier availability. We give you an accurate lead time when the order is placed — not an estimate that gets revised later. If a particular window type has a longer lead time, we tell you immediately so you can adjust the project schedule accordingly.</p>",
+        },
+      ],
+      cta: {
+        heading: "Window Problem on an Apartment Project in Charlotte?",
+        body:
+          "Call Doug directly. He'll assess the situation, give you an accurate timeline, and tell you exactly what it takes to resolve it. No runaround.",
+        footerLine: "Mon–Sat, 7am–6pm | Charlotte, NC and surrounding metro area",
+        primaryText: "Call (704) 771-6111",
+        primaryAction: "custom-link",
+        primaryLink: "tel:+17047716111",
+        secondaryText: "Request a Quote",
+        secondaryAction: "internal-link",
+        secondaryLink: "/contact",
       },
     }),
   },
@@ -2232,11 +2946,11 @@ const cityServiceCards: GlassCard[] = [
   },
   {
     icon: "Building2",
-    title: "Commercial Glass",
+    title: "Commercial Storefront Glass Installation",
     description:
-      "Professional storefront glass, office partitions, and commercial glass solutions for businesses. After-hours and weekend appointments available.",
-    link: "/services/commercial-glass",
-    buttonText: "Learn more about commercial glass",
+      "Aluminum framing, fixed glass panels, and storefront doors for new construction, tenant buildouts, and commercial renovations.",
+    link: "/services/commercial-storefront-glass-installation",
+    buttonText: "Learn more about commercial storefront glass installation",
   },
 ];
 
@@ -2521,11 +3235,19 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
     items: [
       item("About", "/#about"),
       item("Services", "/services", [
-        item("Frameless Showers", "/services/frameless-showers"),
-        item("Window Installation", "/services/window-installation"),
-        item("Door Installation", "/services/door-installation"),
-        item("Window Repair", "/services/window-repair"),
-        item("Commercial Glass", "/services/commercial-glass"),
+        item("Residential", "/services", [
+          item("Frameless Showers", "/services/frameless-showers"),
+          item("Window Installation", "/services/window-installation"),
+          item("Door Installation", "/services/door-installation"),
+          item("Window Repair", "/services/window-repair"),
+        ]),
+        item("Commercial", "/services", [
+          item("Commercial Storefront Glass Installation", "/services/commercial-storefront-glass-installation"),
+          item("Commercial Storefront Glass Replacement & Repair", "/services/commercial-storefront-glass-replacement-repair"),
+          item("Commercial Door Installation", "/services/commercial-door-installation"),
+          item("Commercial Door Replacement & Repair", "/services/commercial-door-replacement-repair"),
+          item("Commercial Window Replacement", "/services/commercial-window-replacement"),
+        ]),
       ]),
       item("Service Areas", "/areas-served/charlotte-nc", [
         item("Charlotte, NC", "/areas-served/charlotte-nc"),
@@ -2550,7 +3272,11 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
     location: "footer_professionals",
     items: [
       item("Window Repair", "/services/window-repair"),
-      item("Commercial Glass", "/services/commercial-glass"),
+      item("Commercial Storefront Glass Installation", "/services/commercial-storefront-glass-installation"),
+      item("Commercial Storefront Glass Replacement & Repair", "/services/commercial-storefront-glass-replacement-repair"),
+      item("Commercial Door Installation", "/services/commercial-door-installation"),
+      item("Commercial Door Replacement & Repair", "/services/commercial-door-replacement-repair"),
+      item("Commercial Window Replacement", "/services/commercial-window-replacement"),
       item("Get a Free Quote", "/#contact"),
     ],
   },
@@ -2590,11 +3316,19 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
     items: [
       item("About", "/#about"),
       item("Services", "/services", [
-        item("Frameless Showers", "/services/frameless-showers"),
-        item("Window Installation", "/services/window-installation"),
-        item("Door Installation", "/services/door-installation"),
-        item("Window Repair", "/services/window-repair"),
-        item("Commercial Glass", "/services/commercial-glass"),
+        item("Residential", "/services", [
+          item("Frameless Showers", "/services/frameless-showers"),
+          item("Window Installation", "/services/window-installation"),
+          item("Door Installation", "/services/door-installation"),
+          item("Window Repair", "/services/window-repair"),
+        ]),
+        item("Commercial", "/services", [
+          item("Commercial Storefront Glass Installation", "/services/commercial-storefront-glass-installation"),
+          item("Commercial Storefront Glass Replacement & Repair", "/services/commercial-storefront-glass-replacement-repair"),
+          item("Commercial Door Installation", "/services/commercial-door-installation"),
+          item("Commercial Door Replacement & Repair", "/services/commercial-door-replacement-repair"),
+          item("Commercial Window Replacement", "/services/commercial-window-replacement"),
+        ]),
       ]),
       item("Service Areas", "/areas-served/charlotte-nc", [
         item("Charlotte, NC", "/areas-served/charlotte-nc"),
@@ -2800,6 +3534,12 @@ async function seedGlassPublicCms() {
     return;
   }
 
+  const existingCommercialGlassPage = await storage.cmsPages.getPageBySlug("services-commercial-glass");
+  if (existingCommercialGlassPage) {
+    await storage.cmsPages.deletePage(existingCommercialGlassPage.id);
+    console.log(`  [deleted] services-commercial-glass page (${existingCommercialGlassPage.id})`);
+  }
+
   const existingHome = await storage.cmsPages.getPageBySlug("home");
   if (existingHome) {
     await storage.cmsPages.updatePage(existingHome.id, {
@@ -2899,7 +3639,7 @@ async function seedGlassPublicCms() {
     content: glassServicesContent,
     seoTitle: "Glass and Door Services in Charlotte & Monroe, NC",
     seoDescription:
-      "Explore frameless showers, window installation, door installation, window repair, and commercial glass services in Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas.",
+      "Explore frameless showers, window installation, door installation, window repair, and commercial glass and door services in Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas.",
     seoKeywords:
       "glass and door services Charlotte NC, Monroe glass company, frameless showers, window installation, door installation, window repair, commercial glass",
     ogImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",

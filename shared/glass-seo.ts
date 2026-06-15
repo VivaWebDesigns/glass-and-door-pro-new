@@ -11,12 +11,28 @@ const cityServiceOffers = [
   ["Window Installation", "/services/window-installation"],
   ["Door Installation", "/services/door-installation"],
   ["Window Repair", "/services/window-repair"],
-  ["Commercial Glass", "/services/commercial-glass"],
+  ["Commercial Storefront Glass Installation", "/services/commercial-storefront-glass-installation"],
+  ["Commercial Storefront Glass Replacement & Repair", "/services/commercial-storefront-glass-replacement-repair"],
+  ["Commercial Door Installation", "/services/commercial-door-installation"],
+  ["Commercial Door Replacement & Repair", "/services/commercial-door-replacement-repair"],
+  ["Commercial Window Replacement", "/services/commercial-window-replacement"],
+] as const;
+
+const serviceHubOffers = [
+  ["Frameless Showers", "/services/frameless-showers"],
+  ["Window Installation", "/services/window-installation"],
+  ["Window Repair", "/services/window-repair"],
+  ["Door Installation", "/services/door-installation"],
+  ["Commercial Storefront Glass Installation", "/services/commercial-storefront-glass-installation"],
+  ["Commercial Storefront Glass Replacement & Repair", "/services/commercial-storefront-glass-replacement-repair"],
+  ["Commercial Door Installation", "/services/commercial-door-installation"],
+  ["Commercial Door Replacement & Repair", "/services/commercial-door-replacement-repair"],
+  ["Commercial Window Replacement", "/services/commercial-window-replacement"],
 ] as const;
 
 const serviceSocialMetadata: Record<
   string,
-  { ogTitle: string; ogDescription: string; twitterCard: string; twitterSite: string }
+  { ogTitle: string; ogDescription: string; twitterCard: string; twitterSite?: string }
 > = {
   "services-window-installation": {
     ogTitle: "Window Installation & Replacement | Glass and Door Pro",
@@ -38,6 +54,36 @@ const serviceSocialMetadata: Record<
       "Entry doors, patio doors, storm doors, and exterior door installation. Owner-operated service across Charlotte, Monroe, and the greater Union County area. Honest pricing, clean finish.",
     twitterCard: "summary_large_image",
     twitterSite: "@GlassDoorPro",
+  },
+  "services-commercial-storefront-glass-installation": {
+    ogTitle: "Commercial Storefront Glass Installation Charlotte, NC | Glass and Door Pro",
+    ogDescription:
+      "Storefront glass installation for new construction, tenant buildouts, and commercial renovations in Charlotte, NC. Owner-operated, reliable scheduling, and clean execution on every project.",
+    twitterCard: "summary_large_image",
+  },
+  "services-commercial-storefront-glass-replacement-repair": {
+    ogTitle: "Commercial Storefront Glass Replacement & Repair Charlotte, NC | Glass and Door Pro",
+    ogDescription:
+      "Broken storefront glass in Charlotte? We board up, secure, and replace commercial storefront glass fast. Owner-operated with same-day emergency response available.",
+    twitterCard: "summary_large_image",
+  },
+  "services-commercial-door-installation": {
+    ogTitle: "Commercial Door Installation Charlotte, NC | Glass and Door Pro",
+    ogDescription:
+      "Commercial door installation for GCs, project managers, and business owners in Charlotte. Aluminum entry doors, glass storefront doors, and complete entrance systems. Reliable scheduling, owner-operated.",
+    twitterCard: "summary_large_image",
+  },
+  "services-commercial-door-replacement-repair": {
+    ogTitle: "Commercial Door Replacement & Repair Charlotte, NC | Glass and Door Pro",
+    ogDescription:
+      "Commercial door not closing right? Glass panel broken? Hardware failing? Glass and Door Pro repairs and replaces commercial doors for Charlotte businesses. Fast response, honest pricing.",
+    twitterCard: "summary_large_image",
+  },
+  "services-commercial-window-replacement": {
+    ogTitle: "Apartment & Multi-Family Window Replacement Charlotte, NC | Glass and Door Pro",
+    ogDescription:
+      "Window replacement for apartment complexes and multi-family properties in Charlotte. Fast mobilization, project manager-friendly, owner-operated. When your timeline can't wait, call Glass and Door Pro.",
+    twitterCard: "summary_large_image",
   },
 };
 
@@ -153,14 +199,100 @@ const servicePageNames: Record<
       "Window Screen Replacement",
     ],
   },
-  "services-commercial-glass": {
-    serviceType: "Commercial Glass Services",
-    name: "Commercial Glass Services",
-    seoTitle: "Commercial Glass Services in Charlotte, NC",
+  "services-commercial-storefront-glass-installation": {
+    serviceType: "Commercial Storefront Glass Installation",
+    name: "Commercial Storefront Glass Installation",
+    seoTitle: "Commercial Storefront Glass Installation in Charlotte, NC | Glass and Door Pro",
     seoDescription:
-      "Commercial glass installation and repair for storefronts, office partitions, glass doors, restaurants, retail spaces, and property managers in Charlotte and nearby areas. Call for a free quote.",
+      "Professional commercial storefront glass installation for new construction and business buildouts in Charlotte, NC. Aluminum framing, glass systems, and storefront doors. Call (704) 771-6111.",
     description:
-      "Commercial glass installation and repair for storefronts, office partitions, glass doors, restaurants, retail spaces, offices, and property managers in Charlotte, NC and nearby areas.",
+      "Commercial storefront glass installation for new construction, tenant buildouts, and commercial renovations in Charlotte, NC. Aluminum framing systems, fixed glass panels, and commercial glass doors.",
+    offerCatalogName: "Commercial Storefront Glass Installation Services",
+    schemaAreaServed: ["Charlotte"],
+    offers: [
+      "Aluminum Storefront Framing Installation",
+      "Commercial Glass Panel Installation",
+      "Commercial Glass Storefront Door Installation",
+      "Tenant Buildout Glazing",
+      "Commercial Renovation Glass Installation",
+      "Commercial Entrance System Installation",
+    ],
+  },
+  "services-commercial-storefront-glass-replacement-repair": {
+    serviceType: "Commercial Storefront Glass Replacement & Repair",
+    name: "Commercial Storefront Glass Replacement & Repair",
+    seoTitle: "Commercial Storefront Glass Replacement & Repair in Charlotte, NC | Glass and Door Pro",
+    seoDescription:
+      "Emergency storefront glass repair, board-up, and replacement for Charlotte businesses. Broken storefront glass secured and replaced fast. Owner-operated, same-day response. Call (704) 771-6111.",
+    description:
+      "Emergency storefront glass board-up, repair, and replacement for Charlotte businesses. Broken storefront glass secured and replaced fast by a local owner-operator.",
+    offerCatalogName: "Commercial Storefront Glass Replacement & Repair Services",
+    schemaAreaServed: ["Charlotte"],
+    offers: [
+      "Emergency Storefront Glass Board-Up",
+      "Commercial Storefront Glass Replacement",
+      "Cracked Storefront Glass Repair",
+      "Storefront Frame Damage Assessment",
+      "Commercial Glass Specification & Upgrade",
+      "Scheduled Storefront Glass Maintenance",
+    ],
+  },
+  "services-commercial-door-installation": {
+    serviceType: "Commercial Door Installation",
+    name: "Commercial Door Installation",
+    seoTitle: "Commercial Door Installation in Charlotte, NC | Storefront & Entry Doors | Glass and Door Pro",
+    seoDescription:
+      "Commercial door installation for new construction, tenant buildouts, and business renovations in Charlotte, NC. Aluminum entry doors, glass storefront doors, and commercial entrance systems. Call (704) 771-6111.",
+    description:
+      "Commercial door installation for new construction, tenant buildouts, and business renovations in Charlotte, NC. Aluminum entry doors, glass storefront doors, and complete commercial entrance systems.",
+    offerCatalogName: "Commercial Door Installation Services",
+    schemaAreaServed: ["Charlotte"],
+    offers: [
+      "Aluminum Storefront Entry Door Installation",
+      "Commercial Glass Door Installation",
+      "ADA-Compliant Commercial Entrance Installation",
+      "Tenant Buildout Entry Door Installation",
+      "Multi-Door Entrance System Installation",
+      "Commercial Door Hardware Installation",
+    ],
+  },
+  "services-commercial-door-replacement-repair": {
+    serviceType: "Commercial Door Replacement & Repair",
+    name: "Commercial Door Replacement & Repair",
+    seoTitle: "Commercial Door Replacement & Repair in Charlotte, NC | Glass and Door Pro",
+    seoDescription:
+      "Commercial door repair and replacement for Charlotte businesses. Broken glass panels, damaged hardware, misaligned frames, and worn closers fixed fast. Owner-operated. Call (704) 771-6111.",
+    description:
+      "Commercial door repair and replacement for Charlotte businesses. Broken glass panels, hardware failures, misaligned frames, and worn closers repaired fast by a local owner-operator.",
+    offerCatalogName: "Commercial Door Replacement & Repair Services",
+    schemaAreaServed: ["Charlotte"],
+    offers: [
+      "Commercial Door Glass Panel Replacement",
+      "Commercial Door Closer Repair & Replacement",
+      "Misaligned Commercial Door Repair",
+      "Commercial Door Lock & Latch Repair",
+      "Commercial Door Threshold & Weatherstripping Replacement",
+      "Full Commercial Door Replacement",
+    ],
+  },
+  "services-commercial-window-replacement": {
+    serviceType: "Apartment & Multi-Family Window Replacement",
+    name: "Apartment & Multi-Family Window Replacement",
+    seoTitle: "Apartment & Multi-Family Window Replacement in Charlotte, NC | Glass and Door Pro",
+    seoDescription:
+      "Fast apartment and multi-family window replacement in Charlotte, NC. Wrong windows ordered? Unit damage? Doug mobilizes faster than larger companies — keeping your project on schedule. Call (704) 771-6111.",
+    description:
+      "Fast apartment and multi-family window replacement in Charlotte, NC. Wrong windows ordered, construction damage, pre-occupancy replacement, and warranty period issues resolved quickly by a local owner-operator.",
+    offerCatalogName: "Apartment & Multi-Family Window Replacement Services",
+    schemaAreaServed: ["Charlotte"],
+    offers: [
+      "Wrong Window Order Replacement",
+      "Construction Damage Window Replacement",
+      "Pre-Occupancy Window Replacement",
+      "Warranty Period Window Replacement",
+      "Unit Turnover Window Replacement",
+      "Multi-Unit Window Replacement Projects",
+    ],
   },
 };
 
@@ -287,8 +419,33 @@ export function buildGlassServiceLdForCmsPage(
     };
   }
 
+  if (page.slug === "services") {
+    return {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "@id": `${absoluteGlassUrl("/services", siteUrl)}#service`,
+      serviceType: "Glass and Door Services",
+      name: "Glass and Door Services",
+      description: page.seoDescription || undefined,
+      provider: { "@id": GLASS_BUSINESS_ID },
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Glass and Door Services",
+        itemListElement: serviceHubOffers.map(([name, path]) => ({
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name,
+            url: absoluteGlassUrl(path, siteUrl),
+          },
+        })),
+      },
+    };
+  }
+
   const serviceData = servicePageNames[page.slug];
   if (!serviceData) return null;
+  const explicitAreaServed = serviceData.schemaAreaServed?.map((name) => city(name));
 
   return {
     "@context": "https://schema.org",
@@ -298,9 +455,11 @@ export function buildGlassServiceLdForCmsPage(
     name: serviceData.name,
     description: serviceData.description || page.seoDescription || undefined,
     provider: { "@id": GLASS_BUSINESS_ID },
-    areaServed: serviceData.schemaAreaServed?.length
-      ? serviceData.schemaAreaServed.map((name) => city(name))
-      : buildGlassServiceAreaServed(),
+    areaServed: explicitAreaServed?.length === 1
+      ? explicitAreaServed[0]
+      : explicitAreaServed?.length
+        ? explicitAreaServed
+        : buildGlassServiceAreaServed(),
     ...(serviceData.offers?.length
       ? {
           hasOfferCatalog: {

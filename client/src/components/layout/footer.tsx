@@ -11,7 +11,11 @@ const defaultPlatformLinks = [
   { href: "/services/window-installation", label: "Window Installation", testId: "link-footer-window-installation" },
   { href: "/services/door-installation", label: "Door Installation", testId: "link-footer-door-installation" },
   { href: "/services/window-repair", label: "Window Repair", testId: "link-footer-window-repair" },
-  { href: "/services/commercial-glass", label: "Commercial Glass", testId: "link-footer-commercial-glass" },
+  { href: "/services/commercial-storefront-glass-installation", label: "Commercial Storefront Glass Installation", testId: "link-footer-commercial-storefront-glass-installation" },
+  { href: "/services/commercial-storefront-glass-replacement-repair", label: "Commercial Storefront Glass Replacement & Repair", testId: "link-footer-commercial-storefront-glass-replacement-repair" },
+  { href: "/services/commercial-door-installation", label: "Commercial Door Installation", testId: "link-footer-commercial-door-installation" },
+  { href: "/services/commercial-door-replacement-repair", label: "Commercial Door Replacement & Repair", testId: "link-footer-commercial-door-replacement-repair" },
+  { href: "/services/commercial-window-replacement", label: "Commercial Window Replacement", testId: "link-footer-commercial-window-replacement" },
   { href: "/gallery", label: "Gallery", testId: "link-footer-gallery" },
   { href: "/reviews", label: "Reviews", testId: "link-footer-reviews" },
 ];
@@ -206,7 +210,7 @@ export function Footer() {
     const cmsLinks = uniqueFooterLinks([...platformLinks, ...professionalLinks, ...galleryLinks])
       .filter((link) => !/quote/i.test(link.label));
 
-    return cmsLinks.length > 0 ? ensureServicesHubLink(cmsLinks).slice(0, 6) : defaultPlatformLinks;
+    return cmsLinks.length > 0 ? ensureServicesHubLink(cmsLinks) : defaultPlatformLinks;
   }, [publicMenus]) as FooterLegalLink[];
 
   const companyLinks = useMemo(() => {

@@ -34,7 +34,11 @@ const defaultNavLinks = [
   { label: "Window Installation", href: "/services/window-installation" },
   { label: "Door Installation", href: "/services/door-installation" },
   { label: "Window Repair", href: "/services/window-repair" },
-  { label: "Commercial Glass", href: "/services/commercial-glass" },
+  { label: "Commercial Storefront Glass Installation", href: "/services/commercial-storefront-glass-installation" },
+  { label: "Commercial Storefront Glass Replacement & Repair", href: "/services/commercial-storefront-glass-replacement-repair" },
+  { label: "Commercial Door Installation", href: "/services/commercial-door-installation" },
+  { label: "Commercial Door Replacement & Repair", href: "/services/commercial-door-replacement-repair" },
+  { label: "Commercial Window Replacement", href: "/services/commercial-window-replacement" },
   { label: "Reviews", href: "/reviews" },
 ];
 
