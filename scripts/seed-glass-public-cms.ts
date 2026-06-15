@@ -3235,13 +3235,13 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
     items: [
       item("About", "/#about"),
       item("Services", "/services", [
-        item("Residential", "/services", [
+        item("Residential", "#", [
           item("Frameless Showers", "/services/frameless-showers"),
           item("Window Installation", "/services/window-installation"),
           item("Door Installation", "/services/door-installation"),
           item("Window Repair", "/services/window-repair"),
         ]),
-        item("Commercial", "/services", [
+        item("Commercial", "#", [
           item("Commercial Storefront Glass Installation", "/services/commercial-storefront-glass-installation"),
           item("Commercial Storefront Glass Replacement & Repair", "/services/commercial-storefront-glass-replacement-repair"),
           item("Commercial Door Installation", "/services/commercial-door-installation"),
@@ -3316,13 +3316,13 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
     items: [
       item("About", "/#about"),
       item("Services", "/services", [
-        item("Residential", "/services", [
+        item("Residential", "#", [
           item("Frameless Showers", "/services/frameless-showers"),
           item("Window Installation", "/services/window-installation"),
           item("Door Installation", "/services/door-installation"),
           item("Window Repair", "/services/window-repair"),
         ]),
-        item("Commercial", "/services", [
+        item("Commercial", "#", [
           item("Commercial Storefront Glass Installation", "/services/commercial-storefront-glass-installation"),
           item("Commercial Storefront Glass Replacement & Repair", "/services/commercial-storefront-glass-replacement-repair"),
           item("Commercial Door Installation", "/services/commercial-door-installation"),

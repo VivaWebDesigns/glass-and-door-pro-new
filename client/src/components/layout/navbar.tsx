@@ -78,6 +78,7 @@ function flattenItems(items: MenuItem[], depth = 0): { item: MenuItem; depth: nu
 
 function isActiveRecursive(items: MenuItem[], currentPath: string): boolean {
   for (const item of items) {
+    if (item.url === "#") continue;
     if (currentPath === item.url) return true;
     if (item.children?.length > 0 && isActiveRecursive(item.children, currentPath)) return true;
   }
@@ -121,33 +122,48 @@ function DynamicDropdown({ item, location: currentPath }: { item: MenuItem; loca
             <DropdownMenuSeparator />
           </>
         ) : null}
-        {flatChildren.map(({ item: child, depth }) => (
-          <DropdownMenuItem
-            key={child.id}
-            asChild
-            className={depth > 0 ? `pl-${4 + depth * 4}` : ""}
-          >
-            {child.openInNewTab ? (
-              <a
-                href={child.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-testid={`link-nav-child-${child.id}`}
+        {flatChildren.map(({ item: child, depth }) => {
+          if (child.url === "#") {
+            return (
+              <div
+                key={child.id}
+                className="px-2 py-1.5 text-sm font-medium text-muted-foreground"
+                data-testid={`text-nav-group-${child.id}`}
                 style={depth > 0 ? { paddingLeft: `${12 + depth * 16}px` } : undefined}
               >
                 {child.label}
-              </a>
-            ) : (
-              <Link
-                href={child.url}
-                data-testid={`link-nav-child-${child.id}`}
-                style={depth > 0 ? { paddingLeft: `${12 + depth * 16}px` } : undefined}
-              >
-                {child.label}
-              </Link>
-            )}
-          </DropdownMenuItem>
-        ))}
+              </div>
+            );
+          }
+
+          return (
+            <DropdownMenuItem
+              key={child.id}
+              asChild
+              className={depth > 0 ? `pl-${4 + depth * 4}` : ""}
+            >
+              {child.openInNewTab ? (
+                <a
+                  href={child.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-testid={`link-nav-child-${child.id}`}
+                  style={depth > 0 ? { paddingLeft: `${12 + depth * 16}px` } : undefined}
+                >
+                  {child.label}
+                </a>
+              ) : (
+                <Link
+                  href={child.url}
+                  data-testid={`link-nav-child-${child.id}`}
+                  style={depth > 0 ? { paddingLeft: `${12 + depth * 16}px` } : undefined}
+                >
+                  {child.label}
+                </Link>
+              )}
+            </DropdownMenuItem>
+          );
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   );
