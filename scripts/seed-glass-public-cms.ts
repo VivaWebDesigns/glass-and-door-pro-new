@@ -3251,7 +3251,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         heading: "Glass & Door Services in Indian Trail, NC",
         subheading:
           "Frameless shower doors, window installation, door installation, window repair, and commercial glass services for Indian Trail homeowners and businesses. Owner-operated with 15+ years of experience. Monroe-based, locally serving Union County. Saturday appointments available.",
-        imageUrl: "",
+        imageUrl: "/images/glass-door-pro/city-indian-trail-hero.webp",
         imagePositionY: 45,
       },
       introTitle: "Your Local Glass and Door Company in Indian Trail",
