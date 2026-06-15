@@ -3903,7 +3903,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         heading: "Glass & Door Services in Weddington, NC",
         subheading:
           "Custom frameless shower enclosures, window replacement, door installation, and window repair for Weddington homeowners. Owner-operated, detail-oriented, and personally handled by Doug Adams. Saturday appointments available.",
-        imageUrl: "",
+        imageUrl: "/images/glass-door-pro/city-weddington-hero.webp",
         imagePositionY: 45,
       },
       introTitle: "Custom Glass and Door Work in Weddington",
