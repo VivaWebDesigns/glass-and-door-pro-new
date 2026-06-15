@@ -4291,7 +4291,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         heading: "Glass & Door Services in Pineville, NC",
         subheading:
           "Frameless shower enclosures, replacement windows, door installation, and window repair for Pineville homeowners. Owner-operated with 15+ years of experience. Serving the south Charlotte area with same-week scheduling and Saturday appointments.",
-        imageUrl: "/images/glass-door-pro/city-charlotte-hero.webp",
+        imageUrl: "/images/glass-door-pro/city-pineville-hero.webp",
         imagePositionY: 45,
       },
       introTitle: "Glass and Door Services for Pineville Homeowners",
