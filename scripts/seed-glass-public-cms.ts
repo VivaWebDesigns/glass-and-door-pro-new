@@ -3643,7 +3643,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         heading: "Glass & Door Services in Waxhaw, NC",
         subheading:
           "Custom frameless shower enclosures, window replacement, door installation, and window repair for Waxhaw homeowners. Monroe-based, owner-operated, and personally handled by Doug Adams on every project. Saturday appointments available.",
-        imageUrl: "",
+        imageUrl: "/images/glass-door-pro/city-waxhaw-hero.webp",
         imagePositionY: 45,
       },
       introTitle: "Your Glass and Door Company in Waxhaw",
