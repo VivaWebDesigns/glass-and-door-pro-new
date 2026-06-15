@@ -3773,7 +3773,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         heading: "Glass & Door Services in Matthews, NC",
         subheading:
           "Frameless shower enclosures, window replacement, door installation, and window repair for Matthews homeowners. Owner-operated with 15+ years of experience serving the greater Charlotte area. Saturday appointments available.",
-        imageUrl: "",
+        imageUrl: "/images/glass-door-pro/city-matthews-hero.webp",
         imagePositionY: 45,
       },
       introTitle: "Glass and Door Services for Matthews Homeowners",
@@ -4032,7 +4032,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         heading: "Glass & Door Services in Indian Land, SC",
         subheading:
           "Frameless shower enclosures, window replacement, door installation, and window repair for Indian Land homeowners. Monroe-based and owner-operated — Doug handles every project personally. Saturday appointments available.",
-        imageUrl: "",
+        imageUrl: "/images/glass-door-pro/city-indian-land-hero.webp",
         imagePositionY: 45,
       },
       introTitle: "Glass and Door Pro — Serving Indian Land Homeowners",
