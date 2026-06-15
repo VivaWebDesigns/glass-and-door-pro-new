@@ -3251,7 +3251,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         heading: "Glass & Door Services in Indian Trail, NC",
         subheading:
           "Frameless shower doors, window installation, door installation, window repair, and commercial glass services for Indian Trail homeowners and businesses. Owner-operated with 15+ years of experience. Monroe-based, locally serving Union County. Saturday appointments available.",
-        imageUrl: "/images/glass-door-pro/city-monroe-hero.webp",
+        imageUrl: "",
         imagePositionY: 45,
       },
       introTitle: "Your Local Glass and Door Company in Indian Trail",
@@ -3383,7 +3383,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         heading: "Glass & Door Services in Stallings, NC",
         subheading:
           "Frameless shower enclosures, replacement windows, door installation, and window repair for Stallings homeowners. Monroe-based and owner-operated — Doug handles every project personally. Saturday appointments available.",
-        imageUrl: "/images/glass-door-pro/city-monroe-hero.webp",
+        imageUrl: "",
         imagePositionY: 45,
       },
       introTitle: "Glass and Door Pro — Serving Stallings Homeowners",
@@ -3513,7 +3513,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         heading: "Glass & Door Services in Wesley Chapel, NC",
         subheading:
           "Frameless shower enclosures, window replacement, door installation, and window repair for Wesley Chapel homeowners. Monroe-based and owner-operated — every project handled personally by Doug Adams. Saturday appointments available.",
-        imageUrl: "/images/glass-door-pro/city-monroe-hero.webp",
+        imageUrl: "",
         imagePositionY: 45,
       },
       introTitle: "Glass and Door Services Right Here in Wesley Chapel",
@@ -3643,7 +3643,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         heading: "Glass & Door Services in Waxhaw, NC",
         subheading:
           "Custom frameless shower enclosures, window replacement, door installation, and window repair for Waxhaw homeowners. Monroe-based, owner-operated, and personally handled by Doug Adams on every project. Saturday appointments available.",
-        imageUrl: "/images/glass-door-pro/city-monroe-hero.webp",
+        imageUrl: "",
         imagePositionY: 45,
       },
       introTitle: "Your Glass and Door Company in Waxhaw",
@@ -3773,7 +3773,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         heading: "Glass & Door Services in Matthews, NC",
         subheading:
           "Frameless shower enclosures, window replacement, door installation, and window repair for Matthews homeowners. Owner-operated with 15+ years of experience serving the greater Charlotte area. Saturday appointments available.",
-        imageUrl: "/images/glass-door-pro/city-charlotte-hero.webp",
+        imageUrl: "",
         imagePositionY: 45,
       },
       introTitle: "Glass and Door Services for Matthews Homeowners",
@@ -3903,7 +3903,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         heading: "Glass & Door Services in Weddington, NC",
         subheading:
           "Custom frameless shower enclosures, window replacement, door installation, and window repair for Weddington homeowners. Owner-operated, detail-oriented, and personally handled by Doug Adams. Saturday appointments available.",
-        imageUrl: "/images/glass-door-pro/city-monroe-hero.webp",
+        imageUrl: "",
         imagePositionY: 45,
       },
       introTitle: "Custom Glass and Door Work in Weddington",
@@ -4032,7 +4032,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         heading: "Glass & Door Services in Indian Land, SC",
         subheading:
           "Frameless shower enclosures, window replacement, door installation, and window repair for Indian Land homeowners. Monroe-based and owner-operated — Doug handles every project personally. Saturday appointments available.",
-        imageUrl: "/images/glass-door-pro/city-charlotte-hero.webp",
+        imageUrl: "",
         imagePositionY: 45,
       },
       introTitle: "Glass and Door Pro — Serving Indian Land Homeowners",
@@ -4162,7 +4162,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         heading: "Glass & Door Services in Fort Mill, SC",
         subheading:
           "Frameless shower enclosures, window replacement, door installation, and window repair for Fort Mill homeowners. Monroe-based, owner-operated, and personally handled by Doug Adams on every project. Saturday appointments available.",
-        imageUrl: "/images/glass-door-pro/city-charlotte-hero.webp",
+        imageUrl: "/images/glass-door-pro/city-fort-mill-hero.webp",
         imagePositionY: 45,
       },
       introTitle: "Local Glass and Door Service for Fort Mill Homeowners",
