@@ -2226,8 +2226,8 @@ const glassServicePages: GlassServicePageSeed[] = [
         heading: "Commercial Storefront Glass Replacement & Repair in Charlotte, NC",
         subheading:
           "Broken storefront glass secured and replaced fast. Whether it's vandalism, an accident, or a failed panel — we board up to secure the building, then return to complete the permanent glass replacement. One call handles the whole situation.",
-        imageUrl: "/images/glass-door-pro/broken-glass-hero.webp",
-        imageAlt: "Broken storefront glass needing commercial glass replacement",
+        imageUrl: "/images/glass-door-pro/storefront-glass-replacement-hero.webp",
+        imageAlt: "Commercial storefront glass door replacement for a Charlotte business",
         imagePositionY: 45,
         primaryText: "Call (704) 771-6111",
         primaryAction: "custom-link",
