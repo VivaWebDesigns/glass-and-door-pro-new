@@ -916,8 +916,8 @@ type GlassServicePageSeed = {
   content: InsertCmsPage["content"];
 };
 
-const serviceAreaText =
-  "Charlotte • Matthews • Mint Hill • Monroe • Pineville • Huntersville • Cornelius • Davidson • Concord • Tega Cay • Waxhaw • Indian Trail • Stallings • Fort Mill • Rock Hill • and surrounding areas";
+const linkedServiceAreaContent =
+  '<p>We serve homeowners and businesses throughout the greater Charlotte metro area, including: <a href="/service-areas/charlotte">Charlotte</a>, <a href="/service-areas/monroe">Monroe</a>, <a href="/service-areas/indian-trail">Indian Trail</a>, <a href="/service-areas/stallings">Stallings</a>, <a href="/service-areas/wesley-chapel">Wesley Chapel</a>, <a href="/service-areas/waxhaw">Waxhaw</a>, <a href="/service-areas/matthews">Matthews</a>, <a href="/service-areas/weddington">Weddington</a>, <a href="/service-areas/pineville">Pineville</a>, <a href="/service-areas/fort-mill">Fort Mill</a>, <a href="/service-areas/indian-land">Indian Land</a>, and surrounding areas.</p>';
 
 function block(type: string, props: Record<string, unknown>) {
   return {
@@ -1025,7 +1025,7 @@ function serviceAreaBlock() {
   return block("rich-text", {
     title: "Serving the Greater Charlotte Area",
     alignment: "center",
-    content: `<p>${serviceAreaText}</p>`,
+    content: linkedServiceAreaContent,
     sectionBackgroundColor: "#ffffff",
     sectionPaddingTop: "md",
     sectionPaddingBottom: "md",
@@ -1398,10 +1398,6 @@ function expandedServicePageContent(props: {
   }>;
   benefitsTitle: string;
   benefitsCards: GlassCard[];
-  serviceArea: {
-    title: string;
-    content: string;
-  };
   faqTitle: string;
   faqs: GlassFaq[];
   cta: {
@@ -1458,14 +1454,7 @@ function expandedServicePageContent(props: {
         columns: "3",
         backgroundColor: "#f8fafc",
       }),
-      block("rich-text", {
-        title: props.serviceArea.title,
-        alignment: "left",
-        content: props.serviceArea.content,
-        sectionBackgroundColor: "#ffffff",
-        sectionPaddingTop: "lg",
-        sectionPaddingBottom: "lg",
-      }),
+      serviceAreaBlock(),
       block("faq", {
         title: props.faqTitle,
         sectionBackgroundColor: "#f8fafc",
@@ -1723,11 +1712,6 @@ const glassServicePages: GlassServicePageSeed[] = [
             "Glass and Door Pro is a Monroe-based, owner-operated business — not a national franchise with local name recognition and distant management. When you call, Doug answers.",
         },
       ],
-      serviceArea: {
-        title: "Areas We Serve for Window Installation",
-        content:
-          "<p>We install and replace residential windows throughout the greater Charlotte metro area, including:</p><p>Monroe, Charlotte, Indian Trail, Stallings, Matthews, Waxhaw, Weddington, Wesley Chapel, Indian Land, Fort Mill, Pineville, and surrounding Union and Mecklenburg County communities.</p><p>Not sure if we come to your neighborhood? Call or text (704) 771-6111 and we'll let you know. We almost certainly do.</p>",
-      },
       faqTitle: "Frequently Asked Questions — Window Installation",
       faqs: [
         {
@@ -1877,11 +1861,6 @@ const glassServicePages: GlassServicePageSeed[] = [
             "Doug has been hanging doors in the Charlotte metro area for over 15 years. He's installed every door type in every kind of home — from 1960s ranch houses to new construction in the Union County suburbs.",
         },
       ],
-      serviceArea: {
-        title: "Door Installation Service Area",
-        content:
-          "<p>We install residential doors throughout the greater Charlotte area, including:</p><p>Monroe, Charlotte, Indian Trail, Stallings, Matthews, Waxhaw, Weddington, Wesley Chapel, Indian Land, Fort Mill, Pineville, and surrounding Union and Mecklenburg County communities.</p><p>Not sure if we serve your neighborhood? Call or text (704) 771-6111 — we almost certainly do.</p>",
-      },
       faqTitle: "Frequently Asked Questions — Door Installation",
       faqs: [
         {
@@ -2031,11 +2010,6 @@ const glassServicePages: GlassServicePageSeed[] = [
             "Monroe-based, serving Charlotte, Indian Trail, Matthews, Waxhaw, Weddington, and surrounding communities. No travel surcharges for nearby areas.",
         },
       ],
-      serviceArea: {
-        title: "Window Repair Service Area",
-        content:
-          "<p>We provide residential window repair throughout the greater Charlotte area, including:</p><p>Monroe, Charlotte, Indian Trail, Stallings, Matthews, Waxhaw, Weddington, Wesley Chapel, Indian Land, Fort Mill, Pineville, and surrounding Union and Mecklenburg County communities.</p><p>Not sure if we serve your area? Call or text (704) 771-6111 — we almost certainly do.</p>",
-      },
       faqTitle: "Frequently Asked Questions — Window Repair",
       faqs: [
         {
@@ -2186,11 +2160,6 @@ const glassServicePages: GlassServicePageSeed[] = [
             "Owner-operated means lower overhead than a large glazing company. That translates to competitive pricing on commercial projects without compromising on materials or execution quality.",
         },
       ],
-      serviceArea: {
-        title: "Commercial Storefront Glass Installation — Charlotte, NC",
-        content:
-          "<p>Glass and Door Pro provides commercial storefront glass installation throughout Charlotte and the surrounding metro area. For commercial project inquiries, call (704) 771-6111 or submit a project inquiry through the contact form.</p>",
-      },
       faqTitle: "Frequently Asked Questions — Commercial Storefront Glass Installation",
       faqs: [
         {
@@ -2347,11 +2316,6 @@ const glassServicePages: GlassServicePageSeed[] = [
             "The completed installation looks the way it should. Properly set glass, clean sealant lines, and framing that's in good condition. Your storefront is the face of your business — the replacement should be indistinguishable from new.",
         },
       ],
-      serviceArea: {
-        title: "Storefront Glass Replacement & Repair — Charlotte, NC",
-        content:
-          "<p>Glass and Door Pro provides commercial storefront glass replacement and emergency board-up services throughout Charlotte and the surrounding metro area. For emergency situations, call (704) 771-6111 directly.</p>",
-      },
       faqTitle: "Frequently Asked Questions — Commercial Storefront Glass Replacement & Repair",
       faqs: [
         {
@@ -2508,11 +2472,6 @@ const glassServicePages: GlassServicePageSeed[] = [
             "The completed door should look and function like it belongs in the building. Proper alignment, clean hardware installation, correct threshold fit — we finish the job the way a professional installation should look.",
         },
       ],
-      serviceArea: {
-        title: "Commercial Door Installation — Charlotte, NC",
-        content:
-          "<p>Glass and Door Pro provides commercial door installation throughout Charlotte and the surrounding metro area. For project inquiries, call (704) 771-6111 or submit a project inquiry through the contact form.</p>",
-      },
       faqTitle: "Frequently Asked Questions — Commercial Door Installation",
       faqs: [
         {
@@ -2667,11 +2626,6 @@ const glassServicePages: GlassServicePageSeed[] = [
             "We work with property managers handling commercial door maintenance across multiple Charlotte locations. We can work within your service request process and provide documentation for your property records.",
         },
       ],
-      serviceArea: {
-        title: "Commercial Door Repair — Charlotte, NC",
-        content:
-          "<p>Glass and Door Pro provides commercial door repair and replacement throughout Charlotte and the surrounding metro area. Call (704) 771-6111 or submit a service request through the contact form.</p>",
-      },
       faqTitle: "Frequently Asked Questions — Commercial Door Replacement & Repair",
       faqs: [
         {
@@ -2834,11 +2788,6 @@ const glassServicePages: GlassServicePageSeed[] = [
             "Multi-family projects require documentation — installation records, product specifications, warranty information. We provide what you need for the project file and property records.",
         },
       ],
-      serviceArea: {
-        title: "Multi-Family Window Replacement — Charlotte, NC",
-        content:
-          "<p>Glass and Door Pro provides apartment and multi-family window replacement throughout Charlotte and the surrounding metro area. For project inquiries, call (704) 771-6111 directly — Doug will assess your situation and give you a straight answer on timeline and availability.</p>",
-      },
       faqTitle: "Frequently Asked Questions — Apartment & Multi-Family Window Replacement",
       faqs: [
         {
