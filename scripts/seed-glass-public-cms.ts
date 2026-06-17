@@ -956,7 +956,7 @@ function serviceHero(props: {
     ctaSecondaryLink: props.secondaryLink ?? "tel:+17047716111",
     ctaSecondaryAction: props.secondaryAction ?? "custom-link",
     backgroundImageUrl: props.imageUrl,
-    backgroundImageAlt: props.imageAlt ?? "",
+    backgroundImageAlt: props.imageAlt ?? props.heading,
     overlayColor: "#000000",
     overlayOpacity: 28,
     minHeight: "700",
