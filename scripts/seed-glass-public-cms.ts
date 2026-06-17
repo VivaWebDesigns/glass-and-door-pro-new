@@ -1619,7 +1619,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         heading: "Window Installation & Replacement in Charlotte, NC",
         subheading:
           "Residential replacement windows measured, fitted, and installed personally by Doug Adams — owner-operator with 15+ years of experience. Serving Monroe, Charlotte, Indian Trail, Matthews, Waxhaw, and surrounding communities. Same-week appointments available.",
-        imageUrl: "/images/glass-door-pro/window-parallax.jpg",
+        imageUrl: "/images/glass-door-pro/charming-suburban-home-hero-1920x1080.webp",
         imagePositionY: 45,
       },
       intro: {
