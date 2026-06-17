@@ -98,23 +98,23 @@ export function FormModalButton({
 
   if (normalizedAction === "internal-link") {
     return (
-      <Link href={normalizedHref}>
-        <Button {...buttonProps} data-testid={testId}>
+      <Button {...buttonProps} asChild data-testid={testId}>
+        <Link href={normalizedHref}>
           {label}
-        </Button>
-      </Link>
+        </Link>
+      </Button>
     );
   }
 
   return (
-    <a
-      href={normalizedHref}
-      target={shouldOpenInNewTab ? "_blank" : undefined}
-      rel={shouldOpenInNewTab ? "noopener noreferrer" : undefined}
-    >
-      <Button {...buttonProps} data-testid={testId}>
+    <Button {...buttonProps} asChild data-testid={testId}>
+      <a
+        href={normalizedHref}
+        target={shouldOpenInNewTab ? "_blank" : undefined}
+        rel={shouldOpenInNewTab ? "noopener noreferrer" : undefined}
+      >
         {label}
-      </Button>
-    </a>
+      </a>
+    </Button>
   );
 }

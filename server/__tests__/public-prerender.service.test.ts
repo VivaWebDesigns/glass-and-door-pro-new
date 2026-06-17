@@ -187,7 +187,7 @@ describe("public-prerender.service", () => {
       title: "Frameless Showers",
       slug: "services-frameless-showers",
       pageType: "service",
-      ogImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
+      ogImageUrl: "/images/glass-door-pro/modern-frameless-shower-hero-1920x1080.webp",
       canonicalUrl: "https://glassanddoorpro.com/services/frameless-showers",
       content: {
         blocks: [
@@ -218,7 +218,7 @@ describe("public-prerender.service", () => {
 
     expect(mockGetPageBySlug).toHaveBeenCalledWith("services-frameless-showers");
     expect(snapshot?.title).toBe(
-      "Frameless Shower Doors in Charlotte, Monroe & Indian Trail NC | Glass & Door Pro",
+      "Frameless Shower Doors Charlotte NC | Glass & Door Pro",
     );
     expect(snapshot?.jsonLd?.map((schema) => schema["@type"])).toEqual([
       "LocalBusiness",
@@ -234,11 +234,11 @@ describe("public-prerender.service", () => {
       ]),
     );
     expect(snapshot?.ogImageUrl).toBe(
-      "https://glassanddoorpro.com/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
+      "https://glassanddoorpro.com/images/glass-door-pro/modern-frameless-shower-hero-1920x1080.webp",
     );
     expect(html).toContain('"@type":"FAQPage"');
     expect(html).toContain(
-      'property="og:image" content="https://glassanddoorpro.com/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png"',
+      'property="og:image" content="https://glassanddoorpro.com/images/glass-door-pro/modern-frameless-shower-hero-1920x1080.webp"',
     );
     expect(html).toContain('"priceRange":"$$"');
     expect(html).not.toContain('"priceRange":"$"');
