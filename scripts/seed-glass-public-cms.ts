@@ -2387,8 +2387,8 @@ const glassServicePages: GlassServicePageSeed[] = [
         heading: "Commercial Door Installation in Charlotte, NC",
         subheading:
           "Aluminum entry doors, glass storefront doors, and commercial entrance systems installed for new construction, tenant buildouts, and business renovations across Charlotte. Direct contact with the person doing the work — from scope through installation.",
-        imageUrl: "/images/glass-door-pro/door-hero.webp",
-        imageAlt: "Commercial glass door installation for a Charlotte business entrance",
+        imageUrl: "/images/glass-door-pro/storefront-door-installation-hero.webp",
+        imageAlt: "Commercial storefront door installation for a Charlotte business entrance",
         imagePositionY: 45,
         primaryText: "Request a Commercial Quote",
       },
