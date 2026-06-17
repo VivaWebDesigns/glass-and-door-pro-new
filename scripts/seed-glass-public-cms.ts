@@ -1103,7 +1103,7 @@ const month1FramelessContent: InsertCmsPage["content"] = {
       heading: "Frameless Glass Shower Doors in Charlotte, Monroe & Surrounding NC",
       subheading:
         "Custom frameless shower enclosures, measured, fabricated, and installed personally by Doug — owner-operator with 15+ years of experience. Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and the surrounding greater Charlotte area.",
-      imageUrl: "/images/glass-door-pro/frameless-parallax.jpg",
+      imageUrl: "/images/glass-door-pro/frameless-parallax.webp",
       imagePositionY: 25,
     }),
     block("rich-text", {
