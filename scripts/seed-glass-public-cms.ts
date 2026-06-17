@@ -931,6 +931,7 @@ function serviceHero(props: {
   heading: string;
   subheading: string;
   imageUrl: string;
+  imageAlt?: string;
   imagePositionY?: number;
   primaryText?: string;
   primaryAction?: string;
@@ -955,6 +956,7 @@ function serviceHero(props: {
     ctaSecondaryLink: props.secondaryLink ?? "tel:+17047716111",
     ctaSecondaryAction: props.secondaryAction ?? "custom-link",
     backgroundImageUrl: props.imageUrl,
+    backgroundImageAlt: props.imageAlt ?? "",
     overlayColor: "#000000",
     overlayOpacity: 28,
     minHeight: "700",
@@ -1104,6 +1106,7 @@ const month1FramelessContent: InsertCmsPage["content"] = {
       subheading:
         "Custom frameless shower enclosures, measured, fabricated, and installed personally by Doug — owner-operator with 15+ years of experience. Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and the surrounding greater Charlotte area.",
       imageUrl: "/images/glass-door-pro/modern-frameless-shower-hero-1920x1080.webp",
+      imageAlt: "Frameless glass shower door installed in a Charlotte area bathroom",
       imagePositionY: 25,
     }),
     block("rich-text", {
@@ -1383,6 +1386,7 @@ function expandedServicePageContent(props: {
     heading: string;
     subheading: string;
     imageUrl: string;
+    imageAlt?: string;
     imagePositionY?: number;
   };
   intro: {
@@ -1484,6 +1488,7 @@ const glassServicesContent: InsertCmsPage["content"] = {
       subheading:
         "Frameless showers, residential windows, door installation, window repair, and commercial glass and door services across Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby communities.",
       imageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
+      imageAlt: "Frameless glass shower and home glass services in the Charlotte area",
       imagePositionY: 42,
       primaryText: "Request a Free Quote",
     }),
@@ -1620,6 +1625,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         subheading:
           "Residential replacement windows measured, fitted, and installed personally by Doug Adams — owner-operator with 15+ years of experience. Serving Monroe, Charlotte, Indian Trail, Matthews, Waxhaw, and surrounding communities. Same-week appointments available.",
         imageUrl: "/images/glass-door-pro/charming-suburban-home-hero-1920x1080.webp",
+        imageAlt: "Suburban home exterior with replacement windows installed",
         imagePositionY: 45,
       },
       intro: {
@@ -1769,6 +1775,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         subheading:
           "Entry doors, patio doors, storm doors, and exterior doors installed correctly — level, plumb, weather-tight, and operating smoothly from day one. Owner-operated service across Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and surrounding communities.",
         imageUrl: "/images/glass-door-pro/door-hero.webp",
+        imageAlt: "Residential exterior door installation for a Charlotte area home",
         imagePositionY: 45,
       },
       intro: {
@@ -1918,6 +1925,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         subheading:
           "Foggy panes, broken seals, failed IGUs, cracked glass, and stuck sashes — fixed without replacing the whole window when possible. Owner-operated service across Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and surrounding areas. Same-week appointments available.",
         imageUrl: "/images/glass-door-pro/broken-glass-hero.webp",
+        imageAlt: "Broken window glass ready for repair or replacement",
         imagePositionY: 45,
       },
       intro: {
@@ -2066,6 +2074,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         subheading:
           "Storefront glass systems, aluminum framing, and commercial glass doors installed for new construction, tenant buildouts, and commercial renovations across Charlotte. Reliable scheduling, clean execution, and a single point of contact from quote through completion.",
         imageUrl: "/images/glass-door-pro/commercial-hero-1280w.webp",
+        imageAlt: "Commercial storefront glass installation for a Charlotte business",
         imagePositionY: 50,
         primaryText: "Request a Commercial Quote",
       },
@@ -2218,6 +2227,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         subheading:
           "Broken storefront glass secured and replaced fast. Whether it's vandalism, an accident, or a failed panel — we board up to secure the building, then return to complete the permanent glass replacement. One call handles the whole situation.",
         imageUrl: "/images/glass-door-pro/broken-glass-hero.webp",
+        imageAlt: "Broken storefront glass needing commercial glass replacement",
         imagePositionY: 45,
         primaryText: "Call (704) 771-6111",
         primaryAction: "custom-link",
@@ -2378,6 +2388,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         subheading:
           "Aluminum entry doors, glass storefront doors, and commercial entrance systems installed for new construction, tenant buildouts, and business renovations across Charlotte. Direct contact with the person doing the work — from scope through installation.",
         imageUrl: "/images/glass-door-pro/door-hero.webp",
+        imageAlt: "Commercial glass door installation for a Charlotte business entrance",
         imagePositionY: 45,
         primaryText: "Request a Commercial Quote",
       },
@@ -2528,6 +2539,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         subheading:
           "Broken glass panels, damaged hardware, misaligned frames, and doors that won't close or lock properly — repaired or replaced fast. Serving Charlotte businesses with honest assessments, same-week scheduling, and owner-operated service you can count on.",
         imageUrl: "/images/glass-door-pro/gallery-door2-1280w.webp",
+        imageAlt: "Commercial glass entry door for replacement or repair service",
         imagePositionY: 45,
         primaryText: "Call (704) 771-6111",
         primaryAction: "custom-link",
@@ -2690,6 +2702,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         subheading:
           "Wrong windows ordered. Unit damage mid-construction. A deadline that can't move. When an apartment or multi-family project in Charlotte has a window problem that needs to be resolved fast, Glass and Door Pro mobilizes quicker than larger companies — and Doug handles the project personally from first call through final installation.",
         imageUrl: "/images/glass-door-pro/commercial-window-replacement-hero-blue-sky.webp",
+        imageAlt: "Multi-family building exterior with replacement windows",
         imagePositionY: 45,
         primaryText: "Call (704) 771-6111",
         primaryAction: "custom-link",

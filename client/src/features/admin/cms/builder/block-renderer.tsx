@@ -103,7 +103,6 @@ import {
 } from "@/lib/blog-post-categories";
 import {
   arr,
-  cmsBackgroundImageValue,
   colorStyle,
   getMobileImageStyles,
   getVimeoId,
@@ -218,6 +217,9 @@ function DynamicPreviewFallback() {
 
 function HeroBlock({ props }: { props: Record<string, unknown> }) {
   const bg = resolveCmsAssetUrl(str(props.backgroundImageUrl));
+  const bgAlt = str(props.backgroundImageAlt) || str(props.imageAlt);
+  const bgWidth = num(props.backgroundImageWidth as number, 0);
+  const bgHeight = num(props.backgroundImageHeight as number, 0);
   const videoBg = str(props.videoBackgroundUrl);
   const variant = str(props.variant);
   const isGlassService = variant === "glass-service";
@@ -249,23 +251,25 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
         ...(sectionStyleConfig.backgroundColor
           ? { backgroundColor: sectionStyleConfig.backgroundColor }
           : {}),
-        ...(bg && !videoBg
-          ? {
-              backgroundImage: cmsBackgroundImageValue(bg),
-              backgroundSize: "cover",
-              backgroundPosition: `${bgPosX}% ${bgPosY}%`,
-            }
-          : bg && videoBg
-            ? {
-                backgroundImage: cmsBackgroundImageValue(bg),
-                backgroundSize: "cover",
-                backgroundPosition: `${bgPosX}% ${bgPosY}%`,
-              }
-            : !videoBg && !sectionStyleConfig.backgroundColor
-              ? { background: DEFAULT_SECTION_LINEAR_GRADIENT }
-              : {}),
+        ...(!bg && !videoBg && !sectionStyleConfig.backgroundColor
+          ? { background: DEFAULT_SECTION_LINEAR_GRADIENT }
+          : {}),
       }}
     >
+      {bg && (
+        <img
+          src={bg}
+          alt={bgAlt}
+          width={bgWidth || undefined}
+          height={bgHeight || undefined}
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ objectPosition: `${bgPosX}% ${bgPosY}%` }}
+          onError={handleCmsPreviewImageError}
+        />
+      )}
       {videoBg && (
         <video
           autoPlay
@@ -365,6 +369,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
             src={bg}
             alt=""
             className="w-full h-full object-cover"
+            style={{ objectPosition: `${bgPosX}% ${bgPosY}%` }}
             onError={handleCmsPreviewImageError}
           />
         </div>

@@ -27,7 +27,6 @@ import {
 } from "@/features/admin/cms/builder/section-style";
 import {
   arr,
-  cmsBackgroundImageValue,
   colorStyle,
   getMobileImageStyles,
   getVimeoId,
@@ -174,6 +173,9 @@ function DynamicFallback() {
 
 function HeroBlock({ props }: { props: Record<string, unknown> }) {
   const bg = resolveCmsAssetUrl(str(props.backgroundImageUrl));
+  const bgAlt = str(props.backgroundImageAlt) || str(props.imageAlt);
+  const bgWidth = num(props.backgroundImageWidth as number, 0);
+  const bgHeight = num(props.backgroundImageHeight as number, 0);
   const videoBg = str(props.videoBackgroundUrl);
   const variant = str(props.variant);
   const isGlassService = variant === "glass-service";
@@ -205,23 +207,21 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
         ...(sectionStyleConfig.backgroundColor
           ? { backgroundColor: sectionStyleConfig.backgroundColor }
           : {}),
-        ...(bg && !videoBg
-          ? {
-              backgroundImage: cmsBackgroundImageValue(bg),
-              backgroundSize: "cover",
-              backgroundPosition: `${bgPosX}% ${bgPosY}%`,
-            }
-          : bg && videoBg
-            ? {
-                backgroundImage: cmsBackgroundImageValue(bg),
-                backgroundSize: "cover",
-                backgroundPosition: `${bgPosX}% ${bgPosY}%`,
-              }
-            : !videoBg && !sectionStyleConfig.backgroundColor
-              ? {}
-              : {}),
       }}
     >
+      {bg && (
+        <img
+          src={bg}
+          alt={bgAlt}
+          width={bgWidth || undefined}
+          height={bgHeight || undefined}
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ objectPosition: `${bgPosX}% ${bgPosY}%` }}
+        />
+      )}
       {videoBg && (
         <video
           autoPlay
@@ -316,7 +316,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
       </div>
       {isSplit && bg && !isGlassService && (
         <div className="hidden md:block absolute right-0 top-0 bottom-0 w-1/3">
-          <img src={bg} alt="" className="w-full h-full object-cover" />
+          <img src={bg} alt="" className="w-full h-full object-cover" style={{ objectPosition: `${bgPosX}% ${bgPosY}%` }} />
         </div>
       )}
     </section>
