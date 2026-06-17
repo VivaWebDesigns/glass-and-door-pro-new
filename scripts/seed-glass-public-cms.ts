@@ -1917,7 +1917,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         heading: "Window Repair in Charlotte & Monroe, NC",
         subheading:
           "Foggy panes, broken seals, failed IGUs, cracked glass, and stuck sashes — fixed without replacing the whole window when possible. Owner-operated service across Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and surrounding areas. Same-week appointments available.",
-        imageUrl: "/images/glass-door-pro/window-repair-parallax.jpg",
+        imageUrl: "/images/glass-door-pro/broken-glass-hero.webp",
         imagePositionY: 45,
       },
       intro: {
@@ -2217,7 +2217,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         heading: "Commercial Storefront Glass Replacement & Repair in Charlotte, NC",
         subheading:
           "Broken storefront glass secured and replaced fast. Whether it's vandalism, an accident, or a failed panel — we board up to secure the building, then return to complete the permanent glass replacement. One call handles the whole situation.",
-        imageUrl: "/images/glass-door-pro/window-repair-parallax.jpg",
+        imageUrl: "/images/glass-door-pro/broken-glass-hero.webp",
         imagePositionY: 45,
         primaryText: "Call (704) 771-6111",
         primaryAction: "custom-link",
