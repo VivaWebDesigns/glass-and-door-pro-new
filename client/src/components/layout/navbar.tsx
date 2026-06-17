@@ -9,6 +9,7 @@ import {
   UserCog,
   ChevronDown,
   Bell,
+  Phone,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useUnreadNotificationCount } from "@/hooks/use-unread-notification-count";
@@ -366,7 +367,30 @@ export function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
-          ) : null}
+          ) : (
+            <>
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="hidden border-[#1a8ead] text-[#0f6f85] hover:bg-[#e8f7fb] hover:text-[#0f6f85] lg:inline-flex"
+                data-testid="link-header-phone"
+              >
+                <a href="tel:+17047716111">
+                  <Phone className="h-3.5 w-3.5" />
+                  <span>(704) 771-6111</span>
+                </a>
+              </Button>
+              <Button
+                asChild
+                size="sm"
+                className="bg-[#1a8ead] text-white hover:bg-[#167f9b] hover:text-white"
+                data-testid="link-header-quote"
+              >
+                <Link href="/#contact">Get a Free Quote</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         <div className="flex md:hidden items-center gap-2">
