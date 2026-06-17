@@ -419,6 +419,24 @@ function extractFaqItems(pageContent: unknown): Array<{ question: string; answer
   return items;
 }
 
+function buildFaqBodyHtml(items: Array<{ question: string; answer: string }>) {
+  if (items.length === 0) return "";
+
+  return [
+    `<section class="seo-prerender-faqs" aria-labelledby="seo-prerender-faqs-heading">`,
+    `<h2 id="seo-prerender-faqs-heading">Frequently Asked Questions</h2>`,
+    ...items.map((item) =>
+      [
+        `<article class="seo-prerender-faq">`,
+        `<h3>${escapeHtml(item.question)}</h3>`,
+        sanitizeRichHtml(item.answer),
+        `</article>`,
+      ].join(""),
+    ),
+    `</section>`,
+  ].join("");
+}
+
 function buildFaqPageSchema(items: Array<{ question: string; answer: string }>) {
   if (items.length === 0) return null;
   return {
@@ -440,6 +458,7 @@ function buildSimplePageBody(
   description: string,
   fragments: string[] = [],
   anchoredSections: Array<{ anchorId: string; fragments: string[] }> = [],
+  extraHtml: string[] = [],
 ) {
   const paragraphs = uniqueFragments([description, ...fragments])
     .filter((fragment) => fragment && fragment.toLowerCase() !== title.trim().toLowerCase())
@@ -460,6 +479,7 @@ function buildSimplePageBody(
     `<h1>${escapeHtml(title)}</h1>`,
     ...paragraphs.map((paragraph) => `<p>${escapeHtml(truncate(paragraph, 340))}</p>`),
     ...anchoredHtml,
+    ...extraHtml,
     `</article>`,
     `</main>`,
   ].join("");
@@ -485,16 +505,17 @@ function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: strin
   const publicPath = getCmsPublicPath(page.slug);
   const canonicalUrl =
     page.canonicalUrl || (publicPath === "/" ? siteUrl : `${siteUrl}${publicPath}`);
+  const faqItems = extractFaqItems(page.content);
   const bodyHtml = buildSimplePageBody(
     getPrerenderHeading(page, title),
     description,
     uniqueFragments(collectTextFragments(page.content)),
     collectAnchoredSections(page.content),
+    [buildFaqBodyHtml(faqItems)].filter(Boolean),
   );
 
   const breadcrumbs =
     page.slug === "home" ? null : buildBreadcrumbSchema(buildGlassBreadcrumbItems(page, siteUrl));
-  const faqItems = extractFaqItems(page.content);
   const cityArea = getGlassCityPageArea(page.slug);
 
   return {

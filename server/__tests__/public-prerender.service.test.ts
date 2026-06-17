@@ -244,6 +244,8 @@ describe("public-prerender.service", () => {
     expect(html).not.toContain('"priceRange":"$"');
     expect(html).toContain('id="__CMS_PRERENDER_PAGE__" type="application/json"');
     expect(html).toContain('"slug":"services-frameless-showers"');
+    expect(snapshot?.bodyHtml).toContain('class="seo-prerender-faqs"');
+    expect(snapshot?.bodyHtml).toContain("How long does installation take?");
     expect(html).toContain("Most frameless shower installations are completed in 2-4 hours.");
   });
 
