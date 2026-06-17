@@ -2538,8 +2538,8 @@ const glassServicePages: GlassServicePageSeed[] = [
         heading: "Commercial Door Replacement & Repair in Charlotte, NC",
         subheading:
           "Broken glass panels, damaged hardware, misaligned frames, and doors that won't close or lock properly — repaired or replaced fast. Serving Charlotte businesses with honest assessments, same-week scheduling, and owner-operated service you can count on.",
-        imageUrl: "/images/glass-door-pro/gallery-door2-1280w.webp",
-        imageAlt: "Commercial glass entry door for replacement or repair service",
+        imageUrl: "/images/glass-door-pro/commercial-door-repair-hero.webp",
+        imageAlt: "Commercial door repair and replacement for a Charlotte business entrance",
         imagePositionY: 45,
         primaryText: "Call (704) 771-6111",
         primaryAction: "custom-link",
