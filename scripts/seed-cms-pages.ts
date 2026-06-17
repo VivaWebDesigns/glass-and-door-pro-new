@@ -38,8 +38,7 @@ const glassHomeContent = {
         eyebrow: "About Us",
         heading: "Hi there! My name is Doug.",
         subtitle: "",
-        body:
-          "<p>Welcome to my glass and door installation business, proudly serving the greater Charlotte, North Carolina area. With over 15 years of hands-on experience, I'm dedicated to providing high-quality, personalized solutions for all your glass and door needs.</p><p>Whether you're looking to enhance your home with a custom frameless shower or improve comfort and energy efficiency with new windows or doors, I've got you covered. I handle every project personally, from small repairs to full installations, ensuring each job is completed efficiently, correctly, and with attention to detail.</p>",
+        body: "<p>Welcome to my glass and door installation business, proudly serving the greater Charlotte, North Carolina area. With over 15 years of hands-on experience, I'm dedicated to providing high-quality, personalized solutions for all your glass and door needs.</p><p>Whether you're looking to enhance your home with a custom frameless shower or improve comfort and energy efficiency with new windows or doors, I've got you covered. I handle every project personally, from small repairs to full installations, ensuring each job is completed efficiently, correctly, and with attention to detail.</p>",
         alignment: "left",
         imageUrl: "/images/glass-door-pro/family-1280w.webp",
         imageAlt: "Doug Adams, owner of Glass & Door Pro, with his family in Charlotte, NC",
@@ -66,35 +65,40 @@ const glassHomeContent = {
           {
             icon: "Droplets",
             title: "Frameless Showers",
-            description: "Custom frameless glass shower enclosures that add luxury and value to any bathroom.",
+            description:
+              "Custom frameless glass shower enclosures that add luxury and value to any bathroom.",
             link: "#contact",
             buttonText: "Get Quote",
           },
           {
             icon: "Grid3X3",
             title: "Window Installation",
-            description: "Energy-efficient window replacements to enhance your property's comfort and curb appeal.",
+            description:
+              "Energy-efficient window replacements to enhance your property's comfort and curb appeal.",
             link: "#contact",
             buttonText: "Get Quote",
           },
           {
             icon: "DoorOpen",
             title: "Door Installation",
-            description: "From entry doors to patio doors, I install options to enhance your home's security and style.",
+            description:
+              "From entry doors to patio doors, I install options to enhance your home's security and style.",
             link: "#contact",
             buttonText: "Get Quote",
           },
           {
             icon: "Wrench",
             title: "Window Repair",
-            description: "Fast, reliable window glass repair for broken panes, foggy windows, and seal failures.",
+            description:
+              "Fast, reliable window glass repair for broken panes, foggy windows, and seal failures.",
             link: "#contact",
             buttonText: "Get Quote",
           },
           {
             icon: "Building2",
             title: "Commercial Glass",
-            description: "Professional storefront glass, office partitions, and commercial glass solutions for businesses.",
+            description:
+              "Professional storefront glass, office partitions, and commercial glass solutions for businesses.",
             link: "#contact",
             buttonText: "Get Quote",
           },
@@ -120,11 +124,11 @@ const glassHomeContent = {
         anchorId: "why-us",
         eyebrow: "Why us?",
         heading: "Get the job done right",
-        body:
-          "<p>I work closely with my clients to ensure that each installation is tailored to their specific preferences and needs, resulting in a truly unique and beautiful addition to any space.</p><p>With 15+ years of experience, I have the knowledge and equipment necessary to install any type of glass or door, from standard windows and exterior doors to more complex frameless shower enclosures.</p>",
+        body: "<p>I work closely with my clients to ensure that each installation is tailored to their specific preferences and needs, resulting in a truly unique and beautiful addition to any space.</p><p>With 15+ years of experience, I have the knowledge and equipment necessary to install any type of glass or door, from standard windows and exterior doors to more complex frameless shower enclosures.</p>",
         alignment: "left",
         imageUrl: "/images/glass-door-pro/gallery-door1-1280w.webp",
-        imageAlt: "Professional entry door installation by Glass & Door Pro serving Monroe and Indian Trail, NC",
+        imageAlt:
+          "Professional entry door installation by Glass & Door Pro serving Monroe and Indian Trail, NC",
         imagePosition: "right",
         badgeValue: "15+",
         badgeLabel: "Years Experience",
@@ -291,7 +295,8 @@ const aboutContent = {
       id: uid(),
       type: "rich-text",
       props: {
-        content: "<p>Core Platform was born from the lived experience of growing up between cultures. Our founders — Adult Core Platforms and mental health advocates — experienced firsthand how difficult it is to find a mental health professional who truly understands what it means to call multiple countries \"home.\" In 2024, they set out to build a bridge between Third Culture Kids and the culturally competent professionals who serve them.</p>",
+        content:
+          '<p>Core Platform was born from the lived experience of growing up between cultures. Our founders — Adult Core Platforms and mental health advocates — experienced firsthand how difficult it is to find a mental health professional who truly understands what it means to call multiple countries "home." In 2024, they set out to build a bridge between Third Culture Kids and the culturally competent professionals who serve them.</p>',
         alignment: "left",
       },
     },
@@ -308,7 +313,8 @@ const aboutContent = {
       id: uid(),
       type: "rich-text",
       props: {
-        content: "<p>Our vision is a world where every Third Culture Kid has access to mental health support that honors their multicultural identity. Our mission is to build the most trusted directory of Core Platform-informed mental health professionals — vetted, accessible, and global — so that no one has to navigate the complexities of cross-cultural life alone.</p>",
+        content:
+          "<p>Our vision is a world where every Third Culture Kid has access to mental health support that honors their multicultural identity. Our mission is to build the most trusted directory of Core Platform-informed mental health professionals — vetted, accessible, and global — so that no one has to navigate the complexities of cross-cultural life alone.</p>",
         alignment: "left",
       },
     },
@@ -332,12 +338,14 @@ const aboutContent = {
           {
             icon: "AlertCircle",
             title: "60% of Core Platforms",
-            description: "experienced symptoms of anxiety related to their cross-cultural upbringing and transitions.",
+            description:
+              "experienced symptoms of anxiety related to their cross-cultural upbringing and transitions.",
           },
           {
             icon: "AlertCircle",
             title: "59% of Core Platforms",
-            description: "experienced symptoms of depression, often connected to unresolved grief of place and identity.",
+            description:
+              "experienced symptoms of depression, often connected to unresolved grief of place and identity.",
           },
           {
             icon: "AlertCircle",
@@ -351,7 +359,8 @@ const aboutContent = {
       id: uid(),
       type: "rich-text",
       props: {
-        content: "<p>However, significantly smaller numbers get diagnosed. While we can only speculate on why, due to our decades of observations and expertise in the field, we think a large reason is due to lack of accessibility to proper mental health services. <strong>Which is a major driver in why we do what we do!</strong></p>",
+        content:
+          "<p>However, significantly smaller numbers get diagnosed. While we can only speculate on why, due to our decades of observations and expertise in the field, we think a large reason is due to lack of accessibility to proper mental health services. <strong>Which is a major driver in why we do what we do!</strong></p>",
         alignment: "center",
       },
     },
@@ -368,7 +377,8 @@ const aboutContent = {
       id: uid(),
       type: "rich-text",
       props: {
-        content: "<p>Traditional therapy models were developed within a single cultural framework. When Core Platforms bring their experiences to these frameworks, important aspects of their story can be misunderstood or pathologized. A Core Platform-informed mental health professional understands concepts like ambiguous loss, hidden immigrants, cultural marginality, and grief of place. They recognize that growing up across cultures creates both remarkable strengths and unique challenges — and they know how to work with both.</p>",
+        content:
+          "<p>Traditional therapy models were developed within a single cultural framework. When Core Platforms bring their experiences to these frameworks, important aspects of their story can be misunderstood or pathologized. A Core Platform-informed mental health professional understands concepts like ambiguous loss, hidden immigrants, cultural marginality, and grief of place. They recognize that growing up across cultures creates both remarkable strengths and unique challenges — and they know how to work with both.</p>",
         alignment: "left",
       },
     },
@@ -529,7 +539,8 @@ const aboutContent = {
       type: "cta",
       props: {
         heading: "Donate to Core Platform",
-        subheading: "Your support helps us maintain this platform, expand our directory, and provide resources to the global Core Platform community. Every contribution — large or small — makes a difference in connecting Core Platforms with the care they deserve.",
+        subheading:
+          "Your support helps us maintain this platform, expand our directory, and provide resources to the global Core Platform community. Every contribution — large or small — makes a difference in connecting Core Platforms with the care they deserve.",
         primaryText: "Donate",
         primaryLink: "/donate",
         variant: "accent",
@@ -586,22 +597,26 @@ const joinContent = {
           {
             icon: "ClipboardCheck",
             title: "Directory Listing",
-            description: "Get a professional profile in our searchable directory, visible to Core Platforms and cross-cultural families seeking specialized support worldwide.",
+            description:
+              "Get a professional profile in our searchable directory, visible to Core Platforms and cross-cultural families seeking specialized support worldwide.",
           },
           {
             icon: "Users",
             title: "Client Connections",
-            description: "Receive referrals from individuals actively searching for Core Platform-informed mental health professionals who understand their experience.",
+            description:
+              "Receive referrals from individuals actively searching for Core Platform-informed mental health professionals who understand their experience.",
           },
           {
             icon: "BarChart3",
             title: "Profile Analytics",
-            description: "Track how many people view your profile, where they're located, and which specializations attract the most interest.",
+            description:
+              "Track how many people view your profile, where they're located, and which specializations attract the most interest.",
           },
           {
             icon: "Star",
             title: "Community Access",
-            description: "Join a network of Core Platform-informed professionals for peer consultation, shared resources, and community events.",
+            description:
+              "Join a network of Core Platform-informed professionals for peer consultation, shared resources, and community events.",
           },
         ],
       },
@@ -623,27 +638,32 @@ const joinContent = {
           {
             icon: "ClipboardCheck",
             title: "1. Submit Your Application",
-            description: "Complete our online application with your credentials, areas of specialization, and experience working with Core Platform or cross-cultural populations.",
+            description:
+              "Complete our online application with your credentials, areas of specialization, and experience working with Core Platform or cross-cultural populations.",
           },
           {
             icon: "CheckCircle",
             title: "2. Credential Verification",
-            description: "Our team verifies your licensure, certifications, and professional standing to ensure quality and trust for our community.",
+            description:
+              "Our team verifies your licensure, certifications, and professional standing to ensure quality and trust for our community.",
           },
           {
             icon: "Search",
             title: "3. Core Platform Competency Review",
-            description: "We assess your training and lived experience with Core Platform, expat, and cross-cultural clients to confirm a strong fit for our directory.",
+            description:
+              "We assess your training and lived experience with Core Platform, expat, and cross-cultural clients to confirm a strong fit for our directory.",
           },
           {
             icon: "User",
             title: "4. Profile Setup",
-            description: "Build your professional profile with your bio, specializations, languages, session formats, and availability for prospective clients.",
+            description:
+              "Build your professional profile with your bio, specializations, languages, session formats, and availability for prospective clients.",
           },
           {
             icon: "Star",
             title: "5. Go Live in the Directory",
-            description: "Once approved, your profile goes live and you begin receiving visibility from Core Platforms and families searching for support.",
+            description:
+              "Once approved, your profile goes live and you begin receiving visibility from Core Platforms and families searching for support.",
           },
         ],
       },
@@ -671,7 +691,8 @@ const insightsContent = {
       props: {
         eyebrow: "Core Platform Blog",
         title: "Insights & Articles",
-        subtitle: "Explore articles, research, and insights on Third Culture Kid mental health and cross-cultural counseling.",
+        subtitle:
+          "Explore articles, research, and insights on Third Culture Kid mental health and cross-cultural counseling.",
         alignment: "center",
       },
     },
@@ -749,8 +770,7 @@ const directoryContent = {
       type: "text-image",
       props: {
         heading: "Why Core Platform Informed?",
-        body:
-          "Traditional therapy models were developed within a single cultural framework. When Core Platforms bring their experiences to these frameworks, important aspects of their story can be misunderstood or pathologized. A Core Platform-informed mental health professional understands concepts like ambiguous loss, hidden immigrants, cultural marginality, and grief of place. They recognize that growing up across cultures creates both remarkable strengths and unique challenges — and they know how to work with both.",
+        body: "Traditional therapy models were developed within a single cultural framework. When Core Platforms bring their experiences to these frameworks, important aspects of their story can be misunderstood or pathologized. A Core Platform-informed mental health professional understands concepts like ambiguous loss, hidden immigrants, cultural marginality, and grief of place. They recognize that growing up across cultures creates both remarkable strengths and unique challenges — and they know how to work with both.",
         imageUrl:
           "https://images.unsplash.com/photo-1573497620053-ea5300f94f21?w=1200&h=1200&fit=crop&crop=faces",
         imageAlt: "Core Platform-informed counseling",
@@ -833,8 +853,7 @@ const pages = [
     status: "published" as const,
     content: eventsContent,
     seoTitle: "Upcoming Events | Core Platform",
-    seoDescription:
-      "Explore upcoming Core Platform trainings, workshops, and community events.",
+    seoDescription: "Explore upcoming Core Platform trainings, workshops, and community events.",
   },
   {
     slug: "recordings",
@@ -843,8 +862,7 @@ const pages = [
     status: "published" as const,
     content: recordingsContent,
     seoTitle: "Video Archives | Core Platform",
-    seoDescription:
-      "Watch past Core Platform trainings and webinars from the video archives.",
+    seoDescription: "Watch past Core Platform trainings and webinars from the video archives.",
   },
   {
     slug: "directory",
@@ -858,16 +876,32 @@ const pages = [
   },
 ];
 
+function shouldOverwriteExistingCmsPages() {
+  const raw = process.env.CMS_SEED_OVERWRITE_EXISTING;
+  return raw === "1" || raw?.toLowerCase() === "true";
+}
+
 async function seed() {
   console.log("Seeding CMS pages...");
+  const overwriteExistingCmsPages = shouldOverwriteExistingCmsPages();
+
+  if (!overwriteExistingCmsPages) {
+    console.log(
+      "  [safe mode] existing CMS pages will not be overwritten; set CMS_SEED_OVERWRITE_EXISTING=true to reset pages from seed content",
+    );
+  }
+
   for (const page of pages) {
-    const existing = await db
-      .select()
-      .from(cmsPages)
-      .where(eq(cmsPages.slug, page.slug))
-      .limit(1);
+    const existing = await db.select().from(cmsPages).where(eq(cmsPages.slug, page.slug)).limit(1);
 
     if (existing.length > 0) {
+      if (!overwriteExistingCmsPages) {
+        console.log(
+          `  [skipped] ${page.slug} — id: ${existing[0].id}; set CMS_SEED_OVERWRITE_EXISTING=true to replace it`,
+        );
+        continue;
+      }
+
       await db
         .update(cmsPages)
         .set({

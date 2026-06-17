@@ -141,8 +141,8 @@ function Router() {
         <Route path="/service-areas/indian-land" component={() => <CmsHybridPage slug="service-areas-indian-land" fallback={<NotFound />} />} />
         <Route path="/service-areas/fort-mill" component={() => <CmsHybridPage slug="service-areas-fort-mill" fallback={<NotFound />} />} />
         <Route path="/service-areas/pineville" component={() => <CmsHybridPage slug="service-areas-pineville" fallback={<NotFound />} />} />
-        <Route path="/areas-served/monroe-nc" component={() => <CmsHybridPage slug="areas-served-monroe-nc" fallback={<NotFound />} />} />
-        <Route path="/areas-served/charlotte-nc" component={() => <CmsHybridPage slug="areas-served-charlotte-nc" fallback={<NotFound />} />} />
+        <Route path="/areas-served/monroe-nc"><Redirect to="/service-areas/monroe" replace /></Route>
+        <Route path="/areas-served/charlotte-nc"><Redirect to="/service-areas/charlotte" replace /></Route>
         <Route path="/preview/cms/:id" component={CmsPreviewPage} />
         <Route path="/join" component={() => <CmsHybridPage slug="join" fallback={<JoinNetworkPage />} />} />
         <Route path="/events" component={() => siteFeatures.eventsEnabled ? <CmsHybridPage slug="events" fallback={<EventsPage />} /> : <NotFound />} />

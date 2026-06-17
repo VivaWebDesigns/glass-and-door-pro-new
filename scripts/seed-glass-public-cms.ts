@@ -12,7 +12,12 @@ function uid() {
   return randomUUID();
 }
 
-function item(label: string, url: string, children: MenuItem[] = [], openInNewTab = false): MenuItem {
+function item(
+  label: string,
+  url: string,
+  children: MenuItem[] = [],
+  openInNewTab = false,
+): MenuItem {
   return {
     id: uid(),
     label,
@@ -41,7 +46,11 @@ const glassReviewItems = [
     "a week ago",
     "I've been finding it very difficult to find good, reliable people for certain renovations. Doug, however, exceeded my expectations by miles. His talent for attention to meticulous details is very impressive. His love and pride for what he does shows through his work, which is immaculate. Not to mention he is just a very nice guy who actually listens and caters to you even if you aren't sure of what you need/want, per se. Extremely communicative and patient. 10/10. Good job and Thank You!",
   ),
-  googleReview("Mike Capuano", "2 weeks ago", "Fast response, Great communication. Quality work. Would call again."),
+  googleReview(
+    "Mike Capuano",
+    "2 weeks ago",
+    "Fast response, Great communication. Quality work. Would call again.",
+  ),
   googleReview(
     "Jvarr",
     "2 weeks ago",
@@ -62,7 +71,11 @@ const glassReviewItems = [
     "a month ago",
     "Doug with Glass and Door Pro is excellent! I broke a piece in my window and I couldn't get my window to open or close. I called Doug on Monday morning and he came out right away. He had all the supplies he needed and sent me texts to let me know the next steps.",
   ),
-  googleReview("Holly Widders", "a month ago", "He did a fantastic job! Our sliding glass door works better than ever now!"),
+  googleReview(
+    "Holly Widders",
+    "a month ago",
+    "He did a fantastic job! Our sliding glass door works better than ever now!",
+  ),
   googleReview(
     "Derick Pope",
     "a month ago",
@@ -118,7 +131,11 @@ const glassReviewItems = [
     "7 months ago",
     "Doug helped us to replace a window and install a storm door. He provided exceptional service throughout the entire process, and I highly recommend Glass and Door Pro.",
   ),
-  googleReview("Andrey Bayrashev", "9 months ago", "Great work installing our broken window, with great quality and at affordable price!"),
+  googleReview(
+    "Andrey Bayrashev",
+    "9 months ago",
+    "Great work installing our broken window, with great quality and at affordable price!",
+  ),
   googleReview(
     "Ryan Billingsley",
     "10 months ago",
@@ -130,13 +147,21 @@ const glassReviewItems = [
     "a year ago",
     "These guys were friendly and professional and also showed up to help last minute!!! I was in a tough spot and they showed up with smiles on their faces and helped me out no problem. Also the pricing is fair and very affordable.",
   ),
-  googleReview("Hardcor Coleman", "a year ago", "Great experience job was done quick and efficient. Plus a good guy will definitely recommend."),
+  googleReview(
+    "Hardcor Coleman",
+    "a year ago",
+    "Great experience job was done quick and efficient. Plus a good guy will definitely recommend.",
+  ),
   googleReview(
     "Samantha Walsh",
     "a year ago",
     "Doug was amazing with our major window issues. He was prompt and professional and very communicative. He helped alleviate a lot of stress and has been our go to ever since. I have to say not only is the quality top notch but his pricing was the most reasonable in town! Would recommend him 10x over!!",
   ),
-  googleReview("Dennis “AusareOne” Stevens", "a year ago", "Excellent work I highly recommend him. 100%."),
+  googleReview(
+    "Dennis “AusareOne” Stevens",
+    "a year ago",
+    "Excellent work I highly recommend him. 100%.",
+  ),
   googleReview(
     "Thomas Foy",
     "a year ago",
@@ -167,7 +192,11 @@ const glassReviewItems = [
     "a year ago",
     "Doug is a great, honest and hard working gentleman. Based on his hard work I suggested him to keep working with great manufacturers to match his valuable work.",
   ),
-  googleReview("Sheila Ellsaesser", "a year ago", "This was a great experience. Very detailed, professional."),
+  googleReview(
+    "Sheila Ellsaesser",
+    "a year ago",
+    "This was a great experience. Very detailed, professional.",
+  ),
   googleReview(
     "cookiemclaughlin",
     "a year ago",
@@ -188,7 +217,11 @@ const glassReviewItems = [
     "2 years ago",
     "Replaced a back door and frame that was rotting out. Did an excellent job with a quality door and frame. Punctual, professional, economical!",
   ),
-  googleReview("G. Scott Denton", "2 years ago", "Doug was simply fantastic. Very thorough and the shower glass turned out amazing! Highly recommend!"),
+  googleReview(
+    "G. Scott Denton",
+    "2 years ago",
+    "Doug was simply fantastic. Very thorough and the shower glass turned out amazing! Highly recommend!",
+  ),
   googleReview(
     "T Woods",
     "2 years ago",
@@ -204,7 +237,11 @@ const glassReviewItems = [
     "2 years ago",
     "Very knowledgeable, knew exactly what to do and was both personable and professional. Plus he cleaned up after he completed the job and everything looked great! Thanks Doug for fixing our shower door!",
   ),
-  googleReview("Mindy Bass", "2 years ago", "Doug came the next day and took precise measurements. Very courteous, professional with very reasonable prices."),
+  googleReview(
+    "Mindy Bass",
+    "2 years ago",
+    "Doug came the next day and took precise measurements. Very courteous, professional with very reasonable prices.",
+  ),
   googleReview(
     "Donna Kelly",
     "2 years ago",
@@ -216,7 +253,11 @@ const glassReviewItems = [
     "3 years ago",
     "A stone broke our sliding glass door glass. Doug came, measured, and gave us the quote. Within a week he came and installed the glass. Extremely nice, knowledgeable, honest and reasonable. I highly recommend him.",
   ),
-  googleReview("Matthew Berti", "3 years ago", "Door came out great and finished off our new shower."),
+  googleReview(
+    "Matthew Berti",
+    "3 years ago",
+    "Door came out great and finished off our new shower.",
+  ),
   googleReview(
     "Will Friedrich",
     "3 years ago",
@@ -227,8 +268,16 @@ const glassReviewItems = [
     "3 years ago",
     "Doug was quick to respond, very professional, and affordable!! We were extremely pleased with the service and will def call him if we need any other window repairs!",
   ),
-  googleReview("Travis Dixon", "3 years ago", "Had a glass shower door installed, did fantastic work and very easy to work with, and communicated every step of the way."),
-  googleReview("William Owens", "3 years ago", "First very kind respectful. His work was quick but professional experience."),
+  googleReview(
+    "Travis Dixon",
+    "3 years ago",
+    "Had a glass shower door installed, did fantastic work and very easy to work with, and communicated every step of the way.",
+  ),
+  googleReview(
+    "William Owens",
+    "3 years ago",
+    "First very kind respectful. His work was quick but professional experience.",
+  ),
   googleReview(
     "JOSEPH PETRILLI",
     "3 years ago",
@@ -249,7 +298,11 @@ const glassReviewItems = [
     "4 years ago",
     "He responded quickly to my call and was very flexible with times. He is extremely professional and was so personable and kind. The workmanship is very precise and the damaged area looks like new. I would highly recommend him to anyone.",
   ),
-  googleReview("Kristy Compton", "4 years ago", "Doug did an AMAZING job!! Very meticulous and made sure it was done right. Will definitely use again and highly recommend."),
+  googleReview(
+    "Kristy Compton",
+    "4 years ago",
+    "Doug did an AMAZING job!! Very meticulous and made sure it was done right. Will definitely use again and highly recommend.",
+  ),
   googleReview(
     "Jyotirmoy Banerjee",
     "4 years ago",
@@ -275,8 +328,16 @@ const glassReviewItems = [
     "4 years ago",
     "Doug was great from beginning to end! He kept and maintained communication from beginning to end. Instead of replacing a door, he was able to repair it and fix a leak problem with the door. Great work.",
   ),
-  googleReview("Jennifer Barber", "4 years ago", "He did a very professional job. When he finished the door repair it was not like it was ever broken."),
-  googleReview("Custodio Benitez", "4 years ago", "Did a great job. I recommend him to anybody that needs a window fix and glass job."),
+  googleReview(
+    "Jennifer Barber",
+    "4 years ago",
+    "He did a very professional job. When he finished the door repair it was not like it was ever broken.",
+  ),
+  googleReview(
+    "Custodio Benitez",
+    "4 years ago",
+    "Did a great job. I recommend him to anybody that needs a window fix and glass job.",
+  ),
   googleReview(
     "Mary Beth Roth",
     "4 years ago",
@@ -325,8 +386,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
         eyebrow: "About Us",
         heading: "Hi there! My name is Doug.",
         subtitle: "",
-        body:
-          "<p>Welcome to my glass and door installation business, proudly serving the greater Charlotte, North Carolina area. With over 15 years of hands-on experience, I'm dedicated to providing high-quality, personalized solutions for all your glass and door needs.</p><p>Whether you're looking to enhance your home with a custom frameless shower or improve comfort and energy efficiency with new windows or doors, I've got you covered. I handle every project personally, from small repairs to full installations, ensuring each job is completed efficiently, correctly, and with attention to detail.</p>",
+        body: "<p>Welcome to my glass and door installation business, proudly serving the greater Charlotte, North Carolina area. With over 15 years of hands-on experience, I'm dedicated to providing high-quality, personalized solutions for all your glass and door needs.</p><p>Whether you're looking to enhance your home with a custom frameless shower or improve comfort and energy efficiency with new windows or doors, I've got you covered. I handle every project personally, from small repairs to full installations, ensuring each job is completed efficiently, correctly, and with attention to detail.</p>",
         alignment: "left",
         imageUrl: "/images/glass-door-pro/family-1280w.webp",
         imageAlt: "Doug Adams, owner of Glass & Door Pro, with his family in Charlotte, NC",
@@ -353,28 +413,32 @@ const glassHomeContent: InsertCmsPage["content"] = {
           {
             icon: "Droplets",
             title: "Frameless Showers",
-            description: "Custom frameless glass shower enclosures that add luxury and value to any bathroom.",
+            description:
+              "Custom frameless glass shower enclosures that add luxury and value to any bathroom.",
             link: "/services/frameless-showers",
             buttonText: "Learn More",
           },
           {
             icon: "Grid3X3",
             title: "Window Installation",
-            description: "Energy-efficient window replacements to enhance your property's comfort and curb appeal.",
+            description:
+              "Energy-efficient window replacements to enhance your property's comfort and curb appeal.",
             link: "/services/window-installation",
             buttonText: "Learn More",
           },
           {
             icon: "DoorOpen",
             title: "Door Installation",
-            description: "From entry doors to patio doors, I install options to enhance your home's security and style.",
+            description:
+              "From entry doors to patio doors, I install options to enhance your home's security and style.",
             link: "/services/door-installation",
             buttonText: "Learn More",
           },
           {
             icon: "Wrench",
             title: "Window Repair",
-            description: "Fast, reliable window glass repair for broken panes, foggy windows, and seal failures.",
+            description:
+              "Fast, reliable window glass repair for broken panes, foggy windows, and seal failures.",
             link: "/services/window-repair",
             buttonText: "Learn More",
           },
@@ -408,11 +472,11 @@ const glassHomeContent: InsertCmsPage["content"] = {
         anchorId: "why-us",
         eyebrow: "Why us?",
         heading: "Get the job done right",
-        body:
-          "<p>I work closely with my clients to ensure that each installation is tailored to their specific preferences and needs, resulting in a truly unique and beautiful addition to any space.</p><p>With 15+ years of experience, I have the knowledge and equipment necessary to install any type of glass or door, from standard windows and exterior doors to more complex frameless shower enclosures.</p>",
+        body: "<p>I work closely with my clients to ensure that each installation is tailored to their specific preferences and needs, resulting in a truly unique and beautiful addition to any space.</p><p>With 15+ years of experience, I have the knowledge and equipment necessary to install any type of glass or door, from standard windows and exterior doors to more complex frameless shower enclosures.</p>",
         alignment: "left",
         imageUrl: "/images/glass-door-pro/gallery-door1-1280w.webp",
-        imageAlt: "Professional entry door installation by Glass & Door Pro serving Monroe and Indian Trail, NC",
+        imageAlt:
+          "Professional entry door installation by Glass & Door Pro serving Monroe and Indian Trail, NC",
         imagePosition: "right",
         badgeValue: "15+",
         badgeLabel: "Years Experience",
@@ -807,7 +871,8 @@ const glassReviewsContent: InsertCmsPage["content"] = {
       ctaSecondaryAction: "form-modal",
       ctaSecondaryFormSlug: "contact-form",
       ctaSecondaryModalTitle: "Request a Free Estimate",
-      ctaSecondaryModalDescription: "Share a few project details and Doug will follow up with next steps.",
+      ctaSecondaryModalDescription:
+        "Share a few project details and Doug will follow up with next steps.",
       backgroundImageUrl: "/images/glass-door-pro/reviews-hero-1920w.webp",
       overlayColor: "#0f172a",
       overlayOpacity: 18,
@@ -884,7 +949,8 @@ function serviceHero(props: {
     ctaLink: props.primaryLink ?? "",
     ctaFormSlug: "contact-form",
     ctaModalTitle: "Request a Free Quote",
-    ctaModalDescription: "Tell us a little about your project and Doug will follow up with next steps.",
+    ctaModalDescription:
+      "Tell us a little about your project and Doug will follow up with next steps.",
     ctaSecondaryText: props.secondaryText ?? "Call (704) 771-6111",
     ctaSecondaryLink: props.secondaryLink ?? "tel:+17047716111",
     ctaSecondaryAction: props.secondaryAction ?? "custom-link",
@@ -1227,7 +1293,7 @@ const month1FramelessContent: InsertCmsPage["content"] = {
       title: "Serving the Greater Charlotte Area",
       alignment: "center",
       content:
-        '<p>We serve homeowners and businesses throughout the greater Charlotte metro area, including: <a href="/areas-served/charlotte-nc">Charlotte</a>, Matthews, Mint Hill, <a href="/areas-served/monroe-nc">Monroe</a>, Pineville, Huntersville, Cornelius, Davidson, Concord, Tega Cay, Waxhaw, Weddington, Wesley Chapel, Indian Trail, Stallings, Fort Mill, Indian Land, Rock Hill, and surrounding areas.</p>',
+        '<p>We serve homeowners and businesses throughout the greater Charlotte metro area, including: <a href="/service-areas/charlotte">Charlotte</a>, <a href="/service-areas/monroe">Monroe</a>, <a href="/service-areas/indian-trail">Indian Trail</a>, <a href="/service-areas/stallings">Stallings</a>, <a href="/service-areas/wesley-chapel">Wesley Chapel</a>, <a href="/service-areas/waxhaw">Waxhaw</a>, <a href="/service-areas/matthews">Matthews</a>, <a href="/service-areas/weddington">Weddington</a>, <a href="/service-areas/pineville">Pineville</a>, <a href="/service-areas/fort-mill">Fort Mill</a>, <a href="/service-areas/indian-land">Indian Land</a>, and surrounding areas.</p>',
       sectionBackgroundColor: "#ffffff",
       sectionPaddingTop: "md",
       sectionPaddingBottom: "md",
@@ -1380,7 +1446,8 @@ function expandedServicePageContent(props: {
           title: section.title,
           alignment: "left",
           content: section.content,
-          sectionBackgroundColor: section.backgroundColor ?? (index % 2 === 0 ? "#ffffff" : "#f8fafc"),
+          sectionBackgroundColor:
+            section.backgroundColor ?? (index % 2 === 0 ? "#ffffff" : "#f8fafc"),
           sectionPaddingTop: "lg",
           sectionPaddingBottom: "lg",
         }),
@@ -1440,28 +1507,32 @@ const glassServicesContent: InsertCmsPage["content"] = {
         {
           icon: "Droplets",
           title: "Frameless Showers",
-          description: "Custom frameless shower doors and glass enclosures measured and installed personally.",
+          description:
+            "Custom frameless shower doors and glass enclosures measured and installed personally.",
           link: "/services/frameless-showers",
           buttonText: "View frameless showers",
         },
         {
           icon: "Grid3X3",
           title: "Window Installation",
-          description: "Residential window installation and replacement for homes across the Charlotte area.",
+          description:
+            "Residential window installation and replacement for homes across the Charlotte area.",
           link: "/services/window-installation",
           buttonText: "View window installation",
         },
         {
           icon: "DoorOpen",
           title: "Door Installation",
-          description: "Entry, patio, storm, and exterior door installation with clean fit and finish.",
+          description:
+            "Entry, patio, storm, and exterior door installation with clean fit and finish.",
           link: "/services/door-installation",
           buttonText: "View door installation",
         },
         {
           icon: "Wrench",
           title: "Window Repair",
-          description: "Broken glass, foggy panes, seal failure, and glass-only replacement when possible.",
+          description:
+            "Broken glass, foggy panes, seal failure, and glass-only replacement when possible.",
           link: "/services/window-repair",
           buttonText: "View window repair",
         },
@@ -1493,14 +1564,16 @@ const glassServicesContent: InsertCmsPage["content"] = {
         {
           icon: "DoorOpen",
           title: "Commercial Door Installation",
-          description: "Aluminum entry doors, glass storefront doors, and complete commercial entrance systems.",
+          description:
+            "Aluminum entry doors, glass storefront doors, and complete commercial entrance systems.",
           link: "/services/commercial-door-installation",
           buttonText: "View commercial door installation",
         },
         {
           icon: "Wrench",
           title: "Commercial Door Replacement & Repair",
-          description: "Broken glass panels, hardware failure, misaligned frames, and worn closers repaired or replaced fast.",
+          description:
+            "Broken glass panels, hardware failure, misaligned frames, and worn closers repaired or replaced fast.",
           link: "/services/commercial-door-replacement-repair",
           buttonText: "View commercial door replacement and repair",
         },
@@ -1545,7 +1618,8 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Window Installation",
     slug: "services-window-installation",
-    seoTitle: "Window Installation in Charlotte & Monroe, NC | Replacement Windows | Glass and Door Pro",
+    seoTitle:
+      "Window Installation in Charlotte & Monroe, NC | Replacement Windows | Glass and Door Pro",
     seoDescription:
       "Professional window installation and replacement for homes across Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Owner-operated, honest pricing, same-week appointments. Call (704) 771-6111.",
     seoKeywords:
@@ -1689,8 +1763,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       ],
       cta: {
         heading: "Ready to Replace Your Windows?",
-        body:
-          "Call, text, or fill out the form for a free in-home quote. Doug will measure every opening personally and give you a clear, written estimate with no pressure and no surprises.",
+        body: "Call, text, or fill out the form for a free in-home quote. Doug will measure every opening personally and give you a clear, written estimate with no pressure and no surprises.",
         footerLine:
           "Mon–Sat, 7am–6pm | Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas",
       },
@@ -1699,7 +1772,8 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Door Installation",
     slug: "services-door-installation",
-    seoTitle: "Door Installation in Charlotte & Monroe, NC | Entry, Patio & Storm Doors | Glass and Door Pro",
+    seoTitle:
+      "Door Installation in Charlotte & Monroe, NC | Entry, Patio & Storm Doors | Glass and Door Pro",
     seoDescription:
       "Residential door installation for entry doors, patio doors, storm doors, and exterior doors across Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Call (704) 771-6111.",
     seoKeywords:
@@ -1843,8 +1917,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       ],
       cta: {
         heading: "Ready to Install or Replace a Door?",
-        body:
-          "Call, text, or fill out the form for a free quote. Doug will measure the opening personally and give you a clear written estimate — no pressure, no surprises.",
+        body: "Call, text, or fill out the form for a free quote. Doug will measure the opening personally and give you a clear written estimate — no pressure, no surprises.",
         footerLine:
           "Mon–Sat, 7am–6pm | Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas",
       },
@@ -1853,7 +1926,8 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Window Repair",
     slug: "services-window-repair",
-    seoTitle: "Window Repair in Charlotte & Monroe, NC | Foggy Glass, Broken Seals & More | Glass and Door Pro",
+    seoTitle:
+      "Window Repair in Charlotte & Monroe, NC | Foggy Glass, Broken Seals & More | Glass and Door Pro",
     seoDescription:
       "Window repair for broken seals, foggy panes, failed IGUs, broken hardware, and cracked glass. Serving Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Call (704) 771-6111.",
     seoKeywords:
@@ -1997,8 +2071,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       ],
       cta: {
         heading: "Have a Window That Needs Attention?",
-        body:
-          "Call, text, or fill out the form and Doug will take a look. Most window repair jobs can be diagnosed quickly and scheduled within the same week.",
+        body: "Call, text, or fill out the form and Doug will take a look. Most window repair jobs can be diagnosed quickly and scheduled within the same week.",
         footerLine:
           "Mon–Sat, 7am–6pm | Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas",
       },
@@ -2073,7 +2146,8 @@ const glassServicePages: GlassServicePageSeed[] = [
             "<p>Commercial storefront installation is a coordination-intensive scope. Here's how we approach it:</p><p><strong>Pre-Construction Consultation</strong><br>Before anything is ordered, we review the project drawings, confirm rough opening dimensions, and discuss the glass and framing specifications. Getting the specification right at this stage prevents costly changes later.</p><p><strong>Accurate Field Measurement</strong><br>We take field measurements from the actual rough opening — not from drawings alone. Commercial construction tolerances vary, and field conditions don't always match what's on paper. Measuring from the actual opening is what prevents fit issues at installation.</p><p><strong>Material Procurement</strong><br>We source aluminum framing systems and commercial glass through established supply relationships. Lead times are discussed at the time of order so the GC or PM has accurate information for scheduling downstream trades.</p><p><strong>Installation</strong><br>Installation is sequenced around the project schedule. We confirm the opening is ready before mobilizing — proper substrate, correct rough opening dimensions, structural support in place. We don't show up to a site that isn't ready, and we don't leave a site until the work is complete and clean.</p><p><strong>Punch List &amp; Closeout</strong><br>After installation, we walk the work with the GC or PM, address any punch list items on the spot, and provide documentation for the project file.</p>",
         },
       ],
-      benefitsTitle: "Why Charlotte Contractors Choose Glass and Door Pro for Storefront Installation",
+      benefitsTitle:
+        "Why Charlotte Contractors Choose Glass and Door Pro for Storefront Installation",
       benefitsCards: [
         {
           icon: "UserCheck",
@@ -2120,7 +2194,8 @@ const glassServicePages: GlassServicePageSeed[] = [
       faqTitle: "Frequently Asked Questions — Commercial Storefront Glass Installation",
       faqs: [
         {
-          question: "How far in advance should I schedule a commercial storefront glass installation?",
+          question:
+            "How far in advance should I schedule a commercial storefront glass installation?",
           answer:
             "<p>Lead time depends on the scope and the materials specified. Standard aluminum storefront systems typically have material lead times of 2–4 weeks from order. We recommend reaching out as early in the project schedule as possible so we can confirm material availability and lock in the installation window. For projects with firm completion dates, earlier engagement gives us more scheduling flexibility.</p>",
         },
@@ -2152,8 +2227,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       ],
       cta: {
         heading: "Have a Commercial Storefront Project in Charlotte?",
-        body:
-          "Call or submit a project inquiry and Doug will follow up directly. We work with GCs, project managers, and business owners — and we respond fast.",
+        body: "Call or submit a project inquiry and Doug will follow up directly. We work with GCs, project managers, and business owners — and we respond fast.",
         footerLine: "Mon–Sat, 7am–6pm | Charlotte, NC and surrounding metro area",
         primaryText: "Request a Commercial Quote",
       },
@@ -2162,7 +2236,8 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Commercial Storefront Glass Replacement & Repair",
     slug: "services-commercial-storefront-glass-replacement-repair",
-    seoTitle: "Commercial Storefront Glass Replacement & Repair in Charlotte, NC | Glass and Door Pro",
+    seoTitle:
+      "Commercial Storefront Glass Replacement & Repair in Charlotte, NC | Glass and Door Pro",
     seoDescription:
       "Emergency storefront glass repair, board-up, and replacement for Charlotte businesses. Broken storefront glass secured and replaced fast. Owner-operated, same-day response. Call (704) 771-6111.",
     seoKeywords:
@@ -2312,8 +2387,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       ],
       cta: {
         heading: "Broken Storefront Glass in Charlotte?",
-        body:
-          "Call us directly for emergency response. For non-emergency replacement and repair, fill out the form and we'll follow up same day.",
+        body: "Call us directly for emergency response. For non-emergency replacement and repair, fill out the form and we'll follow up same day.",
         footerLine: "Mon–Sat, 7am–6pm | Charlotte, NC and surrounding metro area",
         primaryText: "Call (704) 771-6111",
         primaryAction: "custom-link",
@@ -2327,7 +2401,8 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Commercial Door Installation",
     slug: "services-commercial-door-installation",
-    seoTitle: "Commercial Door Installation in Charlotte, NC | Storefront & Entry Doors | Glass and Door Pro",
+    seoTitle:
+      "Commercial Door Installation in Charlotte, NC | Storefront & Entry Doors | Glass and Door Pro",
     seoDescription:
       "Commercial door installation for new construction, tenant buildouts, and business renovations in Charlotte, NC. Aluminum entry doors, glass storefront doors, and commercial entrance systems. Call (704) 771-6111.",
     seoKeywords:
@@ -2393,7 +2468,8 @@ const glassServicePages: GlassServicePageSeed[] = [
             "<p><strong>Scope Review &amp; Specification</strong><br>Before anything is ordered, we review the project scope — door types, quantities, hardware specifications, opening dimensions, and any code requirements for the application. Getting the specification right before ordering prevents change orders and delays.</p><p><strong>Field Measurement</strong><br>We measure from the actual rough openings. Commercial construction tolerances vary, and relying on drawing dimensions alone for door orders creates fit problems. Field measurement is non-negotiable for commercial door work.</p><p><strong>Material Procurement</strong><br>Aluminum door systems and commercial hardware are ordered with confirmed lead times. We communicate material availability to the GC or PM so the installation window can be scheduled accurately within the project timeline.</p><p><strong>Installation</strong><br>Doors are installed level, plumb, and square. Hardware is mounted correctly and tested before we leave the site. We don't call a door complete until it opens freely, closes completely, latches properly, and locks as it should. Thresholds and weatherstripping are set to seal correctly against the floor and frame.</p><p><strong>Punch List</strong><br>We walk the completed installation with the GC or PM, address any punch list items on site, and provide documentation for the project closeout package if required.</p>",
         },
       ],
-      benefitsTitle: "Why Charlotte Contractors Choose Glass and Door Pro for Commercial Door Installation",
+      benefitsTitle:
+        "Why Charlotte Contractors Choose Glass and Door Pro for Commercial Door Installation",
       benefitsCards: [
         {
           icon: "UserCheck",
@@ -2472,8 +2548,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       ],
       cta: {
         heading: "Commercial Door Project in Charlotte?",
-        body:
-          "Call or submit a project inquiry and Doug will follow up directly. We work with GCs, project managers, and business owners — and we respond fast.",
+        body: "Call or submit a project inquiry and Doug will follow up directly. We work with GCs, project managers, and business owners — and we respond fast.",
         footerLine: "Mon–Sat, 7am–6pm | Charlotte, NC and surrounding metro area",
         primaryText: "Request a Commercial Quote",
       },
@@ -2600,7 +2675,8 @@ const glassServicePages: GlassServicePageSeed[] = [
       faqTitle: "Frequently Asked Questions — Commercial Door Replacement & Repair",
       faqs: [
         {
-          question: "My commercial door won't close properly — can it be repaired or does it need to be replaced?",
+          question:
+            "My commercial door won't close properly — can it be repaired or does it need to be replaced?",
           answer:
             "<p>In most cases, a commercial door that won't close properly can be repaired. The most common causes are hinge wear, frame shift, or a failing closer — all of which are repairable. We diagnose the specific issue first and give you a clear recommendation before any work starts. If the frame has shifted beyond what adjustment can correct or the door has structural damage, we'll tell you replacement makes more sense.</p>",
         },
@@ -2610,7 +2686,8 @@ const glassServicePages: GlassServicePageSeed[] = [
             "<p>We schedule commercial door repairs quickly — typically within a few days for standard repairs. For situations where the door is non-functional or creating a security issue, call us directly at (704) 771-6111 and we'll discuss priority scheduling.</p>",
         },
         {
-          question: "Can you replace the glass panel in a commercial door without replacing the entire door?",
+          question:
+            "Can you replace the glass panel in a commercial door without replacing the entire door?",
           answer:
             "<p>Yes, in most cases. If the door frame is in good condition and the door itself is structurally sound, we can replace just the broken glass panel. We source tempered safety glass cut to the correct specification for the door and install it without disturbing the surrounding frame.</p>",
         },
@@ -2625,15 +2702,15 @@ const glassServicePages: GlassServicePageSeed[] = [
             "<p>Yes. We work with property managers overseeing commercial properties in Charlotte. We can handle door maintenance, repair, and replacement across multiple locations and work within your existing service request and documentation process.</p>",
         },
         {
-          question: "My commercial door hardware keeps failing — is this a hardware quality issue or an installation issue?",
+          question:
+            "My commercial door hardware keeps failing — is this a hardware quality issue or an installation issue?",
           answer:
             "<p>It can be either. Commercial door hardware that fails repeatedly is often a specification problem — residential-grade or incorrectly rated hardware installed on a commercial door that sees more use than the hardware was designed for. It can also be an installation issue. We diagnose the root cause and specify replacement hardware correctly for the door's use requirements so the repair holds.</p>",
         },
       ],
       cta: {
         heading: "Commercial Door Not Working Right in Charlotte?",
-        body:
-          "Call us directly for fast scheduling. For non-urgent repairs and replacement quotes, fill out the form and we'll follow up same day.",
+        body: "Call us directly for fast scheduling. For non-urgent repairs and replacement quotes, fill out the form and we'll follow up same day.",
         footerLine: "Mon–Sat, 7am–6pm | Charlotte, NC and surrounding metro area",
         primaryText: "Call (704) 771-6111",
         primaryAction: "custom-link",
@@ -2765,12 +2842,14 @@ const glassServicePages: GlassServicePageSeed[] = [
       faqTitle: "Frequently Asked Questions — Apartment & Multi-Family Window Replacement",
       faqs: [
         {
-          question: "We ordered the wrong windows for an apartment project — how fast can you help?",
+          question:
+            "We ordered the wrong windows for an apartment project — how fast can you help?",
           answer:
             "<p>Call us directly at (704) 771-6111 and describe the situation. We'll assess what's needed — window type, quantity, dimensions, specification — and give you an accurate lead time for sourcing and installation. In situations where the project schedule is the constraint, we prioritize getting an accurate timeline to you immediately so you can make decisions. Speed of response starts with the first call.</p>",
         },
         {
-          question: "Can you handle window replacement on an occupied apartment building without disrupting tenants?",
+          question:
+            "Can you handle window replacement on an occupied apartment building without disrupting tenants?",
           answer:
             "<p>Yes. We work around occupancy schedules and coordinate with property managers to minimize disruption to residents. Unit-by-unit replacement can be scheduled around tenant availability, and we communicate clearly about what the installation process involves for each unit so residents know what to expect.</p>",
         },
@@ -2785,7 +2864,8 @@ const glassServicePages: GlassServicePageSeed[] = [
             "<p>We scope the full project — total window count, unit locations, access requirements, and any constraints around tenant occupancy or construction schedule. We provide a phased installation schedule that works within your project timeline and execute unit by unit or in batches depending on what works best for the property.</p>",
         },
         {
-          question: "Do you work with property management companies on ongoing window maintenance and replacement?",
+          question:
+            "Do you work with property management companies on ongoing window maintenance and replacement?",
           answer:
             "<p>Yes. Property management companies with apartment portfolios in Charlotte can work with us on an ongoing basis for window maintenance, damage replacement, and unit turnover window repair. We're familiar with the documentation and communication requirements of property management operations.</p>",
         },
@@ -2797,8 +2877,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       ],
       cta: {
         heading: "Window Problem on an Apartment Project in Charlotte?",
-        body:
-          "Call Doug directly. He'll assess the situation, give you an accurate timeline, and tell you exactly what it takes to resolve it. No runaround.",
+        body: "Call Doug directly. He'll assess the situation, give you an accurate timeline, and tell you exactly what it takes to resolve it. No runaround.",
         footerLine: "Mon–Sat, 7am–6pm | Charlotte, NC and surrounding metro area",
         primaryText: "Call (704) 771-6111",
         primaryAction: "custom-link",
@@ -2968,7 +3047,7 @@ const glassCityPages: GlassCityPageSeed[] = [
   {
     title: "Monroe, NC",
     slug: "areas-served-monroe-nc",
-    path: "/areas-served/monroe-nc",
+    path: "/service-areas/monroe",
     seoTitle: "Glass & Door Services in Monroe, NC | Glass & Door Pro",
     seoDescription:
       "Monroe, NC's local glass and door company. Frameless showers, window installation, door installation, window repair, and commercial glass. Owner-operator with 15+ years of experience. Call (704) 771-6111.",
@@ -3030,7 +3109,8 @@ const glassCityPages: GlassCityPageSeed[] = [
         "Most Monroe homeowners find us for one specific service, then come back for others. Here's the full range of what we install and repair across Union County:",
       serviceCards: cityServiceCards,
       areasTitle: "Neighborhoods and Areas We Serve In & Around Monroe",
-      areasIntro: "We regularly work throughout the Monroe area and surrounding Union County communities, including:",
+      areasIntro:
+        "We regularly work throughout the Monroe area and surrounding Union County communities, including:",
       areas: [
         "Downtown Monroe and the historic district",
         "Belk Heritage District",
@@ -3101,7 +3181,7 @@ const glassCityPages: GlassCityPageSeed[] = [
   {
     title: "Charlotte, NC",
     slug: "areas-served-charlotte-nc",
-    path: "/areas-served/charlotte-nc",
+    path: "/service-areas/charlotte",
     seoTitle: "Glass & Door Services in Charlotte, NC | Glass & Door Pro",
     seoDescription:
       "Personal, owner-operated glass and door services for Charlotte, NC homeowners. Frameless showers, window installation, door installation, window repair, and commercial glass. 15+ years of experience. Call (704) 771-6111.",
@@ -3154,8 +3234,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         {
           icon: "Phone",
           title: "Personal, Not Corporate",
-          description:
-            "We answer the phone. We text back. We show up when we say we will.",
+          description: "We answer the phone. We text back. We show up when we say we will.",
         },
       ],
       servicesTitle: "Our Services in Charlotte, NC",
@@ -3220,7 +3299,8 @@ const glassCityPages: GlassCityPageSeed[] = [
             "<p>Three reasons most clients tell us. First, Doug personally handles every project — no sales reps, no subcontracted crews. Second, our pricing tends to be more competitive than the larger Charlotte shops because our overhead is lower. Third, Saturday availability — we work Monday through Saturday. The Monroe location is only a disadvantage if you assume we don't actually work in Charlotte, which we do, every week.</p>",
         },
         {
-          question: "Do you do work in historic Charlotte neighborhoods like Dilworth or Myers Park?",
+          question:
+            "Do you do work in historic Charlotte neighborhoods like Dilworth or Myers Park?",
           answer:
             "<p>Yes. Historic Charlotte homes are some of our favorite projects. Older homes often require more careful measurement because walls and openings aren't always plumb or square, but that's exactly what 15+ years of experience prepares you for. We've worked on craftsman bungalows, mid-century homes, and older transitional homes throughout Dilworth, Myers Park, Eastover, Plaza Midwood, and similar neighborhoods.</p>",
         },
@@ -3301,7 +3381,8 @@ const glassCityPages: GlassCityPageSeed[] = [
         "Most Indian Trail homeowners come to us for one specific project. Here's the full range of what we install, repair, and maintain in this area.",
       serviceCards: cityServiceCards,
       areasTitle: "Neighborhoods and Areas We Serve in Indian Trail",
-      areasIntro: "We regularly work throughout Indian Trail and surrounding Union County communities, including:",
+      areasIntro:
+        "We regularly work throughout Indian Trail and surrounding Union County communities, including:",
       areas: [
         "Bonterra and the neighborhoods around Bonterra Town Center",
         "Chestnut Square and surrounding subdivisions",
@@ -3383,7 +3464,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         heading: "Glass & Door Services in Stallings, NC",
         subheading:
           "Frameless shower enclosures, replacement windows, door installation, and window repair for Stallings homeowners. Monroe-based and owner-operated — Doug handles every project personally. Saturday appointments available.",
-        imageUrl: "",
+        imageUrl: "/images/glass-door-pro/city-stallings-hero.webp",
         imagePositionY: 45,
       },
       introTitle: "Glass and Door Pro — Serving Stallings Homeowners",
@@ -3429,7 +3510,8 @@ const glassCityPages: GlassCityPageSeed[] = [
         },
       ],
       servicesTitle: "Our Services in Stallings, NC",
-      servicesIntro: "Most Stallings homeowners reach out for one specific project. Here's everything we do in this area.",
+      servicesIntro:
+        "Most Stallings homeowners reach out for one specific project. Here's everything we do in this area.",
       serviceCards: cityServiceCards,
       areasTitle: "Neighborhoods and Areas We Serve in and Around Stallings",
       areasIntro: "We work regularly throughout Stallings and the nearby communities, including:",
@@ -3513,7 +3595,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         heading: "Glass & Door Services in Wesley Chapel, NC",
         subheading:
           "Frameless shower enclosures, window replacement, door installation, and window repair for Wesley Chapel homeowners. Monroe-based and owner-operated — every project handled personally by Doug Adams. Saturday appointments available.",
-        imageUrl: "",
+        imageUrl: "/images/glass-door-pro/city-wesley-chapel-hero.webp",
         imagePositionY: 45,
       },
       introTitle: "Glass and Door Services Right Here in Wesley Chapel",
@@ -3562,7 +3644,8 @@ const glassCityPages: GlassCityPageSeed[] = [
       servicesIntro: "",
       serviceCards: cityServiceCards,
       areasTitle: "Neighborhoods and Areas We Serve in Wesley Chapel",
-      areasIntro: "We work throughout Wesley Chapel and the surrounding Union County area, including:",
+      areasIntro:
+        "We work throughout Wesley Chapel and the surrounding Union County area, including:",
       areas: [
         "The subdivisions along Wesley Chapel-Stouts Road",
         "Neighborhoods off Highway 74 in the Wesley Chapel corridor",
@@ -3602,12 +3685,14 @@ const glassCityPages: GlassCityPageSeed[] = [
             "<p>Doug schedules an in-home visit to measure the shower opening and discuss your preferences — glass thickness, hardware finish, door configuration. The measurement has to happen on-site because every shower is different. From that visit, you get a written quote. Most visits are scheduled within a few days of your initial call.</p>",
         },
         {
-          question: "What's the best way to handle a home with multiple fogged windows in Wesley Chapel?",
+          question:
+            "What's the best way to handle a home with multiple fogged windows in Wesley Chapel?",
           answer:
             "<p>We assess each window individually. Some may benefit from IGU-only replacement (just the glass, not the frame), while others may warrant full window replacement depending on the frame condition and age. We'll walk through the windows with you, give you an honest read on each one, and let you decide how to prioritize based on budget and urgency.</p>",
         },
         {
-          question: "Can you match the hardware finish on a new shower door to existing fixtures in the bathroom?",
+          question:
+            "Can you match the hardware finish on a new shower door to existing fixtures in the bathroom?",
           answer:
             "<p>Yes. We offer a range of hardware finishes — brushed nickel, matte black, chrome, oil-rubbed bronze, and others — so the new door hardware coordinates with your existing fixtures. Doug discusses finish options during the in-home measurement.</p>",
         },
@@ -3617,7 +3702,8 @@ const glassCityPages: GlassCityPageSeed[] = [
             "<p>Yes. Glass and Door Pro is fully licensed and insured to work throughout Union County, including Wesley Chapel, Monroe, Indian Trail, Waxhaw, and surrounding communities.</p>",
         },
         {
-          question: "Do you do door installation in Wesley Chapel for homes that already have the door purchased?",
+          question:
+            "Do you do door installation in Wesley Chapel for homes that already have the door purchased?",
           answer:
             "<p>Yes. We can install a door you've already purchased or supply and install the door. If you've already bought a door, share the brand and model with us before the installation visit so we can confirm it includes everything needed for a proper install.</p>",
         },
@@ -3692,7 +3778,8 @@ const glassCityPages: GlassCityPageSeed[] = [
       servicesIntro: "",
       serviceCards: cityServiceCards,
       areasTitle: "Neighborhoods and Areas We Serve in and Around Waxhaw",
-      areasIntro: "We work throughout Waxhaw and the surrounding southern Union County area, including:",
+      areasIntro:
+        "We work throughout Waxhaw and the surrounding southern Union County area, including:",
       areas: [
         "Downtown Waxhaw and the historic district",
         "Cureton and Cureton West",
@@ -3703,7 +3790,8 @@ const glassCityPages: GlassCityPageSeed[] = [
         "The communities off New Town Road and Kensington Drive",
         "Rea Road extension and nearby residential areas",
       ],
-      areasClosing: "Not seeing your neighborhood? We serve all of Waxhaw — call (704) 771-6111 and we'll confirm.",
+      areasClosing:
+        "Not seeing your neighborhood? We serve all of Waxhaw — call (704) 771-6111 and we'll confirm.",
       galleryTitle: "Our Work in the Waxhaw Area",
       gallery: [
         {
@@ -3732,7 +3820,8 @@ const glassCityPages: GlassCityPageSeed[] = [
             "<p>Custom frameless shower enclosures are the top request — Waxhaw homeowners tend to invest in their bathrooms and want glass work that reflects that. Entry door upgrades are also very common, particularly for homes in Waxhaw's higher-end subdivisions where the front elevation matters. Window replacement and repair round out the most frequent calls.</p>",
         },
         {
-          question: "Can you install a frameless shower in a master bath that has a non-standard configuration?",
+          question:
+            "Can you install a frameless shower in a master bath that has a non-standard configuration?",
           answer:
             "<p>Yes. Non-standard shower configurations — angled walls, knee walls, offset drains, unusual proportions — are something we encounter regularly. Doug measures every opening on-site and custom-orders the glass panels to fit. There's no standard template we're trying to force your shower into.</p>",
         },
@@ -3867,7 +3956,8 @@ const glassCityPages: GlassCityPageSeed[] = [
             "<p>The installation itself typically takes one day. The process starts with an in-home measurement visit, followed by the glass order (usually 2–3 weeks lead time), and then the installation day. Doug walks you through the finished enclosure before he leaves and addresses anything that needs adjustment before packing up.</p>",
         },
         {
-          question: "My windows are original to the house from the 1980s — should I replace them all at once or a few at a time?",
+          question:
+            "My windows are original to the house from the 1980s — should I replace them all at once or a few at a time?",
           answer:
             "<p>Either approach works and depends on your budget and priorities. Replacing all at once is more efficient and ensures consistency across the house. Prioritizing the worst performers first — typically the ones with the most fogging, worst drafts, or most visible deterioration — lets you spread the cost over time. Doug will walk through the windows with you and give you an honest read on which ones are most urgent.</p>",
         },
@@ -3932,7 +4022,8 @@ const glassCityPages: GlassCityPageSeed[] = [
         {
           icon: "MapPin",
           title: "Monroe-Based, No Travel Fees",
-          description: "Weddington is part of our regular Union County service area. No additional charges for location.",
+          description:
+            "Weddington is part of our regular Union County service area. No additional charges for location.",
         },
         {
           icon: "FileText",
@@ -3951,7 +4042,8 @@ const glassCityPages: GlassCityPageSeed[] = [
       servicesIntro: "",
       serviceCards: cityServiceCards,
       areasTitle: "Neighborhoods and Areas We Serve in Weddington",
-      areasIntro: "We work throughout Weddington and surrounding Union County communities, including:",
+      areasIntro:
+        "We work throughout Weddington and surrounding Union County communities, including:",
       areas: [
         "The established neighborhoods along Weddington Road",
         "Providence Road West corridor communities",
@@ -4006,7 +4098,8 @@ const glassCityPages: GlassCityPageSeed[] = [
             "<p>Yes. Glass and Door Pro is fully licensed and insured to operate throughout Union County, including Weddington, Monroe, Waxhaw, and surrounding communities.</p>",
         },
         {
-          question: "Can you replace windows in a home that has custom or non-standard window sizes?",
+          question:
+            "Can you replace windows in a home that has custom or non-standard window sizes?",
           answer:
             "<p>Yes. We measure every opening and source windows to fit the specific dimensions — there's no assumption that your windows match a standard size. Homes in Weddington often have larger or more customized window configurations than typical production housing, and we handle those without issue.</p>",
         },
@@ -4081,7 +4174,8 @@ const glassCityPages: GlassCityPageSeed[] = [
       servicesIntro: "",
       serviceCards: cityServiceCards,
       areasTitle: "Neighborhoods and Areas We Serve in Indian Land",
-      areasIntro: "We work throughout Indian Land and the surrounding Lancaster County area, including:",
+      areasIntro:
+        "We work throughout Indian Land and the surrounding Lancaster County area, including:",
       areas: [
         "The neighborhoods along Highway 521 in Indian Land",
         "Baxter Village and surrounding communities",
@@ -4092,7 +4186,8 @@ const glassCityPages: GlassCityPageSeed[] = [
         "The new construction communities along Doby's Bridge Road",
         "Neighborhoods connecting Indian Land to Fort Mill",
       ],
-      areasClosing: "Not seeing your community? Call (704) 771-6111 — we cover all of Indian Land and surrounding areas.",
+      areasClosing:
+        "Not seeing your community? Call (704) 771-6111 — we cover all of Indian Land and surrounding areas.",
       galleryTitle: "Our Work in the Indian Land Area",
       gallery: [
         {
@@ -4126,7 +4221,8 @@ const glassCityPages: GlassCityPageSeed[] = [
             "<p>Doug schedules an in-home measurement visit to assess the shower opening, discuss glass thickness and hardware finish options, and take the precise measurements needed to order the glass. After the order is placed (typically 2–3 weeks lead time), he returns for the installation. The whole process from first call to installed enclosure usually runs 3–4 weeks.</p>",
         },
         {
-          question: "Can you replace windows in a newer Indian Land home that has non-standard sizes?",
+          question:
+            "Can you replace windows in a newer Indian Land home that has non-standard sizes?",
           answer:
             "<p>Yes. We measure every opening on-site and source windows to those exact dimensions. New construction in Indian Land often has windows in sizes that don't match standard replacement dimensions, and we handle custom-sized replacements without issue.</p>",
         },
@@ -4144,7 +4240,8 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaHeading: "Ready to Get Started in Indian Land?",
       ctaBody:
         "Call, text, or fill out the form for a free quote. Doug will come out personally, measure the project, and give you clear next steps.",
-      ctaFooter: "Mon–Sat, 7am–6pm | Monroe-based, serving Indian Land and the greater Charlotte area",
+      ctaFooter:
+        "Mon–Sat, 7am–6pm | Monroe-based, serving Indian Land and the greater Charlotte area",
     }),
   },
   {
@@ -4197,19 +4294,22 @@ const glassCityPages: GlassCityPageSeed[] = [
         {
           icon: "FileText",
           title: "Clear Quotes, No Surprises",
-          description: "Written quotes before any work begins. No ambiguity about what's included and what it costs.",
+          description:
+            "Written quotes before any work begins. No ambiguity about what's included and what it costs.",
         },
         {
           icon: "CalendarDays",
           title: "Saturday Appointments Available",
-          description: "Mon–Sat, 7am–6pm. We accommodate Fort Mill homeowners' schedules including Saturdays.",
+          description:
+            "Mon–Sat, 7am–6pm. We accommodate Fort Mill homeowners' schedules including Saturdays.",
         },
       ],
       servicesTitle: "Our Services in Fort Mill, SC",
       servicesIntro: "",
       serviceCards: cityServiceCards,
       areasTitle: "Neighborhoods and Areas We Serve in Fort Mill",
-      areasIntro: "We work throughout Fort Mill and the surrounding York County communities, including:",
+      areasIntro:
+        "We work throughout Fort Mill and the surrounding York County communities, including:",
       areas: [
         "Downtown Fort Mill and the historic district",
         "Baxter Village and surrounding communities",
@@ -4250,7 +4350,8 @@ const glassCityPages: GlassCityPageSeed[] = [
             "<p>Frameless shower enclosures for master bath upgrades are the most frequent request. Fort Mill has a large base of well-maintained homes where owners are making long-term improvements, and a frameless glass shower is often the project that finishes a bathroom remodel. Window replacement and entry door installation are also very common.</p>",
         },
         {
-          question: "Can you install a frameless shower in a Fort Mill home with a walk-in shower that has multiple walls?",
+          question:
+            "Can you install a frameless shower in a Fort Mill home with a walk-in shower that has multiple walls?",
           answer:
             "<p>Yes. Multi-wall shower configurations with multiple fixed panels and one or more doors are something we handle regularly. Doug measures the specific configuration on-site and orders the glass panels to fit. Every element is custom to the opening.</p>",
         },
@@ -4273,7 +4374,8 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaHeading: "Ready to Get Started in Fort Mill?",
       ctaBody:
         "Call, text, or fill out the form. Doug will schedule a visit, measure the project personally, and give you clear next steps.",
-      ctaFooter: "Mon–Sat, 7am–6pm | Monroe-based, serving Fort Mill and the greater Charlotte area",
+      ctaFooter:
+        "Mon–Sat, 7am–6pm | Monroe-based, serving Fort Mill and the greater Charlotte area",
     }),
   },
   {
@@ -4340,7 +4442,8 @@ const glassCityPages: GlassCityPageSeed[] = [
       servicesIntro: "",
       serviceCards: cityServiceCards,
       areasTitle: "Neighborhoods and Areas We Serve in Pineville",
-      areasIntro: "We work throughout Pineville and the surrounding south Charlotte communities, including:",
+      areasIntro:
+        "We work throughout Pineville and the surrounding south Charlotte communities, including:",
       areas: [
         "The neighborhoods along Highway 51 and Pineville-Matthews Road",
         "Pineville town center and surrounding residential areas",
@@ -4381,7 +4484,8 @@ const glassCityPages: GlassCityPageSeed[] = [
             "<p>Frameless shower enclosures for bathroom remodels are the most common call. Pineville has a mix of home ages where bathroom upgrades are a priority. Window replacement for fogged or aging double-pane units is also very common, and entry door replacement rounds out the most frequent project types.</p>",
         },
         {
-          question: "Can you replace windows in a Pineville home that has aluminum-framed originals from the 1980s or 1990s?",
+          question:
+            "Can you replace windows in a Pineville home that has aluminum-framed originals from the 1980s or 1990s?",
           answer:
             "<p>Yes. Older aluminum-framed windows are one of the most common replacement scenarios in Pineville's established neighborhoods. We replace them with modern double-pane vinyl or other appropriate frame types, and the difference in comfort and energy performance is immediately noticeable.</p>",
         },
@@ -4423,10 +4527,19 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
           item("Window Repair", "/services/window-repair"),
         ]),
         item("Commercial", "#", [
-          item("Commercial Storefront Glass Installation", "/services/commercial-storefront-glass-installation"),
-          item("Commercial Storefront Glass Replacement & Repair", "/services/commercial-storefront-glass-replacement-repair"),
+          item(
+            "Commercial Storefront Glass Installation",
+            "/services/commercial-storefront-glass-installation",
+          ),
+          item(
+            "Commercial Storefront Glass Replacement & Repair",
+            "/services/commercial-storefront-glass-replacement-repair",
+          ),
           item("Commercial Door Installation", "/services/commercial-door-installation"),
-          item("Commercial Door Replacement & Repair", "/services/commercial-door-replacement-repair"),
+          item(
+            "Commercial Door Replacement & Repair",
+            "/services/commercial-door-replacement-repair",
+          ),
           item("Commercial Window Replacement", "/services/commercial-window-replacement"),
         ]),
       ]),
@@ -4462,8 +4575,14 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
     location: "footer_professionals",
     items: [
       item("Window Repair", "/services/window-repair"),
-      item("Commercial Storefront Glass Installation", "/services/commercial-storefront-glass-installation"),
-      item("Commercial Storefront Glass Replacement & Repair", "/services/commercial-storefront-glass-replacement-repair"),
+      item(
+        "Commercial Storefront Glass Installation",
+        "/services/commercial-storefront-glass-installation",
+      ),
+      item(
+        "Commercial Storefront Glass Replacement & Repair",
+        "/services/commercial-storefront-glass-replacement-repair",
+      ),
       item("Commercial Door Installation", "/services/commercial-door-installation"),
       item("Commercial Door Replacement & Repair", "/services/commercial-door-replacement-repair"),
       item("Commercial Window Replacement", "/services/commercial-window-replacement"),
@@ -4521,10 +4640,19 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
           item("Window Repair", "/services/window-repair"),
         ]),
         item("Commercial", "#", [
-          item("Commercial Storefront Glass Installation", "/services/commercial-storefront-glass-installation"),
-          item("Commercial Storefront Glass Replacement & Repair", "/services/commercial-storefront-glass-replacement-repair"),
+          item(
+            "Commercial Storefront Glass Installation",
+            "/services/commercial-storefront-glass-installation",
+          ),
+          item(
+            "Commercial Storefront Glass Replacement & Repair",
+            "/services/commercial-storefront-glass-replacement-repair",
+          ),
           item("Commercial Door Installation", "/services/commercial-door-installation"),
-          item("Commercial Door Replacement & Repair", "/services/commercial-door-replacement-repair"),
+          item(
+            "Commercial Door Replacement & Repair",
+            "/services/commercial-door-replacement-repair",
+          ),
           item("Commercial Window Replacement", "/services/commercial-window-replacement"),
         ]),
       ]),
@@ -4653,7 +4781,7 @@ const glassDisclaimerContent = {
       props: {
         alignment: "left",
         content:
-          '<p><strong>Last updated:</strong> June 9, 2026</p><h2>General Information Only</h2><p>The content published on this website is provided for general informational purposes only. It describes the types of services Glass &amp; Door Pro typically offers and the general conditions under which those services are performed. It does not constitute professional advice, a formal assessment, or a recommendation specific to any individual property, window, glass unit, door, shower enclosure, commercial opening, or building condition.</p><h2>Conditions Vary by Property</h2><p>Glass, window, door, shower, and commercial glass recommendations depend heavily on the specific condition of the product, the installation, the surrounding structure, and factors that can only be assessed through an in-person inspection. Information on this website, including descriptions of repair versus replacement criteria, typical repair processes, and expected outcomes, reflects general experience and may not apply to your specific situation. No assessment or recommendation is valid without a direct evaluation by Glass &amp; Door Pro.</p><h2>Manufacturer Warranty Coverage</h2><p>References to manufacturer warranties, warranty service, product defects, or product eligibility on this website are general in nature. Warranty coverage for any specific product depends on the manufacturer\'s warranty terms, the product\'s eligibility, proof of purchase, installation documentation, the nature of the defect or failure, and other factors determined by the manufacturer. Glass &amp; Door Pro cannot confirm warranty coverage or eligibility without reviewing the product and documentation directly. Any manufacturer or product reference does not guarantee that a specific claim will be approved by the manufacturer. Contact Glass &amp; Door Pro for project-specific questions.</p><h2>Pricing and Availability</h2><p>Any pricing references, ranges, or cost comparisons on this website are general in nature and do not constitute a quote or estimate for any specific project. Actual pricing depends on product specifications, site conditions, measurements, finish selections, hardware, parts availability, access requirements, and other factors assessed at the time of the estimate. Availability of services, scheduling, and parts is subject to change without notice. See our Terms of Service for additional information about estimates and service agreements.</p><h2>Commercial Work</h2><p>Descriptions of commercial glass services on this website are general in nature. Commercial project scope, access requirements, permitting, insurance requirements, and applicable code standards vary significantly by property type, location, and jurisdiction. No description on this website should be relied upon as a complete characterization of what a commercial project will require.</p><h2>No Liability</h2><p>Glass &amp; Door Pro makes reasonable efforts to ensure the accuracy of information on this website but does not warrant that all content is current, complete, or error-free. Glass &amp; Door Pro and its owners, employees, contractors, and agents are not liable for any decisions made or actions taken in reliance on information published on this website.</p><h2>Contact</h2><p>If you have questions about a specific project or situation, contact us directly rather than relying on website content.</p><p>Glass &amp; Door Pro<br>2341 Waverly Dr<br>Monroe, NC 28112<br><a href="tel:+17047716111">(704) 771-6111</a></p>',
+          "<p><strong>Last updated:</strong> June 9, 2026</p><h2>General Information Only</h2><p>The content published on this website is provided for general informational purposes only. It describes the types of services Glass &amp; Door Pro typically offers and the general conditions under which those services are performed. It does not constitute professional advice, a formal assessment, or a recommendation specific to any individual property, window, glass unit, door, shower enclosure, commercial opening, or building condition.</p><h2>Conditions Vary by Property</h2><p>Glass, window, door, shower, and commercial glass recommendations depend heavily on the specific condition of the product, the installation, the surrounding structure, and factors that can only be assessed through an in-person inspection. Information on this website, including descriptions of repair versus replacement criteria, typical repair processes, and expected outcomes, reflects general experience and may not apply to your specific situation. No assessment or recommendation is valid without a direct evaluation by Glass &amp; Door Pro.</p><h2>Manufacturer Warranty Coverage</h2><p>References to manufacturer warranties, warranty service, product defects, or product eligibility on this website are general in nature. Warranty coverage for any specific product depends on the manufacturer's warranty terms, the product's eligibility, proof of purchase, installation documentation, the nature of the defect or failure, and other factors determined by the manufacturer. Glass &amp; Door Pro cannot confirm warranty coverage or eligibility without reviewing the product and documentation directly. Any manufacturer or product reference does not guarantee that a specific claim will be approved by the manufacturer. Contact Glass &amp; Door Pro for project-specific questions.</p><h2>Pricing and Availability</h2><p>Any pricing references, ranges, or cost comparisons on this website are general in nature and do not constitute a quote or estimate for any specific project. Actual pricing depends on product specifications, site conditions, measurements, finish selections, hardware, parts availability, access requirements, and other factors assessed at the time of the estimate. Availability of services, scheduling, and parts is subject to change without notice. See our Terms of Service for additional information about estimates and service agreements.</p><h2>Commercial Work</h2><p>Descriptions of commercial glass services on this website are general in nature. Commercial project scope, access requirements, permitting, insurance requirements, and applicable code standards vary significantly by property type, location, and jurisdiction. No description on this website should be relied upon as a complete characterization of what a commercial project will require.</p><h2>No Liability</h2><p>Glass &amp; Door Pro makes reasonable efforts to ensure the accuracy of information on this website but does not warrant that all content is current, complete, or error-free. Glass &amp; Door Pro and its owners, employees, contractors, and agents are not liable for any decisions made or actions taken in reliance on information published on this website.</p><h2>Contact</h2><p>If you have questions about a specific project or situation, contact us directly rather than relying on website content.</p><p>Glass &amp; Door Pro<br>2341 Waverly Dr<br>Monroe, NC 28112<br><a href=\"tel:+17047716111\">(704) 771-6111</a></p>",
       },
     },
   ],
@@ -4692,6 +4820,17 @@ function getSeedOnlySlugs() {
   return slugs.length > 0 ? new Set(slugs) : null;
 }
 
+function shouldOverwriteExistingCmsPages() {
+  const raw = process.env.GLASS_CMS_SEED_OVERWRITE_EXISTING;
+  return raw === "1" || raw?.toLowerCase() === "true";
+}
+
+function logSkippedExistingPage(slug: string, id: string) {
+  console.log(
+    `  [skipped] ${slug} page (${id}) already exists; set GLASS_CMS_SEED_OVERWRITE_EXISTING=true to replace it`,
+  );
+}
+
 async function upsertGlassServicePage(servicePage: GlassServicePageSeed) {
   const existingServicePage = await storage.cmsPages.getPageBySlug(servicePage.slug);
   const servicePath = `/services/${servicePage.slug.replace("services-", "")}`;
@@ -4711,6 +4850,10 @@ async function upsertGlassServicePage(servicePage: GlassServicePageSeed) {
   };
 
   if (existingServicePage) {
+    if (!shouldOverwriteExistingCmsPages()) {
+      logSkippedExistingPage(servicePage.slug, existingServicePage.id);
+      return;
+    }
     await storage.cmsPages.updatePage(existingServicePage.id, pagePayload);
     console.log(`  [updated] ${servicePage.slug} page (${existingServicePage.id})`);
   } else {
@@ -4722,6 +4865,13 @@ async function upsertGlassServicePage(servicePage: GlassServicePageSeed) {
 async function seedGlassPublicCms() {
   console.log("Seeding Glass & Door Pro public CMS content...");
   const seedOnlySlugs = getSeedOnlySlugs();
+  const overwriteExistingCmsPages = shouldOverwriteExistingCmsPages();
+
+  if (!overwriteExistingCmsPages) {
+    console.log(
+      "  [safe mode] existing CMS pages will not be overwritten; set GLASS_CMS_SEED_OVERWRITE_EXISTING=true to reset pages from seed content",
+    );
+  }
 
   if (seedOnlySlugs) {
     console.log(`  [targeted] limiting seed to slugs: ${[...seedOnlySlugs].join(", ")}`);
@@ -4741,30 +4891,42 @@ async function seedGlassPublicCms() {
     return;
   }
 
-  const existingCommercialGlassPage = await storage.cmsPages.getPageBySlug("services-commercial-glass");
+  const existingCommercialGlassPage = await storage.cmsPages.getPageBySlug(
+    "services-commercial-glass",
+  );
   if (existingCommercialGlassPage) {
-    await storage.cmsPages.deletePage(existingCommercialGlassPage.id);
-    console.log(`  [deleted] services-commercial-glass page (${existingCommercialGlassPage.id})`);
+    if (overwriteExistingCmsPages) {
+      await storage.cmsPages.deletePage(existingCommercialGlassPage.id);
+      console.log(`  [deleted] services-commercial-glass page (${existingCommercialGlassPage.id})`);
+    } else {
+      console.log(
+        `  [skipped] services-commercial-glass page (${existingCommercialGlassPage.id}) already exists; set GLASS_CMS_SEED_OVERWRITE_EXISTING=true to delete deprecated seeded pages`,
+      );
+    }
   }
 
   const existingHome = await storage.cmsPages.getPageBySlug("home");
   if (existingHome) {
-    await storage.cmsPages.updatePage(existingHome.id, {
-      title: "Home",
-      slug: "home",
-      pageType: "home",
-      status: "published",
-      template: "full-width",
-      content: glassHomeContent,
-      seoTitle: "Glass & Door Services in Charlotte & Monroe, NC",
-      seoDescription:
-        "Glass & Door Pro serves Charlotte and Monroe, NC with frameless shower doors, window installation, door replacement, window repair, and commercial glass. Owner-operated with 15+ years of experience.",
-      seoKeywords:
-        "glass installation Charlotte NC, frameless shower doors, window repair, door installation, commercial glass",
-      ogImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.jpg",
-      publishedAt: new Date(),
-    });
-    console.log(`  [updated] home page (${existingHome.id})`);
+    if (!overwriteExistingCmsPages) {
+      logSkippedExistingPage("home", existingHome.id);
+    } else {
+      await storage.cmsPages.updatePage(existingHome.id, {
+        title: "Home",
+        slug: "home",
+        pageType: "home",
+        status: "published",
+        template: "full-width",
+        content: glassHomeContent,
+        seoTitle: "Glass & Door Services in Charlotte & Monroe, NC",
+        seoDescription:
+          "Glass & Door Pro serves Charlotte and Monroe, NC with frameless shower doors, window installation, door replacement, window repair, and commercial glass. Owner-operated with 15+ years of experience.",
+        seoKeywords:
+          "glass installation Charlotte NC, frameless shower doors, window repair, door installation, commercial glass",
+        ogImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.jpg",
+        publishedAt: new Date(),
+      });
+      console.log(`  [updated] home page (${existingHome.id})`);
+    }
   } else {
     const page = await storage.cmsPages.createPage({
       title: "Home",
@@ -4803,8 +4965,12 @@ async function seedGlassPublicCms() {
   };
 
   if (existingGallery) {
-    await storage.cmsPages.updatePage(existingGallery.id, galleryPayload);
-    console.log(`  [updated] gallery page (${existingGallery.id})`);
+    if (!overwriteExistingCmsPages) {
+      logSkippedExistingPage("gallery", existingGallery.id);
+    } else {
+      await storage.cmsPages.updatePage(existingGallery.id, galleryPayload);
+      console.log(`  [updated] gallery page (${existingGallery.id})`);
+    }
   } else {
     const page = await storage.cmsPages.createPage(galleryPayload);
     console.log(`  [created] gallery page (${page.id})`);
@@ -4829,8 +4995,12 @@ async function seedGlassPublicCms() {
   };
 
   if (existingReviews) {
-    await storage.cmsPages.updatePage(existingReviews.id, reviewsPayload);
-    console.log(`  [updated] reviews page (${existingReviews.id})`);
+    if (!overwriteExistingCmsPages) {
+      logSkippedExistingPage("reviews", existingReviews.id);
+    } else {
+      await storage.cmsPages.updatePage(existingReviews.id, reviewsPayload);
+      console.log(`  [updated] reviews page (${existingReviews.id})`);
+    }
   } else {
     const page = await storage.cmsPages.createPage(reviewsPayload);
     console.log(`  [created] reviews page (${page.id})`);
@@ -4855,8 +5025,12 @@ async function seedGlassPublicCms() {
   };
 
   if (existingServices) {
-    await storage.cmsPages.updatePage(existingServices.id, servicesPayload);
-    console.log(`  [updated] services page (${existingServices.id})`);
+    if (!overwriteExistingCmsPages) {
+      logSkippedExistingPage("services", existingServices.id);
+    } else {
+      await storage.cmsPages.updatePage(existingServices.id, servicesPayload);
+      console.log(`  [updated] services page (${existingServices.id})`);
+    }
   } else {
     const page = await storage.cmsPages.createPage(servicesPayload);
     console.log(`  [created] services page (${page.id})`);
@@ -4884,8 +5058,12 @@ async function seedGlassPublicCms() {
     };
 
     if (existingCityPage) {
-      await storage.cmsPages.updatePage(existingCityPage.id, pagePayload);
-      console.log(`  [updated] ${cityPage.slug} page (${existingCityPage.id})`);
+      if (!overwriteExistingCmsPages) {
+        logSkippedExistingPage(cityPage.slug, existingCityPage.id);
+      } else {
+        await storage.cmsPages.updatePage(existingCityPage.id, pagePayload);
+        console.log(`  [updated] ${cityPage.slug} page (${existingCityPage.id})`);
+      }
     } else {
       const page = await storage.cmsPages.createPage(pagePayload);
       console.log(`  [created] ${cityPage.slug} page (${page.id})`);
@@ -4902,7 +5080,8 @@ async function seedGlassPublicCms() {
     seoTitle: "Privacy Policy",
     seoDescription:
       "Review how Glass & Door Pro handles contact form details, service inquiries, cookies, analytics, and customer records.",
-    seoKeywords: "Glass & Door Pro privacy policy, Charlotte glass company privacy, customer information",
+    seoKeywords:
+      "Glass & Door Pro privacy policy, Charlotte glass company privacy, customer information",
     ogImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
     canonicalUrl: "https://glassanddoorpro.com/privacy-policy",
     noindex: false,
@@ -4910,8 +5089,12 @@ async function seedGlassPublicCms() {
   };
   const existingPrivacyPolicy = await storage.cmsPages.getPageBySlug("privacy-policy");
   if (existingPrivacyPolicy) {
-    await storage.cmsPages.updatePage(existingPrivacyPolicy.id, privacyPayload);
-    console.log(`  [updated] privacy-policy page (${existingPrivacyPolicy.id})`);
+    if (!overwriteExistingCmsPages) {
+      logSkippedExistingPage("privacy-policy", existingPrivacyPolicy.id);
+    } else {
+      await storage.cmsPages.updatePage(existingPrivacyPolicy.id, privacyPayload);
+      console.log(`  [updated] privacy-policy page (${existingPrivacyPolicy.id})`);
+    }
   } else {
     const page = await storage.cmsPages.createPage(privacyPayload);
     console.log(`  [created] privacy-policy page (${page.id})`);
@@ -4935,8 +5118,12 @@ async function seedGlassPublicCms() {
   };
   const existingTermsOfService = await storage.cmsPages.getPageBySlug("terms-of-service");
   if (existingTermsOfService) {
-    await storage.cmsPages.updatePage(existingTermsOfService.id, termsPayload);
-    console.log(`  [updated] terms-of-service page (${existingTermsOfService.id})`);
+    if (!overwriteExistingCmsPages) {
+      logSkippedExistingPage("terms-of-service", existingTermsOfService.id);
+    } else {
+      await storage.cmsPages.updatePage(existingTermsOfService.id, termsPayload);
+      console.log(`  [updated] terms-of-service page (${existingTermsOfService.id})`);
+    }
   } else {
     const page = await storage.cmsPages.createPage(termsPayload);
     console.log(`  [created] terms-of-service page (${page.id})`);
@@ -4952,7 +5139,8 @@ async function seedGlassPublicCms() {
     seoTitle: "Disclaimer",
     seoDescription:
       "Review Glass & Door Pro disclaimers about website information, estimates, repair recommendations, pricing, and commercial work.",
-    seoKeywords: "Glass & Door Pro disclaimer, glass service disclaimer, Charlotte glass company disclaimer",
+    seoKeywords:
+      "Glass & Door Pro disclaimer, glass service disclaimer, Charlotte glass company disclaimer",
     ogImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
     canonicalUrl: "https://glassanddoorpro.com/disclaimer",
     noindex: false,
@@ -4960,8 +5148,12 @@ async function seedGlassPublicCms() {
   };
   const existingDisclaimer = await storage.cmsPages.getPageBySlug("disclaimer");
   if (existingDisclaimer) {
-    await storage.cmsPages.updatePage(existingDisclaimer.id, disclaimerPayload);
-    console.log(`  [updated] disclaimer page (${existingDisclaimer.id})`);
+    if (!overwriteExistingCmsPages) {
+      logSkippedExistingPage("disclaimer", existingDisclaimer.id);
+    } else {
+      await storage.cmsPages.updatePage(existingDisclaimer.id, disclaimerPayload);
+      console.log(`  [updated] disclaimer page (${existingDisclaimer.id})`);
+    }
   } else {
     const page = await storage.cmsPages.createPage(disclaimerPayload);
     console.log(`  [created] disclaimer page (${page.id})`);

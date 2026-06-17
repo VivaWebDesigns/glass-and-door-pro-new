@@ -28,6 +28,12 @@
 
 ## Migration Notes
 
+## CMS Seed Safety
+
+- CMS page seed scripts are safe by default: existing CMS pages are skipped so admin edits, including hero image focal points, are not overwritten.
+- To intentionally reset Glass public CMS pages from seed content, run with `GLASS_CMS_SEED_OVERWRITE_EXISTING=true`.
+- To intentionally reset the older generic CMS seed pages, run with `CMS_SEED_OVERWRITE_EXISTING=true`.
+
 ## Local Development
 
 - This project is linked to Railway. To run the full app locally with the live environment variables, start it from the project directory with:
