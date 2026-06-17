@@ -1,6 +1,6 @@
-import { useState, useEffect, lazy, Suspense, type ReactElement } from "react";
+import { useState, useEffect, lazy, Suspense, type MouseEvent, type ReactElement } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { FormModalButton } from "@/components/forms/form-modal-button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -459,9 +459,40 @@ function SectionHeaderBlock({ props }: { props: Record<string, unknown> }) {
 }
 
 function RichTextBlock({ props }: { props: Record<string, unknown> }) {
+  const [, setLocation] = useLocation();
   const align = str(props.alignment) || "left";
   const textAlign =
     align === "left" ? "text-left" : align === "right" ? "text-right" : "text-center";
+
+  function handleContentClick(event: MouseEvent<HTMLDivElement>) {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.shiftKey
+    ) {
+      return;
+    }
+
+    const anchor =
+      event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a[href]") : null;
+    if (!anchor) return;
+    if (anchor.target && anchor.target !== "_self") return;
+
+    const href = anchor.getAttribute("href");
+    if (!href || href.startsWith("#") || href.startsWith("tel:") || href.startsWith("mailto:")) {
+      return;
+    }
+
+    const url = new URL(href, window.location.href);
+    if (url.origin !== window.location.origin) return;
+
+    event.preventDefault();
+    setLocation(`${url.pathname}${url.search}${url.hash}`);
+  }
+
   return (
     <div>
       <SectionHeading
@@ -471,6 +502,7 @@ function RichTextBlock({ props }: { props: Record<string, unknown> }) {
       />
       <div
         className={`public-prose prose prose-sm max-w-none ${textAlign}`}
+        onClick={handleContentClick}
         dangerouslySetInnerHTML={{ __html: str(props.content) || "<p>No content.</p>" }}
       />
     </div>
