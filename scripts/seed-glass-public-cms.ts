@@ -1768,7 +1768,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         heading: "Door Installation in Charlotte & Monroe, NC",
         subheading:
           "Entry doors, patio doors, storm doors, and exterior doors installed correctly — level, plumb, weather-tight, and operating smoothly from day one. Owner-operated service across Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and surrounding communities.",
-        imageUrl: "/images/glass-door-pro/door-parallax.jpg",
+        imageUrl: "/images/glass-door-pro/door-hero.webp",
         imagePositionY: 45,
       },
       intro: {
@@ -2377,7 +2377,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         heading: "Commercial Door Installation in Charlotte, NC",
         subheading:
           "Aluminum entry doors, glass storefront doors, and commercial entrance systems installed for new construction, tenant buildouts, and business renovations across Charlotte. Direct contact with the person doing the work — from scope through installation.",
-        imageUrl: "/images/glass-door-pro/door-parallax.jpg",
+        imageUrl: "/images/glass-door-pro/door-hero.webp",
         imagePositionY: 45,
         primaryText: "Request a Commercial Quote",
       },
