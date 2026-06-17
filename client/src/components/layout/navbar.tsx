@@ -218,41 +218,47 @@ export function Navbar() {
               item.children && item.children.length > 0 ? (
                 <DynamicDropdown key={item.id} item={item} location={location} />
               ) : item.openInNewTab ? (
-                <a key={item.id} href={item.url} target="_blank" rel="noopener noreferrer">
-                  <Button
-                    variant="ghost"
-                    className="public-nav-link"
-                    data-testid={`link-nav-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
-                  >
+                <Button
+                  key={item.id}
+                  asChild
+                  variant="ghost"
+                  className="public-nav-link"
+                  data-testid={`link-nav-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+                >
+                  <a href={item.url} target="_blank" rel="noopener noreferrer">
                     {item.label}
-                  </Button>
-                </a>
+                  </a>
+                </Button>
               ) : (
-                <Link key={item.id} href={item.url}>
-                  <Button
-                    variant="ghost"
-                    className="public-nav-link"
-                    data-testid={`link-nav-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
-                    aria-current={location === item.url ? "page" : undefined}
-                  >
+                <Button
+                  key={item.id}
+                  asChild
+                  variant="ghost"
+                  className="public-nav-link"
+                  data-testid={`link-nav-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+                  aria-current={location === item.url ? "page" : undefined}
+                >
+                  <Link href={item.url}>
                     {item.label}
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               ),
             )
           ) : (
             <>
               {defaultNavLinks.map((link) => (
-                <Link key={link.href} href={link.href}>
-                  <Button
-                    variant="ghost"
-                    className="public-nav-link"
-                    data-testid={`link-nav-${link.label.toLowerCase()}`}
-                    aria-current={location === link.href ? "page" : undefined}
-                  >
+                <Button
+                  key={link.href}
+                  asChild
+                  variant="ghost"
+                  className="public-nav-link"
+                  data-testid={`link-nav-${link.label.toLowerCase()}`}
+                  aria-current={location === link.href ? "page" : undefined}
+                >
+                  <Link href={link.href}>
                     {link.label}
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               ))}
               {resourceLinks.length > 0 && (
                 <DropdownMenu>
@@ -281,16 +287,17 @@ export function Navbar() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
-              <Link href="/#contact">
-                <Button
-                  variant="ghost"
-                  className="public-nav-link"
-                  data-testid="link-nav-contact"
-                  aria-current={location === "/#contact" ? "page" : undefined}
-                >
+              <Button
+                asChild
+                variant="ghost"
+                className="public-nav-link"
+                data-testid="link-nav-contact"
+                aria-current={location === "/#contact" ? "page" : undefined}
+              >
+                <Link href="/#contact">
                   Contact
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </>
           )}
         </div>
@@ -425,65 +432,71 @@ export function Navbar() {
                             {item.label}
                           </p>
                           {overviewLink ? (
-                            <Link href={overviewLink.href} onClick={() => setMobileOpen(false)}>
-                              <Button
-                                variant="ghost"
-                                className="w-full justify-start aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
-                                style={
-                                  depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined
-                                }
-                                data-testid="link-mobile-services-overview"
-                                aria-current={location === overviewLink.href ? "page" : undefined}
-                              >
+                            <Button
+                              asChild
+                              variant="ghost"
+                              className="w-full justify-start aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
+                              style={
+                                depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined
+                              }
+                              data-testid="link-mobile-services-overview"
+                              aria-current={location === overviewLink.href ? "page" : undefined}
+                            >
+                              <Link href={overviewLink.href} onClick={() => setMobileOpen(false)}>
                                 {overviewLink.label}
-                              </Button>
-                            </Link>
+                              </Link>
+                            </Button>
                           ) : null}
                         </div>
                       ) : item.openInNewTab ? (
-                      <a
+                      <Button
                         key={item.id}
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => setMobileOpen(false)}
+                        asChild
+                        variant="ghost"
+                        className="w-full justify-start"
+                        style={depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined}
+                        data-testid={`link-mobile-${item.id}`}
                       >
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start"
-                          style={depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined}
-                          data-testid={`link-mobile-${item.id}`}
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => setMobileOpen(false)}
                         >
                           {item.label}
-                        </Button>
-                      </a>
+                        </a>
+                      </Button>
                     ) : (
-                      <Link key={item.id} href={item.url} onClick={() => setMobileOpen(false)}>
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
-                          style={depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined}
-                          data-testid={`link-mobile-${item.id}`}
-                          aria-current={location === item.url ? "page" : undefined}
-                        >
+                      <Button
+                        key={item.id}
+                        asChild
+                        variant="ghost"
+                        className="w-full justify-start aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
+                        style={depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined}
+                        data-testid={`link-mobile-${item.id}`}
+                        aria-current={location === item.url ? "page" : undefined}
+                      >
+                        <Link href={item.url} onClick={() => setMobileOpen(false)}>
                           {item.label}
-                        </Button>
-                      </Link>
+                        </Link>
+                      </Button>
                     );
                   })
                 ) : (
                   <>
                     {defaultNavLinks.map((link) => (
-                      <Link key={link.href} href={link.href} onClick={() => setMobileOpen(false)}>
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
-                          data-testid={`link-mobile-${link.label.toLowerCase()}`}
-                          aria-current={location === link.href ? "page" : undefined}
-                        >
+                      <Button
+                        key={link.href}
+                        asChild
+                        variant="ghost"
+                        className="w-full justify-start aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
+                        data-testid={`link-mobile-${link.label.toLowerCase()}`}
+                        aria-current={location === link.href ? "page" : undefined}
+                      >
+                        <Link href={link.href} onClick={() => setMobileOpen(false)}>
                           {link.label}
-                        </Button>
-                      </Link>
+                        </Link>
+                      </Button>
                     ))}
                     {resourceLinks.length > 0 && (
                       <>
@@ -491,29 +504,32 @@ export function Navbar() {
                           Resources
                         </p>
                         {resourceLinks.map((link) => (
-                          <Link key={link.href} href={link.href} onClick={() => setMobileOpen(false)}>
-                            <Button
-                              variant="ghost"
-                              className="w-full justify-start pl-6 aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
-                              data-testid={`link-mobile-resource-${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
-                              aria-current={location === link.href ? "page" : undefined}
-                            >
+                          <Button
+                            key={link.href}
+                            asChild
+                            variant="ghost"
+                            className="w-full justify-start pl-6 aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
+                            data-testid={`link-mobile-resource-${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+                            aria-current={location === link.href ? "page" : undefined}
+                          >
+                            <Link href={link.href} onClick={() => setMobileOpen(false)}>
                               {link.label}
-                            </Button>
-                          </Link>
+                            </Link>
+                          </Button>
                         ))}
                       </>
                     )}
-                    <Link href="/#contact" onClick={() => setMobileOpen(false)}>
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
-                        data-testid="link-mobile-contact"
-                        aria-current={location === "/#contact" ? "page" : undefined}
-                      >
+                    <Button
+                      asChild
+                      variant="ghost"
+                      className="w-full justify-start aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
+                      data-testid="link-mobile-contact"
+                      aria-current={location === "/#contact" ? "page" : undefined}
+                    >
+                      <Link href="/#contact" onClick={() => setMobileOpen(false)}>
                         Contact
-                      </Button>
-                    </Link>
+                      </Link>
+                    </Button>
                   </>
                 )}
 
@@ -525,28 +541,30 @@ export function Navbar() {
                       Signed in as {user.firstName} {user.lastName}
                     </p>
                     {isTherapist && (
-                      <Link href="/therapist" onClick={() => setMobileOpen(false)}>
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start"
-                          data-testid="link-mobile-therapist"
-                        >
+                      <Button
+                        asChild
+                        variant="ghost"
+                        className="w-full justify-start"
+                        data-testid="link-mobile-therapist"
+                      >
+                        <Link href="/therapist" onClick={() => setMobileOpen(false)}>
                           <LayoutDashboard className="mr-2 h-4 w-4" />
                           Mental Health Professional Dashboard
-                        </Button>
-                      </Link>
+                        </Link>
+                      </Button>
                     )}
                     {isAdmin && (
-                      <Link href="/admin/cms" onClick={() => setMobileOpen(false)}>
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start"
-                          data-testid="link-mobile-admin"
-                        >
+                      <Button
+                        asChild
+                        variant="ghost"
+                        className="w-full justify-start"
+                        data-testid="link-mobile-admin"
+                      >
+                        <Link href="/admin/cms" onClick={() => setMobileOpen(false)}>
                           <Shield className="mr-2 h-4 w-4" />
                           Admin
-                        </Button>
-                      </Link>
+                        </Link>
+                      </Button>
                     )}
                     <Button
                       variant="ghost"
