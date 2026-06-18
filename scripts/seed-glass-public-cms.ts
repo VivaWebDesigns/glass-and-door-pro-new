@@ -919,6 +919,9 @@ type GlassServicePageSeed = {
 const linkedServiceAreaContent =
   '<p>We serve homeowners and businesses throughout the greater Charlotte metro area, including: <a href="/service-areas/charlotte">Charlotte</a>, <a href="/service-areas/monroe">Monroe</a>, <a href="/service-areas/indian-trail">Indian Trail</a>, <a href="/service-areas/stallings">Stallings</a>, <a href="/service-areas/wesley-chapel">Wesley Chapel</a>, <a href="/service-areas/waxhaw">Waxhaw</a>, <a href="/service-areas/matthews">Matthews</a>, <a href="/service-areas/weddington">Weddington</a>, <a href="/service-areas/pineville">Pineville</a>, <a href="/service-areas/fort-mill">Fort Mill</a>, <a href="/service-areas/indian-land">Indian Land</a>, and surrounding areas.</p>';
 
+const commercialLinkedServiceAreaContent =
+  '<p>We serve businesses, property managers, general contractors, and commercial facilities throughout the greater Charlotte metro area, including <a href="/service-areas/charlotte">Charlotte</a>, <a href="/service-areas/matthews">Matthews</a>, <a href="/service-areas/indian-trail">Indian Trail</a>, <a href="/service-areas/monroe">Monroe</a>, <a href="/service-areas/waxhaw">Waxhaw</a>, <a href="/service-areas/fort-mill">Fort Mill</a>, <a href="/service-areas/indian-land">Indian Land</a>, <a href="/service-areas/pineville">Pineville</a>, <a href="/service-areas/weddington">Weddington</a>, <a href="/service-areas/wesley-chapel">Wesley Chapel</a>, <a href="/service-areas/stallings">Stallings</a>, and surrounding areas.</p>';
+
 function block(type: string, props: Record<string, unknown>) {
   return {
     id: uid(),
@@ -1029,11 +1032,11 @@ function faqBlock(items: GlassFaq[]) {
   });
 }
 
-function serviceAreaBlock() {
+function serviceAreaBlock(content = linkedServiceAreaContent) {
   return block("rich-text", {
     title: "Serving the Greater Charlotte Area",
     alignment: "center",
-    content: linkedServiceAreaContent,
+    content,
     sectionBackgroundColor: "#ffffff",
     sectionPaddingTop: "md",
     sectionPaddingBottom: "md",
@@ -1467,6 +1470,7 @@ function expandedServicePageContent(props: {
   benefitsCards: GlassCard[];
   faqTitle: string;
   faqs: GlassFaq[];
+  serviceAreaContent?: string;
   relatedCommercialUrl?: string;
   cta: {
     heading: string;
@@ -1528,7 +1532,7 @@ function expandedServicePageContent(props: {
         columns: "3",
         backgroundColor: "#f8fafc",
       }),
-      serviceAreaBlock(),
+      serviceAreaBlock(props.serviceAreaContent),
       block("faq", {
         title: props.faqTitle,
         sectionBackgroundColor: "#f8fafc",
@@ -2151,6 +2155,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "commercial storefront glass installation Charlotte NC, aluminum storefront framing, commercial glass doors, tenant buildout glazing",
     ogImageUrl: "/images/glass-door-pro/commercial-hero-1280w.webp",
     content: expandedServicePageContent({
+      serviceAreaContent: commercialLinkedServiceAreaContent,
       relatedCommercialUrl: "/services/commercial-storefront-glass-installation",
       hero: {
         heading: "Commercial Storefront Glass Installation in Charlotte, NC",
@@ -2305,6 +2310,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "commercial storefront glass replacement Charlotte NC, storefront glass repair, emergency board-up, broken storefront glass",
     ogImageUrl: "/images/glass-door-pro/storefront-glass-replacement-hero.webp",
     content: expandedServicePageContent({
+      serviceAreaContent: commercialLinkedServiceAreaContent,
       relatedCommercialUrl: "/services/commercial-storefront-glass-replacement-repair",
       hero: {
         heading: "Commercial Storefront Glass Replacement & Repair in Charlotte, NC",
@@ -2475,6 +2481,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "commercial door installation Charlotte NC, aluminum entry doors, glass storefront doors, commercial entrance systems",
     ogImageUrl: "/images/glass-door-pro/storefront-door-installation-hero.webp",
     content: expandedServicePageContent({
+      serviceAreaContent: commercialLinkedServiceAreaContent,
       relatedCommercialUrl: "/services/commercial-door-installation",
       hero: {
         heading: "Commercial Door Installation in Charlotte, NC",
@@ -2627,6 +2634,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "commercial door replacement Charlotte NC, commercial door repair, door closer repair, commercial door glass replacement",
     ogImageUrl: "/images/glass-door-pro/commercial-door-repair-hero.webp",
     content: expandedServicePageContent({
+      serviceAreaContent: commercialLinkedServiceAreaContent,
       relatedCommercialUrl: "/services/commercial-door-replacement-repair",
       hero: {
         heading: "Commercial Door Replacement & Repair in Charlotte, NC",
@@ -2799,6 +2807,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "apartment window replacement Charlotte NC, multi-family window replacement, commercial window replacement, property manager window replacement",
     ogImageUrl: "/images/glass-door-pro/commercial-window-replacement-hero-blue-sky.webp",
     content: expandedServicePageContent({
+      serviceAreaContent: commercialLinkedServiceAreaContent,
       relatedCommercialUrl: "/services/commercial-window-replacement",
       hero: {
         heading: "Apartment & Multi-Family Window Replacement in Charlotte, NC",
