@@ -44,7 +44,7 @@ import { CmsSitemapTab } from "./cms-sitemap-tab";
 
 const seoFormSchema = z.object({
   siteName: z.string().min(1, "Site name is required"),
-  titleSuffix: z.string().default(" | Core Platform"),
+  titleSuffix: z.string().default(" | Glass & Door Pro"),
   defaultMetaDescription: z.string().max(320, "Keep under 320 characters").optional().nullable(),
   siteUrl: z
     .string()
@@ -89,19 +89,19 @@ const ROADMAP_ITEMS = [
   {
     icon: SearchIcon,
     title: "Per-Post SEO",
-    description: "Blog posts already support seoTitle, seoDescription, and ogImageUrl. Fields are editable in the blog post editor.",
+    description: "Retired blog post SEO fields are no longer used by the public Glass & Door Pro site.",
     status: "available",
   },
   {
     icon: Code2,
     title: "Structured Data / JSON-LD",
-    description: "Organization, WebSite, BreadcrumbList, Article (blog posts), Event (event detail), VideoObject (events with recordings), and FAQPage (CMS pages with FAQ blocks) are generated automatically from real content using JSON-LD.",
+    description: "Organization, LocalBusiness, WebSite, BreadcrumbList, Service, OfferCatalog, and FAQPage JSON-LD are generated from current Glass & Door Pro content.",
     status: "available",
   },
   {
     icon: Map,
     title: "Sitemap Generation",
-    description: "Auto-generated /sitemap.xml from all published CMS pages, blog posts, and public events. Draft and noindex content is automatically excluded. Preview available in the Sitemap tab.",
+    description: "Auto-generated /sitemap.xml from published public pages. Draft, noindex, and retired legacy content is excluded. Preview available in the Sitemap tab.",
     status: "available",
   },
   {
@@ -113,7 +113,7 @@ const ROADMAP_ITEMS = [
   {
     icon: BarChart2,
     title: "SEO Audit",
-    description: "Scans all CMS pages, blog posts, and events for missing SEO title, meta description, social image, noindex flags, and publication status. Includes direct edit links.",
+    description: "Scans current CMS pages for missing SEO title, meta description, social image, noindex flags, and publication status. Includes direct edit links.",
     status: "available",
   },
 ];
@@ -144,12 +144,12 @@ export default function CmsSeoPage() {
   const form = useForm<SeoFormValues>({
     resolver: zodResolver(seoFormSchema),
     defaultValues: {
-      siteName: "Core Platform",
-      titleSuffix: " | Core Platform",
+      siteName: "Glass & Door Pro",
+      titleSuffix: " | Glass & Door Pro",
       defaultMetaDescription: "",
       siteUrl: "",
       defaultOgImageUrl: "",
-      organizationName: "Core Platform",
+      organizationName: "Glass & Door Pro",
       organizationLogoUrl: "",
       facebookUrl: "",
       twitterHandle: "",
@@ -162,12 +162,12 @@ export default function CmsSeoPage() {
   useEffect(() => {
     if (settings) {
       form.reset({
-        siteName: settings.siteName ?? "Core Platform",
-        titleSuffix: settings.titleSuffix ?? " | Core Platform",
+        siteName: settings.siteName ?? "Glass & Door Pro",
+        titleSuffix: settings.titleSuffix ?? " | Glass & Door Pro",
         defaultMetaDescription: settings.defaultMetaDescription ?? "",
         siteUrl: settings.siteUrl ?? "",
         defaultOgImageUrl: settings.defaultOgImageUrl ?? "",
-        organizationName: settings.organizationName ?? "Core Platform",
+        organizationName: settings.organizationName ?? "Glass & Door Pro",
         organizationLogoUrl: settings.organizationLogoUrl ?? "",
         facebookUrl: settings.facebookUrl ?? "",
         twitterHandle: settings.twitterHandle ?? "",
@@ -209,7 +209,7 @@ export default function CmsSeoPage() {
               SEO Settings
             </h1>
             <p className="text-muted-foreground mt-1 text-sm">
-              Global SEO defaults for the public-facing site and blog
+              Global SEO defaults for the public-facing site
             </p>
           </div>
           {lastUpdated && (
@@ -260,7 +260,7 @@ export default function CmsSeoPage() {
                             <FormControl>
                               <Input
                                 {...field}
-                                placeholder="Core Platform"
+                                placeholder="Glass & Door Pro"
                                 data-testid="input-site-name"
                               />
                             </FormControl>
@@ -281,7 +281,7 @@ export default function CmsSeoPage() {
                               <Input
                                 {...field}
                                 value={field.value ?? ""}
-                                placeholder="Core Platform"
+                                placeholder="Glass & Door Pro"
                                 data-testid="input-org-name"
                               />
                             </FormControl>
@@ -302,7 +302,7 @@ export default function CmsSeoPage() {
                               <Input
                                 {...field}
                                 value={field.value ?? ""}
-                                placeholder="https://coreplatform.com"
+                                placeholder="https://glassanddoorpro.com"
                                 autoPrependHttps
                                 data-testid="input-site-url"
                               />
@@ -337,12 +337,12 @@ export default function CmsSeoPage() {
                             <FormControl>
                               <Input
                                 {...field}
-                                placeholder=" | Core Platform"
+                                placeholder=" | Glass & Door Pro"
                                 data-testid="input-title-suffix"
                               />
                             </FormControl>
                             <FormDescription className="text-xs">
-                              Appended to page titles — e.g. "Find a Mental Health Professional | Core Platform"
+                              Appended to page titles — e.g. "Window Repair Charlotte NC | Glass & Door Pro"
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -486,7 +486,7 @@ export default function CmsSeoPage() {
                                 <Input
                                   {...field}
                                   value={field.value ?? ""}
-                                  placeholder="https://facebook.com/coreplatform"
+                                  placeholder="https://facebook.com/glassanddoorpro"
                                   autoPrependHttps
                                   data-testid="input-facebook-url"
                                 />
@@ -505,7 +505,7 @@ export default function CmsSeoPage() {
                                 <Input
                                   {...field}
                                   value={field.value ?? ""}
-                                  placeholder="@coreplatform"
+                                  placeholder="@glassanddoorpro"
                                   data-testid="input-twitter-handle"
                                 />
                               </FormControl>
@@ -526,7 +526,7 @@ export default function CmsSeoPage() {
                                 <Input
                                   {...field}
                                   value={field.value ?? ""}
-                                  placeholder="https://linkedin.com/company/coreplatform"
+                                  placeholder="https://linkedin.com/company/glass-and-door-pro"
                                   autoPrependHttps
                                   data-testid="input-linkedin-url"
                                 />
@@ -545,7 +545,7 @@ export default function CmsSeoPage() {
                                 <Input
                                   {...field}
                                   value={field.value ?? ""}
-                                  placeholder="https://instagram.com/coreplatform"
+                                  placeholder="https://instagram.com/glassanddoorpro"
                                   autoPrependHttps
                                   data-testid="input-instagram-url"
                                 />

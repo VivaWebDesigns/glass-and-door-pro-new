@@ -294,7 +294,7 @@ const INTEGRATIONS: IntegrationConfig[] = [
   {
     category: "stripe",
     title: "Stripe",
-    description: "Payment processing for therapist subscriptions",
+    description: "Payment processing for online payments and future billing workflows",
     icon: CreditCard,
     accountUrl: "https://dashboard.stripe.com/apikeys",
     docsUrl: "https://docs.stripe.com/keys",
@@ -355,40 +355,7 @@ const INTEGRATIONS: IntegrationConfig[] = [
         key: "mailgun_from_address",
         label: "From Address",
         isSecret: false,
-        placeholder: "Core Platform <noreply@yourdomain.com>",
-      },
-    ],
-  },
-  {
-    category: "mailchimp",
-    title: "Mailchimp",
-    description: "Audience sync used by managed forms and lifecycle tagging",
-    icon: Tag,
-    accountUrl: "https://admin.mailchimp.com/account/api/",
-    docsUrl: "https://mailchimp.com/help/about-api-keys/",
-    instructions: [
-      "Open Mailchimp API Keys and create or copy an active API key.",
-      "Use the suffix after the API key hyphen as the Server Prefix, for example us6.",
-      "Open Audience settings to copy the Audience ID for the list this site should sync to.",
-    ],
-    fields: [
-      {
-        key: "mailchimp_api_key",
-        label: "API Key",
-        isSecret: true,
-        placeholder: "xxxxxxxxxxxxxxxxxxxx-us6",
-      },
-      {
-        key: "mailchimp_audience_id",
-        label: "Audience ID",
-        isSecret: false,
-        placeholder: "a1b2c3d4e5",
-      },
-      {
-        key: "mailchimp_server_prefix",
-        label: "Server Prefix",
-        isSecret: false,
-        placeholder: "us6",
+        placeholder: "Glass & Door Pro <noreply@yourdomain.com>",
       },
     ],
   },
@@ -1478,7 +1445,7 @@ export function BrandingTab({
                   onChange={(event) =>
                     setCompanyInfo((current) => ({ ...current, company_name: event.target.value }))
                   }
-                  placeholder="Core Platform"
+                  placeholder="Glass & Door Pro"
                   data-testid="input-company-name"
                 />
               </div>
@@ -1924,7 +1891,7 @@ export function BrandingTab({
                   Preview
                 </p>
                 <h4 className="mt-3 text-2xl font-semibold" style={previewHeadingStyle}>
-                  Core Platform helps globally mobile families feel understood.
+                  Glass & Door Pro helps Charlotte-area homes and businesses look their best.
                 </h4>
                 <p className="mt-3 text-sm text-muted-foreground" style={previewBodyStyle}>
                   Use this preview to compare heading and body combinations before saving. These
@@ -2645,8 +2612,8 @@ export function SpecializationsTab({ showHeader = true }: { showHeader?: boolean
                   Specialization Settings
                 </CardTitle>
                 <CardDescription className="mt-1">
-                  Manage the list of specializations available in mental health professional
-                  profiles and the directory filter.
+                  Manage the legacy directory specialization list. This module is retired for the
+                  current Glass & Door Pro public site.
                 </CardDescription>
               </div>
               <Button
@@ -2812,9 +2779,9 @@ export function SpecializationsTab({ showHeader = true }: { showHeader?: boolean
           <SheetHeader>
             <SheetTitle>Delete Specialization</SheetTitle>
             <SheetDescription>
-              This will remove <strong>{deleteTarget?.name}</strong> from the directory filters and
-              mental health professional profile options. Existing profiles that already have this
-              specialization will retain it until they save changes.
+              This will remove <strong>{deleteTarget?.name}</strong> from the legacy directory
+              specialization list. Existing retired profiles that already have this specialization
+              will retain it until they save changes.
             </SheetDescription>
           </SheetHeader>
           <SheetFooter className="mt-6">
