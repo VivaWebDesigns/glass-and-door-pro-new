@@ -248,7 +248,7 @@ const SYSTEM_CONFIGURATION_FIELDS: Array<{
     key: "enable_events",
     label: "Enable Events",
     description:
-      "Controls events administration and public events routes for sites that do not run an events program.",
+      "Controls event-related admin tools and legacy event routes for sites that do not run an events program.",
   },
   {
     key: "enable_crm",
