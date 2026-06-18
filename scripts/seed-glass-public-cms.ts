@@ -371,7 +371,8 @@ const glassHomeContent: InsertCmsPage["content"] = {
         ctaAction: "internal-link",
         ctaSecondaryText: "",
         ctaSecondaryLink: "",
-        backgroundImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.jpg",
+        backgroundImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
+        backgroundImageAlt: "Frameless glass shower installed by Glass & Door Pro in the Charlotte, NC area",
         videoBackgroundUrl: "/videos/glass-door-pro/hero-video.mp4",
         overlayColor: "#0f172a",
         overlayOpacity: 50,
@@ -5001,7 +5002,7 @@ async function seedGlassPublicCms() {
           "Glass & Door Pro serves Charlotte and Monroe, NC with frameless shower doors, window installation, door replacement, window repair, and commercial glass. Owner-operated with 15+ years of experience.",
         seoKeywords:
           "glass installation Charlotte NC, frameless shower doors, window repair, door installation, commercial glass",
-        ogImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.jpg",
+        ogImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
         publishedAt: new Date(),
       });
       console.log(`  [updated] home page (${existingHome.id})`);
@@ -5019,7 +5020,7 @@ async function seedGlassPublicCms() {
         "Glass & Door Pro serves Charlotte and Monroe, NC with frameless shower doors, window installation, door replacement, window repair, and commercial glass. Owner-operated with 15+ years of experience.",
       seoKeywords:
         "glass installation Charlotte NC, frameless shower doors, window repair, door installation, commercial glass",
-      ogImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.jpg",
+      ogImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
       publishedAt: new Date(),
     });
     console.log(`  [created] home page (${page.id})`);
