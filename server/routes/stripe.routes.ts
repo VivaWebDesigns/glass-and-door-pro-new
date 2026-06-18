@@ -7,6 +7,7 @@ import { asyncHandler } from "../middleware/error-handler";
 import type { Event } from "@shared/schema/events";
 import { getEventPath } from "@shared/event-url";
 import { getDirectorySettings } from "../services/directory-settings.service";
+import { requireSiteFeature } from "../services/site-features.service";
 
 const router = Router();
 
@@ -21,6 +22,7 @@ function canAccessEvent(event: Event, userRole: string | null): boolean {
 
 router.post(
   "/create-event-checkout-session",
+  requireSiteFeature("eventsEnabled"),
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { eventId } = req.body;
@@ -148,6 +150,7 @@ router.post(
 
 router.post(
   "/create-checkout-session",
+  requireSiteFeature("directoryEnabled"),
   authenticateToken,
   requireRole("therapist"),
   asyncHandler(async (req, res) => {
@@ -233,6 +236,7 @@ router.post(
 
 router.post(
   "/create-portal-session",
+  requireSiteFeature("directoryEnabled"),
   authenticateToken,
   requireRole("therapist"),
   asyncHandler(async (req, res) => {
@@ -255,6 +259,7 @@ router.post(
 
 router.post(
   "/retry-latest-invoice",
+  requireSiteFeature("directoryEnabled"),
   authenticateToken,
   requireRole("therapist"),
   asyncHandler(async (req, res) => {
@@ -273,6 +278,7 @@ router.post(
 
 router.get(
   "/subscription-status",
+  requireSiteFeature("directoryEnabled"),
   authenticateToken,
   requireRole("therapist"),
   asyncHandler(async (req, res) => {
@@ -283,6 +289,7 @@ router.get(
 
 router.post(
   "/create-recording-checkout",
+  requireSiteFeature("eventsEnabled"),
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { eventId } = req.body;

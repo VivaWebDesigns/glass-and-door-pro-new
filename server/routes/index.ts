@@ -26,7 +26,6 @@ import crmRoutes from "./crm.routes";
 import { searchPublicSite } from "../services/public-search.service";
 import { buildRobotsTxtPayload } from "../services/robots-txt.service";
 import { storage } from "../storage/index";
-import { DEFAULT_SITE_FEATURES, normalizeBooleanSetting } from "@shared/site-features";
 import { getCmsPublicPath } from "@shared/glass-seo";
 import { BRANDING_COLOR_DEFAULTS, resolveBrandingColor } from "@shared/branding-colors";
 import {
@@ -34,6 +33,7 @@ import {
   getDirectorySettings,
 } from "../services/directory-settings.service";
 import { resolveLocalUploadUrlOrFallback } from "../services/local-upload-storage";
+import { getSiteFeatures, requireSiteFeature } from "../services/site-features.service";
 
 const DEFAULT_FRONTEND_LOGO_URL = "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
 const DEFAULT_FAVICON_URL = "/favicon-32x32.png?v=large-2";
@@ -50,26 +50,26 @@ function escapeXml(str: string): string {
 export function registerApiRoutes(app: Express) {
   app.use("/r2", r2PublicRoutes);
   app.use("/api/auth", authRoutes);
-  app.use("/api/therapists", directoryRoutes);
-  app.use("/api/therapist", therapistRoutes);
+  app.use("/api/therapists", requireSiteFeature("directoryEnabled"), directoryRoutes);
+  app.use("/api/therapist", requireSiteFeature("directoryEnabled"), therapistRoutes);
   app.use("/api/stripe", stripeRoutes);
   app.use("/api/admin", adminRoutes);
   app.use("/api/admin", settingsRoutes);
-  app.use("/api/events", eventsRoutes);
+  app.use("/api/events", requireSiteFeature("eventsEnabled"), eventsRoutes);
   app.use("/api/contact", contactRoutes);
   app.use("/api/forms", formsRoutes);
   app.use("/api/crm", crmRoutes);
   app.use("/api/admin/docs", docsRoutes);
   app.use("/api/uploads", uploadRoutes);
   app.use("/api/notifications", notificationsRoutes);
-  app.use("/api/specializations", specializationsRoutes);
-  app.use("/api/blog", blogRoutes);
-  app.use("/api/events", guestRegistrationRoutes);
-  app.use("/api/events", registrationRoutes);
+  app.use("/api/specializations", requireSiteFeature("directoryEnabled"), specializationsRoutes);
+  app.use("/api/blog", requireSiteFeature("blogEnabled"), blogRoutes);
+  app.use("/api/events", requireSiteFeature("eventsEnabled"), guestRegistrationRoutes);
+  app.use("/api/events", requireSiteFeature("eventsEnabled"), registrationRoutes);
   app.use("/api/cms", cmsPublicRoutes);
-  app.use("/api/contact-professional", contactProfessionalRoutes);
+  app.use("/api/contact-professional", requireSiteFeature("directoryEnabled"), contactProfessionalRoutes);
   app.use("/api/setup", setupRoutes);
-  app.use("/api/therapist/application", applicationRoutes);
+  app.use("/api/therapist/application", requireSiteFeature("directoryEnabled"), applicationRoutes);
   app.use("/api/reference", referenceRoutes);
 
   app.get("/api/search", async (req, res) => {
@@ -179,29 +179,7 @@ export function registerApiRoutes(app: Express) {
   });
 
   app.get("/api/site-config", async (_req, res) => {
-    try {
-      const settings = await storage.settings.getDecryptedCategory("system_configuration");
-      res.json({
-        directoryEnabled: normalizeBooleanSetting(
-          settings.enable_directory,
-          DEFAULT_SITE_FEATURES.directoryEnabled,
-        ),
-        blogEnabled: normalizeBooleanSetting(
-          settings.enable_blog,
-          DEFAULT_SITE_FEATURES.blogEnabled,
-        ),
-        eventsEnabled: normalizeBooleanSetting(
-          settings.enable_events,
-          DEFAULT_SITE_FEATURES.eventsEnabled,
-        ),
-        crmEnabled: normalizeBooleanSetting(settings.enable_crm, DEFAULT_SITE_FEATURES.crmEnabled),
-      });
-    } catch (err) {
-      logger.app.warn("Failed to retrieve system configuration, returning defaults", {
-        error: err instanceof Error ? err.message : String(err),
-      });
-      res.json(DEFAULT_SITE_FEATURES);
-    }
+    res.json(await getSiteFeatures());
   });
 
   app.get("/api/runtime-integrations", async (_req, res) => {

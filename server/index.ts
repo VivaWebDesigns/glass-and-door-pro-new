@@ -17,6 +17,7 @@ import { startEventReminderService } from "./services/event-reminder.service";
 import { startSystemBackupService } from "./services/system-backup.service";
 import { startDirectoryMembershipLifecycleService } from "./services/directory-membership-lifecycle.service";
 import { getLocalUploadsRoot } from "./services/local-upload-storage";
+import { getSiteFeatures } from "./services/site-features.service";
 
 declare const __APP_VERSION__: string;
 const pkgVersion = typeof __APP_VERSION__ === "string" ? __APP_VERSION__ : "unknown";
@@ -256,10 +257,15 @@ app.use((req, res, next) => {
     await setupVite(httpServer, app);
   }
 
-  startScheduledPublishService();
-  startEventReminderService();
+  const siteFeatures = await getSiteFeatures();
+  startScheduledPublishService({ blogEnabled: siteFeatures.blogEnabled });
+  if (siteFeatures.eventsEnabled) {
+    startEventReminderService();
+  }
   startSystemBackupService();
-  startDirectoryMembershipLifecycleService();
+  if (siteFeatures.directoryEnabled) {
+    startDirectoryMembershipLifecycleService();
+  }
 
   const port = parseInt(process.env.PORT || "5000", 10);
   httpServer.listen(

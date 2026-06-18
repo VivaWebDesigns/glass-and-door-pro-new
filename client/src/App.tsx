@@ -132,9 +132,9 @@ function Router() {
         <Route path="/areas-served/charlotte-nc"><Redirect to="/service-areas/charlotte" replace /></Route>
         <Route path="/preview/cms/:id" component={CmsPreviewPage} />
         <Route path="/search" component={SearchResultsPage} />
-        <Route path="/privacy-policy" component={() => <CmsHybridPage slug="privacy-policy" fallback={<LegalFallbackPage title="Privacy Policy" subtitle="Review how Core Platform collects, uses, stores, and protects information across the website and related services." />} />} />
-        <Route path="/terms-of-service" component={() => <CmsHybridPage slug="terms-of-service" fallback={<LegalFallbackPage title="Terms of Service" subtitle="Review the terms governing use of the Core Platform website, directory, events, and related services." />} />} />
-        <Route path="/disclaimer" component={() => <CmsHybridPage slug="disclaimer" fallback={<LegalFallbackPage title="Disclaimer" subtitle="Review emergency guidance, directory vetting limitations, and important information about using the Core Platform directory and related services." />} />} />
+        <Route path="/privacy-policy" component={() => <CmsHybridPage slug="privacy-policy" fallback={<LegalFallbackPage title="Privacy Policy" subtitle="Review how Glass & Door Pro handles contact form details, service inquiries, cookies, analytics, and customer records." />} />} />
+        <Route path="/terms-of-service" component={() => <CmsHybridPage slug="terms-of-service" fallback={<LegalFallbackPage title="Terms of Service" subtitle="Review the terms governing use of the Glass & Door Pro website, estimates, service information, third-party links, and site content." />} />} />
+        <Route path="/disclaimer" component={() => <CmsHybridPage slug="disclaimer" fallback={<LegalFallbackPage title="Disclaimer" subtitle="Review important context about website information, estimates, repair recommendations, warranty references, pricing, and commercial glass work." />} />} />
         <Route path="/reference/:token" component={ReferenceFormPage} />
         <Route path="/forms/:slug" component={StandaloneFormPage} />
         <Route path="/auth/login" component={LoginPage} />
