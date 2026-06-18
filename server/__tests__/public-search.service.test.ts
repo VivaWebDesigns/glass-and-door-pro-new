@@ -171,18 +171,18 @@ describe("public-search.service", () => {
     mockGetAllPages.mockResolvedValue([]);
 
     const { searchPublicSite } = await import("../services/public-search.service");
-    const results = await searchPublicSite("application process");
+    const results = await searchPublicSite("mental health professional");
 
-    expect(results.some((result) => result.url === "/join")).toBe(true);
-    expect(results.find((result) => result.url === "/join")?.excerpt).toContain("Submit Your Application");
+    expect(results.some((result) => result.url === "/directory")).toBe(true);
+    expect(results.some((result) => result.url === "/join")).toBe(false);
   });
 
-  it("retains fallback system-page search terms even when a CMS version of that page exists", async () => {
+  it("excludes retired public pages even when a CMS version exists", async () => {
     mockGetAllPages.mockResolvedValue([joinCmsPage]);
 
     const { searchPublicSite } = await import("../services/public-search.service");
-    const results = await searchPublicSite("application process");
+    const results = await searchPublicSite("join network");
 
-    expect(results.some((result) => result.url === "/join")).toBe(true);
+    expect(results.some((result) => result.url === "/join")).toBe(false);
   });
 });

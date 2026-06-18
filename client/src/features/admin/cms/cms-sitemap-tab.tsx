@@ -133,14 +133,14 @@ export function CmsSitemapTab() {
     { loc: `${siteUrl}/insights`, label: "Blog Index", type: "Static", excluded: false },
     { loc: `${siteUrl}/events`, label: "Events Index", type: "Static", excluded: false },
     { loc: `${siteUrl}/directory`, label: "Directory", type: "Static", excluded: false },
-    { loc: `${siteUrl}/join`, label: "Join Network", type: "Static", excluded: false },
     { loc: `${siteUrl}/contact`, label: "Contact", type: "Static", excluded: false },
   ];
 
-  const corePageSlugs = ["home", "about", "contact", "join"];
+  const corePageSlugs = ["home", "about", "contact"];
+  const retiredPageSlugs = ["join"];
 
   const cmsEntries: SitemapEntry[] = (pages ?? [])
-    .filter((p) => !corePageSlugs.includes(p.slug))
+    .filter((p) => !corePageSlugs.includes(p.slug) && !retiredPageSlugs.includes(p.slug))
     .map((p) => {
       const excluded = p.status !== "published" || !!p.noindex;
       return {
@@ -415,7 +415,7 @@ export function CmsSitemapTab() {
               },
               {
                 icon: CheckCircle2,
-                text: "Core routes (about, contact, join, directory) are always included.",
+                text: "Core routes (about, contact, directory) are always included.",
               },
             ].map(({ icon: Icon, text }, i) => (
               <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground">

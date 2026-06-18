@@ -153,31 +153,6 @@ const FALLBACK_PAGE_DOCUMENTS: FallbackPageDocument[] = [
     excerptSource: "Get in touch with Core Platform through the contact form and company information.",
   },
   {
-    slug: "join",
-    type: "page",
-    title: "Join the Network",
-    url: "/join",
-    metadata: "Page",
-    searchableText: [
-      "Are you a Core Platform-Informed Mental Health Professional Join the Network",
-      "What Does Membership Include",
-      "Directory Listing",
-      "Client Connections",
-      "Profile Analytics",
-      "Community Access",
-      "The Application Process",
-      "Submit Your Application",
-      "Credential Verification",
-      "Core Platform Competency Review",
-      "Profile Setup",
-      "Go Live in the Directory",
-      "Interested in Training but Not a Member",
-      "Applications open in June",
-    ].join(" "),
-    excerptSource:
-      "The Application Process includes Submit Your Application, Credential Verification, Core Platform Competency Review, Profile Setup, and Go Live in the Directory.",
-  },
-  {
     slug: "directory",
     type: "page",
     title: "Find a Mental Health Professional",
@@ -236,6 +211,8 @@ const FALLBACK_PAGE_DOCUMENTS_BY_SLUG = new Map(
   FALLBACK_PAGE_DOCUMENTS.map((document) => [document.slug, document] as const),
 );
 
+const RETIRED_PUBLIC_PAGE_SLUGS = new Set(["join"]);
+
 function buildPageText(page: CmsPage) {
   const fallbackDocument = FALLBACK_PAGE_DOCUMENTS_BY_SLUG.get(page.slug);
   return [
@@ -280,7 +257,7 @@ function buildEventText(event: Event) {
 
 function buildFallbackPageDocuments(publishedPageSlugs: Set<string>): SearchDocument[] {
   return FALLBACK_PAGE_DOCUMENTS
-    .filter((doc) => !publishedPageSlugs.has(doc.slug))
+    .filter((doc) => !publishedPageSlugs.has(doc.slug) && !RETIRED_PUBLIC_PAGE_SLUGS.has(doc.slug))
     .map((doc) => ({
       id: `fallback:${doc.slug}`,
       type: doc.type,
@@ -302,7 +279,9 @@ export async function searchPublicSite(query: string): Promise<PublicSearchResul
     storage.events.getPublishedEvents(),
   ]);
 
-  const publishedPages = pages.filter((page) => page.status === "published" && !page.noindex);
+  const publishedPages = pages.filter(
+    (page) => page.status === "published" && !page.noindex && !RETIRED_PUBLIC_PAGE_SLUGS.has(page.slug),
+  );
   const publishedPageSlugs = new Set(publishedPages.map((page) => page.slug));
 
   const documents: SearchDocument[] = [

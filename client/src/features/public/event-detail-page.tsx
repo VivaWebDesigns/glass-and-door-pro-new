@@ -1005,11 +1005,11 @@ export default function EventDetailPage() {
                   <div className="space-y-3">
                     <p className="text-sm text-muted-foreground">
                       <Lock className="inline mr-1 h-4 w-4" />
-                      This event requires membership access. Log in or join the network to view event details.
+                      This event requires membership access. Log in or contact us to view event details.
                     </p>
-                    <Link href="/join">
+                    <Link href="/#contact">
                       <Button variant="outline" data-testid="button-join-network">
-                        Join the Network
+                        Contact Us
                       </Button>
                     </Link>
                   </div>
@@ -1080,8 +1080,8 @@ export default function EventDetailPage() {
                 {event.memberOnly && !event.registrationEnabled && (
                   <p className="text-sm text-muted-foreground">
                     This event is exclusive to Core Platform members.{" "}
-                    <Link href="/join" className="text-accent underline underline-offset-2">
-                      Join the network
+                    <Link href="/#contact" className="text-accent underline underline-offset-2">
+                      Contact us
                     </Link>{" "}
                     to get access.
                   </p>

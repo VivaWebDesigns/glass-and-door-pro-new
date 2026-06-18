@@ -19,7 +19,6 @@ const ReviewsPage = lazy(() => import("@/features/public/reviews-page"));
 const ServicesPage = lazy(() => import("@/features/public/services-page"));
 const EventsPage = lazy(() => import("@/features/public/events-page"));
 const EventDetailPage = lazy(() => import("@/features/public/event-detail-page"));
-const JoinNetworkPage = lazy(() => import("@/features/public/join-network-page"));
 const CmsHybridPage = lazy(() =>
   import("@/features/public/cms-hybrid-page").then((module) => ({
     default: module.CmsHybridPage,
@@ -144,7 +143,6 @@ function Router() {
         <Route path="/areas-served/monroe-nc"><Redirect to="/service-areas/monroe" replace /></Route>
         <Route path="/areas-served/charlotte-nc"><Redirect to="/service-areas/charlotte" replace /></Route>
         <Route path="/preview/cms/:id" component={CmsPreviewPage} />
-        <Route path="/join" component={() => <CmsHybridPage slug="join" fallback={<JoinNetworkPage />} />} />
         <Route path="/events" component={() => siteFeatures.eventsEnabled ? <CmsHybridPage slug="events" fallback={<EventsPage />} /> : <NotFound />} />
         <Route path="/events/:id" component={() => siteFeatures.eventsEnabled ? <EventDetailPage /> : <NotFound />} />
         <Route path="/recordings" component={() => <CmsHybridPage slug="recordings" fallback={<RecordingArchivesPage />} />} />
@@ -159,7 +157,7 @@ function Router() {
         <Route path="/reference/:token" component={ReferenceFormPage} />
         <Route path="/forms/:slug" component={StandaloneFormPage} />
         <Route path="/auth/login" component={LoginPage} />
-        <Route path="/auth/register"><Redirect to="/join" replace /></Route>
+        <Route path="/auth/register"><Redirect to="/" replace /></Route>
         <Route path="/auth/forgot-password" component={ForgotPasswordPage} />
         <Route path="/auth/reset-password" component={ResetPasswordPage} />
         <Route path="/setup" component={AdminSetupPage} />

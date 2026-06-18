@@ -78,7 +78,6 @@ const defaultMenus: Array<InsertCmsMenu & { location: StandardMenuLocation }> = 
     items: [
       item("About", "/about"),
       item("Find a Mental Health Professional", "/directory"),
-      item("Join the Network", "/join"),
       item("Resources", "#", [
         item("Events", "/events"),
         item("Insights & Articles", "/insights"),
@@ -99,7 +98,6 @@ const defaultMenus: Array<InsertCmsMenu & { location: StandardMenuLocation }> = 
     name: "For Mental Health Professionals",
     location: "footer_professionals",
     items: [
-      item("Applications open in June", "/join"),
       item("Mental Health Professional Login", "/auth/login"),
       item("Membership Plans", "/therapist/subscription"),
     ],

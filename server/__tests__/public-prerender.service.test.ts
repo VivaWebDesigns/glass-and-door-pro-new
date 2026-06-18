@@ -51,8 +51,8 @@ const seoSettings: SeoSettings = {
 
 const cmsPage: CmsPage = {
   id: "page-1",
-  title: "Join the Network",
-  slug: "join",
+  title: "Custom Landing Page",
+  slug: "custom-landing",
   status: "published",
   pageType: "system",
   template: "full-width",
@@ -167,11 +167,11 @@ describe("public-prerender.service", () => {
     mockGetPageBySlug.mockResolvedValue(cmsPage);
     const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
 
-    const snapshot = await getPublicHtmlSnapshot("/join");
+    const snapshot = await getPublicHtmlSnapshot("/custom-landing");
 
-    expect(snapshot?.title).toContain("Join the Network");
+    expect(snapshot?.title).toContain("Custom Landing Page");
     expect(snapshot?.bodyHtml).toContain("The Application Process");
-    expect(snapshot?.canonicalUrl).toBe("https://coreplatform.com/join");
+    expect(snapshot?.canonicalUrl).toBe("https://coreplatform.com/custom-landing");
   });
 
   it("emits CMS FAQPage schema and maps nested public routes to CMS slugs", async () => {

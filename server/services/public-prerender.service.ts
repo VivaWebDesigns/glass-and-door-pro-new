@@ -58,13 +58,6 @@ const FALLBACK_STATIC_PAGES: Record<
     body:
       "Contact Core Platform with questions, feedback, or partnership inquiries through the contact form and company information.",
   },
-  "/join": {
-    title: "Join the Network",
-    description:
-      "Learn about membership, the application process, and how Core Platform-informed mental health professionals can join the network.",
-    body:
-      "Join the network to learn about membership benefits and the application process, including submitting your application, credential verification, Core Platform competency review, profile setup, and going live in the directory.",
-  },
   "/directory": {
     title: "Find a Mental Health Professional",
     description:

@@ -1,6 +1,5 @@
 import { randomUUID } from "crypto";
 import { storage } from "../storage";
-import { mergeJoinHeroBlocks, type CmsBuilderBlock } from "@shared/cms-blocks";
 import type { SidebarWidget } from "@shared/schema";
 
 function id() {
@@ -249,25 +248,6 @@ function buildDefaultBlogSidebarWidgets(): SidebarWidget[] {
   ];
 }
 
-function contentWithMergedJoinHero(rawContent: unknown): Record<string, unknown> | null {
-  if (!rawContent || typeof rawContent !== "object") return null;
-
-  const content = rawContent as Record<string, unknown>;
-  if (!Array.isArray(content.blocks)) return null;
-
-  const blocks = content.blocks as CmsBuilderBlock[];
-  const mergedBlocks = mergeJoinHeroBlocks(blocks);
-
-  if (JSON.stringify(blocks) === JSON.stringify(mergedBlocks)) {
-    return null;
-  }
-
-  return {
-    ...content,
-    blocks: mergedBlocks,
-  };
-}
-
 export async function ensureSystemCmsPages() {
   const defaultBlogSidebar = await storage.cmsSidebars.getDefault();
   if (!defaultBlogSidebar) {
@@ -378,13 +358,11 @@ export async function ensureSystemCmsPages() {
 
   const existingJoin = await storage.cmsPages.getPageBySlug("join");
   if (existingJoin) {
-    const mergedContent = contentWithMergedJoinHero(existingJoin.content);
-    if (mergedContent) {
-      await storage.cmsPages.updatePage(existingJoin.id, {
-        content: mergedContent,
-        updatedBy: existingJoin.updatedBy,
-      });
-    }
+    await storage.cmsPages.updatePage(existingJoin.id, {
+      status: "draft",
+      noindex: true,
+      updatedBy: existingJoin.updatedBy,
+    });
   }
 
   const existingPrivacyPolicy = await storage.cmsPages.getPageBySlug("privacy-policy");

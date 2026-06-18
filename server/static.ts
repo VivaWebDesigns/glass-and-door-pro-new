@@ -12,6 +12,8 @@ const LEGACY_PUBLIC_REDIRECTS: Record<string, string> = {
   "/areas-served/monroe-nc": "/service-areas/monroe",
 };
 
+const GONE_PUBLIC_PATHS = new Set(["/join"]);
+
 export function serveStatic(app: Express) {
   const distPath = path.resolve(__dirname, "public");
   if (!fs.existsSync(distPath)) {
@@ -58,6 +60,14 @@ export function serveStatic(app: Express) {
     const redirectTo = LEGACY_PUBLIC_REDIRECTS[pathname];
     if (redirectTo) {
       res.redirect(301, `${redirectTo}${search}`);
+      return;
+    }
+    if (GONE_PUBLIC_PATHS.has(pathname)) {
+      res
+        .status(410)
+        .type("text")
+        .set("Cache-Control", "no-cache")
+        .send("Gone");
       return;
     }
     if (pathname.length > 1 && pathname.endsWith("/")) {
