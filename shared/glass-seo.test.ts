@@ -60,14 +60,35 @@ describe("glass SEO helpers", () => {
     expect((schema?.hasOfferCatalog as { itemListElement: unknown[] }).itemListElement).toHaveLength(9);
   });
 
-  it("uses city-specific LocalBusiness schema for new service-area pages", () => {
+  it("uses city-specific business and service schema for new service-area pages", () => {
     const cityArea = getGlassCityPageArea("service-areas-indian-land");
     const businessSchema = buildGlassLocalBusinessLd(undefined, cityArea);
-
-    expect(buildGlassServiceLdForCmsPage({
+    const serviceSchema = buildGlassServiceLdForCmsPage({
       slug: "service-areas-indian-land",
       seoDescription: "Indian Land service area",
-    })).toBeNull();
+    });
+
+    expect(serviceSchema).toMatchObject({
+      "@type": "Service",
+      name: "Glass and Door Services in Indian Land, SC",
+      hasOfferCatalog: {
+        itemListElement: expect.arrayContaining([
+          expect.objectContaining({
+            itemOffered: expect.objectContaining({
+              name: "Commercial Storefront Glass Installation",
+              url: "https://glassanddoorpro.com/services/commercial-storefront-glass-installation",
+            }),
+          }),
+          expect.objectContaining({
+            itemOffered: expect.objectContaining({
+              name: "Commercial Window Replacement",
+              url: "https://glassanddoorpro.com/services/commercial-window-replacement",
+            }),
+          }),
+        ]),
+      },
+    });
+    expect((serviceSchema?.hasOfferCatalog as { itemListElement: unknown[] }).itemListElement).toHaveLength(9);
     expect(businessSchema.areaServed).toMatchObject({
       "@type": "City",
       name: "Indian Land",

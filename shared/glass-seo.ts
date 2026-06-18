@@ -528,8 +528,6 @@ export function buildGlassServiceLdForCmsPage(
 ): JsonLdObject | null {
   const cityData = cityPageData[page.slug];
   if (cityData) {
-    if (page.slug.startsWith("service-areas-")) return null;
-
     return {
       "@context": "https://schema.org",
       "@type": "Service",
