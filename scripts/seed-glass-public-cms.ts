@@ -1777,6 +1777,8 @@ const glassServicePages: GlassServicePageSeed[] = [
         imageUrl: "/images/glass-door-pro/door-hero.webp",
         imageAlt: "Residential exterior door installation for a Charlotte area home",
         imagePositionY: 45,
+        primaryAction: "form-modal",
+        primaryLink: "",
       },
       intro: {
         title: "Door Installation Done Right the First Time",
