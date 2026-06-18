@@ -125,42 +125,11 @@ function LucideIcon({ name, className }: { name: string; className?: string }) {
   return <Icon className={className} />;
 }
 
-const LazyTherapistMapBlock = lazy(() =>
-  import("./public-dynamic-blocks").then((m) => ({ default: m.TherapistMapBlock })),
-);
 const LazyContactFormBlock = lazy(() =>
   import("./public-dynamic-blocks").then((m) => ({ default: m.ContactFormBlock })),
 );
 const LazyManagedFormEmbedBlock = lazy(() =>
   import("./public-dynamic-blocks").then((m) => ({ default: m.ManagedFormEmbedBlock })),
-);
-const LazyJoinHeroBlock = lazy(() =>
-  import("./public-dynamic-blocks").then((m) => ({ default: m.JoinHeroBlock })),
-);
-const LazyJoinRegistrationFormBlock = lazy(() =>
-  import("./public-dynamic-blocks").then((m) => ({ default: m.JoinRegistrationFormBlock })),
-);
-const LazyBlogPostFeedBlock = lazy(() =>
-  import("./public-dynamic-blocks").then((m) => ({ default: m.BlogPostFeedBlock })),
-);
-const LazyBlogFeaturedPostBlock = lazy(() =>
-  import("./public-dynamic-blocks").then((m) => ({ default: m.BlogFeaturedPostBlock })),
-);
-const LazyStandardBlogPageBlock = lazy(() =>
-  import("./public-dynamic-blocks").then((m) => ({ default: m.StandardBlogPageBlock })),
-);
-const LazyEventsArchiveSection = lazy(() =>
-  import("@/features/public/events-page").then((m) => ({ default: m.EventsArchiveSection })),
-);
-const LazyRecordingArchivesSection = lazy(() =>
-  import("@/features/public/recording-archives-page").then((m) => ({
-    default: m.RecordingArchivesSection,
-  })),
-);
-const LazyDirectoryBrowserSection = lazy(() =>
-  import("@/features/directory/directory-page").then((m) => ({
-    default: m.DirectoryBrowserSection,
-  })),
 );
 
 function DynamicFallback() {
@@ -2003,10 +1972,6 @@ const RENDERERS: Record<string, React.ComponentType<{ props: Record<string, unkn
   "cards-grid": CardsGridBlock,
   faq: FaqBlock,
   testimonials: TestimonialsBlock,
-  "featured-professionals": FeaturedProfessionalsBlock,
-  "featured-counselors": FeaturedProfessionalsBlock,
-  "events-preview": EventsPreviewBlock,
-  "blog-preview": BlogPreviewBlock,
   "button-group": ButtonGroupBlock,
   "image-block": ImageBlockRenderer,
   "video-embed": VideoEmbedBlock,
@@ -2033,17 +1998,8 @@ const RENDERERS: Record<string, React.ComponentType<{ props: Record<string, unkn
 };
 
 const DYNAMIC_BLOCK_TYPES = new Set([
-  "therapist-map",
   "contact-form",
   "form-embed",
-  "join-hero",
-  "join-registration-form",
-  "blog-post-feed",
-  "blog-featured-post",
-  "standard-blog-page",
-  "events-archive",
-  "video-archives",
-  "directory-browser",
 ]);
 
 export function PublicBlockRenderer({
@@ -2062,34 +2018,6 @@ export function PublicBlockRenderer({
   let renderedBlock: ReactElement | null = null;
 
   if (DYNAMIC_BLOCK_TYPES.has(block.type)) {
-    if (block.type === "blog-post-feed") {
-      renderedBlock = (
-        <Suspense fallback={<DynamicFallback />}>
-          <LazyBlogPostFeedBlock props={block.props} />
-        </Suspense>
-      );
-    }
-    if (block.type === "blog-featured-post") {
-      renderedBlock = (
-        <Suspense fallback={<DynamicFallback />}>
-          <LazyBlogFeaturedPostBlock props={block.props} />
-        </Suspense>
-      );
-    }
-    if (block.type === "standard-blog-page") {
-      renderedBlock = (
-        <Suspense fallback={<DynamicFallback />}>
-          <LazyStandardBlogPageBlock props={block.props} />
-        </Suspense>
-      );
-    }
-    if (block.type === "therapist-map") {
-      renderedBlock = (
-        <Suspense fallback={<DynamicFallback />}>
-          <LazyTherapistMapBlock props={block.props} />
-        </Suspense>
-      );
-    }
     if (block.type === "contact-form") {
       renderedBlock = (
         <Suspense fallback={<DynamicFallback />}>
@@ -2101,41 +2029,6 @@ export function PublicBlockRenderer({
       renderedBlock = (
         <Suspense fallback={<DynamicFallback />}>
           <LazyManagedFormEmbedBlock props={block.props} />
-        </Suspense>
-      );
-    }
-    if (block.type === "join-hero") {
-      renderedBlock = (
-        <Suspense fallback={<DynamicFallback />}>
-          <LazyJoinHeroBlock props={block.props} />
-        </Suspense>
-      );
-    }
-    if (block.type === "join-registration-form") {
-      renderedBlock = (
-        <Suspense fallback={<DynamicFallback />}>
-          <LazyJoinRegistrationFormBlock props={block.props} />
-        </Suspense>
-      );
-    }
-    if (block.type === "events-archive") {
-      renderedBlock = (
-        <Suspense fallback={<DynamicFallback />}>
-          <LazyEventsArchiveSection props={block.props} />
-        </Suspense>
-      );
-    }
-    if (block.type === "video-archives") {
-      renderedBlock = (
-        <Suspense fallback={<DynamicFallback />}>
-          <LazyRecordingArchivesSection props={block.props} />
-        </Suspense>
-      );
-    }
-    if (block.type === "directory-browser") {
-      renderedBlock = (
-        <Suspense fallback={<DynamicFallback />}>
-          <LazyDirectoryBrowserSection props={block.props} />
         </Suspense>
       );
     }

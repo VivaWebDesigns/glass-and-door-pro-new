@@ -189,24 +189,6 @@ const LazyManagedFormEmbedBlock = lazy(() =>
   })),
 );
 
-const LazyEventsArchiveSection = lazy(() =>
-  import("@/features/public/events-page").then((module) => ({
-    default: module.EventsArchiveSection,
-  })),
-);
-
-const LazyRecordingArchivesSection = lazy(() =>
-  import("@/features/public/recording-archives-page").then((module) => ({
-    default: module.RecordingArchivesSection,
-  })),
-);
-
-const LazyDirectoryBrowserSection = lazy(() =>
-  import("@/features/directory/directory-page").then((module) => ({
-    default: module.DirectoryBrowserSection,
-  })),
-);
-
 function DynamicPreviewFallback() {
   return (
     <div className="flex justify-center py-10">
@@ -2886,10 +2868,6 @@ const RENDERERS: Record<string, React.ComponentType<{ props: Record<string, unkn
   "cards-grid": CardsGridBlock,
   faq: FaqBlock,
   testimonials: TestimonialsBlock,
-  "featured-professionals": FeaturedProfessionalsBlock,
-  "featured-counselors": FeaturedProfessionalsBlock,
-  "events-preview": EventsPreviewBlock,
-  "blog-preview": BlogPreviewBlock,
   "button-group": ButtonGroupBlock,
   "image-block": ImageBlockRenderer,
   "video-embed": VideoEmbedBlock,
@@ -2941,37 +2919,6 @@ export function BlockRenderer({
         </Suspense>
       );
     }
-    if (!renderedBlock && block.type === "join-hero")
-      renderedBlock = <JoinHeroBlock props={block.props} />;
-    if (!renderedBlock && block.type === "join-registration-form")
-      renderedBlock = <JoinRegistrationFormBlock props={block.props} />;
-    if (!renderedBlock && block.type === "blog-post-feed")
-      renderedBlock = <BlogPostFeedBlock props={block.props} />;
-    if (!renderedBlock && block.type === "blog-featured-post")
-      renderedBlock = <BlogFeaturedPostBlock props={block.props} />;
-    if (!renderedBlock && block.type === "standard-blog-page")
-      renderedBlock = <StandardBlogPageBlock props={block.props} />;
-    if (!renderedBlock && block.type === "events-archive") {
-      renderedBlock = (
-        <Suspense fallback={<DynamicPreviewFallback />}>
-          <LazyEventsArchiveSection props={block.props} />
-        </Suspense>
-      );
-    }
-    if (!renderedBlock && block.type === "video-archives") {
-      renderedBlock = (
-        <Suspense fallback={<DynamicPreviewFallback />}>
-          <LazyRecordingArchivesSection props={block.props} />
-        </Suspense>
-      );
-    }
-    if (!renderedBlock && block.type === "directory-browser") {
-      renderedBlock = (
-        <Suspense fallback={<DynamicPreviewFallback />}>
-          <LazyDirectoryBrowserSection props={block.props} syncUrl={false} />
-        </Suspense>
-      );
-    }
   }
 
   if (!renderedBlock) {
@@ -3010,11 +2957,6 @@ export function BlockRenderer({
  *  Update this set when adding new full-width block types. */
 const FULL_WIDTH_BLOCKS = new Set([
   "hero",
-  "join-hero",
-  "join-registration-form",
-  "events-archive",
-  "video-archives",
-  "directory-browser",
   "cta",
   "trust-bar",
   "divider",
