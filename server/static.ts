@@ -14,7 +14,14 @@ const LEGACY_PUBLIC_REDIRECTS: Record<string, string> = {
   "/areas-served/monroe-nc": "/service-areas/monroe",
 };
 
-const GONE_PUBLIC_PATH_PREFIXES = ["/directory", "/events", "/insights", "/join", "/recordings"];
+const GONE_PUBLIC_PATH_PREFIXES = [
+  "/directory",
+  "/events",
+  "/forms/newsletter-signup",
+  "/insights",
+  "/join",
+  "/recordings",
+];
 
 export function serveStatic(app: Express) {
   const distPath = path.resolve(__dirname, "public");
