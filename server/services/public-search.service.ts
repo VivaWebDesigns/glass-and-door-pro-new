@@ -1,6 +1,5 @@
-import type { BlogPost, CmsPage, Event } from "@shared/schema";
+import type { CmsPage } from "@shared/schema";
 import type { PublicSearchResult } from "@shared/types/public-search";
-import { getEventPath } from "@shared/event-url";
 import { storage } from "../storage";
 
 interface SearchDocument {
@@ -110,62 +109,17 @@ const FALLBACK_PAGE_DOCUMENTS: FallbackPageDocument[] = [
     url: "/",
     metadata: "Page",
     searchableText: [
-      "Core Platform",
-      "Find a Mental Health Professional",
-      "Applications open in June",
-      "Why Core Platform Informed",
-      "Culturally Informed Care",
-      "Specialized Support",
-      "Global Community",
-      "Featured Articles",
-      "Upcoming Events",
+      "Glass & Door Pro",
+      "Charlotte glass company",
+      "Frameless shower doors",
+      "Window installation",
+      "Door installation",
+      "Window repair",
+      "Commercial glass",
+      "Service areas",
     ].join(" "),
-    excerptSource: "Explore Core Platform-informed mental health support, featured articles, and upcoming events.",
-  },
-  {
-    slug: "about",
-    type: "page",
-    title: "About",
-    url: "/about",
-    metadata: "Page",
-    searchableText: [
-      "About Core Platform",
-      "What is a Third Culture Kid",
-      "What does it mean to be vetted",
-      "Every mental health professional completes a detailed application process",
-      "Credentials and licensure are verified",
-      "Training or lived experience with Core Platform cross-cultural populations is required",
-    ].join(" "),
-    excerptSource: "Learn what it means for a provider to be vetted and how Core Platform supports cross-cultural mental health care.",
-  },
-  {
-    slug: "contact",
-    type: "page",
-    title: "Contact Us",
-    url: "/contact",
-    metadata: "Page",
-    searchableText: [
-      "Contact Us",
-      "Send a Message",
-      "Have a question or feedback",
-      "Company Information",
-    ].join(" "),
-    excerptSource: "Get in touch with Core Platform through the contact form and company information.",
-  },
-  {
-    slug: "directory",
-    type: "page",
-    title: "Find a Mental Health Professional",
-    url: "/directory",
-    metadata: "Page",
-    searchableText: [
-      "Find a Mental Health Professional",
-      "Search by specialty location language or session format",
-      "Why Core Platform Informed",
-      "What does it mean to be vetted",
-      "Every mental health professional completes a detailed application process",
-    ].join(" "),
-    excerptSource: "Search for Core Platform-informed care by specialty, location, language, or session format.",
+    excerptSource:
+      "Glass & Door Pro serves the Charlotte area with frameless showers, windows, doors, window repair, and commercial glass.",
   },
   {
     slug: "privacy-policy",
@@ -211,7 +165,15 @@ const FALLBACK_PAGE_DOCUMENTS_BY_SLUG = new Map(
   FALLBACK_PAGE_DOCUMENTS.map((document) => [document.slug, document] as const),
 );
 
-const RETIRED_PUBLIC_PAGE_SLUGS = new Set(["join"]);
+const RETIRED_PUBLIC_PAGE_SLUGS = new Set([
+  "about",
+  "contact",
+  "directory",
+  "events",
+  "insights",
+  "join",
+  "recordings",
+]);
 
 function buildPageText(page: CmsPage) {
   const fallbackDocument = FALLBACK_PAGE_DOCUMENTS_BY_SLUG.get(page.slug);
@@ -223,33 +185,6 @@ function buildPageText(page: CmsPage) {
     page.seoKeywords,
     collectContentText(page.content),
     fallbackDocument?.searchableText,
-  ]
-    .filter(Boolean)
-    .join(" ");
-}
-
-function buildPostText(post: BlogPost) {
-  return [
-    post.title,
-    post.excerpt,
-    post.content,
-    post.authorName,
-    post.category,
-    ...(post.categories ?? []),
-    ...(post.tags ?? []),
-  ]
-    .filter(Boolean)
-    .join(" ");
-}
-
-function buildEventText(event: Event) {
-  return [
-    event.title,
-    event.description,
-    event.speakerName,
-    event.location,
-    event.locationName,
-    event.locationAddress,
   ]
     .filter(Boolean)
     .join(" ");
@@ -273,10 +208,8 @@ export async function searchPublicSite(query: string): Promise<PublicSearchResul
   const normalized = normalizeQuery(query);
   if (!normalized.raw) return [];
 
-  const [pages, posts, events] = await Promise.all([
+  const [pages] = await Promise.all([
     storage.cmsPages.getAllPages(),
-    storage.blog.getPublishedPosts(),
-    storage.events.getPublishedEvents(),
   ]);
 
   const publishedPages = pages.filter(
@@ -299,26 +232,6 @@ export async function searchPublicSite(query: string): Promise<PublicSearchResul
       ]),
     })),
     ...buildFallbackPageDocuments(publishedPageSlugs),
-    ...posts
-      .filter((post) => !post.noindex)
-      .map((post) => ({
-      type: "post" as const,
-      id: post.id,
-      title: post.title,
-      url: `/insights/${post.slug}`,
-      metadata: post.category || post.authorName || "Article",
-      searchableText: buildPostText(post),
-      excerptSource: post.excerpt || post.content,
-      })),
-    ...events.map((event) => ({
-      type: "event" as const,
-      id: event.id,
-      title: event.title,
-      url: getEventPath(event),
-      metadata: event.locationName || event.location || "Event",
-      searchableText: buildEventText(event),
-      excerptSource: event.description || buildEventText(event),
-    })),
   ];
 
   return documents

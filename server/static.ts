@@ -8,11 +8,13 @@ import {
 } from "./services/public-prerender.service";
 
 const LEGACY_PUBLIC_REDIRECTS: Record<string, string> = {
+  "/about": "/#about",
+  "/contact": "/#contact",
   "/areas-served/charlotte-nc": "/service-areas/charlotte",
   "/areas-served/monroe-nc": "/service-areas/monroe",
 };
 
-const GONE_PUBLIC_PATHS = new Set(["/join"]);
+const GONE_PUBLIC_PATH_PREFIXES = ["/directory", "/events", "/insights", "/join", "/recordings"];
 
 export function serveStatic(app: Express) {
   const distPath = path.resolve(__dirname, "public");
@@ -59,10 +61,12 @@ export function serveStatic(app: Express) {
     const { pathname, search } = getRequestPathAndSearch(req.originalUrl || req.url || "/");
     const redirectTo = LEGACY_PUBLIC_REDIRECTS[pathname];
     if (redirectTo) {
-      res.redirect(301, `${redirectTo}${search}`);
+      res.redirect(301, redirectTo.includes("#") ? redirectTo : `${redirectTo}${search}`);
       return;
     }
-    if (GONE_PUBLIC_PATHS.has(pathname)) {
+    if (
+      GONE_PUBLIC_PATH_PREFIXES.some((gonePath) => pathname === gonePath || pathname.startsWith(`${gonePath}/`))
+    ) {
       res
         .status(410)
         .type("text")

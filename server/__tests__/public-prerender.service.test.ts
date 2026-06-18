@@ -332,17 +332,24 @@ describe("public-prerender.service", () => {
     expect(snapshot?.bodyHtml).toContain("frameless shower doors");
   });
 
-  it("returns a prerender snapshot for blog posts and event detail pages", async () => {
+  it("does not prerender retired legacy public sections", async () => {
     mockGetPostBySlug.mockResolvedValue(blogPost);
     mockGetEventByIdentifier.mockResolvedValue(event);
     const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
 
+    const aboutSnapshot = await getPublicHtmlSnapshot("/about");
+    const contactSnapshot = await getPublicHtmlSnapshot("/contact");
+    const directorySnapshot = await getPublicHtmlSnapshot("/directory");
     const postSnapshot = await getPublicHtmlSnapshot("/insights/understanding-application-process");
     const eventSnapshot = await getPublicHtmlSnapshot("/events/event-1");
+    const recordingsSnapshot = await getPublicHtmlSnapshot("/recordings");
 
-    expect(postSnapshot?.bodyHtml).toContain("This article explains the application process");
-    expect(eventSnapshot?.bodyHtml).toContain("Application Process Webinar");
-    expect(eventSnapshot?.canonicalUrl).toBe("https://coreplatform.com/events/application-process-webinar");
+    expect(aboutSnapshot).toBeNull();
+    expect(contactSnapshot).toBeNull();
+    expect(directorySnapshot).toBeNull();
+    expect(postSnapshot).toBeNull();
+    expect(eventSnapshot).toBeNull();
+    expect(recordingsSnapshot).toBeNull();
   });
 
   it("marks search result pages as noindex in the injected head", async () => {

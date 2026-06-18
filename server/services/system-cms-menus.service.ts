@@ -16,6 +16,42 @@ function item(label: string, url: string, children: MenuItem[] = [], openInNewTa
   };
 }
 
+function patchRetiredPublicUrls(items: MenuItem[]): { items: MenuItem[]; changed: boolean } {
+  let changed = false;
+  const removedUrlPrefixes = ["/directory", "/events", "/insights", "/join", "/recordings"];
+
+  const nextItems = items.flatMap((entry) => {
+    const nextChildren = entry.children?.length
+      ? patchRetiredPublicUrls(entry.children)
+      : { items: entry.children ?? [], changed: false };
+
+    if (nextChildren.changed) {
+      changed = true;
+    }
+
+    let nextUrl = entry.url;
+    if (entry.url === "/about") {
+      nextUrl = "/#about";
+      changed = true;
+    } else if (entry.url === "/contact") {
+      nextUrl = "/#contact";
+      changed = true;
+    }
+
+    const shouldRemove = removedUrlPrefixes.some(
+      (prefix) => entry.url === prefix || entry.url.startsWith(`${prefix}/`),
+    );
+    if (shouldRemove) {
+      changed = true;
+      return [];
+    }
+
+    return [{ ...entry, url: nextUrl, children: nextChildren.items }];
+  });
+
+  return { items: nextItems, changed };
+}
+
 function patchLegalItemUrls(items: MenuItem[]): { items: MenuItem[]; changed: boolean } {
   let changed = false;
 
@@ -29,7 +65,7 @@ function patchLegalItemUrls(items: MenuItem[]): { items: MenuItem[]; changed: bo
 
     if (
       normalizedLabel === "privacy policy" &&
-      (entry.url === "/contact" || entry.url === "" || entry.url === "#")
+      (entry.url === "/contact" || entry.url === "/#contact" || entry.url === "" || entry.url === "#")
     ) {
       nextUrl = "/privacy-policy";
       changed = true;
@@ -37,7 +73,7 @@ function patchLegalItemUrls(items: MenuItem[]): { items: MenuItem[]; changed: bo
 
     if (
       normalizedLabel === "terms of service" &&
-      (entry.url === "/contact" || entry.url === "" || entry.url === "#")
+      (entry.url === "/contact" || entry.url === "/#contact" || entry.url === "" || entry.url === "#")
     ) {
       nextUrl = "/terms-of-service";
       changed = true;
@@ -45,7 +81,7 @@ function patchLegalItemUrls(items: MenuItem[]): { items: MenuItem[]; changed: bo
 
     if (
       normalizedLabel === "disclaimer" &&
-      (entry.url === "/contact" || entry.url === "" || entry.url === "#")
+      (entry.url === "/contact" || entry.url === "/#contact" || entry.url === "" || entry.url === "#")
     ) {
       nextUrl = "/disclaimer";
       changed = true;
@@ -76,22 +112,15 @@ const defaultMenus: Array<InsertCmsMenu & { location: StandardMenuLocation }> = 
     name: "Main Navigation",
     location: "main_navigation",
     items: [
-      item("About", "/about"),
-      item("Find a Mental Health Professional", "/directory"),
-      item("Resources", "#", [
-        item("Events", "/events"),
-        item("Insights & Articles", "/insights"),
-      ]),
-      item("Contact", "/contact"),
+      item("About", "/#about"),
+      item("Contact", "/#contact"),
     ],
   },
   {
     name: "Platform",
     location: "footer_platform",
     items: [
-      item("Find a Mental Health Professional", "/directory"),
-      item("Events & Workshops", "/events"),
-      item("How It Works", "/about"),
+      item("How It Works", "/#about"),
     ],
   },
   {
@@ -105,19 +134,15 @@ const defaultMenus: Array<InsertCmsMenu & { location: StandardMenuLocation }> = 
   {
     name: "Resources",
     location: "footer_resources",
-    items: [
-      item("About Core Platforms", "/about"),
-      item("Upcoming Events", "/events"),
-      item("Browse Specializations", "/directory"),
-    ],
+    items: [],
   },
   {
     name: "Company",
     location: "footer_company",
     items: [
-      item("About Us", "/about"),
-      item("Contact", "/contact"),
-      item("Support", "/contact"),
+      item("About Us", "/#about"),
+      item("Contact", "/#contact"),
+      item("Support", "/#contact"),
     ],
   },
   {
@@ -153,6 +178,16 @@ export async function ensureSystemCmsMenus() {
   if (!hasAnyFooterMenus) {
     for (const menu of defaultMenus.filter((entry) => entry.location !== "main_navigation")) {
       await storage.cmsMenus.create(menu);
+    }
+  }
+
+  for (const menu of menus) {
+    if (!menu.items) continue;
+    const patched = patchRetiredPublicUrls((menu.items as MenuItem[]) || []);
+    if (patched.changed) {
+      await storage.cmsMenus.update(menu.id, {
+        items: patched.items,
+      });
     }
   }
 

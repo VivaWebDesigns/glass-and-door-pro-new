@@ -44,27 +44,6 @@ const FALLBACK_STATIC_PAGES: Record<
     body:
       "Glass & Door Pro serves greater Charlotte with frameless showers, windows, doors, window repair, and commercial glass.",
   },
-  "/about": {
-    title: "About",
-    description:
-      "Learn what it means for a provider to be vetted and how Core Platform supports cross-cultural mental health care.",
-    body:
-      "Learn what it means for a provider to be vetted and how Core Platform supports cross-cultural mental health care.",
-  },
-  "/contact": {
-    title: "Contact Us",
-    description:
-      "Get in touch with Core Platform through the contact form and company information.",
-    body:
-      "Contact Core Platform with questions, feedback, or partnership inquiries through the contact form and company information.",
-  },
-  "/directory": {
-    title: "Find a Mental Health Professional",
-    description:
-      "Search for Core Platform-informed mental health professionals by specialty, location, language, or session format.",
-    body:
-      "Find a mental health professional by searching specialties, locations, languages, and session formats in the Core Platform directory.",
-  },
   "/gallery": {
     title: "Gallery",
     description:
@@ -85,27 +64,6 @@ const FALLBACK_STATIC_PAGES: Record<
       "Explore frameless showers, window installation, door installation, window repair, and commercial glass services from Glass & Door Pro in Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas.",
     body:
       "Glass & Door Pro provides frameless shower doors, residential window installation, door installation, window repair, and commercial glass services across Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby communities.",
-  },
-  "/insights": {
-    title: "Insights & Articles",
-    description:
-      "Browse articles, guidance, and insights focused on Third Culture Kids and culturally informed care.",
-    body:
-      "Browse insights and articles focused on Third Culture Kids, culturally informed care, and mental health support.",
-  },
-  "/events": {
-    title: "Events",
-    description:
-      "Explore public events, trainings, and community gatherings from Core Platform.",
-    body:
-      "Explore public events, trainings, and community gatherings from Core Platform.",
-  },
-  "/recordings": {
-    title: "Recording Archives",
-    description:
-      "Watch archived event recordings and educational content from Core Platform.",
-    body:
-      "Watch archived event recordings and educational content from Core Platform.",
   },
   "/privacy-policy": {
     title: "Privacy Policy",
@@ -129,6 +87,9 @@ const FALLBACK_STATIC_PAGES: Record<
       "Review emergency guidance, directory vetting limitations, and important information about using the Core Platform directory and related services.",
   },
 };
+
+const RETIRED_PUBLIC_PATH_PREFIXES = ["/directory", "/events", "/insights", "/join", "/recordings"];
+const REDIRECT_ONLY_PUBLIC_PATHS = new Set(["/about", "/contact"]);
 
 function escapeHtml(value: string) {
   return value
@@ -753,6 +714,13 @@ export async function getPublicHtmlSnapshot(
   const siteUrl =
     (seo?.siteUrl || "").replace(/\/$/, "") ||
     "https://glassanddoorpro.com";
+
+  if (
+    REDIRECT_ONLY_PUBLIC_PATHS.has(pathname) ||
+    RETIRED_PUBLIC_PATH_PREFIXES.some((retiredPath) => pathname === retiredPath || pathname.startsWith(`${retiredPath}/`))
+  ) {
+    return null;
+  }
 
   if (pathname === "/search") {
     const params = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
