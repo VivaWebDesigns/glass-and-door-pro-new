@@ -70,8 +70,8 @@ function shouldHideServiceAreaWorkGallery(pageSlug: string, block: BlockInstance
   if (block.type !== "image-grid") return false;
 
   const title = typeof block.props.title === "string" ? block.props.title : "";
-  const variant = typeof block.props.variant === "string" ? block.props.variant : "";
-  return variant === "project-gallery" && /^Our Work in the .+ Area$/i.test(title.trim());
+  const anchorId = typeof block.props.anchorId === "string" ? block.props.anchorId : "";
+  return anchorId === "gallery" && /^Our Work in the .+ Area$/i.test(title.trim());
 }
 
 function setMeta(name: string, content: string, property = false) {

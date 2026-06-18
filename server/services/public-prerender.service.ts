@@ -256,8 +256,8 @@ function shouldHideServiceAreaWorkGallery(pageSlug: string, block: unknown) {
   if (entry.type !== "image-grid" || !entry.props) return false;
 
   const title = typeof entry.props.title === "string" ? entry.props.title : "";
-  const variant = typeof entry.props.variant === "string" ? entry.props.variant : "";
-  return variant === "project-gallery" && /^Our Work in the .+ Area$/i.test(title.trim());
+  const anchorId = typeof entry.props.anchorId === "string" ? entry.props.anchorId : "";
+  return anchorId === "gallery" && /^Our Work in the .+ Area$/i.test(title.trim());
 }
 
 function filterServiceAreaWorkGalleryFromPage(page: CmsPage): CmsPage {
