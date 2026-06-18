@@ -1105,6 +1105,51 @@ function relatedServicesBlock() {
   });
 }
 
+const commercialServiceLinks = [
+  {
+    label: "Commercial Storefront Glass Installation",
+    description:
+      "Aluminum framing, fixed glass panels, and storefront doors for new construction, tenant buildouts, and commercial renovations.",
+    url: "/services/commercial-storefront-glass-installation",
+  },
+  {
+    label: "Commercial Storefront Glass Replacement & Repair",
+    description:
+      "Emergency board-up, broken panel replacement, and storefront glass repair for Charlotte businesses.",
+    url: "/services/commercial-storefront-glass-replacement-repair",
+  },
+  {
+    label: "Commercial Door Installation",
+    description:
+      "Aluminum entry doors, glass storefront doors, and complete commercial entrance systems.",
+    url: "/services/commercial-door-installation",
+  },
+  {
+    label: "Commercial Door Replacement & Repair",
+    description:
+      "Broken glass panels, hardware failure, misaligned frames, and worn closers repaired or replaced fast.",
+    url: "/services/commercial-door-replacement-repair",
+  },
+  {
+    label: "Commercial Window Replacement",
+    description: "Apartment and multi-family window replacement with fast mobilization.",
+    url: "/services/commercial-window-replacement",
+  },
+];
+
+function relatedCommercialServicesBlock(currentUrl: string) {
+  return block("link-list", {
+    title: "Related Commercial Services",
+    subtitle:
+      "More commercial glass, storefront, door, and window services for Charlotte businesses.",
+    columns: "2",
+    sectionBackgroundColor: "#ffffff",
+    sectionPaddingTop: "md",
+    sectionPaddingBottom: "md",
+    links: commercialServiceLinks.filter((link) => link.url !== currentUrl),
+  });
+}
+
 const month1FramelessContent: InsertCmsPage["content"] = {
   blocks: [
     serviceHero({
@@ -1403,6 +1448,9 @@ function expandedServicePageContent(props: {
     secondaryText?: string;
     secondaryAction?: string;
     secondaryLink?: string;
+    secondaryFormSlug?: string;
+    secondaryModalTitle?: string;
+    secondaryModalDescription?: string;
   };
   intro: {
     title: string;
@@ -1419,6 +1467,7 @@ function expandedServicePageContent(props: {
   benefitsCards: GlassCard[];
   faqTitle: string;
   faqs: GlassFaq[];
+  relatedCommercialUrl?: string;
   cta: {
     heading: string;
     body: string;
@@ -1487,6 +1536,9 @@ function expandedServicePageContent(props: {
         sectionPaddingBottom: "lg",
         items: props.faqs,
       }),
+      ...(props.relatedCommercialUrl
+        ? [relatedCommercialServicesBlock(props.relatedCommercialUrl)]
+        : []),
       block("cta", {
         variant: "glass-service",
         heading: props.cta.heading,
@@ -2099,6 +2151,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "commercial storefront glass installation Charlotte NC, aluminum storefront framing, commercial glass doors, tenant buildout glazing",
     ogImageUrl: "/images/glass-door-pro/commercial-hero-1280w.webp",
     content: expandedServicePageContent({
+      relatedCommercialUrl: "/services/commercial-storefront-glass-installation",
       hero: {
         heading: "Commercial Storefront Glass Installation in Charlotte, NC",
         subheading:
@@ -2252,6 +2305,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "commercial storefront glass replacement Charlotte NC, storefront glass repair, emergency board-up, broken storefront glass",
     ogImageUrl: "/images/glass-door-pro/storefront-glass-replacement-hero.webp",
     content: expandedServicePageContent({
+      relatedCommercialUrl: "/services/commercial-storefront-glass-replacement-repair",
       hero: {
         heading: "Commercial Storefront Glass Replacement & Repair in Charlotte, NC",
         subheading:
@@ -2421,6 +2475,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "commercial door installation Charlotte NC, aluminum entry doors, glass storefront doors, commercial entrance systems",
     ogImageUrl: "/images/glass-door-pro/storefront-door-installation-hero.webp",
     content: expandedServicePageContent({
+      relatedCommercialUrl: "/services/commercial-door-installation",
       hero: {
         heading: "Commercial Door Installation in Charlotte, NC",
         subheading:
@@ -2572,6 +2627,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "commercial door replacement Charlotte NC, commercial door repair, door closer repair, commercial door glass replacement",
     ogImageUrl: "/images/glass-door-pro/commercial-door-repair-hero.webp",
     content: expandedServicePageContent({
+      relatedCommercialUrl: "/services/commercial-door-replacement-repair",
       hero: {
         heading: "Commercial Door Replacement & Repair in Charlotte, NC",
         subheading:
@@ -2743,6 +2799,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "apartment window replacement Charlotte NC, multi-family window replacement, commercial window replacement, property manager window replacement",
     ogImageUrl: "/images/glass-door-pro/commercial-window-replacement-hero-blue-sky.webp",
     content: expandedServicePageContent({
+      relatedCommercialUrl: "/services/commercial-window-replacement",
       hero: {
         heading: "Apartment & Multi-Family Window Replacement in Charlotte, NC",
         subheading:
