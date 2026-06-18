@@ -49,13 +49,23 @@ export interface BuilderContent {
 const LEGACY_BLOCK_TYPE_ALIASES: Record<string, string> = {
   "call-to-action": "cta",
   "cta-banner": "cta",
-  "blog-feed": "blog-post-feed",
-  "blog-archive": "blog-post-feed",
-  "featured-articles": "blog-preview",
-  "articles-preview": "blog-preview",
-  "events-feed": "events-preview",
-  "upcoming-events": "events-preview",
 };
+
+const RETIRED_BLOCK_TYPES = new Set([
+  "featured-professionals",
+  "featured-counselors",
+  "events-preview",
+  "therapist-map",
+  "join-hero",
+  "join-registration-form",
+  "blog-post-feed",
+  "blog-featured-post",
+  "standard-blog-page",
+  "events-archive",
+  "video-archives",
+  "directory-browser",
+  "blog-preview",
+]);
 
 const ALIGN_OPTIONS = [
   { label: "Left", value: "left" },
@@ -414,21 +424,21 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     description: "Full-width hero with heading, subheading, and CTA buttons",
     category: "hero",
     defaultProps: {
-      heading: "Welcome to Core Platform",
+      heading: "Glass & Door Pro",
       accentHeading: "",
       headingColor: "",
       accentHeadingColor: "",
-      subheading: "Connecting Third Culture Kids with mental health professionals who understand your world.",
+      subheading: "Glass, window, door, shower, and commercial glass services for the greater Charlotte area.",
       subheadingColor: "",
-      ctaText: "Find a Mental Health Professional",
-      ctaLink: "/directory",
+      ctaText: "Get a Free Quote",
+      ctaLink: "/#contact",
       ctaAction: "internal-link",
       ctaOpenInNewTab: false,
       ctaFormSlug: "contact-form",
       ctaModalTitle: "",
       ctaModalDescription: "",
       ctaSecondaryText: "Learn More",
-      ctaSecondaryLink: "/about",
+      ctaSecondaryLink: "/#about",
       ctaSecondaryAction: "internal-link",
       ctaSecondaryOpenInNewTab: false,
       ctaSecondaryFormSlug: "contact-form",
@@ -455,16 +465,16 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       { key: "accentHeadingColor", label: "Accent Heading Color", type: "color", placeholder: "#89cda1" },
       { key: "subheading", label: "Subheading", type: "textarea", placeholder: "Supporting text beneath the heading" },
       { key: "subheadingColor", label: "Subheading Color", type: "color", placeholder: "#ffffff" },
-      { key: "ctaText", label: "Primary Button Text", type: "text", placeholder: "e.g. Find a Mental Health Professional" },
+      { key: "ctaText", label: "Primary Button Text", type: "text", placeholder: "e.g. Get a Free Quote" },
       { key: "ctaAction", label: "Primary Button Action", type: "select", options: BUTTON_ACTION_OPTIONS },
-      { key: "ctaLink", label: "Primary Button Link", type: "url", placeholder: "/directory" },
+      { key: "ctaLink", label: "Primary Button Link", type: "url", placeholder: "/#contact" },
       { key: "ctaOpenInNewTab", label: "Primary Open In New Tab", type: "boolean" },
       { key: "ctaFormSlug", label: "Primary Button Form", type: "form-select" },
       { key: "ctaModalTitle", label: "Primary Modal Title", type: "text", placeholder: "Optional modal title override" },
       { key: "ctaModalDescription", label: "Primary Modal Description", type: "textarea", placeholder: "Optional modal description" },
       { key: "ctaSecondaryText", label: "Secondary Button Text", type: "text", placeholder: "e.g. Learn More" },
       { key: "ctaSecondaryAction", label: "Secondary Button Action", type: "select", options: BUTTON_ACTION_OPTIONS },
-      { key: "ctaSecondaryLink", label: "Secondary Button Link", type: "url", placeholder: "/about" },
+      { key: "ctaSecondaryLink", label: "Secondary Button Link", type: "url", placeholder: "/#about" },
       { key: "ctaSecondaryOpenInNewTab", label: "Secondary Open In New Tab", type: "boolean" },
       { key: "ctaSecondaryFormSlug", label: "Secondary Button Form", type: "form-select" },
       { key: "ctaSecondaryModalTitle", label: "Secondary Modal Title", type: "text", placeholder: "Optional modal title override" },
@@ -488,8 +498,8 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     category: "layout",
     defaultProps: {
       eyebrow: "Our Approach",
-      title: "Why Core Platform-Informed Care Matters",
-      subtitle: "We match you with mental health professionals who understand the Core Platform experience.",
+      title: "Glass & Door Services Built Around Your Project",
+      subtitle: "Clear communication, careful measurements, and clean installation from a local owner-operator.",
       alignment: "center",
       headingLevel: "h2",
     },
@@ -524,13 +534,13 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     category: "content",
     defaultProps: {
       eyebrow: "Our Story",
-      heading: "About Our Mission",
+      heading: "About Glass & Door Pro",
       subtitle: "Use this supporting introduction to frame the section before the main body copy begins.",
-      body: "<p>We provide access to culturally informed mental health professionals who understand what it means to grow up between worlds.</p>",
+      body: "<p>Glass & Door Pro provides residential and commercial glass, window, door, and shower services across the greater Charlotte area.</p>",
       alignment: "left",
       headingLevel: "h2",
       imageUrl: "",
-      imageAlt: "About Core Platform",
+      imageAlt: "Glass & Door Pro project detail",
       imageCaption: "",
       imagePosition: "right",
       badgeValue: "",
@@ -668,9 +678,9 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     category: "conversion",
     defaultProps: {
       heading: "Ready to Get Started?",
-      subheading: "Find a Core Platform-informed mental health professional and begin your journey today.",
-      primaryText: "Browse Mental Health Professionals",
-      primaryLink: "/directory",
+      subheading: "Tell us about your glass, window, door, shower, or commercial project.",
+      primaryText: "Get a Free Quote",
+      primaryLink: "/#contact",
       primaryAction: "internal-link",
       primaryOpenInNewTab: false,
       primaryFormSlug: "contact-form",
@@ -690,14 +700,14 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       { key: "subheading", label: "Subheading", type: "textarea", placeholder: "Supporting text" },
       { key: "primaryText", label: "Primary Button", type: "text", placeholder: "Button label" },
       { key: "primaryAction", label: "Primary Button Action", type: "select", options: BUTTON_ACTION_OPTIONS },
-      { key: "primaryLink", label: "Primary Button Link", type: "url", placeholder: "/directory" },
+      { key: "primaryLink", label: "Primary Button Link", type: "url", placeholder: "/#contact" },
       { key: "primaryOpenInNewTab", label: "Primary Open In New Tab", type: "boolean" },
       { key: "primaryFormSlug", label: "Primary Button Form", type: "form-select" },
       { key: "primaryModalTitle", label: "Primary Modal Title", type: "text", placeholder: "Optional modal title override" },
       { key: "primaryModalDescription", label: "Primary Modal Description", type: "textarea", placeholder: "Optional modal description" },
       { key: "secondaryText", label: "Secondary Button", type: "text", placeholder: "Optional secondary button" },
       { key: "secondaryAction", label: "Secondary Button Action", type: "select", options: BUTTON_ACTION_OPTIONS },
-      { key: "secondaryLink", label: "Secondary Button Link", type: "url", placeholder: "/about" },
+      { key: "secondaryLink", label: "Secondary Button Link", type: "url", placeholder: "/#about" },
       { key: "secondaryOpenInNewTab", label: "Secondary Open In New Tab", type: "boolean" },
       { key: "secondaryFormSlug", label: "Secondary Button Form", type: "form-select" },
       { key: "secondaryModalTitle", label: "Secondary Modal Title", type: "text", placeholder: "Optional modal title override" },
@@ -712,14 +722,14 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     description: "A configurable grid of icon + text cards",
     category: "content",
     defaultProps: {
-      title: "Why Choose Core Platform",
+      title: "Why Choose Glass & Door Pro",
       subtitle: "",
       columns: "3",
       variant: "default",
       cards: [
-        { title: "Culturally Informed", description: "Mental health professionals who understand the Core Platform experience.", icon: "Globe" },
-        { title: "Specialized Support", description: "Targeted help for unique Core Platform challenges.", icon: "Heart" },
-        { title: "Global Community", description: "Connect with others who share your journey.", icon: "Users" },
+        { title: "Owner-Operated", description: "You work directly with Doug from estimate through installation.", icon: "UserCheck" },
+        { title: "Measured Carefully", description: "Every opening is checked before materials are ordered or installed.", icon: "Ruler" },
+        { title: "Clean Finish", description: "Projects are completed with attention to fit, seal, and final appearance.", icon: "Sparkles" },
       ],
     },
     propDefs: [
@@ -751,8 +761,8 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     defaultProps: {
       title: "Frequently Asked Questions",
       items: [
-        { question: "What is a Third Culture Kid?", answer: "A Core Platform is someone who spent a significant part of their developmental years in a culture different from their parents'." },
-        { question: "How are mental health professionals vetted?", answer: "All mental health professionals complete a thorough application and background verification process." },
+        { question: "What areas do you serve?", answer: "Glass & Door Pro serves Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby communities." },
+        { question: "Do you handle both residential and commercial work?", answer: "Yes. We handle frameless showers, windows, doors, window repair, storefront glass, and commercial door projects." },
       ],
     },
     propDefs: [
@@ -775,11 +785,11 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     description: "Quote cards from clients or community members",
     category: "social-proof",
     defaultProps: {
-      title: "What Our Community Says",
+      title: "What Customers Say",
       variant: "default",
       items: [
-        { quote: "Finding a mental health professional who truly understood my Core Platform experience was life-changing.", name: "Sarah M.", role: "Core Platform Client", location: "Singapore" },
-        { quote: "I finally feel seen and understood in a way I never did before.", name: "James T.", role: "Core Platform Client", location: "Germany" },
+        { quote: "Doug was responsive, professional, and the finished glass work looks great.", name: "Customer", role: "Glass & Door Pro Customer", location: "Charlotte Area" },
+        { quote: "The project was measured carefully, installed cleanly, and finished exactly as discussed.", name: "Customer", role: "Glass & Door Pro Customer", location: "Greater Charlotte" },
       ],
     },
     propDefs: [
@@ -794,7 +804,7 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
         itemSchema: [
           { key: "quote", label: "Quote", type: "textarea", placeholder: "Testimonial text" },
           { key: "name", label: "Name", type: "text", placeholder: "Person's name" },
-          { key: "role", label: "Role", type: "text", placeholder: "e.g. Core Platform Client" },
+          { key: "role", label: "Role", type: "text", placeholder: "e.g. Customer" },
           { key: "location", label: "Location", type: "text", placeholder: "e.g. Singapore" },
           { key: "rating", label: "Rating", type: "number", min: 1, max: 5 },
           { key: "source", label: "Source", type: "text", placeholder: "e.g. Google" },
@@ -802,90 +812,6 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
           { key: "date", label: "Review Date", type: "text", placeholder: "e.g. May 2024" },
         ],
       },
-    ],
-  },
-  {
-    type: "featured-professionals",
-    label: "Featured Mental Health Professionals",
-    iconName: "UserCheck",
-    description: "Live grid of featured mental health professionals from the directory",
-    category: "data",
-    defaultProps: {
-      title: "Meet Our Mental Health Professionals",
-      subtitle: "Browse our network of Core Platform-informed mental health professionals.",
-      limit: 3,
-    },
-    propDefs: [
-      { key: "title", label: "Section Title", type: "text", placeholder: "Section heading" },
-      { key: "subtitle", label: "Subtitle", type: "text", placeholder: "Supporting text" },
-      { key: "limit", label: "Max Mental Health Professionals to Show", type: "number", min: 1, max: 12 },
-    ],
-  },
-  {
-    type: "featured-counselors",
-    label: "Featured Mental Health Professionals",
-    iconName: "UserCheck",
-    description: "Live grid of featured mental health professionals from the directory",
-    category: "data",
-    defaultProps: {
-      title: "Meet Our Mental Health Professionals",
-      subtitle: "Browse our network of Core Platform-informed mental health professionals.",
-      limit: 3,
-    },
-    propDefs: [
-      { key: "title", label: "Section Title", type: "text", placeholder: "Section heading" },
-      { key: "subtitle", label: "Subtitle", type: "text", placeholder: "Supporting text" },
-      { key: "limit", label: "Max Mental Health Professionals to Show", type: "number", min: 1, max: 12 },
-    ],
-  },
-  {
-    type: "events-preview",
-    label: "Events Preview",
-    iconName: "CalendarDays",
-    description: "Live upcoming events from the events system",
-    category: "data",
-    defaultProps: {
-      title: "Upcoming Events",
-      subtitle: "Join our community events and webinars.",
-      limit: 4,
-      ctaText: "",
-      ctaLink: "",
-      ctaAction: "internal-link",
-      ctaOpenInNewTab: false,
-      ctaFormSlug: "contact-form",
-      ctaModalTitle: "",
-      ctaModalDescription: "",
-    },
-    propDefs: [
-      { key: "title", label: "Section Title", type: "text", placeholder: "Section heading" },
-      { key: "subtitle", label: "Subtitle", type: "text", placeholder: "Supporting text" },
-      { key: "limit", label: "Max Events to Show", type: "number", min: 1, max: 12 },
-      { key: "ctaText", label: "Button Text", type: "text", placeholder: "Optional button label" },
-      { key: "ctaAction", label: "Button Action", type: "select", options: BUTTON_ACTION_OPTIONS },
-      { key: "ctaLink", label: "Button Link", type: "url", placeholder: "/events or https://..." },
-      { key: "ctaOpenInNewTab", label: "Open In New Tab", type: "boolean" },
-      { key: "ctaFormSlug", label: "Assigned Form", type: "form-select" },
-      { key: "ctaModalTitle", label: "Modal Title", type: "text", placeholder: "Optional modal title override" },
-      { key: "ctaModalDescription", label: "Modal Description", type: "textarea", placeholder: "Optional modal description" },
-    ],
-  },
-  {
-    type: "blog-preview",
-    label: "Blog Preview",
-    iconName: "BookOpen",
-    description: "Live featured blog/insights articles",
-    category: "data",
-    defaultProps: {
-      title: "Latest Insights",
-      subtitle: "Resources and perspectives for the Core Platform community.",
-      limit: 5,
-      enableHoverMotion: true,
-    },
-    propDefs: [
-      { key: "title", label: "Section Title", type: "text", placeholder: "Section heading" },
-      { key: "subtitle", label: "Subtitle", type: "text", placeholder: "Supporting text" },
-      { key: "limit", label: "Max Articles to Show", type: "number", min: 1, max: 12 },
-      { key: "enableHoverMotion", label: "Enable Hover Motion", type: "boolean" },
     ],
   },
   {
@@ -897,8 +823,8 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     defaultProps: {
       alignment: "center",
       buttons: [
-        { text: "Get Started", action: "url", link: "/directory", formSlug: "contact-form", modalTitle: "", modalDescription: "", variant: "default" },
-        { text: "Learn More", action: "url", link: "/about", formSlug: "contact-form", modalTitle: "", modalDescription: "", variant: "outline" },
+        { text: "Get a Free Quote", action: "url", link: "/#contact", formSlug: "contact-form", modalTitle: "", modalDescription: "", variant: "default" },
+        { text: "Learn More", action: "url", link: "/#about", formSlug: "contact-form", modalTitle: "", modalDescription: "", variant: "outline" },
       ],
     },
     propDefs: [
@@ -986,8 +912,8 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     defaultProps: {
       title: "Get in Touch",
       items: [
-        { icon: "MapPin", label: "Location", value: "Global — serving Core Platforms worldwide" },
-        { icon: "Globe", label: "Website", value: "www.coreplatform.com" },
+        { icon: "Phone", label: "Phone", value: "(704) 771-6111" },
+        { icon: "MapPin", label: "Service Area", value: "Greater Charlotte metro" },
       ],
     },
     propDefs: [
@@ -1030,9 +956,9 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       subtitle: "",
       columns: "3",
       features: [
-        { icon: "CheckCircle", title: "Vetted Professionals", description: "Every professional is carefully reviewed and verified." },
-        { icon: "Globe", title: "Global Reach", description: "Connect with professionals worldwide." },
-        { icon: "Heart", title: "Culturally Informed", description: "Professionals who understand the Core Platform experience." },
+        { icon: "CheckCircle", title: "Careful Measurements", description: "Openings are measured before glass, windows, or doors are ordered." },
+        { icon: "Wrench", title: "Repair & Installation", description: "Support for residential and commercial glass, door, and window projects." },
+        { icon: "MapPin", title: "Local Service", description: "Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas." },
       ],
     },
     propDefs: [
@@ -1061,8 +987,8 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       title: "Common Questions & Concerns",
       subtitle: "",
       items: [
-        { concern: "Will the professional understand my background?", response: "Every professional in our directory has specific training or lived experience with cross-cultural populations." },
-        { concern: "Is online therapy effective?", response: "Research consistently shows that online therapy can be as effective as in-person sessions for many conditions." },
+        { concern: "Can you look at my project before I decide?", response: "Yes. Glass & Door Pro can review the opening, discuss options, and provide a project-specific estimate." },
+        { concern: "Do you handle both homes and businesses?", response: "Yes. We handle residential glass, windows, doors, showers, and commercial storefront or door projects." },
       ],
     },
     propDefs: [
@@ -1089,9 +1015,9 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       title: "Your Journey",
       subtitle: "",
       items: [
-        { before: "Feeling isolated and misunderstood", after: "Connected with a professional who gets it", milestone: "Week 1" },
-        { before: "Struggling to articulate cross-cultural grief", after: "Learning frameworks to process your experience", milestone: "Month 1" },
-        { before: "Navigating identity confusion alone", after: "Building confidence in your multicultural identity", milestone: "Month 3" },
+        { before: "Broken, drafty, or outdated opening", after: "Measured project with clear repair or replacement options", milestone: "Estimate" },
+        { before: "Unclear schedule or materials", after: "Ordered materials and installation timing confirmed", milestone: "Planning" },
+        { before: "Unfinished glass, window, or door issue", after: "Clean installation or repair completed", milestone: "Finish" },
       ],
     },
     propDefs: [
@@ -1117,10 +1043,10 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     category: "social-proof",
     defaultProps: {
       items: [
-        { icon: "ShieldCheck", label: "Verified Professionals" },
-        { icon: "Lock", label: "Secure & Confidential" },
-        { icon: "Globe", label: "Global Network" },
-        { icon: "Heart", label: "Core Platform-Informed Care" },
+        { icon: "ShieldCheck", label: "Owner-Operated" },
+        { icon: "Ruler", label: "Measured Carefully" },
+        { icon: "Wrench", label: "Repair & Installation" },
+        { icon: "MapPin", label: "Charlotte Area Service" },
       ],
     },
     propDefs: [
@@ -1170,9 +1096,9 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     defaultProps: {
       title: "",
       stats: [
-        { value: "500+", label: "Professionals in Network" },
-        { value: "40+", label: "Countries Represented" },
-        { value: "10,000+", label: "Core Platforms Connected" },
+        { value: "15+", label: "Years of Experience" },
+        { value: "704", label: "Charlotte Area Phone Prefix" },
+        { value: "5", label: "Residential & Commercial Service Categories" },
       ],
       disclaimer: "",
     },
@@ -1255,9 +1181,9 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     category: "data",
     defaultProps: {
       items: [
-        { icon: "Users", value: "1,000+", label: "Active Members" },
-        { icon: "Globe", value: "45+", label: "Countries" },
-        { icon: "Star", value: "4.9", label: "Average Rating" },
+        { icon: "Wrench", value: "15+", label: "Years Experience" },
+        { icon: "MapPin", value: "12+", label: "Service Areas" },
+        { icon: "Home", value: "2", label: "Residential & Commercial" },
       ],
     },
     propDefs: [
@@ -1284,10 +1210,10 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       subtitle: "",
       columns: "4",
       items: [
-        { icon: "Globe", title: "International" },
-        { icon: "Heart", title: "Compassionate" },
-        { icon: "Users", title: "Community" },
-        { icon: "ShieldCheck", title: "Trusted" },
+        { icon: "Ruler", title: "Measured" },
+        { icon: "Wrench", title: "Installed" },
+        { icon: "ShieldCheck", title: "Reliable" },
+        { icon: "Sparkles", title: "Clean Finish" },
       ],
     },
     propDefs: [
@@ -1316,9 +1242,9 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       subtitle: "",
       layout: "stack",
       items: [
-        { icon: "CheckCircle", title: "Expert Guidance", description: "Work with professionals who specialize in cross-cultural challenges." },
-        { icon: "Globe", title: "Global Accessibility", description: "Find support no matter where you are in the world." },
-        { icon: "Heart", title: "Cultural Understanding", description: "Be understood without having to explain your background." },
+        { icon: "CheckCircle", title: "Clear Options", description: "Review repair, replacement, and installation options before work begins." },
+        { icon: "Ruler", title: "Project Fit", description: "Measurements and product choices are matched to the actual opening." },
+        { icon: "Sparkles", title: "Finished Appearance", description: "Work is completed with attention to fit, seal, and visible details." },
       ],
     },
     propDefs: [
@@ -1344,10 +1270,10 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     description: "Evidence-based content with citations and sources",
     category: "content",
     defaultProps: {
-      title: "The Research Behind Our Approach",
+      title: "Project Details",
       body: "",
       citations: [
-        { text: "Core Platform Training Research Study, 2024", url: "" },
+        { text: "Manufacturer product details or warranty reference", url: "" },
       ],
     },
     propDefs: [
@@ -1374,10 +1300,10 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       title: "Safety & Quality Standards",
       disclaimer: "",
       items: [
-        { text: "Licensed mental health professional", required: true },
-        { text: "Cross-cultural training or experience", required: true },
-        { text: "Background verification completed", required: true },
-        { text: "Specialized in Core Platform-related challenges", required: false },
+        { text: "Opening measured before ordering materials", required: true },
+        { text: "Glass, window, or door options reviewed before installation", required: true },
+        { text: "Work area cleaned up after completion", required: true },
+        { text: "Warranty or care guidance discussed when applicable", required: false },
       ],
     },
     propDefs: [
@@ -1404,12 +1330,12 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       title: "Our Commitment to You",
       subtitle: "",
       items: [
-        { text: "Every professional is individually vetted and verified" },
-        { text: "Your privacy and confidentiality are always protected" },
-        { text: "Support team available if you need help finding the right match" },
+        { text: "Measurements and product choices are reviewed before work begins" },
+        { text: "Residential and commercial projects are handled with clear communication" },
+        { text: "Repair and replacement recommendations are based on the actual opening" },
       ],
-      ctaText: "Contact Support",
-      ctaLink: "/contact",
+      ctaText: "Request a Quote",
+      ctaLink: "/#contact",
       ctaAction: "internal-link",
       ctaOpenInNewTab: false,
       ctaFormSlug: "contact-form",
@@ -1429,7 +1355,7 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       },
       { key: "ctaText", label: "CTA Button Text", type: "text", placeholder: "Button label" },
       { key: "ctaAction", label: "CTA Button Action", type: "select", options: BUTTON_ACTION_OPTIONS },
-      { key: "ctaLink", label: "CTA Link", type: "url", placeholder: "/contact" },
+      { key: "ctaLink", label: "CTA Link", type: "url", placeholder: "/#contact" },
       { key: "ctaOpenInNewTab", label: "Open In New Tab", type: "boolean" },
       { key: "ctaFormSlug", label: "Assigned Form", type: "form-select" },
       { key: "ctaModalTitle", label: "Modal Title", type: "text", placeholder: "Optional modal title override" },
@@ -1446,9 +1372,9 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       title: "How It Works",
       subtitle: "",
       steps: [
-        { step: "1", title: "Browse the Directory", description: "Search by specialty, location, or language." },
-        { step: "2", title: "Review Profiles", description: "Read about their approach and qualifications." },
-        { step: "3", title: "Make Contact", description: "Reach out directly through their profile." },
+        { step: "1", title: "Request an Estimate", description: "Share the glass, window, door, shower, or commercial project details." },
+        { step: "2", title: "Measure & Review Options", description: "Confirm measurements, product choices, and timing." },
+        { step: "3", title: "Install or Repair", description: "Complete the project with a clean, finished result." },
       ],
       includedItems: [],
     },
@@ -1482,12 +1408,12 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     description: "Persona-based messaging showing who this is for",
     category: "content",
     defaultProps: {
-      title: "Who Is Core Platform For?",
+      title: "Who We Help",
       subtitle: "",
       personas: [
-        { title: "Adult Core Platforms", description: "Adults who grew up across cultures and need support navigating identity, belonging, and transitions.", icon: "User" },
-        { title: "Expat Families", description: "Parents raising children between cultures who want proactive mental health support.", icon: "Users" },
-        { title: "Organizations", description: "Companies and schools supporting internationally mobile employees and students.", icon: "Building2" },
+        { title: "Homeowners", description: "Residential glass, window, door, and shower projects across the Charlotte area.", icon: "Home" },
+        { title: "Property Managers", description: "Repairs and replacements for rental, multi-unit, and managed properties.", icon: "Building2" },
+        { title: "Businesses", description: "Storefront glass, commercial doors, and facility repair needs.", icon: "BriefcaseBusiness" },
       ],
     },
     propDefs: [
@@ -1499,7 +1425,7 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
         type: "array-items",
         itemSchema: [
           { key: "icon", label: "Icon (Lucide)", type: "text", placeholder: "e.g. User, Users" },
-          { key: "title", label: "Persona Title", type: "text", placeholder: "e.g. Adult Core Platforms" },
+          { key: "title", label: "Persona Title", type: "text", placeholder: "e.g. Homeowners" },
           { key: "description", label: "Description", type: "textarea", placeholder: "Who they are and what they need" },
         ],
       },
@@ -1516,9 +1442,9 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       subtitle: "",
       level: "beginner",
       steps: [
-        { title: "Create Your Account", description: "Sign up for free and set your preferences." },
-        { title: "Explore the Directory", description: "Use filters to find professionals matching your needs." },
-        { title: "Schedule a Session", description: "Contact a professional and book your first appointment." },
+        { title: "Describe the Project", description: "Send the service type, location, photos if available, and timing needs." },
+        { title: "Confirm the Scope", description: "Review repair or replacement recommendations and any product details." },
+        { title: "Schedule the Work", description: "Set a time for measurement, installation, or repair." },
       ],
     },
     propDefs: [
@@ -1540,11 +1466,6 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
 
 const FULL_WIDTH_BLOCK_TYPES = new Set([
   "hero",
-  "join-hero",
-  "join-registration-form",
-  "events-archive",
-  "video-archives",
-  "directory-browser",
   "cta",
   "trust-bar",
   "divider",
@@ -1552,206 +1473,20 @@ const FULL_WIDTH_BLOCK_TYPES = new Set([
   "stats-bar",
 ]);
 
-export const BLOCK_REGISTRY: BlockDef[] = BASE_BLOCK_REGISTRY.map((block) => {
-  const blockWithHeading = withSharedSectionHeading(block);
-  if (block.type === "hero") {
-    return withSharedVisibility(blockWithHeading);
-  }
-  return withSharedVisibility(withSharedSectionStyles(blockWithHeading, {
-    includeImageControls: true,
-    includePaddingControls: !FULL_WIDTH_BLOCK_TYPES.has(block.type),
-  }));
-});
+export const BLOCK_REGISTRY: BlockDef[] = BASE_BLOCK_REGISTRY
+  .filter((block) => !RETIRED_BLOCK_TYPES.has(block.type))
+  .map((block) => {
+    const blockWithHeading = withSharedSectionHeading(block);
+    if (block.type === "hero") {
+      return withSharedVisibility(blockWithHeading);
+    }
+    return withSharedVisibility(withSharedSectionStyles(blockWithHeading, {
+      includeImageControls: true,
+      includePaddingControls: !FULL_WIDTH_BLOCK_TYPES.has(block.type),
+    }));
+  });
 
 const BASE_DYNAMIC_BLOCK_TYPES: BlockDef[] = [
-  {
-    type: "therapist-map",
-    label: "Global Therapist Map (Live Data)",
-    iconName: "Map",
-    description: "Interactive map showing all mental health professionals — populated from live data",
-    isDynamic: true,
-    category: "dynamic",
-    defaultProps: {
-      title: "Our Mental Health Professionals Around the World",
-      subtitle: "Click a pin to learn more about a Core Platform-informed professional near you",
-    },
-    propDefs: [
-      { key: "title", label: "Section Title", type: "text", placeholder: "Section heading" },
-      { key: "subtitle", label: "Subtitle", type: "textarea", placeholder: "Supporting text" },
-    ],
-  },
-  {
-    type: "blog-post-feed",
-    label: "Blog Post Feed (Live)",
-    iconName: "Rss",
-    description: "Paginated blog post grid with search and category filters",
-    isDynamic: true,
-    category: "dynamic",
-    defaultProps: {
-      postsPerPage: 9,
-      gridColumns: "3",
-      feedStyle: "pagination",
-      showSearch: true,
-      showCategoryFilter: true,
-      showTagFilter: true,
-      enableHoverMotion: true,
-    },
-    propDefs: [
-      { key: "postsPerPage", label: "Posts Per Page", type: "number", min: 3, max: 24 },
-      { key: "gridColumns", label: "Grid Columns", type: "select", options: COLUMNS_OPTIONS },
-      {
-        key: "feedStyle",
-        label: "Archive Navigation",
-        type: "select",
-        options: [
-          { label: "Pagination", value: "pagination" },
-          { label: "Load More", value: "load-more" },
-        ],
-      },
-      { key: "showSearch", label: "Show Search", type: "boolean" },
-      { key: "showCategoryFilter", label: "Show Category Filter", type: "boolean" },
-      { key: "showTagFilter", label: "Show Tag Filter", type: "boolean" },
-      { key: "enableHoverMotion", label: "Enable Hover Motion", type: "boolean" },
-    ],
-  },
-  {
-    type: "blog-featured-post",
-    label: "Blog Featured Post (Live)",
-    iconName: "FileText",
-    description: "Large featured blog post card from latest published post",
-    isDynamic: true,
-    category: "dynamic",
-    defaultProps: {
-      layout: "split",
-      enableHoverMotion: true,
-    },
-    propDefs: [
-      {
-        key: "layout",
-        label: "Featured Layout",
-        type: "select",
-        options: [
-          { label: "Split Card", value: "split" },
-          { label: "Stacked Card", value: "stacked" },
-        ],
-      },
-      { key: "enableHoverMotion", label: "Enable Hover Motion", type: "boolean" },
-    ],
-  },
-  {
-    type: "standard-blog-page",
-    label: "Standard Blog Page (Live)",
-    iconName: "Newspaper",
-    description: "Combined blog archive with filters, featured post, and article feed in one reusable live block",
-    isDynamic: true,
-    category: "dynamic",
-    defaultProps: {
-      layout: "split",
-      postsPerPage: 9,
-      gridColumns: "3",
-      feedStyle: "pagination",
-      showSearch: true,
-      showCategoryFilter: true,
-      showTagFilter: true,
-      enableHoverMotion: true,
-    },
-    propDefs: [
-      {
-        key: "layout",
-        label: "Featured Layout",
-        type: "select",
-        options: [
-          { label: "Split Card", value: "split" },
-          { label: "Stacked Card", value: "stacked" },
-        ],
-      },
-      { key: "postsPerPage", label: "Posts Per Page", type: "number", min: 3, max: 24 },
-      { key: "gridColumns", label: "Grid Columns", type: "select", options: COLUMNS_OPTIONS },
-      {
-        key: "feedStyle",
-        label: "Archive Navigation",
-        type: "select",
-        options: [
-          { label: "Pagination", value: "pagination" },
-          { label: "Load More", value: "load-more" },
-        ],
-      },
-      { key: "showSearch", label: "Show Search", type: "boolean" },
-      { key: "showCategoryFilter", label: "Show Category Filter", type: "boolean" },
-      { key: "showTagFilter", label: "Show Tag Filter", type: "boolean" },
-      { key: "enableHoverMotion", label: "Enable Hover Motion", type: "boolean" },
-    ],
-  },
-  {
-    type: "events-archive",
-    label: "Events Archive (Live)",
-    iconName: "CalendarDays",
-    description: "Upcoming events listing with list/calendar views powered by the live events system",
-    isDynamic: true,
-    category: "dynamic",
-    defaultProps: {
-      heading: "Upcoming Events",
-      subheading: "We offer quarterly Core Platform-informed trainings for professional providers. All of our members get free registration to the events below.",
-      defaultView: "list",
-      showViewToggle: true,
-    },
-    propDefs: [
-      { key: "heading", label: "Heading", type: "text", placeholder: "Section heading" },
-      { key: "subheading", label: "Subheading", type: "textarea", placeholder: "Supporting text" },
-      {
-        key: "defaultView",
-        label: "Default View",
-        type: "select",
-        options: [
-          { label: "List", value: "list" },
-          { label: "Calendar", value: "calendar" },
-        ],
-      },
-      { key: "showViewToggle", label: "Show View Toggle", type: "boolean" },
-    ],
-  },
-  {
-    type: "video-archives",
-    label: "Video Archives (Live)",
-    iconName: "Video",
-    description: "On-demand recording archive with search and purchase/access controls powered by live event recordings",
-    isDynamic: true,
-    category: "dynamic",
-    defaultProps: {
-      heading: "Video Archives",
-      subheading: "Browse our collection of past trainings and webinars.",
-      showSearch: true,
-      showYearFilter: true,
-      showAccessFilter: true,
-    },
-    propDefs: [
-      { key: "heading", label: "Heading", type: "text", placeholder: "Section heading" },
-      { key: "subheading", label: "Subheading", type: "textarea", placeholder: "Supporting text" },
-      { key: "showSearch", label: "Show Search", type: "boolean" },
-      { key: "showYearFilter", label: "Show Year Filter", type: "boolean" },
-      { key: "showAccessFilter", label: "Show Access Filter", type: "boolean" },
-    ],
-  },
-  {
-    type: "directory-browser",
-    label: "Professional Directory (Live)",
-    iconName: "Map",
-    description: "Interactive therapist directory with filters, results, and map powered by the live directory data",
-    isDynamic: true,
-    category: "dynamic",
-    defaultProps: {
-      heading: "Find a Mental Health Professional",
-      subheading: "",
-      showCategoryChips: true,
-      showMap: true,
-    },
-    propDefs: [
-      { key: "heading", label: "Heading", type: "text", placeholder: "Section heading" },
-      { key: "subheading", label: "Subheading", type: "textarea", placeholder: "Optional supporting text" },
-      { key: "showCategoryChips", label: "Show Category Chips", type: "boolean" },
-      { key: "showMap", label: "Show Map", type: "boolean" },
-    ],
-  },
   {
     type: "contact-form",
     label: "Contact Form (Live)",
@@ -1804,69 +1539,15 @@ const BASE_DYNAMIC_BLOCK_TYPES: BlockDef[] = [
       { key: "formSlug", label: "Assigned Form", type: "form-select" },
     ],
   },
-  {
-    type: "join-hero",
-    label: "Join Hero (Live)",
-    iconName: "UserPlus",
-    description: "Join page hero heading for mental health professionals — managed automatically",
-    isDynamic: true,
-    category: "hero",
-    defaultProps: {
-      heading: "Are you a Core Platform-Informed Mental Health Professional?",
-      accentHeading: "Join the Network!",
-      headingColor: "",
-      accentHeadingColor: "",
-      subheading: "",
-      subheadingColor: "",
-    },
-    propDefs: [
-      { key: "heading", label: "Heading", type: "text", placeholder: "Main heading" },
-      { key: "accentHeading", label: "Accent Heading", type: "text", placeholder: "Highlighted heading text" },
-      { key: "headingColor", label: "Heading Color", type: "color", placeholder: "#ffffff" },
-      { key: "accentHeadingColor", label: "Accent Heading Color", type: "color", placeholder: "#89cda1" },
-      { key: "subheading", label: "Subheading", type: "textarea", placeholder: "Optional supporting text" },
-      { key: "subheadingColor", label: "Subheading Color", type: "color", placeholder: "#ffffff" },
-    ],
-  },
-  {
-    type: "join-registration-form",
-    label: "Join Hero + Application Status (Live)",
-    iconName: "UserPlus",
-    description: "Combined Join page hero, application status, and member login prompt — managed automatically",
-    isDynamic: true,
-    category: "dynamic",
-    defaultProps: {
-      heading: "Are you a Core Platform-Informed Mental Health Professional?",
-      accentHeading: "Join the Network!",
-      headingColor: "",
-      accentHeadingColor: "",
-      subheading: "",
-      subheadingColor: "",
-      applicationStatusText: "Applications open in June.",
-      loginPromptPrefix: "If you're already a member click here to",
-      loginLinkText: "Log in",
-      loginPromptSuffix: "to your profile!",
-    },
-    propDefs: [
-      { key: "heading", label: "Heading", type: "text", placeholder: "Main heading" },
-      { key: "accentHeading", label: "Accent Heading", type: "text", placeholder: "Highlighted heading text" },
-      { key: "headingColor", label: "Heading Color", type: "color", placeholder: "#ffffff" },
-      { key: "accentHeadingColor", label: "Accent Heading Color", type: "color", placeholder: "#89cda1" },
-      { key: "subheading", label: "Subheading", type: "textarea", placeholder: "Optional supporting text" },
-      { key: "subheadingColor", label: "Subheading Color", type: "color", placeholder: "#ffffff" },
-      { key: "applicationStatusText", label: "Button Status Text", type: "text", placeholder: "Applications open in June." },
-      { key: "loginPromptPrefix", label: "Login Prompt Prefix", type: "text", placeholder: "If you're already a member click here to" },
-      { key: "loginLinkText", label: "Login Link Text", type: "text", placeholder: "Log in" },
-      { key: "loginPromptSuffix", label: "Login Prompt Suffix", type: "text", placeholder: "to your profile!" },
-    ],
-  },
 ];
 
-export const DYNAMIC_BLOCK_TYPES: BlockDef[] = BASE_DYNAMIC_BLOCK_TYPES.map((block) =>
-  withSharedVisibility(withSharedSectionStyles(withSharedSectionHeading(block), {
-    includePaddingControls: !FULL_WIDTH_BLOCK_TYPES.has(block.type),
-  }))
-);
+export const DYNAMIC_BLOCK_TYPES: BlockDef[] = BASE_DYNAMIC_BLOCK_TYPES
+  .filter((block) => !RETIRED_BLOCK_TYPES.has(block.type))
+  .map((block) =>
+    withSharedVisibility(withSharedSectionStyles(withSharedSectionHeading(block), {
+      includePaddingControls: !FULL_WIDTH_BLOCK_TYPES.has(block.type),
+    }))
+  );
 
 export const ALL_BLOCKS: BlockDef[] = [...BLOCK_REGISTRY, ...DYNAMIC_BLOCK_TYPES];
 

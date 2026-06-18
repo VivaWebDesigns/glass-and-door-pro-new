@@ -68,23 +68,23 @@ const FALLBACK_STATIC_PAGES: Record<
   "/privacy-policy": {
     title: "Privacy Policy",
     description:
-      "Review how Core Platform collects, uses, stores, and protects information across the website and related services.",
+      "Review how Glass & Door Pro handles contact form details, service inquiries, cookies, analytics, and customer records.",
     body:
-      "Review how Core Platform collects, uses, stores, and protects information across the website and related services.",
+      "Review how Glass & Door Pro handles contact form details, service inquiries, cookies, analytics, and customer records.",
   },
   "/terms-of-service": {
     title: "Terms of Service",
     description:
-      "Review the terms governing use of the Core Platform website, directory, events, and related services.",
+      "Review the terms governing use of the Glass & Door Pro website, estimates, service information, third-party links, and site content.",
     body:
-      "Review the terms governing use of the Core Platform website, directory, events, and related services.",
+      "Review the terms governing use of the Glass & Door Pro website, estimates, service information, third-party links, and site content.",
   },
   "/disclaimer": {
     title: "Disclaimer",
     description:
-      "Review emergency guidance, directory vetting limitations, and important information about using the Core Platform directory and related services.",
+      "Review important context about website information, estimates, repair recommendations, warranty references, pricing, and commercial glass work.",
     body:
-      "Review emergency guidance, directory vetting limitations, and important information about using the Core Platform directory and related services.",
+      "Review important context about website information, estimates, repair recommendations, warranty references, pricing, and commercial glass work.",
   },
 };
 
@@ -655,8 +655,8 @@ function buildSearchSnapshot(query: string, seo: SeoSettings | null, siteUrl: st
   const term = query.trim();
   const title = term ? `Search Results for "${term}"` : "Site Search";
   const description = term
-    ? `Search results for ${term} across pages, articles, and events on Core Platform.`
-    : "Search pages, articles, and events on Core Platform.";
+    ? `Search results for ${term} across the Glass & Door Pro website.`
+    : "Search the Glass & Door Pro website.";
 
   return {
     title: buildHeadTitle(title, seo),
@@ -664,7 +664,7 @@ function buildSearchSnapshot(query: string, seo: SeoSettings | null, siteUrl: st
     canonicalUrl: term ? `${siteUrl}/search?query=${encodeURIComponent(term)}` : `${siteUrl}/search`,
     robots: "noindex,follow",
     bodyHtml: buildSimplePageBody(title, description, [
-      "Search the site for pages, articles, and events.",
+      "Search the site for services, service areas, gallery projects, reviews, and company information.",
       term ? `Current search query: ${term}` : "",
     ]),
     jsonLd: [buildOrganizationSchema(seo, siteUrl), buildWebsiteSchema(seo, siteUrl)].filter(

@@ -129,9 +129,10 @@ const FALLBACK_PAGE_DOCUMENTS: FallbackPageDocument[] = [
     metadata: "Page",
     searchableText: [
       "Privacy Policy",
-      "how Core Platform collects uses stores and protects information",
+      "how Glass & Door Pro handles contact form details service inquiries cookies analytics and customer records",
     ].join(" "),
-    excerptSource: "Review how Core Platform collects, uses, stores, and protects information across the website and related services.",
+    excerptSource:
+      "Review how Glass & Door Pro handles contact form details, service inquiries, cookies, analytics, and customer records.",
   },
   {
     slug: "terms-of-service",
@@ -141,9 +142,10 @@ const FALLBACK_PAGE_DOCUMENTS: FallbackPageDocument[] = [
     metadata: "Page",
     searchableText: [
       "Terms of Service",
-      "terms governing use of the Core Platform website directory events and services",
+      "terms governing use of the Glass & Door Pro website estimates service information third party links and site content",
     ].join(" "),
-    excerptSource: "Review the terms governing use of the Core Platform website, directory, events, and related services.",
+    excerptSource:
+      "Review the terms governing use of the Glass & Door Pro website, estimates, service information, third-party links, and site content.",
   },
   {
     slug: "disclaimer",
@@ -153,11 +155,15 @@ const FALLBACK_PAGE_DOCUMENTS: FallbackPageDocument[] = [
     metadata: "Page",
     searchableText: [
       "Disclaimer",
-      "mental health emergency",
-      "suicide and crisis lifeline",
-      "Core Platform conducts a vetting process",
+      "website information",
+      "estimates",
+      "repair recommendations",
+      "warranty references",
+      "pricing",
+      "commercial glass work",
     ].join(" "),
-    excerptSource: "Review emergency guidance, directory vetting limitations, and important information about using the Core Platform directory and related services.",
+    excerptSource:
+      "Review important context about website information, estimates, repair recommendations, warranty references, pricing, and commercial glass work.",
   },
 ];
 

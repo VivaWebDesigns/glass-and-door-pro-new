@@ -5,15 +5,20 @@ import { createFallbackBlockDef } from "@/features/admin/cms/builder/block-edito
 describe("block registry compatibility helpers", () => {
   it("normalizes known legacy block aliases to current block types", () => {
     expect(normalizeBlockType("call-to-action")).toBe("cta");
-    expect(normalizeBlockType("blog-feed")).toBe("blog-post-feed");
     expect(getBlockDef("call-to-action")?.type).toBe("cta");
-    expect(getBlockDef("blog-feed")?.type).toBe("blog-post-feed");
+  });
+
+  it("does not expose retired product block aliases in the active registry", () => {
+    expect(normalizeBlockType("blog-feed")).toBe("blog-feed");
+    expect(getBlockDef("blog-feed")).toBeUndefined();
+    expect(getBlockDef("directory-browser")).toBeUndefined();
+    expect(getBlockDef("events-preview")).toBeUndefined();
   });
 
   it("creates a compatibility editor definition from primitive block props", () => {
     const fallbackDef = createFallbackBlockDef("legacy-cta", {
       heading: "Join us",
-      primaryLink: "/join",
+      primaryLink: "/#contact",
       enableHoverMotion: true,
       limit: 5,
     });
