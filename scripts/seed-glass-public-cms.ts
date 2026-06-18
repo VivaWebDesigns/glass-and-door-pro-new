@@ -1618,7 +1618,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "Professional window installation and replacement for homes across Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Owner-operated, honest pricing, same-week appointments. Call (704) 771-6111.",
     seoKeywords:
       "window installation Charlotte NC, window replacement Monroe NC, residential windows, energy efficient windows",
-    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    ogImageUrl: "/images/glass-door-pro/charming-suburban-home-hero-1920x1080.webp",
     content: expandedServicePageContent({
       hero: {
         heading: "Window Installation & Replacement in Charlotte, NC",
@@ -1768,7 +1768,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "Residential door installation for entry doors, patio doors, storm doors, and exterior doors across Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Call (704) 771-6111.",
     seoKeywords:
       "door installation Charlotte NC, entry doors Monroe NC, patio door replacement, exterior door installer",
-    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    ogImageUrl: "/images/glass-door-pro/door-hero.webp",
     content: expandedServicePageContent({
       hero: {
         heading: "Door Installation in Charlotte & Monroe, NC",
@@ -1918,7 +1918,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "Window repair for broken seals, foggy panes, failed IGUs, broken hardware, and cracked glass. Serving Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Call (704) 771-6111.",
     seoKeywords:
       "window repair Charlotte NC, broken window glass, foggy window repair, seal failure repair, glass replacement",
-    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    ogImageUrl: "/images/glass-door-pro/broken-glass-hero.webp",
     content: expandedServicePageContent({
       hero: {
         heading: "Window Repair in Charlotte & Monroe, NC",
@@ -2067,7 +2067,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "Professional commercial storefront glass installation for new construction and business buildouts in Charlotte, NC. Aluminum framing, glass systems, and storefront doors. Call (704) 771-6111.",
     seoKeywords:
       "commercial storefront glass installation Charlotte NC, aluminum storefront framing, commercial glass doors, tenant buildout glazing",
-    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    ogImageUrl: "/images/glass-door-pro/commercial-hero-1280w.webp",
     content: expandedServicePageContent({
       hero: {
         heading: "Commercial Storefront Glass Installation in Charlotte, NC",
@@ -2220,7 +2220,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "Emergency storefront glass repair, board-up, and replacement for Charlotte businesses. Broken storefront glass secured and replaced fast. Owner-operated, same-day response. Call (704) 771-6111.",
     seoKeywords:
       "commercial storefront glass replacement Charlotte NC, storefront glass repair, emergency board-up, broken storefront glass",
-    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    ogImageUrl: "/images/glass-door-pro/storefront-glass-replacement-hero.webp",
     content: expandedServicePageContent({
       hero: {
         heading: "Commercial Storefront Glass Replacement & Repair in Charlotte, NC",
@@ -2381,7 +2381,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "Commercial door installation for new construction, tenant buildouts, and business renovations in Charlotte, NC. Aluminum entry doors, glass storefront doors, and commercial entrance systems. Call (704) 771-6111.",
     seoKeywords:
       "commercial door installation Charlotte NC, aluminum entry doors, glass storefront doors, commercial entrance systems",
-    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    ogImageUrl: "/images/glass-door-pro/storefront-door-installation-hero.webp",
     content: expandedServicePageContent({
       hero: {
         heading: "Commercial Door Installation in Charlotte, NC",
@@ -2532,7 +2532,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "Commercial door repair and replacement for Charlotte businesses. Broken glass panels, damaged hardware, misaligned frames, and worn closers fixed fast. Owner-operated. Call (704) 771-6111.",
     seoKeywords:
       "commercial door replacement Charlotte NC, commercial door repair, door closer repair, commercial door glass replacement",
-    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    ogImageUrl: "/images/glass-door-pro/commercial-door-repair-hero.webp",
     content: expandedServicePageContent({
       hero: {
         heading: "Commercial Door Replacement & Repair in Charlotte, NC",
@@ -2695,7 +2695,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "Fast apartment and multi-family window replacement in Charlotte, NC. Wrong windows ordered? Unit damage? Doug mobilizes faster than larger companies — keeping your project on schedule. Call (704) 771-6111.",
     seoKeywords:
       "apartment window replacement Charlotte NC, multi-family window replacement, commercial window replacement, property manager window replacement",
-    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    ogImageUrl: "/images/glass-door-pro/commercial-window-replacement-hero-blue-sky.webp",
     content: expandedServicePageContent({
       hero: {
         heading: "Apartment & Multi-Family Window Replacement in Charlotte, NC",
@@ -3015,7 +3015,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       "Monroe, NC's local glass and door company. Frameless showers, window installation, door installation, window repair, and commercial glass. Owner-operator with 15+ years of experience. Call (704) 771-6111.",
     seoKeywords:
       "glass services Monroe NC, frameless shower doors Monroe NC, window installation Monroe NC, door installation Monroe NC, window repair Monroe NC",
-    ogImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
+    ogImageUrl: "/images/glass-door-pro/city-monroe-hero.webp",
     content: cityPageContent({
       hero: {
         heading: "Glass & Door Services in Monroe, NC",
@@ -3149,7 +3149,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       "Personal, owner-operated glass and door services for Charlotte, NC homeowners. Frameless showers, window installation, door installation, window repair, and commercial glass. 15+ years of experience. Call (704) 771-6111.",
     seoKeywords:
       "glass services Charlotte NC, frameless shower doors Charlotte NC, window installation Charlotte NC, door installation Charlotte NC, window repair Charlotte NC",
-    ogImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
+    ogImageUrl: "/images/glass-door-pro/city-charlotte-hero.webp",
     content: cityPageContent({
       hero: {
         heading: "Glass & Door Services in Charlotte, NC",
@@ -3287,7 +3287,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       "Frameless showers, window installation, window repair, door installation, and commercial glass services in Indian Trail, NC. Owner-operated, honest pricing, Saturday appointments. Call (704) 771-6111.",
     seoKeywords:
       "glass services Indian Trail NC, frameless shower doors Indian Trail NC, window installation Indian Trail NC, door installation Indian Trail NC, window repair Indian Trail NC",
-    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    ogImageUrl: "/images/glass-door-pro/city-indian-trail-hero.webp",
     content: cityPageContent({
       hero: {
         heading: "Glass & Door Services in Indian Trail, NC",
@@ -3420,7 +3420,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       "Frameless showers, window installation, window repair, and door installation in Stallings, NC. Monroe-based, owner-operated, Saturday appointments available. Call (704) 771-6111.",
     seoKeywords:
       "glass services Stallings NC, frameless shower doors Stallings NC, window installation Stallings NC, door installation Stallings NC, window repair Stallings NC",
-    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    ogImageUrl: "/images/glass-door-pro/city-stallings-hero.webp",
     content: cityPageContent({
       hero: {
         heading: "Glass & Door Services in Stallings, NC",
@@ -3551,7 +3551,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       "Frameless shower doors, window installation, window repair, and door installation in Wesley Chapel, NC. Monroe-based, owner-operated, Saturday appointments. Call (704) 771-6111.",
     seoKeywords:
       "glass services Wesley Chapel NC, frameless shower doors Wesley Chapel NC, window installation Wesley Chapel NC, door installation Wesley Chapel NC, window repair Wesley Chapel NC",
-    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    ogImageUrl: "/images/glass-door-pro/city-wesley-chapel-hero.webp",
     content: cityPageContent({
       hero: {
         heading: "Glass & Door Services in Wesley Chapel, NC",
@@ -3685,7 +3685,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       "Frameless shower doors, window installation, window repair, and door installation in Waxhaw, NC. Monroe-based, owner-operated, honest pricing. Saturday appointments available. Call (704) 771-6111.",
     seoKeywords:
       "glass services Waxhaw NC, frameless shower doors Waxhaw NC, window installation Waxhaw NC, door installation Waxhaw NC, window repair Waxhaw NC",
-    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    ogImageUrl: "/images/glass-door-pro/city-waxhaw-hero.webp",
     content: cityPageContent({
       hero: {
         heading: "Glass & Door Services in Waxhaw, NC",
@@ -3818,7 +3818,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       "Frameless shower doors, window installation, window repair, and door installation in Matthews, NC. Owner-operated with 15+ years of experience. Saturday appointments available. Call (704) 771-6111.",
     seoKeywords:
       "glass services Matthews NC, frameless shower doors Matthews NC, window installation Matthews NC, door installation Matthews NC, window repair Matthews NC",
-    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    ogImageUrl: "/images/glass-door-pro/city-matthews-hero.webp",
     content: cityPageContent({
       hero: {
         heading: "Glass & Door Services in Matthews, NC",
@@ -3949,7 +3949,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       "Custom frameless shower doors, window installation, door installation, and window repair in Weddington, NC. Owner-operated, detail-oriented, Saturday appointments available. Call (704) 771-6111.",
     seoKeywords:
       "glass services Weddington NC, frameless shower doors Weddington NC, window installation Weddington NC, door installation Weddington NC, window repair Weddington NC",
-    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    ogImageUrl: "/images/glass-door-pro/city-weddington-hero.webp",
     content: cityPageContent({
       hero: {
         heading: "Glass & Door Services in Weddington, NC",
@@ -4081,7 +4081,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       "Frameless shower doors, window installation, window repair, and door installation in Indian Land, SC. Monroe-based, owner-operated, Saturday appointments available. Call (704) 771-6111.",
     seoKeywords:
       "glass services Indian Land SC, frameless shower doors Indian Land SC, window installation Indian Land SC, door installation Indian Land SC, window repair Indian Land SC",
-    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    ogImageUrl: "/images/glass-door-pro/city-indian-land-hero.webp",
     content: cityPageContent({
       hero: {
         heading: "Glass & Door Services in Indian Land, SC",
@@ -4215,7 +4215,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       "Frameless shower doors, window installation, window repair, and door installation in Fort Mill, SC. Monroe-based, owner-operated, Saturday appointments. Call (704) 771-6111.",
     seoKeywords:
       "glass services Fort Mill SC, frameless shower doors Fort Mill SC, window installation Fort Mill SC, door installation Fort Mill SC, window repair Fort Mill SC",
-    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    ogImageUrl: "/images/glass-door-pro/city-fort-mill-hero.webp",
     content: cityPageContent({
       hero: {
         heading: "Glass & Door Services in Fort Mill, SC",
@@ -4349,7 +4349,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       "Frameless shower doors, window installation, window repair, and door installation in Pineville, NC. Owner-operated, Monroe-based, Saturday appointments available. Call (704) 771-6111.",
     seoKeywords:
       "glass services Pineville NC, frameless shower doors Pineville NC, window installation Pineville NC, door installation Pineville NC, window repair Pineville NC",
-    ogImageUrl: "/images/glass-door-pro/opengraph.jpg",
+    ogImageUrl: "/images/glass-door-pro/city-pineville-hero.webp",
     content: cityPageContent({
       hero: {
         heading: "Glass & Door Services in Pineville, NC",
