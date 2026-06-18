@@ -3117,7 +3117,7 @@ const cityServiceCards: GlassCard[] = [
     title: "Commercial Services",
     description:
       "Storefront glass, commercial doors, and apartment window replacement for Charlotte-area businesses.",
-    link: "/services#commercial",
+    link: "/services/commercial-storefront-glass-installation",
     buttonText: "Learn more about commercial services",
   },
 ];
