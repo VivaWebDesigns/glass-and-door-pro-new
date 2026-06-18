@@ -61,6 +61,19 @@ function parseCmsContent(content: unknown): BlockInstance[] {
   return Array.isArray(c.blocks) ? c.blocks : [];
 }
 
+function isServiceAreaPageSlug(slug: string) {
+  return slug.startsWith("service-areas-") || slug.startsWith("areas-served-");
+}
+
+function shouldHideServiceAreaWorkGallery(pageSlug: string, block: BlockInstance) {
+  if (!isServiceAreaPageSlug(pageSlug)) return false;
+  if (block.type !== "image-grid") return false;
+
+  const title = typeof block.props.title === "string" ? block.props.title : "";
+  const variant = typeof block.props.variant === "string" ? block.props.variant : "";
+  return variant === "project-gallery" && /^Our Work in the .+ Area$/i.test(title.trim());
+}
+
 function setMeta(name: string, content: string, property = false) {
   const attr = property ? "property" : "name";
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${name}"]`);
@@ -208,7 +221,9 @@ function CmsLoadingPage() {
 }
 
 export function CmsPageView({ page, globalSeo, previewLabel }: CmsPageViewProps) {
-  const blocks = parseCmsContent(page.content);
+  const blocks = parseCmsContent(page.content).filter(
+    (block) => !shouldHideServiceAreaWorkGallery(page.slug, block),
+  );
   const showSidebar =
     page.template === "with-sidebar" && Boolean(page.sidebarId || page.slug === "insights");
   const useDefaultSidebar = !page.sidebarId && page.slug === "insights";

@@ -244,6 +244,38 @@ function collectAnchoredSections(content: unknown) {
     .filter((section): section is { anchorId: string; fragments: string[] } => Boolean(section));
 }
 
+function isServiceAreaPageSlug(slug: string) {
+  return slug.startsWith("service-areas-") || slug.startsWith("areas-served-");
+}
+
+function shouldHideServiceAreaWorkGallery(pageSlug: string, block: unknown) {
+  if (!isServiceAreaPageSlug(pageSlug)) return false;
+  if (!block || typeof block !== "object") return false;
+
+  const entry = block as { type?: unknown; props?: Record<string, unknown> };
+  if (entry.type !== "image-grid" || !entry.props) return false;
+
+  const title = typeof entry.props.title === "string" ? entry.props.title : "";
+  const variant = typeof entry.props.variant === "string" ? entry.props.variant : "";
+  return variant === "project-gallery" && /^Our Work in the .+ Area$/i.test(title.trim());
+}
+
+function filterServiceAreaWorkGalleryFromPage(page: CmsPage): CmsPage {
+  if (!isServiceAreaPageSlug(page.slug)) return page;
+  const content = page.content;
+  if (!content || typeof content !== "object") return page;
+  const blocks = (content as { blocks?: unknown }).blocks;
+  if (!Array.isArray(blocks)) return page;
+
+  return {
+    ...page,
+    content: {
+      ...(content as Record<string, unknown>),
+      blocks: blocks.filter((block) => !shouldHideServiceAreaWorkGallery(page.slug, block)),
+    },
+  };
+}
+
 function sanitizeRichHtml(value: string) {
   return sanitizeHtml(value, {
     allowedTags: [
@@ -448,46 +480,47 @@ function getPrerenderHeading(page: Pick<CmsPage, "slug" | "title">, effectiveTit
 }
 
 function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: string): PublicHtmlSnapshot {
-  const seoOverride = getGlassServiceSeoOverride(page.slug);
-  const socialOverride = getGlassServiceSocialMetadata(page.slug);
-  const title = seoOverride?.title || page.seoTitle || page.title || "Page";
+  const visiblePage = filterServiceAreaWorkGalleryFromPage(page);
+  const seoOverride = getGlassServiceSeoOverride(visiblePage.slug);
+  const socialOverride = getGlassServiceSocialMetadata(visiblePage.slug);
+  const title = seoOverride?.title || visiblePage.seoTitle || visiblePage.title || "Page";
   const description =
     seoOverride?.description ||
-    page.seoDescription ||
-    truncate(uniqueFragments(collectTextFragments(page.content)).join(" "), 180) ||
+    visiblePage.seoDescription ||
+    truncate(uniqueFragments(collectTextFragments(visiblePage.content)).join(" "), 180) ||
     DEFAULT_DESCRIPTION;
-  const publicPath = getCmsPublicPath(page.slug);
+  const publicPath = getCmsPublicPath(visiblePage.slug);
   const canonicalUrl =
-    page.canonicalUrl || (publicPath === "/" ? siteUrl : `${siteUrl}${publicPath}`);
-  const faqItems = extractFaqItems(page.content);
+    visiblePage.canonicalUrl || (publicPath === "/" ? siteUrl : `${siteUrl}${publicPath}`);
+  const faqItems = extractFaqItems(visiblePage.content);
   const bodyHtml = buildSimplePageBody(
-    getPrerenderHeading(page, title),
+    getPrerenderHeading(visiblePage, title),
     description,
-    uniqueFragments(collectTextFragments(page.content)),
-    collectAnchoredSections(page.content),
+    uniqueFragments(collectTextFragments(visiblePage.content)),
+    collectAnchoredSections(visiblePage.content),
     [buildFaqBodyHtml(faqItems)].filter(Boolean),
   );
 
   const breadcrumbs =
-    page.slug === "home" ? null : buildBreadcrumbSchema(buildGlassBreadcrumbItems(page, siteUrl));
-  const cityArea = getGlassCityPageArea(page.slug);
+    visiblePage.slug === "home" ? null : buildBreadcrumbSchema(buildGlassBreadcrumbItems(visiblePage, siteUrl));
+  const cityArea = getGlassCityPageArea(visiblePage.slug);
 
   return {
     title: buildHeadTitle(title, seo, {
-      brandLast: page.slug === "home" || isGlassServicePageSlug(page.slug),
+      brandLast: visiblePage.slug === "home" || isGlassServicePageSlug(visiblePage.slug),
     }),
     description,
     canonicalUrl,
     ogTitle: socialOverride?.ogTitle || null,
     ogDescription: socialOverride?.ogDescription || null,
-    ogImageUrl: absoluteUrl(page.ogImageUrl || seo?.defaultOgImageUrl, siteUrl) || null,
+    ogImageUrl: absoluteUrl(visiblePage.ogImageUrl || seo?.defaultOgImageUrl, siteUrl) || null,
     twitterSite: socialOverride?.twitterSite || null,
-    robots: page.noindex ? "noindex,nofollow" : null,
+    robots: visiblePage.noindex ? "noindex,nofollow" : null,
     bodyHtml,
-    cmsPage: page,
+    cmsPage: visiblePage,
     jsonLd: [
       buildGlassLocalBusinessLd(siteUrl, cityArea),
-      buildGlassServiceLdForCmsPage(page, siteUrl),
+      buildGlassServiceLdForCmsPage(visiblePage, siteUrl),
       breadcrumbs,
       buildFaqPageSchema(faqItems),
     ].filter(Boolean) as Array<Record<string, unknown>>,
