@@ -278,7 +278,7 @@ describe("public-prerender.service", () => {
               ctaText: "Get a Free Quote",
               ctaLink: "#contact",
               ctaAction: "internal-link",
-              backgroundImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.jpg",
+              backgroundImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
             },
           },
         ],

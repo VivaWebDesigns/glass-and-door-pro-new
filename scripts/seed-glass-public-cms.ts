@@ -576,57 +576,57 @@ const glassHomeContent: InsertCmsPage["content"] = {
 
 const framelessShowerImages = [
   {
-    url: "/images/glass-door-pro/gallery/frameless-showers/03.jpg",
+    url: "/images/glass-door-pro/gallery/frameless-showers/03.webp",
     alt: "Black frame glass shower enclosure with marble walls and freestanding tub installed by Glass & Door Pro in SouthPark, Charlotte, NC",
     caption: "Frameless Shower Install - SouthPark",
   },
   {
-    url: "/images/glass-door-pro/gallery/frameless-showers/01.jpg",
+    url: "/images/glass-door-pro/gallery/frameless-showers/01.webp",
     alt: "Frameless glass shower enclosure with marble walls and built-in bench installed by Glass & Door Pro in Myers Park, Charlotte, NC",
     caption: "Frameless Shower Install - Myers Park",
   },
   {
-    url: "/images/glass-door-pro/gallery/frameless-showers/06.jpg",
+    url: "/images/glass-door-pro/gallery/frameless-showers/06.webp",
     alt: "Corner frameless shower with gold hardware and blue accent walls installed by Glass & Door Pro in Weddington, NC",
     caption: "Frameless Shower Install - Weddington",
   },
   {
-    url: "/images/glass-door-pro/gallery/frameless-showers/09.jpg",
+    url: "/images/glass-door-pro/gallery/frameless-showers/09.webp",
     alt: "Sliding frameless shower door with marble walls and patterned floor installed by Glass & Door Pro in Waxhaw, NC",
     caption: "Frameless Shower Install - Waxhaw",
   },
   {
-    url: "/images/glass-door-pro/gallery/frameless-showers/02.jpg",
+    url: "/images/glass-door-pro/gallery/frameless-showers/02.webp",
     alt: "Modern frameless shower with barn door hardware and wood ceiling installed by Glass & Door Pro in Dilworth, Charlotte, NC",
     caption: "Frameless Shower Install - Dilworth",
   },
   {
-    url: "/images/glass-door-pro/gallery/frameless-showers/08.jpg",
+    url: "/images/glass-door-pro/gallery/frameless-showers/08.webp",
     alt: "Large frameless shower enclosure with dual shower heads installed by Glass & Door Pro in Marvin, NC near Monroe",
     caption: "Frameless Shower Install - Marvin",
   },
   {
-    url: "/images/glass-door-pro/gallery/frameless-showers/05.jpg",
+    url: "/images/glass-door-pro/gallery/frameless-showers/05.webp",
     alt: "Black frame shower door with dark tile and modern hardware installed by Glass & Door Pro in Plaza Midwood, Charlotte, NC",
     caption: "Frameless Shower Install - Plaza Midwood",
   },
   {
-    url: "/images/glass-door-pro/gallery/frameless-showers/12.jpg",
+    url: "/images/glass-door-pro/gallery/frameless-showers/12.webp",
     alt: "Frameless sliding shower door with gold hardware and wood vanity installed by Glass & Door Pro in Matthews, NC",
     caption: "Frameless Shower Install - Matthews",
   },
   {
-    url: "/images/glass-door-pro/gallery/frameless-showers/04.jpg",
+    url: "/images/glass-door-pro/gallery/frameless-showers/04.webp",
     alt: "Corner frameless shower with gold hardware and blue tile floor installed by Glass & Door Pro in Ballantyne, Charlotte, NC",
     caption: "Frameless Shower Install - Ballantyne",
   },
   {
-    url: "/images/glass-door-pro/gallery/frameless-showers/07.jpg",
+    url: "/images/glass-door-pro/gallery/frameless-showers/07.webp",
     alt: "Frameless glass shower with gray subway tile and half wall installed by Glass & Door Pro in the Lake Norman area, NC",
     caption: "Frameless Shower Install - Lake Norman",
   },
   {
-    url: "/images/glass-door-pro/gallery/frameless-showers/10.jpg",
+    url: "/images/glass-door-pro/gallery/frameless-showers/10.webp",
     alt: "Frameless glass shower enclosure with patterned floor tile installed by Glass & Door Pro in Fort Mill, SC near Charlotte",
     caption: "Frameless Shower Install - Fort Mill",
   },
@@ -1270,7 +1270,7 @@ const month1FramelessContent: InsertCmsPage["content"] = {
         alt: "Modern frameless shower door with gold hardware fixtures installed in Monroe, NC",
       },
       {
-        url: "/images/glass-door-pro/gallery/frameless-showers/03.jpg",
+        url: "/images/glass-door-pro/gallery/frameless-showers/03.webp",
         alt: "Frameless shower glass installation by Glass and Door Pro",
       },
     ]),
@@ -5039,7 +5039,7 @@ async function seedGlassPublicCms() {
       "Browse frameless shower door installations completed by Glass & Door Pro across Charlotte, Monroe, Indian Trail, and surrounding areas.",
     seoKeywords:
       "Glass & Door Pro gallery, frameless shower photos, Charlotte glass installation gallery, shower door projects",
-    ogImageUrl: "/images/glass-door-pro/gallery/frameless-showers/03.jpg",
+    ogImageUrl: "/images/glass-door-pro/gallery/frameless-showers/03.webp",
     canonicalUrl: "https://glassanddoorpro.com/gallery",
     publishedAt: new Date(),
   };

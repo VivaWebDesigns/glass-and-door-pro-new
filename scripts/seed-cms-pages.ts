@@ -23,7 +23,7 @@ const glassHomeContent = {
         ctaAction: "internal-link",
         ctaSecondaryText: "",
         ctaSecondaryLink: "",
-        backgroundImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.jpg",
+        backgroundImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
         videoBackgroundUrl: "/videos/glass-door-pro/hero-video.mp4",
         overlayColor: "#0f172a",
         overlayOpacity: 50,
