@@ -939,6 +939,9 @@ function serviceHero(props: {
   secondaryText?: string;
   secondaryAction?: string;
   secondaryLink?: string;
+  secondaryFormSlug?: string;
+  secondaryModalTitle?: string;
+  secondaryModalDescription?: string;
 }) {
   return block("hero", {
     variant: "glass-service",
@@ -955,6 +958,9 @@ function serviceHero(props: {
     ctaSecondaryText: props.secondaryText ?? "Call (704) 771-6111",
     ctaSecondaryLink: props.secondaryLink ?? "tel:+17047716111",
     ctaSecondaryAction: props.secondaryAction ?? "custom-link",
+    ctaSecondaryFormSlug: props.secondaryFormSlug,
+    ctaSecondaryModalTitle: props.secondaryModalTitle,
+    ctaSecondaryModalDescription: props.secondaryModalDescription,
     backgroundImageUrl: props.imageUrl,
     backgroundImageAlt: props.imageAlt ?? props.heading,
     overlayColor: "#000000",
@@ -1322,6 +1328,9 @@ function servicePageContent(props: {
     secondaryText?: string;
     secondaryAction?: string;
     secondaryLink?: string;
+    secondaryFormSlug?: string;
+    secondaryModalTitle?: string;
+    secondaryModalDescription?: string;
   };
   intro?: {
     title: string;
@@ -1388,6 +1397,12 @@ function expandedServicePageContent(props: {
     imageUrl: string;
     imageAlt?: string;
     imagePositionY?: number;
+    primaryText?: string;
+    primaryAction?: string;
+    primaryLink?: string;
+    secondaryText?: string;
+    secondaryAction?: string;
+    secondaryLink?: string;
   };
   intro: {
     title: string;
@@ -1414,6 +1429,9 @@ function expandedServicePageContent(props: {
     secondaryText?: string;
     secondaryAction?: string;
     secondaryLink?: string;
+    secondaryFormSlug?: string;
+    secondaryModalTitle?: string;
+    secondaryModalDescription?: string;
   };
 }): InsertCmsPage["content"] {
   return {
@@ -1421,11 +1439,14 @@ function expandedServicePageContent(props: {
       serviceHero({
         ...props.hero,
         primaryText: props.hero.primaryText ?? "Request a Free Quote",
-        primaryAction: props.hero.primaryAction ?? "internal-link",
-        primaryLink: props.hero.primaryLink ?? "/contact",
+        primaryAction: props.hero.primaryAction ?? "form-modal",
+        primaryLink: props.hero.primaryLink ?? "",
         secondaryText: props.hero.secondaryText,
         secondaryAction: props.hero.secondaryAction,
         secondaryLink: props.hero.secondaryLink,
+        secondaryFormSlug: props.hero.secondaryFormSlug,
+        secondaryModalTitle: props.hero.secondaryModalTitle,
+        secondaryModalDescription: props.hero.secondaryModalDescription,
       }),
       block("rich-text", {
         title: props.intro.title,
@@ -1471,11 +1492,18 @@ function expandedServicePageContent(props: {
         heading: props.cta.heading,
         subheading: `<p>${props.cta.body}</p><p><strong>${props.cta.footerLine}</strong></p>`,
         primaryText: props.cta.primaryText ?? "Get Your Free Estimate",
-        primaryAction: props.cta.primaryAction ?? "internal-link",
-        primaryLink: props.cta.primaryLink ?? "/contact",
+        primaryAction: props.cta.primaryAction ?? "form-modal",
+        primaryLink: props.cta.primaryLink ?? "",
+        primaryFormSlug: "contact-form",
+        primaryModalTitle: "Request a Free Estimate",
+        primaryModalDescription:
+          "Share a few project details and Doug will follow up with next steps.",
         secondaryText: props.cta.secondaryText ?? "Call (704) 771-6111",
         secondaryAction: props.cta.secondaryAction ?? "custom-link",
         secondaryLink: props.cta.secondaryLink ?? "tel:+17047716111",
+        secondaryFormSlug: props.cta.secondaryFormSlug,
+        secondaryModalTitle: props.cta.secondaryModalTitle,
+        secondaryModalDescription: props.cta.secondaryModalDescription,
       }),
     ],
   };
@@ -2235,8 +2263,12 @@ const glassServicePages: GlassServicePageSeed[] = [
         primaryAction: "custom-link",
         primaryLink: "tel:+17047716111",
         secondaryText: "Request a Quote",
-        secondaryAction: "internal-link",
-        secondaryLink: "/contact",
+        secondaryAction: "form-modal",
+        secondaryLink: "",
+        secondaryFormSlug: "contact-form",
+        secondaryModalTitle: "Request a Free Quote",
+        secondaryModalDescription:
+          "Tell us a little about your project and Doug will follow up with next steps.",
       },
       intro: {
         title: "When Your Storefront Glass Goes Down, You Need Fast and Reliable",
@@ -2369,8 +2401,12 @@ const glassServicePages: GlassServicePageSeed[] = [
         primaryAction: "custom-link",
         primaryLink: "tel:+17047716111",
         secondaryText: "Request a Quote",
-        secondaryAction: "internal-link",
-        secondaryLink: "/contact",
+        secondaryAction: "form-modal",
+        secondaryLink: "",
+        secondaryFormSlug: "contact-form",
+        secondaryModalTitle: "Request a Free Quote",
+        secondaryModalDescription:
+          "Tell us a little about your project and Doug will follow up with next steps.",
       },
     }),
   },
@@ -2547,8 +2583,12 @@ const glassServicePages: GlassServicePageSeed[] = [
         primaryAction: "custom-link",
         primaryLink: "tel:+17047716111",
         secondaryText: "Request a Quote",
-        secondaryAction: "internal-link",
-        secondaryLink: "/contact",
+        secondaryAction: "form-modal",
+        secondaryLink: "",
+        secondaryFormSlug: "contact-form",
+        secondaryModalTitle: "Request a Free Quote",
+        secondaryModalDescription:
+          "Tell us a little about your project and Doug will follow up with next steps.",
       },
       intro: {
         title: "Commercial Door Problems Don't Wait — Neither Should the Fix",
@@ -2684,8 +2724,12 @@ const glassServicePages: GlassServicePageSeed[] = [
         primaryAction: "custom-link",
         primaryLink: "tel:+17047716111",
         secondaryText: "Request a Quote",
-        secondaryAction: "internal-link",
-        secondaryLink: "/contact",
+        secondaryAction: "form-modal",
+        secondaryLink: "",
+        secondaryFormSlug: "contact-form",
+        secondaryModalTitle: "Request a Free Quote",
+        secondaryModalDescription:
+          "Tell us a little about your project and Doug will follow up with next steps.",
       },
     }),
   },
@@ -2710,8 +2754,12 @@ const glassServicePages: GlassServicePageSeed[] = [
         primaryAction: "custom-link",
         primaryLink: "tel:+17047716111",
         secondaryText: "Request a Quote",
-        secondaryAction: "internal-link",
-        secondaryLink: "/contact",
+        secondaryAction: "form-modal",
+        secondaryLink: "",
+        secondaryFormSlug: "contact-form",
+        secondaryModalTitle: "Request a Free Quote",
+        secondaryModalDescription:
+          "Tell us a little about your project and Doug will follow up with next steps.",
       },
       intro: {
         title: "The Window Contractor That Shows Up When Your Schedule Can't Slip",
@@ -2847,8 +2895,12 @@ const glassServicePages: GlassServicePageSeed[] = [
         primaryAction: "custom-link",
         primaryLink: "tel:+17047716111",
         secondaryText: "Request a Quote",
-        secondaryAction: "internal-link",
-        secondaryLink: "/contact",
+        secondaryAction: "form-modal",
+        secondaryLink: "",
+        secondaryFormSlug: "contact-form",
+        secondaryModalTitle: "Request a Free Quote",
+        secondaryModalDescription:
+          "Tell us a little about your project and Doug will follow up with next steps.",
       },
     }),
   },
@@ -2956,10 +3008,7 @@ function cityPageContent(props: {
         sectionPaddingBottom: "lg",
         items: props.faqs,
       }),
-      quoteCtaBlock(props.ctaHeading, props.ctaBody, props.ctaFooter, {
-        primaryAction: "internal-link",
-        primaryLink: "/contact",
-      }),
+      quoteCtaBlock(props.ctaHeading, props.ctaBody, props.ctaFooter),
     ],
   };
 }
