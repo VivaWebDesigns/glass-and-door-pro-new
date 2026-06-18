@@ -88,12 +88,11 @@ describe("ensureSystemForms", () => {
     const mod = await import("../services/system-forms.service");
     await mod.ensureSystemForms();
 
-    expect(mockCreate).toHaveBeenCalledTimes(2);
+    expect(mockCreate).toHaveBeenCalledTimes(1);
     const createdSlugs = mockCreate.mock.calls.map(([form]) => form.slug);
     expect(createdSlugs).toEqual(
       expect.arrayContaining([
         "contact-form",
-        "newsletter-signup",
       ])
     );
   });

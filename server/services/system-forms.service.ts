@@ -65,26 +65,6 @@ const SYSTEM_FORMS: ManagedSystemForm[] = [
       storeAsContactMessage: true,
     }),
   },
-  {
-    name: "Newsletter Signup",
-    slug: "newsletter-signup",
-    description: "Newsletter form used in widgets and embeddable form blocks.",
-    kind: "newsletter",
-    isSystem: true,
-    isActive: true,
-    fields: [
-      field("email", "email", "Email", "email", {
-        placeholder: "you@example.com",
-        required: true,
-      }),
-    ],
-    settings: settings({
-      submitButtonText: "Sign Up",
-      successMessage: "You're on the list. We'll keep you posted.",
-      mailchimpEnabled: false,
-      mailchimpTag: "Glass & Door Pro Newsletter",
-    }),
-  },
 ];
 
 export async function ensureSystemForms() {

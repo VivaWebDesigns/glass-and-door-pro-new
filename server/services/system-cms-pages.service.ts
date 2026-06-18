@@ -116,16 +116,6 @@ function buildDefaultBlogSidebarWidgets(): SidebarWidget[] {
       title: "Popular Topics",
       settings: {},
     },
-    {
-      id: id(),
-      type: "newsletter",
-      title: "Stay Connected",
-      settings: {
-        description: "Get Core Platform-informed articles, events, and resources in your inbox.",
-        buttonText: "Sign Up",
-        formSlug: "newsletter-signup",
-      },
-    },
   ];
 }
 

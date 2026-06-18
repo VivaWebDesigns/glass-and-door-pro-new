@@ -49,7 +49,6 @@ import { useLockConflictGuard } from "@/hooks/use-lock-conflict-guard";
 
 const WIDGET_LABELS: Record<SidebarWidgetType, string> = {
   "recent-posts": "Recent Blog Posts",
-  newsletter: "Newsletter Signup",
   form: "Form",
   callout: "Callout / CTA",
   search: "Search",
@@ -60,7 +59,6 @@ const WIDGET_LABELS: Record<SidebarWidgetType, string> = {
 
 const WIDGET_ICONS: Record<SidebarWidgetType, ElementType> = {
   "recent-posts": PanelRight,
-  newsletter: Mail,
   form: Mail,
   callout: Star,
   search: Search,
@@ -76,18 +74,6 @@ function generateId() {
 function defaultWidget(type: SidebarWidgetType): SidebarWidget {
   if (type === "recent-posts") {
     return { id: generateId(), type, title: "Recent Posts", settings: { limit: 5 } };
-  }
-  if (type === "newsletter") {
-    return {
-      id: generateId(),
-      type,
-      title: "Stay Connected",
-      settings: {
-        description: "Get Core Platform-informed articles, events, and resources in your inbox.",
-        buttonText: "Sign Up",
-        formSlug: "newsletter-signup",
-      },
-    };
   }
   if (type === "form") {
     return {
@@ -178,49 +164,6 @@ function WidgetSettings({
             onChange={(event) => updateSetting("limit", Number(event.target.value))}
             data-testid={`input-widget-limit-${widget.id}`}
           />
-        </div>
-      )}
-
-      {widget.type === "newsletter" && (
-        <div className="space-y-3">
-          <div className="space-y-1.5">
-            <Label>Description</Label>
-            <Textarea
-              value={String(widget.settings.description ?? "")}
-              onChange={(event) => updateSetting("description", event.target.value)}
-              rows={2}
-              data-testid={`textarea-newsletter-description-${widget.id}`}
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label>Button Text</Label>
-              <Input
-                value={String(widget.settings.buttonText ?? "")}
-                onChange={(event) => updateSetting("buttonText", event.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Assigned Form</Label>
-              <Select
-                value={String(widget.settings.formSlug ?? "newsletter-signup")}
-                onValueChange={(value) => updateSetting("formSlug", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a form" />
-                </SelectTrigger>
-                <SelectContent>
-                  {forms
-                    .filter((form) => form.kind === "newsletter" || form.slug === "newsletter-signup")
-                    .map((form) => (
-                      <SelectItem key={form.id} value={form.slug}>
-                        {form.name}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
         </div>
       )}
 

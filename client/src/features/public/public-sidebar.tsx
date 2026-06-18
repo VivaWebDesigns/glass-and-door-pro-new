@@ -74,29 +74,6 @@ function RecentPostsWidget({ widget }: { widget: SidebarWidget }) {
   );
 }
 
-function NewsletterWidget({ widget }: { widget: SidebarWidget }) {
-  const heading = widget.title || "Stay Connected";
-  const description = text(
-    widget.settings.description,
-    "Get Core Platform-informed articles, events, and resources in your inbox."
-  );
-  const buttonText = text(widget.settings.buttonText, "Sign Up");
-  const formSlug = text(widget.settings.formSlug, "newsletter-signup");
-
-  return (
-    <WidgetCard title={heading}>
-      <PublicFormRenderer
-        slug={formSlug}
-        showHeader={false}
-        descriptionOverride={description}
-        buttonTextOverride={buttonText}
-        compact
-        className="space-y-3"
-      />
-    </WidgetCard>
-  );
-}
-
 function FormWidget({ widget }: { widget: SidebarWidget }) {
   const heading = widget.title || "Form";
   const formSlug = text(widget.settings.formSlug, "contact-form");
@@ -240,7 +217,6 @@ function HtmlWidget({ widget }: { widget: SidebarWidget }) {
 
 function SidebarWidgetRenderer({ widget }: { widget: SidebarWidget }) {
   if (widget.type === "recent-posts") return <RecentPostsWidget widget={widget} />;
-  if (widget.type === "newsletter") return <NewsletterWidget widget={widget} />;
   if (widget.type === "form") return <FormWidget widget={widget} />;
   if (widget.type === "callout") return <CalloutWidget widget={widget} />;
   if (widget.type === "search") return <SearchWidget widget={widget} />;
