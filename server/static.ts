@@ -15,6 +15,8 @@ const LEGACY_PUBLIC_REDIRECTS: Record<string, string> = {
 };
 
 const GONE_PUBLIC_PATH_PREFIXES = [
+  "/commercial-glass",
+  "/commercialglass",
   "/directory",
   "/events",
   "/forms/newsletter-signup",
