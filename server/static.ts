@@ -12,6 +12,27 @@ const LEGACY_PUBLIC_REDIRECTS: Record<string, string> = {
   "/contact": "/#contact",
   "/areas-served/charlotte-nc": "/service-areas/charlotte",
   "/areas-served/monroe-nc": "/service-areas/monroe",
+  "/areas-served/indian-trail-nc": "/service-areas/indian-trail",
+  "/areas-served/stallings-nc": "/service-areas/stallings",
+  "/areas-served/wesley-chapel-nc": "/service-areas/wesley-chapel",
+  "/areas-served/waxhaw-nc": "/service-areas/waxhaw",
+  "/areas-served/matthews-nc": "/service-areas/matthews",
+  "/areas-served/weddington-nc": "/service-areas/weddington",
+  "/areas-served/pineville-nc": "/service-areas/pineville",
+  "/areas-served/fort-mill-sc": "/service-areas/fort-mill",
+  "/areas-served/fort-mill-nc": "/service-areas/fort-mill",
+  "/areas-served/indian-land-sc": "/service-areas/indian-land",
+  "/areas-served/indian-land-nc": "/service-areas/indian-land",
+  "/window-installation": "/services/window-installation",
+  "/door-installation": "/services/door-installation",
+  "/window-repair": "/services/window-repair",
+  "/frameless-showers": "/services/frameless-showers",
+  "/frameless-shower-doors": "/services/frameless-showers",
+  "/commercial-storefront-glass-installation": "/services/commercial-storefront-glass-installation",
+  "/commercial-storefront-glass-replacement-repair": "/services/commercial-storefront-glass-replacement-repair",
+  "/commercial-door-installation": "/services/commercial-door-installation",
+  "/commercial-door-replacement-repair": "/services/commercial-door-replacement-repair",
+  "/commercial-window-replacement": "/services/commercial-window-replacement",
 };
 
 const GONE_PUBLIC_PATH_PREFIXES = [
@@ -66,6 +87,10 @@ export function serveStatic(app: Express) {
     };
   }
 
+  function isClientOnlyPublicRoute(pathname: string) {
+    return pathname.startsWith("/forms/") || pathname.startsWith("/reference/");
+  }
+
   // fall through to index.html if the file doesn't exist
   app.use("/{*path}", async (req, res) => {
     const template = await getIndexTemplate();
@@ -103,6 +128,14 @@ export function serveStatic(app: Express) {
       !pathname.startsWith("/preview") &&
       !pathname.startsWith("/uploads") &&
       !pathname.startsWith("/api");
+    if (shouldInjectPublicHead && !snapshot && !isClientOnlyPublicRoute(pathname)) {
+      res
+        .status(404)
+        .type("text")
+        .set("Cache-Control", "no-cache")
+        .send("Not found");
+      return;
+    }
     const customHeadHtml = shouldInjectPublicHead ? await getPublicHeadAdditions() : null;
 
     res.setHeader(
