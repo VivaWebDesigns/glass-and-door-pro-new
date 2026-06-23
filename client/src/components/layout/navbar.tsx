@@ -2,16 +2,10 @@ import { useState, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import {
   Menu,
-  User,
-  LogOut,
-  Shield,
-  UserCog,
   ChevronDown,
-  Bell,
   Phone,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { useUnreadNotificationCount } from "@/hooks/use-unread-notification-count";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import {
@@ -22,9 +16,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useBranding } from "@/components/shared/branding-provider";
-import { useAuth } from "@/hooks/use-auth";
-import { UserProfileDialog } from "@/components/shared/user-profile-dialog";
-import { NotificationBell } from "@/components/shared/notification-bell";
 import type { CmsMenu, MenuItem, PublicMenuLocation } from "@shared/schema";
 
 const defaultNavLinks = [
@@ -174,11 +165,8 @@ function DynamicDropdown({ item, location: currentPath }: { item: MenuItem; loca
 
 export function Navbar() {
   const [location] = useLocation();
-  const { user, isLoading, logout, isAdmin } = useAuth();
   const { frontendLogoUrl, companyName } = useBranding();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [notifOpen, setNotifOpen] = useState(false);
 
   const { data: publicMenus } = useQuery<Partial<Record<PublicMenuLocation, CmsMenu>>>({
     queryKey: ["/api/cms/menus"],
@@ -199,7 +187,6 @@ export function Navbar() {
 
   const resourceLinks = allResourceLinks;
 
-  const unreadNotifCount = useUnreadNotificationCount();
   const brandLogo = frontendLogoUrl || "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
   const brandName = companyName || "Glass & Door Pro";
 
@@ -304,93 +291,26 @@ export function Navbar() {
         </div>
 
         <div className="hidden items-center gap-3 md:flex md:flex-wrap">
-          {isLoading ? null : user ? (
-            <>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    type="button"
-                    className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-border/80 bg-background shadow-sm transition-shadow hover:ring-2 hover:ring-ring hover:ring-offset-1"
-                    data-testid="button-user-menu"
-                  >
-                    {user.profileImageUrl ? (
-                      <img
-                        src={user.profileImageUrl}
-                        alt=""
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <User className="h-4 w-4 text-muted-foreground" />
-                    )}
-                    {unreadNotifCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-[10px] font-bold rounded-full h-4 min-w-4 flex items-center justify-center px-1 leading-none">
-                        {unreadNotifCount > 99 ? "99+" : unreadNotifCount}
-                      </span>
-                    )}
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="z-[1000]">
-                  {isAdmin && (
-                    <DropdownMenuItem asChild>
-                      <Link href="/admin/cms" data-testid="link-admin-dashboard">
-                        <Shield className="mr-2 h-4 w-4" />
-                        Admin
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => setNotifOpen(true)}
-                    data-testid="button-notifications-menu"
-                  >
-                    <Bell className="mr-2 h-4 w-4" />
-                    Notifications
-                    {unreadNotifCount > 0 && (
-                      <span className="ml-auto bg-accent text-accent-foreground text-xs font-semibold rounded-full h-5 min-w-5 flex items-center justify-center px-1.5">
-                        {unreadNotifCount}
-                      </span>
-                    )}
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => setProfileOpen(true)}
-                    data-testid="button-my-profile"
-                  >
-                    <UserCog className="mr-2 h-4 w-4" />
-                    My Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => logout.mutate()} data-testid="button-logout">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
-          ) : (
-            <>
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="hidden border-[#1a8ead] text-[#0f6f85] hover:bg-[#e8f7fb] hover:text-[#0f6f85] lg:inline-flex"
-                data-testid="link-header-phone"
-              >
-                <a href="tel:+17047716111">
-                  <Phone className="h-3.5 w-3.5" />
-                  <span>(704) 771-6111</span>
-                </a>
-              </Button>
-              <Button
-                asChild
-                size="sm"
-                className="bg-[#1a8ead] text-white hover:bg-[#167f9b] hover:text-white"
-                data-testid="link-header-quote"
-              >
-                <Link href="/#contact">Get a Free Quote</Link>
-              </Button>
-            </>
-          )}
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="hidden border-[#1a8ead] text-[#0f6f85] hover:bg-[#e8f7fb] hover:text-[#0f6f85] lg:inline-flex"
+            data-testid="link-header-phone"
+          >
+            <a href="tel:+17047716111">
+              <Phone className="h-3.5 w-3.5" />
+              <span>(704) 771-6111</span>
+            </a>
+          </Button>
+          <Button
+            asChild
+            size="sm"
+            className="bg-[#1a8ead] text-white hover:bg-[#167f9b] hover:text-white"
+            data-testid="link-header-quote"
+          >
+            <Link href="/#contact">Get a Free Quote</Link>
+          </Button>
         </div>
 
         <div className="flex md:hidden items-center gap-2">
@@ -525,81 +445,11 @@ export function Navbar() {
                     </Button>
                   </>
                 )}
-
-                <div className="my-3 border-t" />
-
-                {isLoading ? null : user ? (
-                  <>
-                    <p className="px-4 py-2 text-sm text-muted-foreground">
-                      Signed in as {user.firstName} {user.lastName}
-                    </p>
-                    {isAdmin && (
-                      <Button
-                        asChild
-                        variant="ghost"
-                        className={mobileNavButtonClassName}
-                        data-testid="link-mobile-admin"
-                      >
-                        <Link href="/admin/cms" onClick={() => setMobileOpen(false)}>
-                          <Shield className="mr-2 h-4 w-4" />
-                          Admin
-                        </Link>
-                      </Button>
-                    )}
-                    <Button
-                      variant="ghost"
-                      className={mobileNavButtonClassName}
-                      onClick={() => {
-                        setNotifOpen(true);
-                        setMobileOpen(false);
-                      }}
-                      data-testid="button-mobile-notifications"
-                    >
-                      <Bell className="mr-2 h-4 w-4" />
-                      Notifications
-                      {unreadNotifCount > 0 && (
-                        <span className="ml-auto bg-accent text-accent-foreground text-xs font-semibold rounded-full h-5 min-w-5 flex items-center justify-center px-1.5">
-                          {unreadNotifCount}
-                        </span>
-                      )}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className={mobileNavButtonClassName}
-                      onClick={() => {
-                        setProfileOpen(true);
-                        setMobileOpen(false);
-                      }}
-                      data-testid="button-mobile-profile"
-                    >
-                      <UserCog className="mr-2 h-4 w-4" />
-                      My Profile
-                    </Button>
-                    <div className="my-1 border-t" />
-                    <Button
-                      variant="ghost"
-                      className={mobileNavButtonClassName}
-                      onClick={() => {
-                        logout.mutate();
-                        setMobileOpen(false);
-                      }}
-                      data-testid="button-mobile-logout"
-                    >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Logout
-                    </Button>
-                  </>
-                ) : null}
               </div>
             </SheetContent>
           </Sheet>
         </div>
       </div>
-
-      {user && (
-        <NotificationBell open={notifOpen} onOpenChange={setNotifOpen} showTrigger={false} />
-      )}
-      <UserProfileDialog open={profileOpen} onOpenChange={setProfileOpen} />
     </nav>
   );
 }

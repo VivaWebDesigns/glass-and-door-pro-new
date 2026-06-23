@@ -42,7 +42,6 @@ const CmsMenusPage = lazy(() => import("@/features/admin/cms/cms-menus-page"));
 const CmsSidebarsPage = lazy(() => import("@/features/admin/cms/cms-sidebars-page"));
 const SystemBackupsPage = lazy(() => import("@/features/admin/system-backups-page"));
 
-const SearchResultsPage = lazy(() => import("@/features/public/search-results-page"));
 const LegalFallbackPage = lazy(() => import("@/features/public/legal-fallback-page"));
 
 function PageLoader() {
@@ -107,7 +106,6 @@ function Router() {
         <Route path="/areas-served/monroe-nc"><Redirect to="/service-areas/monroe" replace /></Route>
         <Route path="/areas-served/charlotte-nc"><Redirect to="/service-areas/charlotte" replace /></Route>
         <Route path="/preview/cms/:id" component={CmsPreviewPage} />
-        <Route path="/search" component={SearchResultsPage} />
         <Route path="/privacy-policy" component={() => <CmsHybridPage slug="privacy-policy" fallback={<LegalFallbackPage title="Privacy Policy" subtitle="Review how Glass & Door Pro handles contact form details, service inquiries, cookies, analytics, and customer records." />} />} />
         <Route path="/terms-of-service" component={() => <CmsHybridPage slug="terms-of-service" fallback={<LegalFallbackPage title="Terms of Service" subtitle="Review the terms governing use of the Glass & Door Pro website, estimates, service information, third-party links, and site content." />} />} />
         <Route path="/disclaimer" component={() => <CmsHybridPage slug="disclaimer" fallback={<LegalFallbackPage title="Disclaimer" subtitle="Review important context about website information, estimates, repair recommendations, warranty references, pricing, and commercial glass work." />} />} />
