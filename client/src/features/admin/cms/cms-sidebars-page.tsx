@@ -35,11 +35,9 @@ import {
   GripVertical,
   Loader2,
   Mail,
-  PanelRight,
   Plus,
   Search,
   Star,
-  Tag,
   Trash2,
   Type,
 } from "lucide-react";
@@ -48,22 +46,16 @@ import { useEditorLock } from "@/hooks/use-editor-lock";
 import { useLockConflictGuard } from "@/hooks/use-lock-conflict-guard";
 
 const WIDGET_LABELS: Record<SidebarWidgetType, string> = {
-  "recent-posts": "Recent Blog Posts",
   form: "Form",
   callout: "Callout / CTA",
   search: "Search",
-  categories: "Categories",
-  "tag-cloud": "Tag Cloud",
   "custom-html": "Custom HTML",
 };
 
 const WIDGET_ICONS: Record<SidebarWidgetType, ElementType> = {
-  "recent-posts": PanelRight,
   form: Mail,
   callout: Star,
   search: Search,
-  categories: Type,
-  "tag-cloud": Tag,
   "custom-html": Type,
 };
 
@@ -72,9 +64,6 @@ function generateId() {
 }
 
 function defaultWidget(type: SidebarWidgetType): SidebarWidget {
-  if (type === "recent-posts") {
-    return { id: generateId(), type, title: "Recent Posts", settings: { limit: 5 } };
-  }
   if (type === "form") {
     return {
       id: generateId(),
@@ -153,20 +142,6 @@ function WidgetSettings({
         </div>
       </div>
 
-      {widget.type === "recent-posts" && (
-        <div className="space-y-1.5">
-          <Label>Number of posts</Label>
-          <Input
-            type="number"
-            min={1}
-            max={10}
-            value={String(widget.settings.limit ?? 5)}
-            onChange={(event) => updateSetting("limit", Number(event.target.value))}
-            data-testid={`input-widget-limit-${widget.id}`}
-          />
-        </div>
-      )}
-
       {widget.type === "form" && (
         <div className="space-y-3">
           <div className="space-y-1.5">
@@ -179,9 +154,7 @@ function WidgetSettings({
                 <SelectValue placeholder="Select a form" />
               </SelectTrigger>
               <SelectContent>
-                {forms
-                  .filter((form) => form.kind !== "application")
-                  .map((form) => (
+                {forms.map((form) => (
                     <SelectItem key={form.id} value={form.slug}>
                       {form.name}
                     </SelectItem>
@@ -380,7 +353,7 @@ function SidebarEditor({ sidebar, onClose }: { sidebar: CmsSidebar | null; onClo
         <CardContent>
           {widgets.length === 0 ? (
             <div className="rounded-lg border border-dashed p-10 text-center text-muted-foreground" data-testid="text-empty-widgets">
-              <PanelRight className="mx-auto mb-3 h-10 w-10 opacity-40" />
+              <Type className="mx-auto mb-3 h-10 w-10 opacity-40" />
               <p className="font-medium">No widgets yet</p>
               <p className="text-sm">Use the Add widget dropdown to start building this sidebar.</p>
             </div>
@@ -476,10 +449,10 @@ export default function CmsSidebarsPage() {
         ) : sidebars.length === 0 ? (
           <Card>
             <CardContent className="py-16 text-center">
-              <PanelRight className="mx-auto mb-3 h-12 w-12 text-muted-foreground opacity-50" />
+              <Type className="mx-auto mb-3 h-12 w-12 text-muted-foreground opacity-50" />
               <h2 className="text-lg font-medium">No sidebars yet</h2>
               <p className="text-sm text-muted-foreground mt-1 mb-4">
-                Create a default blog sidebar or page-specific sidebar to get started.
+                Create a reusable page sidebar to get started.
               </p>
               <Button onClick={() => setEditingSidebar("new")}>
                 <Plus className="mr-2 h-4 w-4" />
@@ -496,7 +469,7 @@ export default function CmsSidebarsPage() {
                     <div>
                       <CardTitle className="text-base flex items-center gap-2">
                         {sidebar.name}
-                        {sidebar.isDefault && <Badge className="bg-emerald-600 text-white">Default Blog</Badge>}
+                        {sidebar.isDefault && <Badge className="bg-emerald-600 text-white">Default</Badge>}
                       </CardTitle>
                       <CardDescription className="mt-1">
                         {sidebar.description || "No description"} · {widgetCount(sidebar)} widget{widgetCount(sidebar) === 1 ? "" : "s"}

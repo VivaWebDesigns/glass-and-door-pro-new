@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import {
   Users,
@@ -10,7 +9,6 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
-  BookOpen,
   Globe,
   FileCode,
   Image,
@@ -30,7 +28,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { UserProfileDialog } from "@/components/shared/user-profile-dialog";
-import { DEFAULT_SITE_FEATURES, type SiteFeatures } from "@shared/site-features";
 import type { AdminPermission } from "@shared/types";
 import type { User as AppUser } from "@shared/schema";
 
@@ -50,7 +47,6 @@ interface NavGroup {
 }
 
 function buildNavGroups(
-  siteFeatures: SiteFeatures,
   user: AppUser | null,
   hasAdminPermission: (permission: AdminPermission) => boolean,
 ): NavGroup[] {
@@ -78,16 +74,6 @@ function buildNavGroups(
                 icon: SquarePen,
                 iconColor: "text-violet-500",
               },
-              ...(siteFeatures.blogEnabled
-                ? [
-                    {
-                      title: "Blog",
-                      href: "/admin/cms/blog",
-                      icon: BookOpen,
-                      iconColor: "text-purple-600",
-                    } satisfies NavItem,
-                  ]
-                : []),
               {
                 title: "Media",
                 href: "/admin/cms/media",
@@ -191,18 +177,13 @@ export function AdminSidebar({ children }: AdminSidebarProps) {
   const [profileOpen, setProfileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
-  const { data: siteFeaturesData } = useQuery<SiteFeatures>({
-    queryKey: ["/api/site-config"],
-    staleTime: 60_000,
-  });
-  const siteFeatures = siteFeaturesData ?? DEFAULT_SITE_FEATURES;
-  const navGroups = buildNavGroups(siteFeatures, user, hasAdminPermission).filter(
+  const navGroups = buildNavGroups(user, hasAdminPermission).filter(
     (group) => group.items.length > 0,
   );
   const toggleGroup = (label: string, open: boolean) => {
     setOpenGroup(open ? label : null);
   };
-  const exactOnlyRoutes = ["/admin", "/admin/cms", "/admin/crm"];
+  const exactOnlyRoutes = ["/admin", "/admin/cms"];
   const isRouteActive = (href?: string) => Boolean(
     href &&
       (location === href ||

@@ -1,39 +1,22 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { logger } from "../utils/logger";
 import authRoutes from "./auth.routes";
-import directoryRoutes from "./directory.routes";
-import therapistRoutes from "./therapist.routes";
-import stripeRoutes from "./stripe.routes";
 import adminRoutes from "./admin/index";
 import settingsRoutes from "./settings.routes";
-import eventsRoutes from "./events.routes";
 import contactRoutes from "./contact.routes";
 import docsRoutes from "./docs.routes";
 import uploadRoutes from "./upload.routes";
 import notificationsRoutes from "./notifications.routes";
-import specializationsRoutes from "./specializations.routes";
-import blogRoutes from "./blog.routes";
-import registrationRoutes from "./registration.routes";
-import guestRegistrationRoutes from "./guest-registration.routes";
 import cmsPublicRoutes from "./cms-public.routes";
 import r2PublicRoutes from "./r2-public.routes";
-import contactProfessionalRoutes from "./contact-professional.routes";
 import setupRoutes from "./setup.routes";
-import applicationRoutes from "./application.routes";
-import referenceRoutes from "./reference.routes";
 import formsRoutes from "./forms.routes";
-import crmRoutes from "./crm.routes";
 import { searchPublicSite } from "../services/public-search.service";
 import { buildRobotsTxtPayload } from "../services/robots-txt.service";
 import { storage } from "../storage/index";
 import { getCmsPublicPath } from "@shared/glass-seo";
 import { BRANDING_COLOR_DEFAULTS, resolveBrandingColor } from "@shared/branding-colors";
-import {
-  DEFAULT_DIRECTORY_SETTINGS,
-  getDirectorySettings,
-} from "../services/directory-settings.service";
 import { resolveLocalUploadUrlOrFallback } from "../services/local-upload-storage";
-import { getSiteFeatures, requireSiteFeature } from "../services/site-features.service";
 
 const DEFAULT_FRONTEND_LOGO_URL = "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
 const DEFAULT_FAVICON_URL = "/favicon-32x32.png?v=large-2";
@@ -50,27 +33,15 @@ function escapeXml(str: string): string {
 export function registerApiRoutes(app: Express) {
   app.use("/r2", r2PublicRoutes);
   app.use("/api/auth", authRoutes);
-  app.use("/api/therapists", requireSiteFeature("directoryEnabled"), directoryRoutes);
-  app.use("/api/therapist", requireSiteFeature("directoryEnabled"), therapistRoutes);
-  app.use("/api/stripe", stripeRoutes);
   app.use("/api/admin", adminRoutes);
   app.use("/api/admin", settingsRoutes);
-  app.use("/api/events", requireSiteFeature("eventsEnabled"), eventsRoutes);
   app.use("/api/contact", contactRoutes);
   app.use("/api/forms", formsRoutes);
-  app.use("/api/crm", crmRoutes);
   app.use("/api/admin/docs", docsRoutes);
   app.use("/api/uploads", uploadRoutes);
   app.use("/api/notifications", notificationsRoutes);
-  app.use("/api/specializations", requireSiteFeature("directoryEnabled"), specializationsRoutes);
-  app.use("/api/blog", requireSiteFeature("blogEnabled"), blogRoutes);
-  app.use("/api/events", requireSiteFeature("eventsEnabled"), guestRegistrationRoutes);
-  app.use("/api/events", requireSiteFeature("eventsEnabled"), registrationRoutes);
   app.use("/api/cms", cmsPublicRoutes);
-  app.use("/api/contact-professional", requireSiteFeature("directoryEnabled"), contactProfessionalRoutes);
   app.use("/api/setup", setupRoutes);
-  app.use("/api/therapist/application", requireSiteFeature("directoryEnabled"), applicationRoutes);
-  app.use("/api/reference", referenceRoutes);
 
   app.get("/api/search", async (req, res) => {
     try {
@@ -178,10 +149,6 @@ export function registerApiRoutes(app: Express) {
     }
   });
 
-  app.get("/api/site-config", async (_req, res) => {
-    res.json(await getSiteFeatures());
-  });
-
   app.get("/api/runtime-integrations", async (_req, res) => {
     try {
       const analytics = await storage.settings.getDecryptedCategory("google_analytics");
@@ -195,22 +162,6 @@ export function registerApiRoutes(app: Express) {
       res.json({
         ga4MeasurementId: null,
       });
-    }
-  });
-
-  app.get("/api/membership-tiers", async (_req, res) => {
-    const tiers = await storage.tiers.getActiveTiers();
-    res.json(tiers);
-  });
-
-  app.get("/api/directory-settings", async (_req, res) => {
-    try {
-      res.json(await getDirectorySettings());
-    } catch (err) {
-      logger.app.warn("Failed to retrieve directory settings, returning defaults", {
-        error: err instanceof Error ? err.message : String(err),
-      });
-      res.json(DEFAULT_DIRECTORY_SETTINGS);
     }
   });
 
@@ -264,7 +215,7 @@ export function registerApiRoutes(app: Express) {
         const publicPath = getCmsPublicPath(page.slug);
         const priority = publicPath.startsWith("/services/")
           ? "0.8"
-          : publicPath.startsWith("/areas-served/")
+          : publicPath.startsWith("/service-areas/")
             ? "0.75"
             : ["privacy-policy", "terms-of-service", "disclaimer"].includes(page.slug)
               ? "0.3"

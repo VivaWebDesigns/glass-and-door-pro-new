@@ -6,8 +6,8 @@ export const mixedBuilderFixture: BuilderContent = {
       id: "hero-block",
       type: "hero",
       props: {
-        heading: "Support Third Culture Kids",
-        subheading: "<p>Helping families find the right care and community.</p>",
+        heading: "Glass & Door Pro",
+        subheading: "<p>Glass, door, and window service for the Charlotte area.</p>",
         layout: "stacked",
       },
     },
@@ -15,25 +15,9 @@ export const mixedBuilderFixture: BuilderContent = {
       id: "cta-legacy-block",
       type: "call-to-action",
       props: {
-        heading: "Join the Network",
-        body: "<p>Apply to be part of the Core Platform-informed network.</p>",
-        ctaText: "Apply Now",
-      },
-    },
-    {
-      id: "blog-legacy-block",
-      type: "blog-feed",
-      props: {
-        heading: "Latest Insights",
-        limit: 5,
-      },
-    },
-    {
-      id: "events-block",
-      type: "events-preview",
-      props: {
-        heading: "Upcoming Trainings",
-        limit: 4,
+        heading: "Ready to start your project?",
+        body: "<p>Request a quote from Glass & Door Pro.</p>",
+        ctaText: "Get a Free Quote",
       },
     },
     {
@@ -47,10 +31,10 @@ export const mixedBuilderFixture: BuilderContent = {
       },
     },
     {
-      id: "directory-block",
-      type: "directory-browser",
+      id: "cards-block",
+      type: "cards-grid",
       props: {
-        heading: "Find a Mental Health Professional",
+        heading: "Popular Services",
       },
     },
   ],
@@ -61,9 +45,9 @@ export const fixtureWithBrokenPreview: BuilderContent = {
     ...mixedBuilderFixture.blocks,
     {
       id: "broken-preview-block",
-      type: "blog-preview",
+      type: "unknown-preview",
       props: {
-        heading: "Featured Articles",
+        heading: "Unsupported Block",
       },
     },
   ],

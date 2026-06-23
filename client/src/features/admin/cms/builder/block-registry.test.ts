@@ -8,16 +8,16 @@ describe("block registry compatibility helpers", () => {
     expect(getBlockDef("call-to-action")?.type).toBe("cta");
   });
 
-  it("does not expose retired product block aliases in the active registry", () => {
-    expect(normalizeBlockType("blog-feed")).toBe("blog-feed");
-    expect(getBlockDef("blog-feed")).toBeUndefined();
-    expect(getBlockDef("directory-browser")).toBeUndefined();
-    expect(getBlockDef("events-preview")).toBeUndefined();
+  it("does not expose unknown block types in the active registry", () => {
+    expect(normalizeBlockType("unknown-feed")).toBe("unknown-feed");
+    expect(getBlockDef("unknown-feed")).toBeUndefined();
+    expect(getBlockDef("unknown-directory")).toBeUndefined();
+    expect(getBlockDef("unknown-preview")).toBeUndefined();
   });
 
   it("creates a compatibility editor definition from primitive block props", () => {
     const fallbackDef = createFallbackBlockDef("legacy-cta", {
-      heading: "Join us",
+      heading: "Request a Quote",
       primaryLink: "/#contact",
       enableHoverMotion: true,
       limit: 5,

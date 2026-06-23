@@ -55,7 +55,7 @@ export function LandingPageWizard({ open, onClose, onCreate }: LandingPageWizard
   const [selectedBlocks, setSelectedBlocks] = useState<string[]>([]);
   const [blocksInitialized, setBlocksInitialized] = useState(false);
   const [ctaText, setCtaText] = useState("Get Started");
-  const [ctaLink, setCtaLink] = useState("/directory");
+  const [ctaLink, setCtaLink] = useState("/#contact");
 
   const toggleAudience = (id: string) => {
     setSelectedAudiences((prev) =>
@@ -101,7 +101,7 @@ export function LandingPageWizard({ open, onClose, onCreate }: LandingPageWizard
     setSelectedBlocks([]);
     setBlocksInitialized(false);
     setCtaText("Get Started");
-    setCtaLink("/directory");
+    setCtaLink("/#contact");
   };
 
   const handleCreate = () => {
@@ -292,7 +292,7 @@ export function LandingPageWizard({ open, onClose, onCreate }: LandingPageWizard
                     id="wiz-cta-link"
                     value={ctaLink}
                     onChange={(e) => setCtaLink(e.target.value)}
-                    placeholder="/directory"
+                    placeholder="/#contact"
                     autoPrependHttps
                     className="mt-1 font-mono text-sm"
                     data-testid="input-wizard-cta-link"

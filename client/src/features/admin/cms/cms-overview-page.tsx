@@ -13,9 +13,8 @@ import {
   Plus,
   ArrowRight,
   Clock,
-  BookOpen,
 } from "lucide-react";
-import type { CmsPage, BlogPost } from "@shared/schema";
+import type { CmsPage } from "@shared/schema";
 import { format } from "date-fns";
 
 const HIDDEN_CMS_PAGE_SLUGS = new Set(["directory", "recordings", "events", "insights"]);
@@ -27,20 +26,13 @@ export default function CmsOverviewPage() {
     queryKey: ["/api/admin/cms/pages"],
   });
 
-  const { data: posts = [], isLoading: postsLoading } = useQuery<BlogPost[]>({
-    queryKey: ["/api/admin/blog"],
-  });
-
-  const isLoading = pagesLoading || postsLoading;
+  const isLoading = pagesLoading;
 
   const visiblePages = pages.filter((page) => !HIDDEN_CMS_PAGE_SLUGS.has(page.slug));
   const totalPages = visiblePages.length;
   const publishedPages = visiblePages.filter((p) => p.status === "published").length;
   const draftPages = visiblePages.filter((p) => p.status === "draft").length;
   const recentPages = visiblePages.slice(0, 5);
-
-  const totalPosts = posts.length;
-  const publishedPosts = posts.filter((p) => p.isPublished).length;
 
   const quickLinks = [
     {
@@ -50,15 +42,6 @@ export default function CmsOverviewPage() {
       href: "/admin/cms/pages",
       color: "text-violet-600",
       bg: "bg-violet-50 dark:bg-violet-950/30",
-      available: true,
-    },
-    {
-      title: "Blog",
-      description: "Write and publish articles at /insights with SEO controls",
-      icon: BookOpen,
-      href: "/admin/cms/blog",
-      color: "text-purple-600",
-      bg: "bg-purple-50 dark:bg-purple-950/30",
       available: true,
     },
     {
@@ -90,7 +73,7 @@ export default function CmsOverviewPage() {
               Content Management System
             </h1>
             <p className="text-muted-foreground mt-1">
-              Manage your public-facing website pages, blog, and media
+              Manage your public-facing website pages, media, and SEO
             </p>
           </div>
           <Button onClick={() => navigate("/admin/cms/pages/new")} data-testid="button-create-page">
@@ -99,7 +82,7 @@ export default function CmsOverviewPage() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Card data-testid="card-stat-total">
             <CardContent className="pt-5">
               <div className="flex items-center gap-3">
@@ -136,37 +119,19 @@ export default function CmsOverviewPage() {
             </CardContent>
           </Card>
 
-          <Card data-testid="card-stat-blog-total">
+          <Card data-testid="card-stat-drafts">
             <CardContent className="pt-5">
               <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                  <BookOpen className="h-4.5 w-4.5 text-purple-600" />
+                <div className="h-9 w-9 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                  <FileCode className="h-4.5 w-4.5 text-amber-600" />
                 </div>
                 <div>
                   {isLoading ? (
                     <Skeleton className="h-6 w-10" />
                   ) : (
-                    <p className="text-xl font-bold" data-testid="text-stat-blog-total">{totalPosts}</p>
+                    <p className="text-xl font-bold" data-testid="text-stat-drafts">{draftPages}</p>
                   )}
-                  <p className="text-xs text-muted-foreground">Blog Posts</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card data-testid="card-stat-blog-published">
-            <CardContent className="pt-5">
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                  <BookOpen className="h-4.5 w-4.5 text-emerald-500" />
-                </div>
-                <div>
-                  {isLoading ? (
-                    <Skeleton className="h-6 w-10" />
-                  ) : (
-                    <p className="text-xl font-bold" data-testid="text-stat-blog-published">{publishedPosts}</p>
-                  )}
-                  <p className="text-xs text-muted-foreground">Posts Live</p>
+                  <p className="text-xs text-muted-foreground">Draft Pages</p>
                 </div>
               </div>
             </CardContent>
@@ -241,9 +206,7 @@ export default function CmsOverviewPage() {
                     <tr
                       key={page.id}
                       className="border-b last:border-0 hover:bg-muted/30 cursor-pointer"
-                      onClick={() =>
-                        navigate(page.slug === "directory" ? "/admin/cms/pages/directory" : `/admin/cms/pages/${page.id}`)
-                      }
+                      onClick={() => navigate(`/admin/cms/pages/${page.id}`)}
                       data-testid={`row-recent-page-${page.id}`}
                     >
                       <td className="py-2 font-medium">{page.title}</td>
@@ -267,58 +230,6 @@ export default function CmsOverviewPage() {
           </CardContent>
         </Card>
 
-        {posts.length > 0 && (
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-purple-600" />
-                  Recent Blog Posts
-                </CardTitle>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/admin/cms/blog")}>
-                  View all
-                  <ArrowRight className="h-3.5 w-3.5 ml-1" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <table className="w-full text-sm" data-testid="table-recent-posts">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-2 text-muted-foreground font-medium">Title</th>
-                    <th className="text-left py-2 text-muted-foreground font-medium">Author</th>
-                    <th className="text-left py-2 text-muted-foreground font-medium">Status</th>
-                    <th className="text-left py-2 text-muted-foreground font-medium">Published</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {posts.slice(0, 5).map((post) => (
-                    <tr
-                      key={post.id}
-                      className="border-b last:border-0 hover:bg-muted/30 cursor-pointer"
-                      onClick={() => navigate(`/admin/cms/blog/${post.id}`)}
-                      data-testid={`row-recent-post-${post.id}`}
-                    >
-                      <td className="py-2 font-medium truncate max-w-[200px]">{post.title}</td>
-                      <td className="py-2 text-muted-foreground">{post.authorName}</td>
-                      <td className="py-2">
-                        <Badge
-                          variant={post.isPublished ? "default" : "outline"}
-                          className={`text-xs ${post.isPublished ? "bg-emerald-600" : ""}`}
-                        >
-                          {post.isPublished ? "Published" : "Draft"}
-                        </Badge>
-                      </td>
-                      <td className="py-2 text-muted-foreground">
-                        {post.publishedAt ? format(new Date(post.publishedAt), "MMM d, yyyy") : "—"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </AdminSidebar>
   );

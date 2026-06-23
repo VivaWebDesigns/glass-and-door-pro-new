@@ -36,7 +36,6 @@ export function securityHeaders(): RequestHandler {
         defaultSrc: ["'self'"],
         scriptSrc: [
           "'self'",
-          "https://js.stripe.com",
           "https://www.googletagmanager.com",
           "https://static.cloudflareinsights.com",
         ],
@@ -54,7 +53,6 @@ export function securityHeaders(): RequestHandler {
         ],
         connectSrc: [
           "'self'",
-          "https://api.stripe.com",
           "https://www.google-analytics.com",
           "https://region1.google-analytics.com",
           "https://www.googletagmanager.com",
@@ -64,7 +62,7 @@ export function securityHeaders(): RequestHandler {
           "https://*.tile.openstreetmap.org",
           "https://*.basemaps.cartocdn.com",
         ],
-        frameSrc: ["'self'", "https://js.stripe.com", "https://hooks.stripe.com"],
+        frameSrc: ["'self'"],
         objectSrc: ["'none'"],
         baseUri: ["'self'"],
         formAction: ["'self'"],
@@ -175,14 +173,6 @@ function getTrustedOrigins(): Set<string> {
 
 export const originCheck: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
   if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") {
-    return next();
-  }
-
-  if (req.path === "/api/stripe/webhook") {
-    return next();
-  }
-
-  if (req.path === "/api/crm/leads") {
     return next();
   }
 

@@ -1,6 +1,5 @@
 import { randomUUID } from "crypto";
 import { storage } from "../storage";
-import type { SidebarWidget } from "@shared/schema";
 
 function id() {
   return randomUUID();
@@ -90,46 +89,7 @@ function buildDisclaimerContent() {
   };
 }
 
-function buildDefaultBlogSidebarWidgets(): SidebarWidget[] {
-  return [
-    {
-      id: id(),
-      type: "search",
-      title: "Search",
-      settings: {},
-    },
-    {
-      id: id(),
-      type: "recent-posts",
-      title: "Recent Posts",
-      settings: { limit: 5 },
-    },
-    {
-      id: id(),
-      type: "categories",
-      title: "Categories",
-      settings: {},
-    },
-    {
-      id: id(),
-      type: "tag-cloud",
-      title: "Popular Topics",
-      settings: {},
-    },
-  ];
-}
-
 export async function ensureSystemCmsPages() {
-  const defaultBlogSidebar = await storage.cmsSidebars.getDefault();
-  if (!defaultBlogSidebar) {
-    await storage.cmsSidebars.create({
-      name: "Blog Sidebar",
-      description: "Default sidebar for Insights & Articles and blog posts.",
-      isDefault: true,
-      widgets: buildDefaultBlogSidebarWidgets(),
-    });
-  }
-
   for (const retiredSlug of ["about", "contact", "directory", "events", "insights", "join", "recordings"]) {
     const existingPage = await storage.cmsPages.getPageBySlug(retiredSlug);
     if (existingPage) {

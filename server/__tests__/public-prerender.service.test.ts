@@ -1,12 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { BlogPost, CmsPage, Event, SeoSettings } from "@shared/schema";
+import type { CmsPage, SeoSettings } from "@shared/schema";
 
 const mockGetSeo = vi.fn();
 const mockGetSetting = vi.fn();
 const mockGetPageBySlug = vi.fn();
-const mockGetPostBySlug = vi.fn();
-const mockGetEventByIdentifier = vi.fn();
-const mockGetProfileWithUser = vi.fn();
 
 vi.mock("../storage", () => ({
   storage: {
@@ -19,27 +16,18 @@ vi.mock("../storage", () => ({
     cmsPages: {
       getPageBySlug: mockGetPageBySlug,
     },
-    blog: {
-      getPostBySlug: mockGetPostBySlug,
-    },
-    events: {
-      getEventByIdentifier: mockGetEventByIdentifier,
-    },
-    therapists: {
-      getProfileWithUser: mockGetProfileWithUser,
-    },
   },
 }));
 
 const seoSettings: SeoSettings = {
   id: "seo-1",
-  siteName: "Core Platform",
-  siteUrl: "https://coreplatform.com",
-  titleSuffix: " | Core Platform",
+  siteName: "Glass & Door Pro",
+  siteUrl: "https://glassanddoorpro.com",
+  titleSuffix: " | Glass & Door Pro",
   defaultMetaDescription: "Default description",
-  defaultOgImageUrl: "https://coreplatform.com/og.jpg",
+  defaultOgImageUrl: "https://glassanddoorpro.com/og.jpg",
   defaultRobotsNoindex: false,
-  organizationName: "Core Platform",
+  organizationName: "Glass & Door Pro",
   organizationLogoUrl: null,
   facebookUrl: null,
   instagramUrl: null,
@@ -59,11 +47,11 @@ const cmsPage: CmsPage = {
   sidebarId: null,
   content: {
     blocks: [
-      { id: "b1", type: "hero", props: { title: "The Application Process", subtitle: "Submit your application and complete credential verification." } },
+      { id: "b1", type: "hero", props: { title: "Glass Services", subtitle: "Schedule local glass and door service." } },
     ],
   },
   seoTitle: null,
-  seoDescription: "Learn about the application process.",
+  seoDescription: "Learn about local glass and door service.",
   seoKeywords: null,
   ogImageUrl: null,
   canonicalUrl: null,
@@ -76,91 +64,12 @@ const cmsPage: CmsPage = {
   updatedAt: new Date(),
 };
 
-const blogPost: BlogPost = {
-  id: "post-1",
-  title: "Understanding the Application Process",
-  slug: "understanding-application-process",
-  excerpt: "Everything you need to know before you apply.",
-  content: "<p>This article explains the application process in detail.</p>",
-  coverImageUrl: null,
-  coverImagePositionX: 50,
-  coverImagePositionY: 50,
-  authorName: "Team",
-  category: "Guides",
-  categories: ["Guides"],
-  tags: ["Application"],
-  postType: "article",
-  podcastUrl: null,
-  externalUrl: null,
-  sidebarId: null,
-  isPublished: true,
-  scheduledAt: null,
-  publishedAt: new Date(),
-  seoTitle: null,
-  seoDescription: null,
-  ogImageUrl: null,
-  noindex: false,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-const event: Event = {
-  id: "event-1",
-  title: "Application Process Webinar",
-  slug: "application-process-webinar",
-  description: "Join us for a walk-through of the application process.",
-  date: new Date("2026-06-01T15:00:00.000Z"),
-  endDate: null,
-  location: "Online",
-  isVirtual: true,
-  zoomLink: null,
-  memberOnly: false,
-  imageUrl: null,
-  imagePositionX: 50,
-  imagePositionY: 50,
-  createdAt: new Date(),
-  virtualJoinUrl: null,
-  virtualDialInInfo: null,
-  recordingUrl: null,
-  showInArchives: false,
-  recordingAccess: "free",
-  recordingPrice: null,
-  registrationEnabled: false,
-  registrationType: "free",
-  registrationFee: null,
-  registrationCurrency: "usd",
-  registrationOpensAt: null,
-  registrationClosesAt: null,
-  capacity: null,
-  waitlistEnabled: false,
-  status: "published",
-  visibility: "public",
-  timezone: null,
-  locationName: null,
-  locationAddress: null,
-  latitude: null,
-  longitude: null,
-  speakerName: "Guide Team",
-  speakerBio: null,
-  speakerImageUrl: null,
-  isRecurring: false,
-  recurrencePattern: null,
-  recurrenceInterval: null,
-  recurrenceDaysOfWeek: null,
-  recurrenceEndDate: null,
-  recurrenceCount: null,
-  parentEventId: null,
-};
-
 describe("public-prerender.service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetSeo.mockResolvedValue(seoSettings);
     mockGetSetting.mockResolvedValue(null);
     mockGetPageBySlug.mockResolvedValue(undefined);
-    mockGetPostBySlug.mockResolvedValue(undefined);
-    mockGetEventByIdentifier.mockResolvedValue(undefined);
-    mockGetProfileWithUser.mockResolvedValue(undefined);
   });
 
   it("returns a prerender snapshot for published CMS pages", async () => {
@@ -170,8 +79,8 @@ describe("public-prerender.service", () => {
     const snapshot = await getPublicHtmlSnapshot("/custom-landing");
 
     expect(snapshot?.title).toContain("Custom Landing Page");
-    expect(snapshot?.bodyHtml).toContain("The Application Process");
-    expect(snapshot?.canonicalUrl).toBe("https://coreplatform.com/custom-landing");
+    expect(snapshot?.bodyHtml).toContain("Glass Services");
+    expect(snapshot?.canonicalUrl).toBe("https://glassanddoorpro.com/custom-landing");
   });
 
   it("emits CMS FAQPage schema and maps nested public routes to CMS slugs", async () => {
@@ -308,7 +217,7 @@ describe("public-prerender.service", () => {
     const snapshot = await getPublicHtmlSnapshot("/gallery");
 
     expect(snapshot?.title).toContain("Gallery");
-    expect(snapshot?.canonicalUrl).toBe("https://coreplatform.com/gallery");
+    expect(snapshot?.canonicalUrl).toBe("https://glassanddoorpro.com/gallery");
     expect(snapshot?.bodyHtml).toContain("Glass &amp; Door Pro project photos");
   });
 
@@ -318,7 +227,7 @@ describe("public-prerender.service", () => {
     const snapshot = await getPublicHtmlSnapshot("/reviews");
 
     expect(snapshot?.title).toContain("Customer Reviews");
-    expect(snapshot?.canonicalUrl).toBe("https://coreplatform.com/reviews");
+    expect(snapshot?.canonicalUrl).toBe("https://glassanddoorpro.com/reviews");
     expect(snapshot?.bodyHtml).toContain("Glass &amp; Door Pro customer reviews");
   });
 
@@ -328,20 +237,18 @@ describe("public-prerender.service", () => {
     const snapshot = await getPublicHtmlSnapshot("/services");
 
     expect(snapshot?.title).toContain("Glass and Door Services");
-    expect(snapshot?.canonicalUrl).toBe("https://coreplatform.com/services");
+    expect(snapshot?.canonicalUrl).toBe("https://glassanddoorpro.com/services");
     expect(snapshot?.bodyHtml).toContain("frameless shower doors");
   });
 
   it("does not prerender retired legacy public sections", async () => {
-    mockGetPostBySlug.mockResolvedValue(blogPost);
-    mockGetEventByIdentifier.mockResolvedValue(event);
     const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
 
     const aboutSnapshot = await getPublicHtmlSnapshot("/about");
     const contactSnapshot = await getPublicHtmlSnapshot("/contact");
     const directorySnapshot = await getPublicHtmlSnapshot("/directory");
-    const postSnapshot = await getPublicHtmlSnapshot("/insights/understanding-application-process");
-    const eventSnapshot = await getPublicHtmlSnapshot("/events/event-1");
+    const postSnapshot = await getPublicHtmlSnapshot("/insights/old-post");
+    const eventSnapshot = await getPublicHtmlSnapshot("/events/old-event");
     const recordingsSnapshot = await getPublicHtmlSnapshot("/recordings");
 
     expect(aboutSnapshot).toBeNull();
@@ -356,11 +263,11 @@ describe("public-prerender.service", () => {
     const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } = await import("../services/public-prerender.service");
     const template = "<html><head><title>Default</title><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--><div id=\"root\"></div></body></html>";
 
-    const snapshot = await getPublicHtmlSnapshot("/search", "?query=application+process");
+    const snapshot = await getPublicHtmlSnapshot("/search", "?query=frameless+shower");
     const html = injectPublicHtmlSnapshot(template, snapshot);
 
     expect(html).toContain('meta name="robots" content="noindex,follow"');
-    expect(html).toContain("Search Results for &quot;application process&quot;");
+    expect(html).toContain("Search Results for &quot;frameless shower&quot;");
   });
 
   it("retrieves and injects custom public head additions", async () => {

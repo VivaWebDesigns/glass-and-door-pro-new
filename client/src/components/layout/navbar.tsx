@@ -4,7 +4,6 @@ import {
   Menu,
   User,
   LogOut,
-  LayoutDashboard,
   Shield,
   UserCog,
   ChevronDown,
@@ -43,7 +42,7 @@ const defaultNavLinks = [
   { label: "Reviews", href: "/reviews" },
 ];
 
-const allResourceLinks: { label: string; href: string; hideFromClients?: boolean }[] = [];
+const allResourceLinks: { label: string; href: string }[] = [];
 
 function normalizePublicMenuUrl(item: Pick<MenuItem, "label" | "url">) {
   if (/services/i.test(item.label) && item.url === "/#services") {
@@ -93,6 +92,9 @@ function getServicesOverviewLink(item: Pick<MenuItem, "label" | "url">) {
     href: item.url === "/#services" ? "/services" : normalizePublicMenuUrl(item),
   };
 }
+
+const mobileNavButtonClassName =
+  "h-auto min-h-9 w-full min-w-0 justify-start whitespace-normal text-left leading-snug aria-[current=page]:bg-transparent aria-[current=page]:text-accent";
 
 function DynamicDropdown({ item, location: currentPath }: { item: MenuItem; location: string }) {
   const overviewLink = getServicesOverviewLink(item);
@@ -172,7 +174,7 @@ function DynamicDropdown({ item, location: currentPath }: { item: MenuItem; loca
 
 export function Navbar() {
   const [location] = useLocation();
-  const { user, isLoading, logout, isAdmin, isTherapist } = useAuth();
+  const { user, isLoading, logout, isAdmin } = useAuth();
   const { frontendLogoUrl, companyName } = useBranding();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -195,8 +197,7 @@ export function Navbar() {
     return items.length > 0 ? items : null;
   }, [publicMenus]);
 
-  const isClient = user && user.role === "client";
-  const resourceLinks = allResourceLinks.filter((link) => !(link.hideFromClients && isClient));
+  const resourceLinks = allResourceLinks;
 
   const unreadNotifCount = useUnreadNotificationCount();
   const brandLogo = frontendLogoUrl || "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
@@ -329,14 +330,6 @@ export function Navbar() {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="z-[1000]">
-                  {isTherapist && (
-                    <DropdownMenuItem asChild>
-                      <Link href="/therapist" data-testid="link-therapist-dashboard">
-                        <LayoutDashboard className="mr-2 h-4 w-4" />
-                        Mental Health Professional Dashboard
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
                   {isAdmin && (
                     <DropdownMenuItem asChild>
                       <Link href="/admin/cms" data-testid="link-admin-dashboard">
@@ -418,7 +411,7 @@ export function Navbar() {
                   <img src={brandLogo} alt={brandName} className="h-12 w-auto" />
                 </SheetTitle>
               </SheetHeader>
-              <div className="mt-6 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain pb-8 pr-1">
+              <div className="mt-6 flex min-h-0 flex-1 flex-col gap-1 overflow-x-hidden overflow-y-auto overscroll-contain pb-8 pr-1">
                 {dynamicItems ? (
                   flattenItems(dynamicItems).map(({ item, depth }) => {
                     const overviewLink = getServicesOverviewLink(item);
@@ -435,7 +428,7 @@ export function Navbar() {
                             <Button
                               asChild
                               variant="ghost"
-                              className="w-full justify-start aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
+                              className={mobileNavButtonClassName}
                               style={
                                 depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined
                               }
@@ -453,7 +446,7 @@ export function Navbar() {
                         key={item.id}
                         asChild
                         variant="ghost"
-                        className="w-full justify-start"
+                        className={mobileNavButtonClassName}
                         style={depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined}
                         data-testid={`link-mobile-${item.id}`}
                       >
@@ -471,7 +464,7 @@ export function Navbar() {
                         key={item.id}
                         asChild
                         variant="ghost"
-                        className="w-full justify-start aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
+                        className={mobileNavButtonClassName}
                         style={depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined}
                         data-testid={`link-mobile-${item.id}`}
                         aria-current={location === item.url ? "page" : undefined}
@@ -489,7 +482,7 @@ export function Navbar() {
                         key={link.href}
                         asChild
                         variant="ghost"
-                        className="w-full justify-start aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
+                        className={mobileNavButtonClassName}
                         data-testid={`link-mobile-${link.label.toLowerCase()}`}
                         aria-current={location === link.href ? "page" : undefined}
                       >
@@ -508,7 +501,7 @@ export function Navbar() {
                             key={link.href}
                             asChild
                             variant="ghost"
-                            className="w-full justify-start pl-6 aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
+                            className={`${mobileNavButtonClassName} pl-6`}
                             data-testid={`link-mobile-resource-${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
                             aria-current={location === link.href ? "page" : undefined}
                           >
@@ -522,7 +515,7 @@ export function Navbar() {
                     <Button
                       asChild
                       variant="ghost"
-                      className="w-full justify-start aria-[current=page]:bg-transparent aria-[current=page]:text-accent"
+                      className={mobileNavButtonClassName}
                       data-testid="link-mobile-contact"
                       aria-current={location === "/#contact" ? "page" : undefined}
                     >
@@ -540,24 +533,11 @@ export function Navbar() {
                     <p className="px-4 py-2 text-sm text-muted-foreground">
                       Signed in as {user.firstName} {user.lastName}
                     </p>
-                    {isTherapist && (
-                      <Button
-                        asChild
-                        variant="ghost"
-                        className="w-full justify-start"
-                        data-testid="link-mobile-therapist"
-                      >
-                        <Link href="/therapist" onClick={() => setMobileOpen(false)}>
-                          <LayoutDashboard className="mr-2 h-4 w-4" />
-                          Mental Health Professional Dashboard
-                        </Link>
-                      </Button>
-                    )}
                     {isAdmin && (
                       <Button
                         asChild
                         variant="ghost"
-                        className="w-full justify-start"
+                        className={mobileNavButtonClassName}
                         data-testid="link-mobile-admin"
                       >
                         <Link href="/admin/cms" onClick={() => setMobileOpen(false)}>
@@ -568,7 +548,7 @@ export function Navbar() {
                     )}
                     <Button
                       variant="ghost"
-                      className="w-full justify-start"
+                      className={mobileNavButtonClassName}
                       onClick={() => {
                         setNotifOpen(true);
                         setMobileOpen(false);
@@ -585,7 +565,7 @@ export function Navbar() {
                     </Button>
                     <Button
                       variant="ghost"
-                      className="w-full justify-start"
+                      className={mobileNavButtonClassName}
                       onClick={() => {
                         setProfileOpen(true);
                         setMobileOpen(false);
@@ -598,7 +578,7 @@ export function Navbar() {
                     <div className="my-1 border-t" />
                     <Button
                       variant="ghost"
-                      className="w-full justify-start"
+                      className={mobileNavButtonClassName}
                       onClick={() => {
                         logout.mutate();
                         setMobileOpen(false);

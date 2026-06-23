@@ -3,7 +3,6 @@ import cookieParser from "cookie-parser";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
-import { WebhookHandlers } from "./webhooks/stripe.handler";
 import {
   enforceRequiredSecrets,
   securityHeaders,
@@ -13,11 +12,8 @@ import {
 import { logger, requestIdMiddleware } from "./utils/logger";
 import { recordRequest, getMetricsSnapshot } from "./utils/metrics";
 import { startScheduledPublishService } from "./services/scheduled-publish.service";
-import { startEventReminderService } from "./services/event-reminder.service";
 import { startSystemBackupService } from "./services/system-backup.service";
-import { startDirectoryMembershipLifecycleService } from "./services/directory-membership-lifecycle.service";
 import { getLocalUploadsRoot } from "./services/local-upload-storage";
-import { getSiteFeatures } from "./services/site-features.service";
 
 declare const __APP_VERSION__: string;
 const pkgVersion = typeof __APP_VERSION__ === "string" ? __APP_VERSION__ : "unknown";
@@ -36,17 +32,6 @@ declare module "http" {
     rawBody: unknown;
   }
 }
-
-app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), async (req, res) => {
-  try {
-    const signature = req.headers["stripe-signature"] as string;
-    await WebhookHandlers.processWebhook(req.body, signature);
-    res.json({ received: true });
-  } catch (err) {
-    logger.stripe.error("Webhook endpoint error", err, { requestId: req.requestId });
-    res.status(400).json({ error: "Webhook processing failed" });
-  }
-});
 
 app.use(
   express.json({
@@ -219,9 +204,6 @@ app.use((req, res, next) => {
     await runMigrations();
   }
 
-  const { initSearchIndex } = await import("./lib/search-index");
-  await initSearchIndex();
-
   const { runSystemBootstrap } = await import("./services/system-bootstrap.service");
   await runSystemBootstrap();
 
@@ -257,15 +239,8 @@ app.use((req, res, next) => {
     await setupVite(httpServer, app);
   }
 
-  const siteFeatures = await getSiteFeatures();
-  startScheduledPublishService({ blogEnabled: siteFeatures.blogEnabled });
-  if (siteFeatures.eventsEnabled) {
-    startEventReminderService();
-  }
+  startScheduledPublishService();
   startSystemBackupService();
-  if (siteFeatures.directoryEnabled) {
-    startDirectoryMembershipLifecycleService();
-  }
 
   const port = parseInt(process.env.PORT || "5000", 10);
   httpServer.listen(

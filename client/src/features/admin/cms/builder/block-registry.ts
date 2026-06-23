@@ -51,22 +51,6 @@ const LEGACY_BLOCK_TYPE_ALIASES: Record<string, string> = {
   "cta-banner": "cta",
 };
 
-const RETIRED_BLOCK_TYPES = new Set([
-  "featured-professionals",
-  "featured-counselors",
-  "events-preview",
-  "therapist-map",
-  "join-hero",
-  "join-registration-form",
-  "blog-post-feed",
-  "blog-featured-post",
-  "standard-blog-page",
-  "events-archive",
-  "video-archives",
-  "directory-browser",
-  "blog-preview",
-]);
-
 const ALIGN_OPTIONS = [
   { label: "Left", value: "left" },
   { label: "Center", value: "center" },
@@ -1473,9 +1457,7 @@ const FULL_WIDTH_BLOCK_TYPES = new Set([
   "stats-bar",
 ]);
 
-export const BLOCK_REGISTRY: BlockDef[] = BASE_BLOCK_REGISTRY
-  .filter((block) => !RETIRED_BLOCK_TYPES.has(block.type))
-  .map((block) => {
+export const BLOCK_REGISTRY: BlockDef[] = BASE_BLOCK_REGISTRY.map((block) => {
     const blockWithHeading = withSharedSectionHeading(block);
     if (block.type === "hero") {
       return withSharedVisibility(blockWithHeading);
@@ -1541,9 +1523,7 @@ const BASE_DYNAMIC_BLOCK_TYPES: BlockDef[] = [
   },
 ];
 
-export const DYNAMIC_BLOCK_TYPES: BlockDef[] = BASE_DYNAMIC_BLOCK_TYPES
-  .filter((block) => !RETIRED_BLOCK_TYPES.has(block.type))
-  .map((block) =>
+export const DYNAMIC_BLOCK_TYPES: BlockDef[] = BASE_DYNAMIC_BLOCK_TYPES.map((block) =>
     withSharedVisibility(withSharedSectionStyles(withSharedSectionHeading(block), {
       includePaddingControls: !FULL_WIDTH_BLOCK_TYPES.has(block.type),
     }))

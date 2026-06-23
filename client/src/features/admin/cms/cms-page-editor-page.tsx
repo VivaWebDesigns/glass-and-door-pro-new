@@ -67,7 +67,6 @@ import { format } from "date-fns";
 import { PageBuilder } from "./builder/page-builder";
 import type { BuilderContent } from "./builder/block-registry";
 import { reportBuilderRenderError } from "./builder/builder-diagnostics";
-import { mergeJoinHeroBlocks } from "@shared/cms-blocks";
 import { TemplatePicker } from "./components/template-picker";
 import { LandingPageWizard } from "./components/landing-page-wizard";
 import { analyzeCmsPageQuality } from "@/lib/cms-page-quality";
@@ -108,7 +107,7 @@ function parseBuilderContent(raw: unknown): BuilderContent {
   if (!raw || typeof raw !== "object") return EMPTY_CONTENT;
   const obj = raw as Record<string, unknown>;
   if (Array.isArray(obj.blocks)) {
-    return { blocks: mergeJoinHeroBlocks(obj.blocks as BuilderContent["blocks"]) };
+    return { blocks: obj.blocks as BuilderContent["blocks"] };
   }
   return EMPTY_CONTENT;
 }
@@ -890,7 +889,7 @@ export default function CmsPageEditorPage() {
                                     {sidebars.map((sidebar) => (
                                       <SelectItem key={sidebar.id} value={sidebar.id}>
                                         {sidebar.name}
-                                        {sidebar.isDefault ? " (Default Blog)" : ""}
+                                        {sidebar.isDefault ? " (Default)" : ""}
                                       </SelectItem>
                                     ))}
                                   </SelectContent>

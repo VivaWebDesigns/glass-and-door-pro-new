@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type ElementType } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -30,11 +30,11 @@ import {
   SheetFooter,
 } from "@/components/ui/sheet";
 import {
-  CreditCard,
   Mail,
   Cloud,
   Eye,
   EyeOff,
+  Pencil,
   Save,
   Plug,
   CheckCircle2,
@@ -42,11 +42,7 @@ import {
   Loader2,
   Send,
   FileText,
-  Pencil,
   AlertCircle,
-  Plus,
-  Trash2,
-  Tag,
   Link2,
   ExternalLink,
   RefreshCw,
@@ -76,7 +72,6 @@ import {
 } from "@/lib/branding";
 import { cn } from "@/lib/utils";
 import { useEditorLock } from "@/hooks/use-editor-lock";
-import { DEFAULT_SITE_FEATURES, normalizeBooleanSetting } from "@shared/site-features";
 import { resolveBrandingColor } from "@shared/branding-colors";
 
 type SettingsData = Record<string, Record<string, { value: string; isSecret: boolean }>>;
@@ -107,12 +102,6 @@ type BrandingColorSettingKey =
   | "text_primary_foreground_color"
   | "text_secondary_foreground_color"
   | "text_tertiary_foreground_color";
-
-type SystemConfigurationSettingKey =
-  | "enable_directory"
-  | "enable_blog"
-  | "enable_events"
-  | "enable_crm";
 
 const BRANDING_CORE_COLOR_FIELDS: Array<{
   key: BrandingColorSettingKey;
@@ -227,37 +216,6 @@ const BRANDING_COLOR_FIELDS = [
   ...BRANDING_UI_TEXT_COLOR_FIELDS,
 ] as const;
 
-const SYSTEM_CONFIGURATION_FIELDS: Array<{
-  key: SystemConfigurationSettingKey;
-  label: string;
-  description: string;
-}> = [
-  {
-    key: "enable_directory",
-    label: "Enable Directory",
-    description:
-      "Turns the directory app on or off for this site, including admin navigation and directory routes.",
-  },
-  {
-    key: "enable_blog",
-    label: "Enable Blog",
-    description:
-      "Controls blog and insights entry points so sites can ship without the publishing app when needed.",
-  },
-  {
-    key: "enable_events",
-    label: "Enable Events",
-    description:
-      "Controls event-related admin tools and legacy event routes for sites that do not run an events program.",
-  },
-  {
-    key: "enable_crm",
-    label: "Enable CRM",
-    description:
-      "Turns the CRM pipeline app on or off, including admin navigation and inbound lead routes.",
-  },
-];
-
 interface EmailTemplate {
   id: string;
   slug: string;
@@ -281,7 +239,7 @@ interface IntegrationConfig {
   category: string;
   title: string;
   description: string;
-  icon: typeof CreditCard;
+  icon: ElementType;
   accountUrl: string;
   docsUrl?: string;
   instructions: string[];
@@ -291,40 +249,6 @@ interface IntegrationConfig {
 }
 
 const INTEGRATIONS: IntegrationConfig[] = [
-  {
-    category: "stripe",
-    title: "Stripe",
-    description: "Payment processing for online payments and future billing workflows",
-    icon: CreditCard,
-    accountUrl: "https://dashboard.stripe.com/apikeys",
-    docsUrl: "https://docs.stripe.com/keys",
-    instructions: [
-      "Open Stripe API keys and confirm you are in the correct test or live mode.",
-      "Copy the Publishable key and Secret key into this card.",
-      "Create or open the webhook endpoint in Stripe, then copy its signing secret into Webhook Secret.",
-    ],
-    replitConnected: false,
-    fields: [
-      {
-        key: "stripe_secret_key",
-        label: "Secret Key",
-        isSecret: true,
-        placeholder: "sk_live_...",
-      },
-      {
-        key: "stripe_publishable_key",
-        label: "Publishable Key",
-        isSecret: false,
-        placeholder: "pk_live_...",
-      },
-      {
-        key: "stripe_webhook_secret",
-        label: "Webhook Secret",
-        isSecret: true,
-        placeholder: "whsec_...",
-      },
-    ],
-  },
   {
     category: "mailgun",
     title: "Mailgun",
@@ -397,29 +321,6 @@ const INTEGRATIONS: IntegrationConfig[] = [
         label: "Reporting Private Key",
         isSecret: true,
         placeholder: "-----BEGIN PRIVATE KEY-----",
-      },
-    ],
-  },
-  {
-    category: "crm",
-    title: "CRM Inbound API",
-    description:
-      "API key used by external lead sources like social ads, Zapier, and landing-page tools",
-    icon: Plug,
-    accountUrl: "https://core-platform-production-0848.up.railway.app/admin/settings",
-    docsUrl: "https://core-platform-production-0848.up.railway.app/admin/settings",
-    instructions: [
-      "Create a strong shared key for trusted lead sources.",
-      "Send inbound leads to /api/crm/leads with the key in the X-CRM-API-Key header.",
-      "Rotate this key if a connected integration is removed or compromised.",
-    ],
-    supportsConnectionTest: false,
-    fields: [
-      {
-        key: "crm_api_key",
-        label: "Inbound API Key",
-        isSecret: true,
-        placeholder: "Generate a long random secret",
       },
     ],
   },
@@ -724,148 +625,6 @@ function IntegrationsTab({ settings }: { settings: SettingsData }) {
       {INTEGRATIONS.map((config) => (
         <IntegrationCard key={config.category} config={config} settings={settings} />
       ))}
-    </div>
-  );
-}
-
-function SystemConfigurationTab({ settings }: { settings: SettingsData }) {
-  const { toast } = useToast();
-  const systemConfig = settings.system_configuration || {};
-  const getStoredValue = (key: SystemConfigurationSettingKey) => {
-    if (key === "enable_directory") {
-      return normalizeBooleanSetting(
-        systemConfig.enable_directory?.value,
-        DEFAULT_SITE_FEATURES.directoryEnabled,
-      );
-    }
-    if (key === "enable_blog") {
-      return normalizeBooleanSetting(
-        systemConfig.enable_blog?.value,
-        DEFAULT_SITE_FEATURES.blogEnabled,
-      );
-    }
-    if (key === "enable_crm") {
-      return normalizeBooleanSetting(
-        systemConfig.enable_crm?.value,
-        DEFAULT_SITE_FEATURES.crmEnabled,
-      );
-    }
-    return normalizeBooleanSetting(
-      systemConfig.enable_events?.value,
-      DEFAULT_SITE_FEATURES.eventsEnabled,
-    );
-  };
-  const [values, setValues] = useState<Record<SystemConfigurationSettingKey, boolean>>({
-    enable_directory: getStoredValue("enable_directory"),
-    enable_blog: getStoredValue("enable_blog"),
-    enable_events: getStoredValue("enable_events"),
-    enable_crm: getStoredValue("enable_crm"),
-  });
-
-  useEffect(() => {
-    setValues({
-      enable_directory: getStoredValue("enable_directory"),
-      enable_blog: getStoredValue("enable_blog"),
-      enable_events: getStoredValue("enable_events"),
-      enable_crm: getStoredValue("enable_crm"),
-    });
-  }, [
-    systemConfig.enable_directory?.value,
-    systemConfig.enable_blog?.value,
-    systemConfig.enable_events?.value,
-    systemConfig.enable_crm?.value,
-  ]);
-
-  const saveMutation = useMutation({
-    mutationFn: async () => {
-      await Promise.all(
-        SYSTEM_CONFIGURATION_FIELDS.map((field) =>
-          apiRequest("PUT", "/api/admin/settings", {
-            key: field.key,
-            value: values[field.key] ? "true" : "false",
-            category: "system_configuration",
-            isSecret: false,
-          }),
-        ),
-      );
-    },
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["/api/admin/settings"] }),
-        queryClient.invalidateQueries({ queryKey: ["/api/site-config"] }),
-      ]);
-      toast({ title: "System configuration updated" });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Could not save system configuration",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const hasChanges = SYSTEM_CONFIGURATION_FIELDS.some(
-    (field) => values[field.key] !== getStoredValue(field.key),
-  );
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold" data-testid="text-system-configuration-heading">
-          System Configuration
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          Control which major site apps are active so this platform can be reused across projects
-          without carrying unnecessary features.
-        </p>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Feature Apps</CardTitle>
-          <CardDescription>
-            These toggles hide or reveal major admin navigation and public entry routes. Existing
-            data is preserved when an app is turned off.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {SYSTEM_CONFIGURATION_FIELDS.map((field) => (
-            <div
-              key={field.key}
-              className="flex items-start justify-between gap-4 rounded-xl border p-4"
-            >
-              <div className="space-y-1">
-                <Label className="text-sm font-medium">{field.label}</Label>
-                <p className="text-xs text-muted-foreground">{field.description}</p>
-              </div>
-              <Switch
-                checked={values[field.key]}
-                onCheckedChange={(checked) =>
-                  setValues((current) => ({ ...current, [field.key]: checked }))
-                }
-                data-testid={`switch-${field.key}`}
-              />
-            </div>
-          ))}
-
-          <div className="flex gap-2 pt-2">
-            <Button
-              type="button"
-              onClick={() => saveMutation.mutate()}
-              disabled={!hasChanges || saveMutation.isPending}
-              data-testid="button-save-system-configuration"
-            >
-              {saveMutation.isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Save className="mr-2 h-4 w-4" />
-              )}
-              Save Configuration
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
@@ -2546,264 +2305,6 @@ function EmailTemplatesTab() {
   );
 }
 
-type Specialization = { id: number; name: string; sortOrder: number };
-
-export function SpecializationsTab({ showHeader = true }: { showHeader?: boolean } = {}) {
-  const { toast } = useToast();
-  const [addName, setAddName] = useState("");
-  const [addOpen, setAddOpen] = useState(false);
-  const [editTarget, setEditTarget] = useState<Specialization | null>(null);
-  const [editName, setEditName] = useState("");
-  const [deleteTarget, setDeleteTarget] = useState<Specialization | null>(null);
-
-  const { data: specs, isLoading } = useQuery<Specialization[]>({
-    queryKey: ["/api/specializations"],
-  });
-
-  const addMutation = useMutation({
-    mutationFn: (name: string) => apiRequest("POST", "/api/specializations", { name }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/specializations"] });
-      setAddName("");
-      setAddOpen(false);
-      toast({ title: "Specialization added" });
-    },
-    onError: (err: Error) =>
-      toast({ title: "Error", description: err.message, variant: "destructive" }),
-  });
-
-  const editMutation = useMutation({
-    mutationFn: ({ id, name }: { id: number; name: string }) =>
-      apiRequest("PUT", `/api/specializations/${id}`, { name }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/specializations"] });
-      setEditTarget(null);
-      toast({ title: "Specialization updated" });
-    },
-    onError: (err: Error) =>
-      toast({ title: "Error", description: err.message, variant: "destructive" }),
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => apiRequest("DELETE", `/api/specializations/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/specializations"] });
-      setDeleteTarget(null);
-      toast({ title: "Specialization deleted" });
-    },
-    onError: (err: Error) =>
-      toast({ title: "Error", description: err.message, variant: "destructive" }),
-  });
-
-  function handleStartEdit(spec: Specialization) {
-    setEditTarget(spec);
-    setEditName(spec.name);
-  }
-
-  return (
-    <>
-      <Card>
-        {showHeader ? (
-          <CardHeader>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Tag className="h-4 w-4" />
-                  Specialization Settings
-                </CardTitle>
-                <CardDescription className="mt-1">
-                  Manage the legacy directory specialization list. This module is retired for the
-                  current Glass & Door Pro public site.
-                </CardDescription>
-              </div>
-              <Button
-                size="sm"
-                onClick={() => setAddOpen(true)}
-                className="bg-accent text-accent-foreground flex-shrink-0"
-                data-testid="button-add-specialization"
-              >
-                <Plus className="h-4 w-4 mr-1.5" />
-                Add
-              </Button>
-            </div>
-          </CardHeader>
-        ) : (
-          <CardContent className="flex items-center justify-end border-b py-4">
-            <Button
-              size="sm"
-              onClick={() => setAddOpen(true)}
-              className="bg-accent text-accent-foreground flex-shrink-0"
-              data-testid="button-add-specialization"
-            >
-              <Plus className="h-4 w-4 mr-1.5" />
-              Add
-            </Button>
-          </CardContent>
-        )}
-        <CardContent>
-          {isLoading ? (
-            <div className="flex justify-center py-10">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            </div>
-          ) : !specs?.length ? (
-            <div className="text-center py-10 text-muted-foreground text-sm">
-              No specializations yet.
-            </div>
-          ) : (
-            <div className="divide-y rounded-md border">
-              {specs.map((spec) => (
-                <div
-                  key={spec.id}
-                  className="flex items-center justify-between gap-3 px-4 py-2.5"
-                  data-testid={`specialization-row-${spec.id}`}
-                >
-                  <span className="text-sm">{spec.name}</span>
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8"
-                      onClick={() => handleStartEdit(spec)}
-                      data-testid={`button-edit-specialization-${spec.id}`}
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8 text-destructive hover:text-destructive"
-                      onClick={() => setDeleteTarget(spec)}
-                      data-testid={`button-delete-specialization-${spec.id}`}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <Sheet open={addOpen} onOpenChange={setAddOpen}>
-        <SheetContent side="right" className="sm:max-w-md z-[1300]">
-          <SheetHeader>
-            <SheetTitle>Add Specialization</SheetTitle>
-            <SheetDescription>Enter a name for the new specialization.</SheetDescription>
-          </SheetHeader>
-          <SheetBody>
-            <div className="space-y-2">
-              <Label htmlFor="add-spec-name">Name</Label>
-              <Input
-                id="add-spec-name"
-                value={addName}
-                onChange={(e) => setAddName(e.target.value)}
-                placeholder="e.g. Parenting Challenges"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && addName.trim()) addMutation.mutate(addName.trim());
-                }}
-                data-testid="input-add-specialization-name"
-                autoFocus
-              />
-            </div>
-          </SheetBody>
-          <SheetFooter>
-            <Button variant="outline" onClick={() => setAddOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={() => addMutation.mutate(addName.trim())}
-              disabled={!addName.trim() || addMutation.isPending}
-              data-testid="button-save-add-specialization"
-            >
-              {addMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Add Specialization
-            </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
-
-      <Sheet
-        open={!!editTarget}
-        onOpenChange={(open) => {
-          if (!open) setEditTarget(null);
-        }}
-      >
-        <SheetContent side="right" className="sm:max-w-md z-[1300]">
-          <SheetHeader>
-            <SheetTitle>Edit Specialization</SheetTitle>
-            <SheetDescription>Update the name of this specialization.</SheetDescription>
-          </SheetHeader>
-          <SheetBody>
-            <div className="space-y-2">
-              <Label htmlFor="edit-spec-name">Name</Label>
-              <Input
-                id="edit-spec-name"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && editName.trim() && editTarget) {
-                    editMutation.mutate({ id: editTarget.id, name: editName.trim() });
-                  }
-                }}
-                data-testid="input-edit-specialization-name"
-                autoFocus
-              />
-            </div>
-          </SheetBody>
-          <SheetFooter>
-            <Button variant="outline" onClick={() => setEditTarget(null)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={() =>
-                editTarget && editMutation.mutate({ id: editTarget.id, name: editName.trim() })
-              }
-              disabled={!editName.trim() || editMutation.isPending}
-              data-testid="button-save-edit-specialization"
-            >
-              {editMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Save Changes
-            </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
-
-      <Sheet
-        open={!!deleteTarget}
-        onOpenChange={(open) => {
-          if (!open) setDeleteTarget(null);
-        }}
-      >
-        <SheetContent side="right" className="sm:max-w-md z-[1300]">
-          <SheetHeader>
-            <SheetTitle>Delete Specialization</SheetTitle>
-            <SheetDescription>
-              This will remove <strong>{deleteTarget?.name}</strong> from the legacy directory
-              specialization list. Existing retired profiles that already have this specialization
-              will retain it until they save changes.
-            </SheetDescription>
-          </SheetHeader>
-          <SheetFooter className="mt-6">
-            <Button variant="outline" onClick={() => setDeleteTarget(null)}>
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
-              disabled={deleteMutation.isPending}
-              data-testid="button-confirm-delete-specialization"
-            >
-              {deleteMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Delete
-            </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
-    </>
-  );
-}
-
 export default function AdminSettingsPage() {
   const { data: settings, isLoading } = useQuery<SettingsData>({
     queryKey: ["/api/admin/settings"],
@@ -2816,7 +2317,7 @@ export default function AdminSettingsPage() {
           System Settings
         </h1>
         <p className="text-muted-foreground mb-6">
-          Manage integrations, head markup, system configuration, and system email templates.
+          Manage integrations, head markup, and system email templates.
         </p>
 
         <Tabs defaultValue="integrations">
@@ -2826,9 +2327,6 @@ export default function AdminSettingsPage() {
             </TabsTrigger>
             <TabsTrigger value="head-tags" data-testid="tab-head-tag-additions">
               Head Tag Additions
-            </TabsTrigger>
-            <TabsTrigger value="configuration" data-testid="tab-system-configuration">
-              System Configuration
             </TabsTrigger>
             <TabsTrigger value="templates" data-testid="tab-templates">
               Email Templates
@@ -2859,15 +2357,6 @@ export default function AdminSettingsPage() {
             )}
           </TabsContent>
 
-          <TabsContent value="configuration" className="mt-6">
-            {isLoading ? (
-              <div className="flex items-center justify-center p-12">
-                <Loader2 className="h-6 w-6 animate-spin" />
-              </div>
-            ) : (
-              <SystemConfigurationTab settings={settings || {}} />
-            )}
-          </TabsContent>
         </Tabs>
       </div>
     </AdminSidebar>

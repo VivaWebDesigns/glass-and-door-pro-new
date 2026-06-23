@@ -26,7 +26,6 @@ const ForgotPasswordPage = lazy(() => import("@/features/auth/forgot-password-pa
 const ResetPasswordPage = lazy(() => import("@/features/auth/reset-password-page"));
 const AdminSetupPage = lazy(() => import("@/features/auth/admin-setup-page"));
 
-const ReferenceFormPage = lazy(() => import("@/features/public/reference-form-page"));
 const StandaloneFormPage = lazy(() => import("@/features/public/standalone-form-page"));
 const AdminUsersPage = lazy(() => import("@/features/admin/users-page"));
 const AdminFormsPage = lazy(() => import("@/features/admin/forms-page"));
@@ -112,7 +111,6 @@ function Router() {
         <Route path="/privacy-policy" component={() => <CmsHybridPage slug="privacy-policy" fallback={<LegalFallbackPage title="Privacy Policy" subtitle="Review how Glass & Door Pro handles contact form details, service inquiries, cookies, analytics, and customer records." />} />} />
         <Route path="/terms-of-service" component={() => <CmsHybridPage slug="terms-of-service" fallback={<LegalFallbackPage title="Terms of Service" subtitle="Review the terms governing use of the Glass & Door Pro website, estimates, service information, third-party links, and site content." />} />} />
         <Route path="/disclaimer" component={() => <CmsHybridPage slug="disclaimer" fallback={<LegalFallbackPage title="Disclaimer" subtitle="Review important context about website information, estimates, repair recommendations, warranty references, pricing, and commercial glass work." />} />} />
-        <Route path="/reference/:token" component={ReferenceFormPage} />
         <Route path="/forms/:slug" component={StandaloneFormPage} />
         <Route path="/auth/login" component={LoginPage} />
         <Route path="/auth/register"><Redirect to="/" replace /></Route>
@@ -120,34 +118,21 @@ function Router() {
         <Route path="/auth/reset-password" component={ResetPasswordPage} />
         <Route path="/setup" component={AdminSetupPage} />
 
-        <Route path="/therapist" component={NotFound} />
-        <Route path="/therapist/profile" component={NotFound} />
-        <Route path="/therapist/subscription" component={NotFound} />
-        <Route path="/therapist/apply" component={NotFound} />
-        <Route path="/therapist/application/status" component={NotFound} />
-
         <Route path="/admin">
           <ProtectedRoute roles={["admin", "editor"]}>
             <AdminIndexRoute />
           </ProtectedRoute>
         </Route>
-        <Route path="/admin/therapists" component={NotFound} />
-        <Route path="/admin/directory/settings" component={NotFound} />
         <Route path="/admin/users">
           <ProtectedRoute roles={["admin"]}>
             <AdminUsersPage />
           </ProtectedRoute>
         </Route>
-        <Route path="/admin/membership-tiers" component={NotFound} />
-        <Route path="/admin/events" component={NotFound} />
         <Route path="/admin/forms">
           <ProtectedRoute roles={["admin", "editor"]} adminPermissions={["content"]}>
             <AdminFormsPage />
           </ProtectedRoute>
         </Route>
-        <Route path="/admin/crm/clients" component={NotFound} />
-        <Route path="/admin/crm" component={NotFound} />
-        <Route path="/admin/blog" component={NotFound} />
         <Route path="/admin/docs">
           <ProtectedRoute roles={["admin"]}>
             <DocsPage />
@@ -176,14 +161,11 @@ function Router() {
             <AdminDesignPage initialSubview="typography" />
           </ProtectedRoute>
         </Route>
-        <Route path="/admin/therapists/specializations" component={NotFound} />
         <Route path="/admin/system/backups">
           <ProtectedRoute roles={["admin"]}>
             <SystemBackupsPage />
           </ProtectedRoute>
         </Route>
-        <Route path="/admin/applications/:id" component={NotFound} />
-        <Route path="/admin/applications" component={NotFound} />
         <Route path="/admin/cms">
           <ProtectedRoute roles={["admin", "editor"]} adminPermissions={["content"]}>
             <CmsOverviewPage />
@@ -209,11 +191,6 @@ function Router() {
             <CmsMediaPage />
           </ProtectedRoute>
         </Route>
-        <Route path="/admin/cms/blog/new" component={NotFound} />
-        <Route path="/admin/cms/blog/settings" component={NotFound} />
-        <Route path="/admin/cms/blog/comments" component={NotFound} />
-        <Route path="/admin/cms/blog/:id" component={NotFound} />
-        <Route path="/admin/cms/blog" component={NotFound} />
         <Route path="/admin/cms/sections/new" component={NotFound} />
         <Route path="/admin/cms/sections/:id" component={NotFound} />
         <Route path="/admin/cms/sections" component={NotFound} />

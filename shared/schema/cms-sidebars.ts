@@ -4,12 +4,9 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const SIDEBAR_WIDGET_TYPES = [
-  "recent-posts",
   "form",
   "callout",
   "search",
-  "categories",
-  "tag-cloud",
   "custom-html",
 ] as const;
 

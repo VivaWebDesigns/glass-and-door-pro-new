@@ -2,7 +2,7 @@ import { sql } from "drizzle-orm";
 import { pgTable, text, varchar, timestamp, jsonb, boolean, index, uniqueIndex } from "drizzle-orm/pg-core";
 import { z } from "zod";
 
-export const CMS_FORM_KINDS = ["contact", "newsletter", "interest", "application", "custom"] as const;
+export const CMS_FORM_KINDS = ["contact", "custom"] as const;
 export type CmsFormKind = (typeof CMS_FORM_KINDS)[number];
 
 export const CMS_FORM_FIELD_TYPES = [
@@ -94,7 +94,6 @@ export const cmsFormSettingsSchema = z.object({
   mailchimpTag: z.string().optional().default(""),
   notifyAdmins: z.boolean().optional().default(false),
   storeAsContactMessage: z.boolean().optional().default(false),
-  createCrmLead: z.boolean().optional().default(false),
 });
 
 export type CmsFormSettings = z.infer<typeof cmsFormSettingsSchema>;

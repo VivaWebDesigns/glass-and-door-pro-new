@@ -9,7 +9,7 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   firstName: text("first_name"),
   lastName: text("last_name"),
-  role: text("role").notNull().default("therapist"),
+  role: text("role").notNull().default("editor"),
   adminPermissions: jsonb("admin_permissions").$type<string[]>().default(sql`'[]'::jsonb`).notNull(),
   formNotificationFormIds: jsonb("form_notification_form_ids").$type<string[]>().default(sql`'[]'::jsonb`).notNull(),
   profileImageUrl: text("profile_image_url"),

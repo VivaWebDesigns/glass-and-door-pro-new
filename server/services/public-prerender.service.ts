@@ -1,6 +1,5 @@
 import sanitizeHtml from "sanitize-html";
-import type { BlogPost, CmsPage, Event, SeoSettings } from "@shared/schema";
-import { getEventPath } from "@shared/event-url";
+import type { CmsPage, SeoSettings } from "@shared/schema";
 import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
 import {
   buildGlassBreadcrumbItems,
@@ -88,7 +87,7 @@ const FALLBACK_STATIC_PAGES: Record<
   },
 };
 
-const RETIRED_PUBLIC_PATH_PREFIXES = ["/directory", "/events", "/insights", "/join", "/recordings"];
+const RETIRED_PUBLIC_PATH_PREFIXES = ["/directory", "/events", "/insights", "/join", "/recordings", "/therapist"];
 const REDIRECT_ONLY_PUBLIC_PATHS = new Set(["/about", "/contact"]);
 
 function escapeHtml(value: string) {
@@ -527,163 +526,6 @@ function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: strin
   };
 }
 
-function buildPostSnapshot(post: BlogPost, seo: SeoSettings | null, siteUrl: string): PublicHtmlSnapshot {
-  const canonicalUrl = `${siteUrl}/insights/${post.slug}`;
-  const title = post.seoTitle || post.title;
-  const description =
-    post.seoDescription || post.excerpt || truncate(stripHtml(post.content), 180) || DEFAULT_DESCRIPTION;
-  const bodyHtml = [
-    `<main class="seo-prerender-content">`,
-    `<article>`,
-    `<h1>${escapeHtml(post.title)}</h1>`,
-    post.excerpt ? `<p>${escapeHtml(post.excerpt)}</p>` : "",
-    sanitizeRichHtml(post.content),
-    `</article>`,
-    `</main>`,
-  ].join("");
-
-  return {
-    title: buildHeadTitle(title, seo),
-    description,
-    canonicalUrl,
-    ogImageUrl: absoluteUrl(post.ogImageUrl || post.coverImageUrl || seo?.defaultOgImageUrl, siteUrl) || null,
-    robots: post.noindex ? "noindex,nofollow" : null,
-    bodyHtml,
-    jsonLd: [
-      buildOrganizationSchema(seo, siteUrl),
-      buildWebsiteSchema(seo, siteUrl),
-      buildBreadcrumbSchema([
-        { name: "Home", url: siteUrl },
-        { name: "Insights", url: `${siteUrl}/insights` },
-        { name: post.title, url: canonicalUrl },
-      ]),
-      {
-        "@context": "https://schema.org",
-        "@type": "Article",
-        headline: post.seoTitle || post.title,
-        description,
-        url: canonicalUrl,
-        image: absoluteUrl(post.ogImageUrl || post.coverImageUrl, siteUrl) || undefined,
-        datePublished: post.publishedAt ? new Date(post.publishedAt).toISOString() : undefined,
-        dateModified: post.updatedAt ? new Date(post.updatedAt).toISOString() : undefined,
-        author: post.authorName
-          ? {
-              "@type": "Person",
-              name: post.authorName,
-            }
-          : undefined,
-      },
-    ].filter(Boolean) as Array<Record<string, unknown>>,
-  };
-}
-
-function buildEventSnapshot(event: Event, seo: SeoSettings | null, siteUrl: string): PublicHtmlSnapshot {
-  const canonicalUrl = `${siteUrl}${getEventPath(event)}`;
-  const title = event.title;
-  const description = truncate(stripHtml(event.description || ""), 180) || DEFAULT_DESCRIPTION;
-  const detailLines = [
-    event.description ? sanitizeRichHtml(event.description) : "",
-    event.speakerName ? `<p><strong>Speaker:</strong> ${escapeHtml(event.speakerName)}</p>` : "",
-    event.locationName || event.location
-      ? `<p><strong>Location:</strong> ${escapeHtml(event.locationName || event.location || "")}</p>`
-      : "",
-    event.date
-      ? `<p><strong>Date:</strong> ${escapeHtml(new Date(event.date).toUTCString())}</p>`
-      : "",
-  ].filter(Boolean);
-
-  return {
-    title: buildHeadTitle(title, seo),
-    description,
-    canonicalUrl,
-    ogImageUrl: absoluteUrl(event.imageUrl || seo?.defaultOgImageUrl, siteUrl) || null,
-    bodyHtml: [
-      `<main class="seo-prerender-content">`,
-      `<article>`,
-      `<h1>${escapeHtml(event.title)}</h1>`,
-      ...detailLines,
-      `</article>`,
-      `</main>`,
-    ].join(""),
-    jsonLd: [
-      buildOrganizationSchema(seo, siteUrl),
-      buildWebsiteSchema(seo, siteUrl),
-      buildBreadcrumbSchema([
-        { name: "Home", url: siteUrl },
-        { name: "Events", url: `${siteUrl}/events` },
-        { name: event.title, url: canonicalUrl },
-      ]),
-      {
-        "@context": "https://schema.org",
-        "@type": "Event",
-        name: event.title,
-        description: event.description || undefined,
-        url: canonicalUrl,
-        image: absoluteUrl(event.imageUrl, siteUrl) || undefined,
-        startDate: event.date ? new Date(event.date).toISOString() : undefined,
-        endDate: event.endDate ? new Date(event.endDate).toISOString() : undefined,
-        location:
-          event.locationName || event.location || event.locationAddress
-            ? {
-                "@type": "Place",
-                name: event.locationName || event.location || undefined,
-                address: event.locationAddress || event.location || undefined,
-              }
-            : undefined,
-      },
-    ].filter(Boolean) as Array<Record<string, unknown>>,
-  };
-}
-
-async function buildTherapistSnapshot(
-  id: string,
-  seo: SeoSettings | null,
-  siteUrl: string,
-): Promise<PublicHtmlSnapshot | null> {
-  const profile = await storage.therapists.getProfileWithUser(id);
-  if (!profile || !profile.isApproved || !profile.isActive) return null;
-
-  const displayName =
-    [profile.user?.firstName, profile.user?.lastName].filter(Boolean).join(" ") ||
-    "Mental Health Professional";
-  const canonicalUrl = `${siteUrl}/directory/${profile.id}`;
-  const description =
-    truncate(
-      stripHtml(profile.bio || profile.title || "View this Core Platform-informed mental health professional profile."),
-      180,
-    ) || "View this Core Platform-informed mental health professional profile.";
-
-  return {
-    title: buildHeadTitle(displayName, seo),
-    description,
-    canonicalUrl,
-    ogImageUrl: absoluteUrl(profile.user?.profileImageUrl || seo?.defaultOgImageUrl, siteUrl) || null,
-    bodyHtml: [
-      `<main class="seo-prerender-content">`,
-      `<article>`,
-      `<h1>${escapeHtml(displayName)}</h1>`,
-      profile.title ? `<p>${escapeHtml(profile.title)}</p>` : "",
-      profile.bio ? sanitizeRichHtml(profile.bio) : "",
-      profile.city || profile.country
-        ? `<p>${escapeHtml([profile.city, profile.country].filter(Boolean).join(", "))}</p>`
-        : "",
-      `</article>`,
-      `</main>`,
-    ].join(""),
-    jsonLd: [
-      buildOrganizationSchema(seo, siteUrl),
-      buildWebsiteSchema(seo, siteUrl),
-      {
-        "@context": "https://schema.org",
-        "@type": "Person",
-        name: displayName,
-        description,
-        url: canonicalUrl,
-      },
-    ].filter(Boolean) as Array<Record<string, unknown>>,
-  };
-}
-
 function buildSearchSnapshot(query: string, seo: SeoSettings | null, siteUrl: string): PublicHtmlSnapshot {
   const term = query.trim();
   const title = term ? `Search Results for "${term}"` : "Site Search";
@@ -735,7 +577,6 @@ export async function getPublicHtmlSnapshot(
     pathname.startsWith("/api") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/auth") ||
-    pathname.startsWith("/therapist") ||
     pathname.startsWith("/setup") ||
     pathname.startsWith("/preview") ||
     pathname.startsWith("/uploads")
@@ -758,25 +599,6 @@ export async function getPublicHtmlSnapshot(
   if (pathname === "/search") {
     const params = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
     return buildSearchSnapshot(params.get("query") || "", seo, siteUrl);
-  }
-
-  const blogMatch = pathname.match(/^\/insights\/([^/]+)$/);
-  if (blogMatch) {
-    const post = await storage.blog.getPostBySlug(decodeURIComponent(blogMatch[1]));
-    if (!post || !post.isPublished) return null;
-    return buildPostSnapshot(post, seo, siteUrl);
-  }
-
-  const eventMatch = pathname.match(/^\/events\/([^/]+)$/);
-  if (eventMatch) {
-    const event = await storage.events.getEventByIdentifier(decodeURIComponent(eventMatch[1]));
-    if (!event || event.status !== "published" || event.visibility !== "public") return null;
-    return buildEventSnapshot(event, seo, siteUrl);
-  }
-
-  const therapistMatch = pathname.match(/^\/directory\/([^/]+)$/);
-  if (therapistMatch) {
-    return buildTherapistSnapshot(decodeURIComponent(therapistMatch[1]), seo, siteUrl);
   }
 
   const slug = getCmsSlugForPublicPath(pathname);

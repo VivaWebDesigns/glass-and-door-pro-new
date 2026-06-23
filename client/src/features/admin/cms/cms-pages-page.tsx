@@ -85,8 +85,7 @@ export default function CmsPagesPage() {
     onError: () => toast({ title: "Failed to delete page", variant: "destructive" }),
   });
 
-  const getEditorHref = (page: CmsPage) =>
-    page.slug === "directory" ? "/admin/cms/pages/directory" : `/admin/cms/pages/${page.id}`;
+  const getEditorHref = (page: CmsPage) => `/admin/cms/pages/${page.id}`;
 
   return (
     <AdminSidebar>

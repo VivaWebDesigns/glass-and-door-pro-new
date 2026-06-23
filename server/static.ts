@@ -46,6 +46,7 @@ const GONE_PUBLIC_PATH_PREFIXES = [
   "/insights",
   "/join",
   "/recordings",
+  "/therapist",
 ];
 
 export function serveStatic(app: Express) {
@@ -88,7 +89,7 @@ export function serveStatic(app: Express) {
   }
 
   function isClientOnlyPublicRoute(pathname: string) {
-    return pathname.startsWith("/forms/") || pathname.startsWith("/reference/");
+    return pathname.startsWith("/forms/");
   }
 
   // fall through to index.html if the file doesn't exist
@@ -123,7 +124,6 @@ export function serveStatic(app: Express) {
     const shouldInjectPublicHead =
       !pathname.startsWith("/admin") &&
       !pathname.startsWith("/auth") &&
-      !pathname.startsWith("/therapist") &&
       !pathname.startsWith("/setup") &&
       !pathname.startsWith("/preview") &&
       !pathname.startsWith("/uploads") &&
@@ -142,8 +142,7 @@ export function serveStatic(app: Express) {
       "Cache-Control",
       pathname.startsWith("/admin") ||
         pathname.startsWith("/auth") ||
-        pathname.startsWith("/setup") ||
-        pathname.startsWith("/therapist")
+        pathname.startsWith("/setup")
         ? "private, no-store, max-age=0"
         : "no-cache",
     );

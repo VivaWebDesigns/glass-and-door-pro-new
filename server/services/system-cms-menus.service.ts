@@ -117,18 +117,21 @@ const defaultMenus: Array<InsertCmsMenu & { location: StandardMenuLocation }> = 
     ],
   },
   {
-    name: "Platform",
+    name: "Services",
     location: "footer_platform",
     items: [
-      item("How It Works", "/#about"),
+      item("Services", "/services"),
+      item("Frameless Showers", "/services/frameless-showers"),
+      item("Window Installation", "/services/window-installation"),
     ],
   },
   {
-    name: "For Mental Health Professionals",
+    name: "Commercial Services",
     location: "footer_professionals",
     items: [
-      item("Mental Health Professional Login", "/auth/login"),
-      item("Membership Plans", "/therapist/subscription"),
+      item("Storefront Glass Installation", "/services/commercial-storefront-glass-installation"),
+      item("Storefront Glass Repair", "/services/commercial-storefront-glass-replacement-repair"),
+      item("Commercial Door Repair", "/services/commercial-door-replacement-repair"),
     ],
   },
   {

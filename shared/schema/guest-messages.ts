@@ -16,7 +16,7 @@ export const guestMessages = pgTable("guest_messages", {
   isRead: boolean("is_read").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [
-  index("idx_guest_msg_counselor").on(table.professionalId),
+  index("idx_guest_msg_professional").on(table.professionalId),
   index("idx_guest_msg_read").on(table.professionalId, table.isRead),
   index("idx_guest_msg_created").on(table.createdAt),
 ]);

@@ -121,14 +121,14 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
     const seoOverride = getGlassServiceSeoOverride(page.slug);
     const socialOverride = getGlassServiceSocialMetadata(page.slug);
     const effectiveTitle = seoOverride?.title || page.seoTitle || page.title;
-    const titleSuffix = globalSeo?.titleSuffix ?? " | Core Platform";
+    const titleSuffix = globalSeo?.titleSuffix ?? " | Glass & Door Pro";
     const titleFormatter = page.slug === "home" || isGlassServicePageSlug(page.slug)
       ? formatBrandLastTitle
       : formatBrandFirstTitle;
     const headTitle =
       effectiveTitle && hasBrandSuffix(effectiveTitle)
         ? effectiveTitle
-        : titleFormatter(effectiveTitle, titleSuffix, globalSeo?.siteName ?? "Core Platform");
+        : titleFormatter(effectiveTitle, titleSuffix, globalSeo?.siteName ?? "Glass & Door Pro");
     const effectiveDescription =
       seoOverride?.description || page.seoDescription || globalSeo?.defaultMetaDescription || "";
     const socialTitle = socialOverride?.ogTitle || headTitle;

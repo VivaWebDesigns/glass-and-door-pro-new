@@ -1,7 +1,7 @@
 import { CheckCircle2, Circle, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type ContentType = "page" | "post" | "event";
+export type ContentType = "page";
 
 interface SchemaCheck {
   type: string;
@@ -17,10 +17,6 @@ interface StructuredDataStatusProps {
     hasTitle?: boolean;
     hasDescription?: boolean;
     hasImage?: boolean;
-    hasAuthor?: boolean;
-    hasDate?: boolean;
-    hasLocation?: boolean;
-    hasRecordingUrl?: boolean;
     hasFaqBlocks?: boolean;
     isPublished?: boolean;
     noindex?: boolean;
@@ -45,52 +41,14 @@ function buildChecks(contentType: ContentType, fields: StructuredDataStatusProps
     missingFields: [],
   });
 
-  if (contentType !== "page" || true) {
-    const breadcrumbMissing: string[] = [];
-    if (!fields.hasTitle) breadcrumbMissing.push("title");
-    checks.push({
-      type: "BreadcrumbList",
-      label: "BreadcrumbList",
-      applies: true,
-      missingFields: breadcrumbMissing,
-    });
-  }
-
-  if (contentType === "post") {
-    const missing: string[] = [];
-    if (!fields.hasTitle) missing.push("title");
-    if (!fields.hasDescription) missing.push("meta description");
-    if (!fields.hasImage) missing.push("cover/OG image");
-    if (!fields.hasAuthor) missing.push("author name");
-    if (!fields.hasDate) missing.push("publish date");
-    checks.push({
-      type: "Article",
-      label: "Article",
-      applies: true,
-      missingFields: missing,
-    });
-  }
-
-  if (contentType === "event") {
-    const missing: string[] = [];
-    if (!fields.hasTitle) missing.push("title");
-    if (!fields.hasDescription) missing.push("description");
-    if (!fields.hasDate) missing.push("event date");
-    checks.push({
-      type: "Event",
-      label: "Event",
-      applies: true,
-      missingFields: missing,
-    });
-
-    checks.push({
-      type: "VideoObject",
-      label: "VideoObject",
-      applies: !!fields.hasRecordingUrl,
-      condition: fields.hasRecordingUrl ? undefined : "Only emitted when a recording URL is set",
-      missingFields: fields.hasRecordingUrl ? [] : [],
-    });
-  }
+  const breadcrumbMissing: string[] = [];
+  if (!fields.hasTitle) breadcrumbMissing.push("title");
+  checks.push({
+    type: "BreadcrumbList",
+    label: "BreadcrumbList",
+    applies: true,
+    missingFields: breadcrumbMissing,
+  });
 
   if (contentType === "page") {
     checks.push({
@@ -150,7 +108,7 @@ export function StructuredDataStatus({
   const hasIssues = activeChecks.some((c) => (c.missingFields?.length ?? 0) > 0);
 
   const noindexWarning = fields.noindex;
-  const unpublishedWarning = contentType !== "event" && fields.isPublished === false;
+  const unpublishedWarning = fields.isPublished === false;
 
   return (
     <div className={cn("rounded-lg border bg-muted/30 p-4", className)}>

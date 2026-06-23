@@ -13,7 +13,7 @@ export const conversations = pgTable("conversations", {
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
   index("idx_conv_client_id").on(table.clientId),
-  index("idx_conv_counselor_id").on(table.professionalId),
+  index("idx_conv_professional_id").on(table.professionalId),
   index("idx_conv_updated_at").on(table.updatedAt),
   index("idx_conv_participants").on(table.clientId, table.professionalId),
   index("idx_conv_last_message").on(table.lastMessageAt),

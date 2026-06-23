@@ -76,15 +76,9 @@ const ROLE_COLORS: Record<string, string> = {
 
 const EDITOR_PERMISSION_OPTIONS = [
   {
-    value: AdminPermission.DIRECTORY,
-    label: "Directory",
-    description: "Profiles, applications, specializations, and directory settings.",
-    icon: PanelsTopLeft,
-  },
-  {
     value: AdminPermission.CONTENT,
     label: "Content",
-    description: "Pages, media, forms, events, blog, and SEO tools.",
+    description: "Pages, media, forms, and SEO tools.",
     icon: FolderKanban,
   },
   {
@@ -92,12 +86,6 @@ const EDITOR_PERMISSION_OPTIONS = [
     label: "Design",
     description: "Branding, typography, menus, sidebars, and reusable sections.",
     icon: Palette,
-  },
-  {
-    value: AdminPermission.CRM,
-    label: "CRM",
-    description: "Pipeline, leads, notes, and follow-up tasks.",
-    icon: FolderKanban,
   },
 ] as const;
 
@@ -111,7 +99,7 @@ const SYSTEM_ROLE_OPTIONS = [
   {
     value: "editor" as const,
     label: "Editor",
-    description: "Access only to the Directory, Content, and Design areas you assign.",
+    description: "Access only to the Content and Design areas you assign.",
     icon: FolderKanban,
   },
 ] as const;

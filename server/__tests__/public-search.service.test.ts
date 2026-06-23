@@ -13,15 +13,15 @@ vi.mock("../storage", () => ({
 
 const samplePage: CmsPage = {
   id: "page-1",
-  title: "Application Process",
-  slug: "application-process",
+  title: "Frameless Shower Doors",
+  slug: "services-frameless-showers",
   status: "published",
   pageType: "custom",
   template: "full-width",
   sidebarId: null,
-  content: [{ title: "The Application Process", body: "Learn how to apply with step-by-step guidance." }],
+  content: [{ title: "Frameless Shower Doors", body: "Custom glass shower doors for Charlotte area homes." }],
   seoTitle: null,
-  seoDescription: "A guide to the Core Platform application process.",
+  seoDescription: "Custom frameless shower doors installed in the Charlotte area.",
   seoKeywords: null,
   ogImageUrl: null,
   canonicalUrl: null,
@@ -45,10 +45,10 @@ const draftPage: CmsPage = {
 const joinCmsPage: CmsPage = {
   ...samplePage,
   id: "page-join",
-  title: "Join the Network",
+  title: "Join",
   slug: "join",
   seoDescription: null,
-  content: [{ title: "Membership", body: "Grow your practice with Core Platform." }],
+  content: [{ title: "Join", body: "Retired legacy page content." }],
 };
 
 describe("public-search.service", () => {
@@ -59,10 +59,10 @@ describe("public-search.service", () => {
 
   it("returns public CMS page results for matching content", async () => {
     const { searchPublicSite } = await import("../services/public-search.service");
-    const results = await searchPublicSite("application process");
+    const results = await searchPublicSite("frameless shower");
 
     expect(results.map((result) => result.type)).toEqual(expect.arrayContaining(["page"]));
-    expect(results.map((result) => result.url)).toContain("/application-process");
+    expect(results.map((result) => result.url)).toContain("/services-frameless-showers");
     expect(results.some((result) => result.url.startsWith("/insights"))).toBe(false);
     expect(results.some((result) => result.url.startsWith("/events"))).toBe(false);
   });
@@ -76,9 +76,9 @@ describe("public-search.service", () => {
 
   it("prefers title matches over body-only matches", async () => {
     const { searchPublicSite } = await import("../services/public-search.service");
-    const results = await searchPublicSite("application process");
+    const results = await searchPublicSite("frameless shower");
 
-    expect(results[0]?.title).toBe("Application Process");
+    expect(results[0]?.title).toBe("Frameless Shower Doors");
   });
 
   it("includes current fallback public pages when no published CMS page exists for that route", async () => {
@@ -96,7 +96,7 @@ describe("public-search.service", () => {
     mockGetAllPages.mockResolvedValue([joinCmsPage]);
 
     const { searchPublicSite } = await import("../services/public-search.service");
-    const results = await searchPublicSite("join network");
+    const results = await searchPublicSite("retired legacy");
 
     expect(results.some((result) => result.url === "/join")).toBe(false);
   });
