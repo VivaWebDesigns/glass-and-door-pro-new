@@ -526,28 +526,6 @@ function buildCmsSnapshot(page: CmsPage, seo: SeoSettings | null, siteUrl: strin
   };
 }
 
-function buildSearchSnapshot(query: string, seo: SeoSettings | null, siteUrl: string): PublicHtmlSnapshot {
-  const term = query.trim();
-  const title = term ? `Search Results for "${term}"` : "Site Search";
-  const description = term
-    ? `Search results for ${term} across the Glass & Door Pro website.`
-    : "Search the Glass & Door Pro website.";
-
-  return {
-    title: buildHeadTitle(title, seo),
-    description,
-    canonicalUrl: term ? `${siteUrl}/search?query=${encodeURIComponent(term)}` : `${siteUrl}/search`,
-    robots: "noindex,follow",
-    bodyHtml: buildSimplePageBody(title, description, [
-      "Search the site for services, service areas, gallery projects, reviews, and company information.",
-      term ? `Current search query: ${term}` : "",
-    ]),
-    jsonLd: [buildOrganizationSchema(seo, siteUrl), buildWebsiteSchema(seo, siteUrl)].filter(
-      Boolean,
-    ) as Array<Record<string, unknown>>,
-  };
-}
-
 function buildFallbackSnapshot(
   pathname: string,
   seo: SeoSettings | null,
@@ -594,11 +572,6 @@ export async function getPublicHtmlSnapshot(
     RETIRED_PUBLIC_PATH_PREFIXES.some((retiredPath) => pathname === retiredPath || pathname.startsWith(`${retiredPath}/`))
   ) {
     return null;
-  }
-
-  if (pathname === "/search") {
-    const params = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
-    return buildSearchSnapshot(params.get("query") || "", seo, siteUrl);
   }
 
   const slug = getCmsSlugForPublicPath(pathname);
