@@ -1548,7 +1548,7 @@ export function BrandingTab({
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-muted-foreground">
-                    Choose from 10 sans serif and 10 serif Google fonts.
+                    Choose from curated sans serif and serif Google fonts.
                   </p>
                 </div>
 

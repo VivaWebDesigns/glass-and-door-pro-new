@@ -95,6 +95,13 @@ export const BRANDING_FONT_OPTIONS: BrandingFontOption[] = [
     preview: "Soft, approachable forms for welcoming brands.",
   },
   {
+    value: "manrope",
+    label: "Manrope",
+    family: "'Manrope', sans-serif",
+    category: "sans",
+    preview: "Modern geometric sans with a crisp, confident voice.",
+  },
+  {
     value: "work-sans",
     label: "Work Sans",
     family: "'Work Sans', sans-serif",
