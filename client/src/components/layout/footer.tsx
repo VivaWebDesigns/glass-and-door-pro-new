@@ -1,5 +1,4 @@
 import { useMemo, type ReactNode } from "react";
-import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { useBranding } from "@/components/shared/branding-provider";
@@ -100,13 +99,13 @@ function DynamicFooterColumn({ item }: { item: MenuItem }) {
                   {child.label}
                 </a>
               ) : (
-                <Link
+                <a
                   href={href}
                   className="text-slate-400 transition-colors hover:text-white"
                   data-testid={`link-footer-${child.id}`}
                 >
                   {child.label}
-                </Link>
+                </a>
               )}
             </li>
           );
@@ -176,9 +175,9 @@ function FooterTextLink({ link }: { link: FooterLegalLink }) {
   }
 
   return (
-    <Link href={link.href} className={className} data-testid={link.testId}>
+    <a href={link.href} className={className} data-testid={link.testId}>
       {link.label}
-    </Link>
+    </a>
   );
 }
 
@@ -289,13 +288,13 @@ export function Footer() {
                           {item.label}
                         </a>
                       ) : (
-                        <Link
+                        <a
                           href={normalizeFooterMenuUrl(item)}
                           className="font-semibold text-slate-400 transition-colors hover:text-white"
                           data-testid={`link-footer-${item.id}`}
                         >
                           {item.label}
-                        </Link>
+                        </a>
                       )}
                     </li>
                   </ul>
