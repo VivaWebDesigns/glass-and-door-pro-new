@@ -89,6 +89,107 @@ function buildDisclaimerContent() {
   };
 }
 
+type CmsContentBlock = {
+  id?: string;
+  type?: string;
+  props?: Record<string, unknown>;
+};
+
+type CmsBuilderContent = {
+  blocks?: CmsContentBlock[];
+  [key: string]: unknown;
+};
+
+const commercialDoorInstallationSlug = "services-commercial-door-installation";
+
+const commercialServiceLinks = [
+  {
+    label: "Commercial Storefront Glass Installation",
+    description:
+      "Aluminum framing, fixed glass panels, and storefront doors for new construction, tenant buildouts, and commercial renovations.",
+    url: "/services/commercial-storefront-glass-installation",
+  },
+  {
+    label: "Commercial Storefront Glass Replacement & Repair",
+    description:
+      "Emergency board-up, broken panel replacement, and storefront glass repair for Charlotte businesses.",
+    url: "/services/commercial-storefront-glass-replacement-repair",
+  },
+  {
+    label: "Commercial Door Replacement & Repair",
+    description:
+      "Broken glass panels, hardware failure, misaligned frames, and worn closers repaired or replaced fast.",
+    url: "/services/commercial-door-replacement-repair",
+  },
+  {
+    label: "Commercial Window Replacement",
+    description: "Apartment and multi-family window replacement with fast mobilization.",
+    url: "/services/commercial-window-replacement",
+  },
+];
+
+function buildRelatedCommercialServicesBlock(): CmsContentBlock {
+  return {
+    id: id(),
+    type: "link-list",
+    props: {
+      title: "Related Commercial Services",
+      subtitle:
+        "More commercial glass, storefront, door, and window services for Charlotte businesses.",
+      columns: "2",
+      sectionBackgroundColor: "#ffffff",
+      sectionPaddingTop: "md",
+      sectionPaddingBottom: "md",
+      links: commercialServiceLinks,
+    },
+  };
+}
+
+function addRelatedCommercialServicesBlock(content: unknown) {
+  if (!content || typeof content !== "object") return null;
+
+  const builderContent = content as CmsBuilderContent;
+  if (!Array.isArray(builderContent.blocks)) return null;
+  if (
+    builderContent.blocks.some(
+      (block) =>
+        block.type === "link-list" &&
+        block.props?.title === "Related Commercial Services",
+    )
+  ) {
+    return null;
+  }
+
+  const relatedBlock = buildRelatedCommercialServicesBlock();
+  const ctaIndex = builderContent.blocks.findLastIndex((block) => block.type === "cta");
+  const nextBlocks =
+    ctaIndex >= 0
+      ? [
+          ...builderContent.blocks.slice(0, ctaIndex),
+          relatedBlock,
+          ...builderContent.blocks.slice(ctaIndex),
+        ]
+      : [...builderContent.blocks, relatedBlock];
+
+  return {
+    ...builderContent,
+    blocks: nextBlocks,
+  };
+}
+
+async function ensureCommercialDoorInstallationRelatedServicesBlock() {
+  const page = await storage.cmsPages.getPageBySlug(commercialDoorInstallationSlug);
+  if (!page) return;
+
+  const content = addRelatedCommercialServicesBlock(page.content);
+  if (!content) return;
+
+  await storage.cmsPages.updatePage(page.id, {
+    content,
+    updatedBy: page.updatedBy,
+  });
+}
+
 export async function ensureSystemCmsPages() {
   for (const retiredSlug of ["about", "contact", "directory", "events", "insights", "join", "recordings"]) {
     const existingPage = await storage.cmsPages.getPageBySlug(retiredSlug);
@@ -100,6 +201,8 @@ export async function ensureSystemCmsPages() {
       });
     }
   }
+
+  await ensureCommercialDoorInstallationRelatedServicesBlock();
 
   const existingPrivacyPolicy = await storage.cmsPages.getPageBySlug("privacy-policy");
   if (!existingPrivacyPolicy) {
