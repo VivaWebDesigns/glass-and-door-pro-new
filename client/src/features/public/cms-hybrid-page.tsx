@@ -61,6 +61,86 @@ function parseCmsContent(content: unknown): BlockInstance[] {
   return Array.isArray(c.blocks) ? c.blocks : [];
 }
 
+const commercialServiceLinks = [
+  {
+    label: "Commercial Storefront Glass Installation",
+    description:
+      "Aluminum framing, fixed glass panels, and storefront doors for new construction, tenant buildouts, and commercial renovations.",
+    url: "/services/commercial-storefront-glass-installation",
+  },
+  {
+    label: "Commercial Storefront Glass Replacement & Repair",
+    description:
+      "Emergency board-up, broken panel replacement, and storefront glass repair for Charlotte businesses.",
+    url: "/services/commercial-storefront-glass-replacement-repair",
+  },
+  {
+    label: "Commercial Door Installation",
+    description:
+      "Aluminum entry doors, glass storefront doors, and complete commercial entrance systems.",
+    url: "/services/commercial-door-installation",
+  },
+  {
+    label: "Commercial Door Replacement & Repair",
+    description:
+      "Broken glass panels, hardware failure, misaligned frames, and worn closers repaired or replaced fast.",
+    url: "/services/commercial-door-replacement-repair",
+  },
+  {
+    label: "Commercial Window Replacement",
+    description: "Apartment and multi-family window replacement with fast mobilization.",
+    url: "/services/commercial-window-replacement",
+  },
+] as const;
+
+function isCommercialServicePageSlug(slug: string) {
+  return slug.startsWith("services-commercial-");
+}
+
+function hasRelatedCommercialServicesBlock(blocks: BlockInstance[]) {
+  return blocks.some(
+    (block) =>
+      block.type === "link-list" &&
+      block.props.title === "Related Commercial Services",
+  );
+}
+
+function buildRelatedCommercialServicesBlock(pageSlug: string): BlockInstance {
+  const currentUrl = getCmsPublicPath(pageSlug);
+  return {
+    id: "auto-related-commercial-services",
+    type: "link-list",
+    props: {
+      title: "Related Commercial Services",
+      subtitle:
+        "More commercial glass, storefront, door, and window services for Charlotte businesses.",
+      columns: "2",
+      sectionBackgroundColor: "#ffffff",
+      sectionPaddingTop: "md",
+      sectionPaddingBottom: "md",
+      links: commercialServiceLinks.filter((link) => link.url !== currentUrl),
+    },
+  };
+}
+
+export function ensureRelatedCommercialServicesBlock(
+  pageSlug: string,
+  blocks: BlockInstance[],
+) {
+  if (!isCommercialServicePageSlug(pageSlug) || hasRelatedCommercialServicesBlock(blocks)) {
+    return blocks;
+  }
+
+  const relatedBlock = buildRelatedCommercialServicesBlock(pageSlug);
+  for (let index = blocks.length - 1; index >= 0; index -= 1) {
+    if (blocks[index].type === "cta") {
+      return [...blocks.slice(0, index), relatedBlock, ...blocks.slice(index)];
+    }
+  }
+
+  return [...blocks, relatedBlock];
+}
+
 function isServiceAreaPageSlug(slug: string) {
   return slug.startsWith("service-areas-") || slug.startsWith("areas-served-");
 }
@@ -221,8 +301,11 @@ function CmsLoadingPage() {
 }
 
 export function CmsPageView({ page, globalSeo, previewLabel }: CmsPageViewProps) {
-  const blocks = parseCmsContent(page.content).filter(
-    (block) => !shouldHideServiceAreaWorkGallery(page.slug, block),
+  const blocks = ensureRelatedCommercialServicesBlock(
+    page.slug,
+    parseCmsContent(page.content).filter(
+      (block) => !shouldHideServiceAreaWorkGallery(page.slug, block),
+    ),
   );
   const showSidebar =
     page.template === "with-sidebar" && Boolean(page.sidebarId || page.slug === "insights");
