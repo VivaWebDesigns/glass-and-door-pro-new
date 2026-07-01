@@ -101,6 +101,7 @@ type CmsBuilderContent = {
 };
 
 const commercialDoorInstallationSlug = "services-commercial-door-installation";
+const SYSTEM_RETIRED_PAGE_MARKERS = ["systemRetired", "isSystemRetired"];
 
 const commercialServiceLinks = [
   {
@@ -152,9 +153,7 @@ function addRelatedCommercialServicesBlock(content: unknown) {
   if (!Array.isArray(builderContent.blocks)) return null;
   if (
     builderContent.blocks.some(
-      (block) =>
-        block.type === "link-list" &&
-        block.props?.title === "Related Commercial Services",
+      (block) => block.type === "link-list" && block.props?.title === "Related Commercial Services",
     )
   ) {
     return null;
@@ -177,9 +176,16 @@ function addRelatedCommercialServicesBlock(content: unknown) {
   };
 }
 
+function shouldEnsureRelatedCommercialServicesBlock(content: unknown) {
+  if (!isRecord(content)) return false;
+  const systemMeta = content._system ?? content.system;
+  return isRecord(systemMeta) && systemMeta.ensureRelatedCommercialServices === true;
+}
+
 async function ensureCommercialDoorInstallationRelatedServicesBlock() {
   const page = await storage.cmsPages.getPageBySlug(commercialDoorInstallationSlug);
   if (!page) return;
+  if (!shouldEnsureRelatedCommercialServicesBlock(page.content)) return;
 
   const content = addRelatedCommercialServicesBlock(page.content);
   if (!content) return;
@@ -190,10 +196,39 @@ async function ensureCommercialDoorInstallationRelatedServicesBlock() {
   });
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+export function isSystemRetiredCmsPageContent(content: unknown) {
+  if (!isRecord(content)) return false;
+
+  if (SYSTEM_RETIRED_PAGE_MARKERS.some((key) => content[key] === true)) {
+    return true;
+  }
+
+  const systemMeta = content._system ?? content.system;
+  return (
+    isRecord(systemMeta) && SYSTEM_RETIRED_PAGE_MARKERS.some((key) => systemMeta[key] === true)
+  );
+}
+
 export async function ensureSystemCmsPages() {
-  for (const retiredSlug of ["about", "contact", "directory", "events", "insights", "join", "recordings"]) {
+  for (const retiredSlug of [
+    "about",
+    "contact",
+    "directory",
+    "events",
+    "insights",
+    "join",
+    "recordings",
+  ]) {
     const existingPage = await storage.cmsPages.getPageBySlug(retiredSlug);
-    if (existingPage) {
+    if (
+      existingPage &&
+      isSystemRetiredCmsPageContent(existingPage.content) &&
+      (existingPage.status !== "draft" || existingPage.noindex !== true)
+    ) {
       await storage.cmsPages.updatePage(existingPage.id, {
         status: "draft",
         noindex: true,
@@ -214,8 +249,10 @@ export async function ensureSystemCmsPages() {
       status: "published",
       content: buildPrivacyPolicyContent(),
       seoTitle: "Privacy Policy | Glass & Door Pro",
-      seoDescription: "Review how Glass & Door Pro handles contact form details, service inquiries, cookies, analytics, and customer records.",
-      seoKeywords: "Glass & Door Pro privacy policy, Charlotte glass company privacy, customer information",
+      seoDescription:
+        "Review how Glass & Door Pro handles contact form details, service inquiries, cookies, analytics, and customer records.",
+      seoKeywords:
+        "Glass & Door Pro privacy policy, Charlotte glass company privacy, customer information",
       ogImageUrl: "",
       canonicalUrl: "",
       noindex: false,
@@ -237,8 +274,10 @@ export async function ensureSystemCmsPages() {
       status: "published",
       content: buildTermsOfServiceContent(),
       seoTitle: "Terms of Service | Glass & Door Pro",
-      seoDescription: "Review Glass & Door Pro website terms for estimates, service information, third-party links, and site content.",
-      seoKeywords: "Glass & Door Pro terms of service, Charlotte glass company terms, website terms",
+      seoDescription:
+        "Review Glass & Door Pro website terms for estimates, service information, third-party links, and site content.",
+      seoKeywords:
+        "Glass & Door Pro terms of service, Charlotte glass company terms, website terms",
       ogImageUrl: "",
       canonicalUrl: "",
       noindex: false,
@@ -260,8 +299,10 @@ export async function ensureSystemCmsPages() {
       status: "published",
       content: buildDisclaimerContent(),
       seoTitle: "Disclaimer | Glass & Door Pro",
-      seoDescription: "Review Glass & Door Pro disclaimers about website information, estimates, repair recommendations, pricing, and commercial work.",
-      seoKeywords: "Glass & Door Pro disclaimer, glass service disclaimer, Charlotte glass company disclaimer",
+      seoDescription:
+        "Review Glass & Door Pro disclaimers about website information, estimates, repair recommendations, pricing, and commercial work.",
+      seoKeywords:
+        "Glass & Door Pro disclaimer, glass service disclaimer, Charlotte glass company disclaimer",
       ogImageUrl: "",
       canonicalUrl: "",
       noindex: false,

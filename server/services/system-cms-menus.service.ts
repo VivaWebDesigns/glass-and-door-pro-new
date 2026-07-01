@@ -2,11 +2,18 @@ import { randomUUID } from "crypto";
 import { storage } from "../storage";
 import type { InsertCmsMenu, MenuItem, StandardMenuLocation } from "@shared/schema";
 
+export const SYSTEM_MANAGED_MENU_NAME_PREFIX = "System - ";
+
 function id() {
   return randomUUID();
 }
 
-function item(label: string, url: string, children: MenuItem[] = [], openInNewTab = false): MenuItem {
+function item(
+  label: string,
+  url: string,
+  children: MenuItem[] = [],
+  openInNewTab = false,
+): MenuItem {
   return {
     id: id(),
     label,
@@ -65,7 +72,10 @@ function patchLegalItemUrls(items: MenuItem[]): { items: MenuItem[]; changed: bo
 
     if (
       normalizedLabel === "privacy policy" &&
-      (entry.url === "/contact" || entry.url === "/#contact" || entry.url === "" || entry.url === "#")
+      (entry.url === "/contact" ||
+        entry.url === "/#contact" ||
+        entry.url === "" ||
+        entry.url === "#")
     ) {
       nextUrl = "/privacy-policy";
       changed = true;
@@ -73,7 +83,10 @@ function patchLegalItemUrls(items: MenuItem[]): { items: MenuItem[]; changed: bo
 
     if (
       normalizedLabel === "terms of service" &&
-      (entry.url === "/contact" || entry.url === "/#contact" || entry.url === "" || entry.url === "#")
+      (entry.url === "/contact" ||
+        entry.url === "/#contact" ||
+        entry.url === "" ||
+        entry.url === "#")
     ) {
       nextUrl = "/terms-of-service";
       changed = true;
@@ -81,7 +94,10 @@ function patchLegalItemUrls(items: MenuItem[]): { items: MenuItem[]; changed: bo
 
     if (
       normalizedLabel === "disclaimer" &&
-      (entry.url === "/contact" || entry.url === "/#contact" || entry.url === "" || entry.url === "#")
+      (entry.url === "/contact" ||
+        entry.url === "/#contact" ||
+        entry.url === "" ||
+        entry.url === "#")
     ) {
       nextUrl = "/disclaimer";
       changed = true;
@@ -98,7 +114,9 @@ function patchLegalItemUrls(items: MenuItem[]): { items: MenuItem[]; changed: bo
     };
   });
 
-  const hasDisclaimer = nextItems.some((entry) => entry.label.trim().toLowerCase() === "disclaimer");
+  const hasDisclaimer = nextItems.some(
+    (entry) => entry.label.trim().toLowerCase() === "disclaimer",
+  );
   if (!hasDisclaimer) {
     nextItems.push(item("Disclaimer", "/disclaimer"));
     changed = true;
@@ -111,10 +129,7 @@ const defaultMenus: Array<InsertCmsMenu & { location: StandardMenuLocation }> = 
   {
     name: "Main Navigation",
     location: "main_navigation",
-    items: [
-      item("About", "/#about"),
-      item("Contact", "/#contact"),
-    ],
+    items: [item("About", "/#about"), item("Contact", "/#contact")],
   },
   {
     name: "Services",
@@ -159,6 +174,10 @@ const defaultMenus: Array<InsertCmsMenu & { location: StandardMenuLocation }> = 
   },
 ];
 
+export function isSystemManagedCmsMenu(menu: { name?: string | null }) {
+  return Boolean(menu.name?.startsWith(SYSTEM_MANAGED_MENU_NAME_PREFIX));
+}
+
 export async function ensureSystemCmsMenus() {
   const menus = await storage.cmsMenus.getAll();
   const assignedLocations = new Set(menus.map((menu) => menu.location));
@@ -185,6 +204,7 @@ export async function ensureSystemCmsMenus() {
   }
 
   for (const menu of menus) {
+    if (!isSystemManagedCmsMenu(menu)) continue;
     if (!menu.items) continue;
     const patched = patchRetiredPublicUrls((menu.items as MenuItem[]) || []);
     if (patched.changed) {
@@ -195,7 +215,7 @@ export async function ensureSystemCmsMenus() {
   }
 
   const legalMenu = await storage.cmsMenus.getByLocation("footer_legal");
-  if (legalMenu?.items) {
+  if (legalMenu?.items && isSystemManagedCmsMenu(legalMenu)) {
     const patched = patchLegalItemUrls((legalMenu.items as MenuItem[]) || []);
     if (patched.changed) {
       await storage.cmsMenus.update(legalMenu.id, {

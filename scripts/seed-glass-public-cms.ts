@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import { pathToFileURL } from "url";
 import { storage } from "../server/storage";
 import type {
   InsertCmsMenu,
@@ -372,7 +373,8 @@ const glassHomeContent: InsertCmsPage["content"] = {
         ctaSecondaryText: "",
         ctaSecondaryLink: "",
         backgroundImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
-        backgroundImageAlt: "Frameless glass shower installed by Glass & Door Pro in the Charlotte, NC area",
+        backgroundImageAlt:
+          "Frameless glass shower installed by Glass & Door Pro in the Charlotte, NC area",
         videoBackgroundUrl: "/videos/glass-door-pro/hero-video.mp4",
         overlayColor: "#0f172a",
         overlayOpacity: 50,
@@ -4867,10 +4869,25 @@ const glassDisclaimerContent = {
   ],
 };
 
-async function upsertMenu(menu: InsertCmsMenu & { location: MenuLocation }) {
+function envFlag(name: string) {
+  const raw = process.env[name];
+  return raw === "1" || raw?.toLowerCase() === "true";
+}
+
+async function upsertMenu(
+  menu: InsertCmsMenu & { location: MenuLocation },
+  options: { force: boolean },
+) {
   const allMenus = await storage.cmsMenus.getAll();
   const matches = allMenus.filter((entry) => entry.location === menu.location);
   const [primary, ...duplicates] = matches;
+
+  if (primary && !options.force) {
+    console.log(
+      `  [skipped] ${menu.location} menu (${primary.id}) already exists; set GLASS_CMS_SEED_FORCE_MENUS=true to replace menus`,
+    );
+    return;
+  }
 
   for (const duplicate of duplicates) {
     await storage.cmsMenus.update(duplicate.id, { location: "unassigned" });
@@ -4901,13 +4918,24 @@ function getSeedOnlySlugs() {
 }
 
 function shouldOverwriteExistingCmsPages() {
-  const raw = process.env.GLASS_CMS_SEED_OVERWRITE_EXISTING;
-  return raw === "1" || raw?.toLowerCase() === "true";
+  return envFlag("GLASS_CMS_SEED_FORCE_PAGES") || envFlag("GLASS_CMS_SEED_OVERWRITE_EXISTING");
+}
+
+function shouldOverwriteExistingCmsMenus() {
+  return envFlag("GLASS_CMS_SEED_FORCE_MENUS");
+}
+
+function shouldOverwriteExistingBrandingSettings() {
+  return envFlag("GLASS_CMS_SEED_FORCE_BRANDING");
+}
+
+function shouldOverwriteExistingSeoSettings() {
+  return envFlag("GLASS_CMS_SEED_FORCE_SEO");
 }
 
 function logSkippedExistingPage(slug: string, id: string) {
   console.log(
-    `  [skipped] ${slug} page (${id}) already exists; set GLASS_CMS_SEED_OVERWRITE_EXISTING=true to replace it`,
+    `  [skipped] ${slug} page (${id}) already exists; set GLASS_CMS_SEED_FORCE_PAGES=true to replace it`,
   );
 }
 
@@ -4942,14 +4970,32 @@ async function upsertGlassServicePage(servicePage: GlassServicePageSeed) {
   }
 }
 
-async function seedGlassPublicCms() {
+export async function seedGlassPublicCms() {
   console.log("Seeding Glass & Door Pro public CMS content...");
   const seedOnlySlugs = getSeedOnlySlugs();
-  const overwriteExistingCmsPages = shouldOverwriteExistingCmsPages();
+  const forcePages = shouldOverwriteExistingCmsPages();
+  const forceMenus = shouldOverwriteExistingCmsMenus();
+  const forceBranding = shouldOverwriteExistingBrandingSettings();
+  const forceSeo = shouldOverwriteExistingSeoSettings();
 
-  if (!overwriteExistingCmsPages) {
+  if (!forcePages) {
     console.log(
-      "  [safe mode] existing CMS pages will not be overwritten; set GLASS_CMS_SEED_OVERWRITE_EXISTING=true to reset pages from seed content",
+      "  [safe mode] existing CMS pages will not be overwritten; set GLASS_CMS_SEED_FORCE_PAGES=true to reset pages from seed content",
+    );
+  }
+  if (!forceMenus) {
+    console.log(
+      "  [safe mode] existing CMS menus will not be overwritten; set GLASS_CMS_SEED_FORCE_MENUS=true to reset menus from seed content",
+    );
+  }
+  if (!forceBranding) {
+    console.log(
+      "  [safe mode] existing branding settings will not be overwritten; set GLASS_CMS_SEED_FORCE_BRANDING=true to reset branding",
+    );
+  }
+  if (!forceSeo) {
+    console.log(
+      "  [safe mode] existing global SEO settings will not be overwritten; set GLASS_CMS_SEED_FORCE_SEO=true to reset global SEO",
     );
   }
 
@@ -4975,19 +5021,19 @@ async function seedGlassPublicCms() {
     "services-commercial-glass",
   );
   if (existingCommercialGlassPage) {
-    if (overwriteExistingCmsPages) {
+    if (forcePages) {
       await storage.cmsPages.deletePage(existingCommercialGlassPage.id);
       console.log(`  [deleted] services-commercial-glass page (${existingCommercialGlassPage.id})`);
     } else {
       console.log(
-        `  [skipped] services-commercial-glass page (${existingCommercialGlassPage.id}) already exists; set GLASS_CMS_SEED_OVERWRITE_EXISTING=true to delete deprecated seeded pages`,
+        `  [skipped] services-commercial-glass page (${existingCommercialGlassPage.id}) already exists; set GLASS_CMS_SEED_FORCE_PAGES=true to delete deprecated seeded pages`,
       );
     }
   }
 
   const existingHome = await storage.cmsPages.getPageBySlug("home");
   if (existingHome) {
-    if (!overwriteExistingCmsPages) {
+    if (!forcePages) {
       logSkippedExistingPage("home", existingHome.id);
     } else {
       await storage.cmsPages.updatePage(existingHome.id, {
@@ -5045,7 +5091,7 @@ async function seedGlassPublicCms() {
   };
 
   if (existingGallery) {
-    if (!overwriteExistingCmsPages) {
+    if (!forcePages) {
       logSkippedExistingPage("gallery", existingGallery.id);
     } else {
       await storage.cmsPages.updatePage(existingGallery.id, galleryPayload);
@@ -5075,7 +5121,7 @@ async function seedGlassPublicCms() {
   };
 
   if (existingReviews) {
-    if (!overwriteExistingCmsPages) {
+    if (!forcePages) {
       logSkippedExistingPage("reviews", existingReviews.id);
     } else {
       await storage.cmsPages.updatePage(existingReviews.id, reviewsPayload);
@@ -5105,7 +5151,7 @@ async function seedGlassPublicCms() {
   };
 
   if (existingServices) {
-    if (!overwriteExistingCmsPages) {
+    if (!forcePages) {
       logSkippedExistingPage("services", existingServices.id);
     } else {
       await storage.cmsPages.updatePage(existingServices.id, servicesPayload);
@@ -5138,7 +5184,7 @@ async function seedGlassPublicCms() {
     };
 
     if (existingCityPage) {
-      if (!overwriteExistingCmsPages) {
+      if (!forcePages) {
         logSkippedExistingPage(cityPage.slug, existingCityPage.id);
       } else {
         await storage.cmsPages.updatePage(existingCityPage.id, pagePayload);
@@ -5169,7 +5215,7 @@ async function seedGlassPublicCms() {
   };
   const existingPrivacyPolicy = await storage.cmsPages.getPageBySlug("privacy-policy");
   if (existingPrivacyPolicy) {
-    if (!overwriteExistingCmsPages) {
+    if (!forcePages) {
       logSkippedExistingPage("privacy-policy", existingPrivacyPolicy.id);
     } else {
       await storage.cmsPages.updatePage(existingPrivacyPolicy.id, privacyPayload);
@@ -5198,7 +5244,7 @@ async function seedGlassPublicCms() {
   };
   const existingTermsOfService = await storage.cmsPages.getPageBySlug("terms-of-service");
   if (existingTermsOfService) {
-    if (!overwriteExistingCmsPages) {
+    if (!forcePages) {
       logSkippedExistingPage("terms-of-service", existingTermsOfService.id);
     } else {
       await storage.cmsPages.updatePage(existingTermsOfService.id, termsPayload);
@@ -5228,7 +5274,7 @@ async function seedGlassPublicCms() {
   };
   const existingDisclaimer = await storage.cmsPages.getPageBySlug("disclaimer");
   if (existingDisclaimer) {
-    if (!overwriteExistingCmsPages) {
+    if (!forcePages) {
       logSkippedExistingPage("disclaimer", existingDisclaimer.id);
     } else {
       await storage.cmsPages.updatePage(existingDisclaimer.id, disclaimerPayload);
@@ -5240,24 +5286,48 @@ async function seedGlassPublicCms() {
   }
 
   for (const menu of glassMenus) {
-    await upsertMenu(menu);
-    console.log(`  [synced] ${menu.location} menu`);
+    await upsertMenu(menu, { force: forceMenus });
   }
 
+  let syncedBrandingSettings = 0;
+  let skippedBrandingSettings = 0;
   for (const [key, value] of Object.entries(brandingSettings)) {
-    await storage.settings.upsertSetting(key, value, "branding", false);
+    const existingValue = await storage.settings.getSetting(key);
+    if (forceBranding || existingValue === null) {
+      await storage.settings.upsertSetting(key, value, "branding", false);
+      syncedBrandingSettings += 1;
+    } else {
+      skippedBrandingSettings += 1;
+    }
   }
-  console.log("  [synced] branding settings");
 
-  await storage.seoSettings.upsert(glassSeoSettings);
-  console.log("  [synced] global SEO settings");
+  if (syncedBrandingSettings > 0) {
+    console.log(`  [synced] ${syncedBrandingSettings} branding settings`);
+  }
+  if (skippedBrandingSettings > 0) {
+    console.log(
+      `  [skipped] ${skippedBrandingSettings} existing branding settings; set GLASS_CMS_SEED_FORCE_BRANDING=true to replace branding`,
+    );
+  }
+
+  const existingSeoSettings = await storage.seoSettings.get();
+  if (forceSeo || !existingSeoSettings) {
+    await storage.seoSettings.upsert(glassSeoSettings);
+    console.log("  [synced] global SEO settings");
+  } else {
+    console.log(
+      "  [skipped] existing global SEO settings; set GLASS_CMS_SEED_FORCE_SEO=true to replace global SEO",
+    );
+  }
 
   console.log("Done.");
 }
 
-seedGlassPublicCms()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  seedGlassPublicCms()
+    .then(() => process.exit(0))
+    .catch((error) => {
+      console.error(error);
+      process.exit(1);
+    });
+}
