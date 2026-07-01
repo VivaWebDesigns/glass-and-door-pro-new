@@ -30,9 +30,39 @@
 
 ## CMS Seed Safety
 
-- CMS page seed scripts are safe by default: existing CMS pages are skipped so admin edits, including hero image focal points, are not overwritten.
-- To intentionally reset Glass public CMS pages from seed content, run with `GLASS_CMS_SEED_OVERWRITE_EXISTING=true`.
-- To intentionally reset the older generic CMS seed pages, run with `CMS_SEED_OVERWRITE_EXISTING=true`.
+Production startup runs system bootstrap, but bootstrap is default-safe for admin CMS content:
+
+- Existing admin CMS pages are not drafted, noindexed, or structurally changed on every startup unless their content is explicitly marked system-retired.
+- Existing CMS menus are not cleaned up, removed, or repointed on every startup unless the menu is explicitly system-managed.
+- A menu is system-managed only when its name starts with `System - `. Admin-created menus should not use that prefix.
+- Missing default legal pages, starter sections, system forms, docs, and email templates may still be created where the bootstrap service is create-only/default-safe.
+
+The Glass public CMS seed command is also safe by default:
+
+```bash
+npm run seed:glass-public-cms
+```
+
+In safe mode, existing CMS pages, menus, branding settings, and global SEO settings are preserved. This protects admin edits to text, block content, image fields, focal points, alt text, captions, SEO fields, canonical URLs, page status, navigation, logos, colors, and company information.
+
+Use force flags only when intentionally resetting a specific seeded area:
+
+| Flag                                     | Use When                                                                                                                                  | May Overwrite                                                                                                                                                                                                      |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `GLASS_CMS_SEED_FORCE_PAGES=true`        | Reset seeded public pages from `scripts/seed-glass-public-cms.ts`, or delete deprecated seeded pages such as `services-commercial-glass`. | Page title, slug metadata, status, template, block structure, body text, hero/image/gallery URLs, focal positions, alt text, captions, SEO title/description/keywords, OG image, canonical URL, publish timestamp. |
+| `GLASS_CMS_SEED_FORCE_MENUS=true`        | Reset seeded navigation menus by theme location.                                                                                          | Menu names, labels, URLs, nesting, location assignments, and duplicate menu location assignments.                                                                                                                  |
+| `GLASS_CMS_SEED_FORCE_BRANDING=true`     | Reset seeded brand settings.                                                                                                              | Logo URLs, favicon, company name/address/phone, font selections, and brand/text color settings.                                                                                                                    |
+| `GLASS_CMS_SEED_FORCE_SEO=true`          | Reset seeded global SEO defaults.                                                                                                         | Site name, title suffix, default meta description, site URL, default OG image, organization name, and organization logo.                                                                                           |
+| `GLASS_CMS_SEED_OVERWRITE_EXISTING=true` | Legacy compatibility only. Prefer `GLASS_CMS_SEED_FORCE_PAGES=true`.                                                                      | Pages only. It is an alias for page force mode and does not force menus, branding, or SEO.                                                                                                                         |
+
+Optional targeted page seeding is available with `GLASS_CMS_SEED_ONLY_SLUGS`, but targeted existing pages are still preserved unless page force mode is enabled:
+
+```bash
+GLASS_CMS_SEED_ONLY_SLUGS=services-frameless-showers npm run seed:glass-public-cms
+GLASS_CMS_SEED_FORCE_PAGES=true GLASS_CMS_SEED_ONLY_SLUGS=services-frameless-showers npm run seed:glass-public-cms
+```
+
+Run `npm run seed:glass-public-cms -- --help` for command-line help.
 
 ## Local Development
 

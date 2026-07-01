@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { pathToFileURL } from "url";
-import { storage } from "../server/storage";
+import type { storage as storageInstance } from "../server/storage";
 import type {
   InsertCmsMenu,
   InsertCmsPage,
@@ -11,6 +11,15 @@ import type {
 
 function uid() {
   return randomUUID();
+}
+
+type AppStorage = typeof storageInstance;
+
+let storagePromise: Promise<AppStorage> | null = null;
+
+function getStorage() {
+  storagePromise ??= import("../server/storage").then((module) => module.storage);
+  return storagePromise;
 }
 
 function item(
@@ -4878,6 +4887,7 @@ async function upsertMenu(
   menu: InsertCmsMenu & { location: MenuLocation },
   options: { force: boolean },
 ) {
+  const storage = await getStorage();
   const allMenus = await storage.cmsMenus.getAll();
   const matches = allMenus.filter((entry) => entry.location === menu.location);
   const [primary, ...duplicates] = matches;
@@ -4933,6 +4943,43 @@ function shouldOverwriteExistingSeoSettings() {
   return envFlag("GLASS_CMS_SEED_FORCE_SEO");
 }
 
+function printSeedHelp() {
+  console.log(`Glass & Door Pro public CMS seed
+
+Usage:
+  npm run seed:glass-public-cms
+
+Safe mode is the default. Existing CMS pages, menus, branding settings, and global SEO settings
+are preserved unless a specific force flag is set.
+
+Force flags:
+  GLASS_CMS_SEED_FORCE_PAGES=true
+    Replace existing seeded public CMS pages and delete deprecated seeded pages.
+    May overwrite page text, block structure, images, focal points, alt text, captions, SEO fields,
+    canonical URLs, status, template, and publish timestamps.
+
+  GLASS_CMS_SEED_FORCE_MENUS=true
+    Replace existing menus in seeded theme locations and unassign duplicate menus in those locations.
+    May overwrite admin-created navigation labels, URLs, nesting, and location assignments.
+
+  GLASS_CMS_SEED_FORCE_BRANDING=true
+    Replace existing seeded branding settings such as logo, colors, company name, address, and phone.
+
+  GLASS_CMS_SEED_FORCE_SEO=true
+    Replace existing global SEO settings such as site name, title suffix, default meta description,
+    site URL, default OG image, organization name, and organization logo.
+
+Legacy:
+  GLASS_CMS_SEED_OVERWRITE_EXISTING=true
+    Pages-only alias for GLASS_CMS_SEED_FORCE_PAGES=true. It does not force menus, branding, or SEO.
+
+Targeting:
+  GLASS_CMS_SEED_ONLY_SLUGS=services-frameless-showers,services-window-installation
+    Limit page seeding to supported service-page slugs. Existing targeted pages are still preserved
+    unless page force mode is enabled.
+`);
+}
+
 function logSkippedExistingPage(slug: string, id: string) {
   console.log(
     `  [skipped] ${slug} page (${id}) already exists; set GLASS_CMS_SEED_FORCE_PAGES=true to replace it`,
@@ -4940,6 +4987,7 @@ function logSkippedExistingPage(slug: string, id: string) {
 }
 
 async function upsertGlassServicePage(servicePage: GlassServicePageSeed) {
+  const storage = await getStorage();
   const existingServicePage = await storage.cmsPages.getPageBySlug(servicePage.slug);
   const servicePath = `/services/${servicePage.slug.replace("services-", "")}`;
   const pagePayload: InsertCmsPage = {
@@ -4972,6 +5020,7 @@ async function upsertGlassServicePage(servicePage: GlassServicePageSeed) {
 
 export async function seedGlassPublicCms() {
   console.log("Seeding Glass & Door Pro public CMS content...");
+  const storage = await getStorage();
   const seedOnlySlugs = getSeedOnlySlugs();
   const forcePages = shouldOverwriteExistingCmsPages();
   const forceMenus = shouldOverwriteExistingCmsMenus();
@@ -5324,6 +5373,11 @@ export async function seedGlassPublicCms() {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  if (process.argv.includes("--help") || process.argv.includes("-h")) {
+    printSeedHelp();
+    process.exit(0);
+  }
+
   seedGlassPublicCms()
     .then(() => process.exit(0))
     .catch((error) => {

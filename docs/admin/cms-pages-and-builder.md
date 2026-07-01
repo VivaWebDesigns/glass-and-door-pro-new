@@ -70,3 +70,11 @@ Pages now use live editor locks.
 - Avoid pasting raw third-party code unless the section explicitly supports HTML content.
 - Check CTA links carefully before publishing.
 - When sharing a preview link, remember it represents the latest saved draft. Saving again refreshes the underlying preview token so reviewers are always looking at the current version.
+
+## Bootstrap And Seed Safety
+
+Production startup bootstrap is designed to preserve admin page edits. Existing CMS pages are not repeatedly drafted, noindexed, or changed unless they are explicitly marked as system-retired in their content metadata.
+
+Glass public CMS seed safe mode also preserves existing pages by default. Do not run page force mode unless the intent is to replace seeded pages from code. `GLASS_CMS_SEED_FORCE_PAGES=true` may overwrite page text, block structure, image URLs, focal points, alt text, captions, SEO fields, canonical URLs, status, templates, and publish timestamps.
+
+The legacy `GLASS_CMS_SEED_OVERWRITE_EXISTING=true` flag is kept only as a pages-only alias. It does not reset menus, branding, or global SEO.
