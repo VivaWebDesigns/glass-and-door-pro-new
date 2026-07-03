@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { storage } from "../storage";
 import { normalizeSeoDescription } from "@shared/seo-description";
+import type { InsertCmsPage } from "@shared/schema";
 
 function id() {
   return randomUUID();
@@ -104,6 +105,35 @@ type CmsBuilderContent = {
 const commercialDoorInstallationSlug = "services-commercial-door-installation";
 const SYSTEM_RETIRED_PAGE_MARKERS = ["systemRetired", "isSystemRetired"];
 
+const residentialServicePageUrlsBySlug: Record<string, string> = {
+  "services-window-installation": "/services/window-installation",
+  "services-door-installation": "/services/door-installation",
+  "services-window-repair": "/services/window-repair",
+};
+
+const residentialServiceLinks = [
+  {
+    label: "Frameless Showers",
+    description: "Custom frameless glass shower doors and enclosures.",
+    url: "/services/frameless-showers",
+  },
+  {
+    label: "Window Installation",
+    description: "For whole-bathroom or whole-home remodels.",
+    url: "/services/window-installation",
+  },
+  {
+    label: "Door Installation",
+    description: "Entry, patio, and interior doors.",
+    url: "/services/door-installation",
+  },
+  {
+    label: "Window Repair",
+    description: "Foggy glass, broken panes, seal failures, and hardware.",
+    url: "/services/window-repair",
+  },
+];
+
 const commercialServiceLinks = [
   {
     label: "Commercial Storefront Glass Installation",
@@ -130,6 +160,21 @@ const commercialServiceLinks = [
   },
 ];
 
+function buildRelatedServicesBlock(currentUrl: string): CmsContentBlock {
+  return {
+    id: id(),
+    type: "link-list",
+    props: {
+      title: "Related Services",
+      columns: "1",
+      sectionBackgroundColor: "#ffffff",
+      sectionPaddingTop: "md",
+      sectionPaddingBottom: "md",
+      links: residentialServiceLinks.filter((link) => link.url !== currentUrl),
+    },
+  };
+}
+
 function buildRelatedCommercialServicesBlock(): CmsContentBlock {
   return {
     id: id(),
@@ -147,34 +192,48 @@ function buildRelatedCommercialServicesBlock(): CmsContentBlock {
   };
 }
 
-function addRelatedCommercialServicesBlock(content: unknown) {
+function hasLinkListBlock(content: unknown, title: string) {
+  if (!content || typeof content !== "object") return false;
+  const builderContent = content as CmsBuilderContent;
+  return Boolean(
+    builderContent.blocks?.some(
+      (block) => block.type === "link-list" && block.props?.title === title,
+    ),
+  );
+}
+
+function insertBlockBeforeCta(content: unknown, blockToInsert: CmsContentBlock) {
   if (!content || typeof content !== "object") return null;
 
   const builderContent = content as CmsBuilderContent;
   if (!Array.isArray(builderContent.blocks)) return null;
-  if (
-    builderContent.blocks.some(
-      (block) => block.type === "link-list" && block.props?.title === "Related Commercial Services",
-    )
-  ) {
-    return null;
-  }
 
-  const relatedBlock = buildRelatedCommercialServicesBlock();
   const ctaIndex = builderContent.blocks.findLastIndex((block) => block.type === "cta");
   const nextBlocks =
     ctaIndex >= 0
       ? [
           ...builderContent.blocks.slice(0, ctaIndex),
-          relatedBlock,
+          blockToInsert,
           ...builderContent.blocks.slice(ctaIndex),
         ]
-      : [...builderContent.blocks, relatedBlock];
+      : [...builderContent.blocks, blockToInsert];
 
   return {
     ...builderContent,
     blocks: nextBlocks,
   };
+}
+
+function addRelatedCommercialServicesBlock(content: unknown) {
+  if (hasLinkListBlock(content, "Related Commercial Services")) return null;
+
+  return insertBlockBeforeCta(content, buildRelatedCommercialServicesBlock());
+}
+
+function addRelatedServicesBlock(content: unknown, currentUrl: string) {
+  if (hasLinkListBlock(content, "Related Services")) return null;
+
+  return insertBlockBeforeCta(content, buildRelatedServicesBlock(currentUrl));
 }
 
 function shouldEnsureRelatedCommercialServicesBlock(content: unknown) {
@@ -197,14 +256,29 @@ async function ensureCommercialDoorInstallationRelatedServicesBlock() {
   });
 }
 
-async function normalizeStoredSeoDescriptions() {
+async function normalizeStoredCmsPages() {
   const pages = await storage.cmsPages.getAllPages();
 
   for (const page of pages) {
+    const updates: {
+      seoDescription?: string | null;
+      content?: InsertCmsPage["content"];
+      updatedBy?: string | null;
+    } = {};
     const normalized = normalizeSeoDescription(page.seoDescription);
     if (normalized !== page.seoDescription) {
+      updates.seoDescription = normalized;
+    }
+
+    const currentResidentialUrl = residentialServicePageUrlsBySlug[page.slug];
+    if (currentResidentialUrl) {
+      const content = addRelatedServicesBlock(page.content, currentResidentialUrl);
+      if (content) updates.content = content as InsertCmsPage["content"];
+    }
+
+    if (Object.keys(updates).length > 0) {
       await storage.cmsPages.updatePage(page.id, {
-        seoDescription: normalized,
+        ...updates,
         updatedBy: page.updatedBy,
       });
     }
@@ -229,7 +303,7 @@ export function isSystemRetiredCmsPageContent(content: unknown) {
 }
 
 export async function ensureSystemCmsPages() {
-  await normalizeStoredSeoDescriptions();
+  await normalizeStoredCmsPages();
 
   for (const retiredSlug of [
     "about",

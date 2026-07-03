@@ -1093,30 +1093,37 @@ function quoteCtaBlock(
   });
 }
 
-function relatedServicesBlock() {
+const residentialServiceLinks = [
+  {
+    label: "Frameless Showers",
+    description: "Custom frameless glass shower doors and enclosures.",
+    url: "/services/frameless-showers",
+  },
+  {
+    label: "Window Installation",
+    description: "For whole-bathroom or whole-home remodels.",
+    url: "/services/window-installation",
+  },
+  {
+    label: "Door Installation",
+    description: "Entry, patio, and interior doors.",
+    url: "/services/door-installation",
+  },
+  {
+    label: "Window Repair",
+    description: "Foggy glass, broken panes, seal failures, and hardware.",
+    url: "/services/window-repair",
+  },
+];
+
+function relatedServicesBlock(currentUrl = "/services/frameless-showers") {
   return block("link-list", {
     title: "Related Services",
     columns: "1",
     sectionBackgroundColor: "#ffffff",
     sectionPaddingTop: "md",
     sectionPaddingBottom: "md",
-    links: [
-      {
-        label: "Window Installation",
-        description: "For whole-bathroom or whole-home remodels.",
-        url: "/services/window-installation",
-      },
-      {
-        label: "Door Installation",
-        description: "Entry, patio, and interior doors.",
-        url: "/services/door-installation",
-      },
-      {
-        label: "Window Repair",
-        description: "Foggy glass, broken panes, seal failures, and hardware.",
-        url: "/services/window-repair",
-      },
-    ],
+    links: residentialServiceLinks.filter((link) => link.url !== currentUrl),
   });
 }
 
@@ -1483,6 +1490,7 @@ function expandedServicePageContent(props: {
   faqTitle: string;
   faqs: GlassFaq[];
   serviceAreaContent?: string;
+  relatedServicesUrl?: string;
   relatedCommercialUrl?: string;
   cta: {
     heading: string;
@@ -1555,6 +1563,7 @@ function expandedServicePageContent(props: {
       ...(props.relatedCommercialUrl
         ? [relatedCommercialServicesBlock(props.relatedCommercialUrl)]
         : []),
+      ...(props.relatedServicesUrl ? [relatedServicesBlock(props.relatedServicesUrl)] : []),
       block("cta", {
         variant: "glass-service",
         heading: props.cta.heading,
@@ -1716,6 +1725,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "window installation Charlotte NC, window replacement Monroe NC, residential windows, energy efficient windows",
     ogImageUrl: "/images/glass-door-pro/charming-suburban-home-hero-1920x1080.webp",
     content: expandedServicePageContent({
+      relatedServicesUrl: "/services/window-installation",
       hero: {
         heading: "Window Installation & Replacement in Charlotte, NC",
         subheading:
@@ -1866,6 +1876,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "door installation Charlotte NC, entry doors Monroe NC, patio door replacement, exterior door installer",
     ogImageUrl: "/images/glass-door-pro/door-hero.webp",
     content: expandedServicePageContent({
+      relatedServicesUrl: "/services/door-installation",
       hero: {
         heading: "Door Installation in Charlotte & Monroe, NC",
         subheading:
@@ -2018,6 +2029,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       "window repair Charlotte NC, broken window glass, foggy window repair, seal failure repair, glass replacement",
     ogImageUrl: "/images/glass-door-pro/broken-glass-hero.webp",
     content: expandedServicePageContent({
+      relatedServicesUrl: "/services/window-repair",
       hero: {
         heading: "Window Repair in Charlotte & Monroe, NC",
         subheading:
