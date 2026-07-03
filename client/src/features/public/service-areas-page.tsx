@@ -87,7 +87,7 @@ export default function ServiceAreasPage() {
               Glass and Door Services Across Greater Charlotte
             </h1>
             <div className="mb-9 max-w-2xl text-base leading-8 text-white/85 sm:text-lg [&_a]:text-white [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-white/80 [&_p]:m-0">
-              Glass & Door Pro serves Charlotte, Monroe, Union County, and nearby South Carolina
+              Glass & Door Pro serves Charlotte, Union County, and nearby South Carolina
               communities with frameless showers, window installation, door installation, window
               repair, and commercial glass services.
             </div>
