@@ -21,6 +21,7 @@ const defaultPlatformLinks = [
 ];
 
 const defaultServiceAreaLinks = [
+  { href: "/service-areas", label: "All Service Areas", testId: "link-footer-service-areas" },
   { href: "/service-areas/charlotte", label: "Charlotte", testId: "link-footer-service-area-charlotte" },
   { href: "/service-areas/monroe", label: "Monroe", testId: "link-footer-service-area-monroe" },
   { href: "/service-areas/indian-trail", label: "Indian Trail", testId: "link-footer-service-area-indian-trail" },
@@ -151,6 +152,18 @@ function ensureServicesHubLink<T extends FooterLegalLink>(links: T[]) {
   ];
 }
 
+function ensureServiceAreasHubLink<T extends FooterLegalLink>(links: T[]) {
+  if (links.some((link) => link.href === "/service-areas")) return links;
+  return [
+    {
+      href: "/service-areas",
+      label: "All Service Areas",
+      testId: "link-footer-service-areas",
+    } as T,
+    ...links,
+  ];
+}
+
 function FooterTextLink({ link }: { link: FooterLegalLink }) {
   const className = "text-slate-400 transition-colors hover:text-white";
   if (link.openInNewTab) {
@@ -230,7 +243,9 @@ export function Footer() {
   const serviceAreaLinks = useMemo(() => {
     const links = menuItemsToLinks(publicMenus?.footer_resources?.items as MenuItem[] | undefined, "link-footer-service-areas")
       .filter((link) => link.href.startsWith("/service-areas/"));
-    return links.length > 0 ? uniqueFooterLinks(links) : defaultServiceAreaLinks;
+    return links.length > 0
+      ? ensureServiceAreasHubLink(uniqueFooterLinks(links))
+      : defaultServiceAreaLinks;
   }, [publicMenus]) as FooterLegalLink[];
 
   const companyLinks = useMemo(() => {

@@ -21,6 +21,7 @@ import type { CmsMenu, MenuItem, PublicMenuLocation } from "@shared/schema";
 const defaultNavLinks = [
   { label: "About", href: "/#about" },
   { label: "Services", href: "/services" },
+  { label: "Service Areas", href: "/service-areas" },
   { label: "Frameless Showers", href: "/services/frameless-showers" },
   { label: "Window Installation", href: "/services/window-installation" },
   { label: "Door Installation", href: "/services/door-installation" },
@@ -38,6 +39,9 @@ const allResourceLinks: { label: string; href: string }[] = [];
 function normalizePublicMenuUrl(item: Pick<MenuItem, "label" | "url">) {
   if (/services/i.test(item.label) && item.url === "/#services") {
     return "/services";
+  }
+  if (/^service areas$/i.test(item.label.trim()) && item.url.startsWith("/service-areas/")) {
+    return "/service-areas";
   }
   if (/gallery/i.test(item.label) && item.url === "/#gallery") {
     return "/gallery";
@@ -77,10 +81,14 @@ function isActiveRecursive(items: MenuItem[], currentPath: string): boolean {
 }
 
 function getServicesOverviewLink(item: Pick<MenuItem, "label" | "url">) {
-  if (!/^services$/i.test(item.label.trim())) return null;
+  const normalizedLabel = item.label.trim();
+  if (!/^services$/i.test(normalizedLabel) && !/^service areas$/i.test(normalizedLabel)) {
+    return null;
+  }
+  const normalizedUrl = normalizePublicMenuUrl(item);
   return {
-    label: "Services Overview",
-    href: item.url === "/#services" ? "/services" : normalizePublicMenuUrl(item),
+    label: /^service areas$/i.test(normalizedLabel) ? "All Service Areas" : "Services Overview",
+    href: item.url === "/#services" ? "/services" : normalizedUrl,
   };
 }
 
