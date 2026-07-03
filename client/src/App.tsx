@@ -14,6 +14,7 @@ const HomePage = lazy(() => import("@/features/public/home-page"));
 const GalleryPage = lazy(() => import("@/features/public/gallery-page"));
 const ReviewsPage = lazy(() => import("@/features/public/reviews-page"));
 const ServicesPage = lazy(() => import("@/features/public/services-page"));
+const ServiceAreasPage = lazy(() => import("@/features/public/service-areas-page"));
 const CmsHybridPage = lazy(() =>
   import("@/features/public/cms-hybrid-page").then((module) => ({
     default: module.CmsHybridPage,
@@ -92,6 +93,7 @@ function Router() {
         <Route path="/services/commercial-door-installation" component={() => <CmsHybridPage slug="services-commercial-door-installation" fallback={<NotFound />} />} />
         <Route path="/services/commercial-door-replacement-repair" component={() => <CmsHybridPage slug="services-commercial-door-replacement-repair" fallback={<NotFound />} />} />
         <Route path="/services/commercial-window-replacement" component={() => <CmsHybridPage slug="services-commercial-window-replacement" fallback={<NotFound />} />} />
+        <Route path="/service-areas" component={ServiceAreasPage} />
         <Route path="/service-areas/charlotte" component={() => <CmsHybridPage slug="areas-served-charlotte-nc" fallback={<NotFound />} />} />
         <Route path="/service-areas/monroe" component={() => <CmsHybridPage slug="areas-served-monroe-nc" fallback={<NotFound />} />} />
         <Route path="/service-areas/indian-trail" component={() => <CmsHybridPage slug="service-areas-indian-trail" fallback={<NotFound />} />} />

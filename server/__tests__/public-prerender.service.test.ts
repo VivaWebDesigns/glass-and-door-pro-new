@@ -47,7 +47,11 @@ const cmsPage: CmsPage = {
   sidebarId: null,
   content: {
     blocks: [
-      { id: "b1", type: "hero", props: { title: "Glass Services", subtitle: "Schedule local glass and door service." } },
+      {
+        id: "b1",
+        type: "hero",
+        props: { title: "Glass Services", subtitle: "Schedule local glass and door service." },
+      },
     ],
   },
   seoTitle: null,
@@ -115,20 +119,17 @@ describe("public-prerender.service", () => {
         ],
       },
     });
-    const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } = await import(
-      "../services/public-prerender.service"
-    );
+    const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } =
+      await import("../services/public-prerender.service");
 
     const snapshot = await getPublicHtmlSnapshot("/services/frameless-showers");
     const html = injectPublicHtmlSnapshot(
-      "<html><head><title>Default</title><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--><div id=\"root\"></div></body></html>",
+      '<html><head><title>Default</title><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--><div id="root"></div></body></html>',
       snapshot,
     );
 
     expect(mockGetPageBySlug).toHaveBeenCalledWith("services-frameless-showers");
-    expect(snapshot?.title).toBe(
-      "Frameless Shower Doors Charlotte NC | Glass & Door Pro",
-    );
+    expect(snapshot?.title).toBe("Frameless Shower Doors Charlotte NC | Glass & Door Pro");
     expect(snapshot?.jsonLd?.map((schema) => schema["@type"])).toEqual([
       "LocalBusiness",
       "Service",
@@ -156,6 +157,64 @@ describe("public-prerender.service", () => {
     expect(snapshot?.bodyHtml).toContain('class="seo-prerender-faqs"');
     expect(snapshot?.bodyHtml).toContain("How long does installation take?");
     expect(html).toContain("Most frameless shower installations are completed in 2-4 hours.");
+  });
+
+  it("emits real body anchors for linked CMS content and priority site links", async () => {
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      title: "Commercial Door Replacement & Repair",
+      slug: "services-commercial-door-replacement-repair",
+      pageType: "service",
+      content: {
+        blocks: [
+          {
+            id: "linked-rich-text",
+            type: "rich-text",
+            props: {
+              content:
+                '<p>Serving <a href="/service-areas/charlotte">Charlotte</a> and nearby cities.</p>',
+            },
+          },
+          {
+            id: "related-links",
+            type: "link-list",
+            props: {
+              links: [
+                {
+                  label: "Commercial Storefront Glass Installation",
+                  url: "/services/commercial-storefront-glass-installation",
+                  description: "Storefront installation for Charlotte businesses.",
+                },
+              ],
+            },
+          },
+          {
+            id: "linked-faq",
+            type: "faq",
+            props: {
+              items: [
+                {
+                  question: "Do you serve Monroe?",
+                  answer:
+                    '<p>Yes, see our <a href="/service-areas/monroe">Monroe service area</a>.</p>',
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+    const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
+
+    const snapshot = await getPublicHtmlSnapshot("/services/commercial-door-replacement-repair");
+
+    expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/charlotte">Charlotte</a>');
+    expect(snapshot?.bodyHtml).toContain(
+      '<a href="/services/commercial-storefront-glass-installation">Commercial Storefront Glass Installation</a>',
+    );
+    expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/monroe">Monroe service area</a>');
+    expect(snapshot?.bodyHtml).toContain('<nav class="seo-prerender-footer"');
+    expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/indian-trail">Indian Trail</a>');
   });
 
   it("keeps CMS internals out of the home prerender body", async () => {
@@ -239,6 +298,24 @@ describe("public-prerender.service", () => {
     expect(snapshot?.title).toContain("Glass and Door Services");
     expect(snapshot?.canonicalUrl).toBe("https://glassanddoorpro.com/services");
     expect(snapshot?.bodyHtml).toContain("frameless shower doors");
+    expect(snapshot?.bodyHtml).toContain(
+      '<a href="/services/window-installation">Window Installation</a>',
+    );
+    expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/monroe">Monroe</a>');
+  });
+
+  it("returns a service areas hub fallback snapshot with crawlable city links", async () => {
+    const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
+
+    const snapshot = await getPublicHtmlSnapshot("/service-areas");
+
+    expect(snapshot?.title).toContain("Service Areas");
+    expect(snapshot?.canonicalUrl).toBe("https://glassanddoorpro.com/service-areas");
+    expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/charlotte">Charlotte</a>');
+    expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/fort-mill">Fort Mill</a>');
+    expect(snapshot?.bodyHtml).toContain(
+      '<a href="/services/frameless-showers">Frameless Showers</a>',
+    );
   });
 
   it("does not prerender retired legacy public sections", async () => {
@@ -269,11 +346,10 @@ describe("public-prerender.service", () => {
 
   it("retrieves and injects custom public head additions", async () => {
     mockGetSetting.mockResolvedValue('<meta name="custom-test" content="enabled" />');
-    const { getPublicHeadAdditions, injectPublicHtmlSnapshot } = await import(
-      "../services/public-prerender.service"
-    );
+    const { getPublicHeadAdditions, injectPublicHtmlSnapshot } =
+      await import("../services/public-prerender.service");
     const template =
-      "<html><head><title>Default</title><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--><div id=\"root\"></div></body></html>";
+      '<html><head><title>Default</title><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--><div id="root"></div></body></html>';
 
     const headHtml = await getPublicHeadAdditions();
     const html = injectPublicHtmlSnapshot(template, null, headHtml);
@@ -286,15 +362,15 @@ describe("public-prerender.service", () => {
     mockGetSetting.mockResolvedValue(
       [
         '<script async src="https://www.googletagmanager.com/gtag/js?id=G-TEST"></script',
-        '<script>window.dataLayer = window.dataLayer || [];</script',
+        "<script>window.dataLayer = window.dataLayer || [];</script",
       ].join("\n"),
     );
     const { getPublicHeadAdditions } = await import("../services/public-prerender.service");
 
     const headHtml = await getPublicHeadAdditions();
 
-    expect(headHtml).toContain('</script>');
-    expect(headHtml).not.toContain('</script\n');
-    expect(headHtml).not.toContain('</script<');
+    expect(headHtml).toContain("</script>");
+    expect(headHtml).not.toContain("</script\n");
+    expect(headHtml).not.toContain("</script<");
   });
 });

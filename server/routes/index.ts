@@ -185,6 +185,11 @@ export function registerApiRoutes(app: Express) {
         [];
 
       urls.push({ loc: base || "/", changefreq: "weekly", priority: "1.0" });
+      urls.push({
+        loc: `${base}/service-areas`,
+        changefreq: "monthly",
+        priority: "0.75",
+      });
 
       for (const page of pages) {
         if (page.status !== "published" || page.noindex) continue;
