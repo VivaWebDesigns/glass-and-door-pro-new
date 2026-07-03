@@ -7,12 +7,9 @@ import { PublicSidebar } from "@/features/public/public-sidebar";
 import { Loader2 } from "lucide-react";
 import type { BlockInstance, BuilderContent } from "@/features/admin/cms/builder/block-registry";
 import type { CmsPage, SeoSettings } from "@shared/schema";
+import { normalizeSeoDescription } from "@shared/seo-description";
 import { JsonLd } from "@/components/shared/json-ld";
-import {
-  buildBreadcrumbLd,
-  buildFaqPageLd,
-  extractFaqItems,
-} from "@/lib/structured-data";
+import { buildBreadcrumbLd, buildFaqPageLd, extractFaqItems } from "@/lib/structured-data";
 import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
 import {
   buildGlassBreadcrumbItems,
@@ -122,20 +119,27 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
     const socialOverride = getGlassServiceSocialMetadata(page.slug);
     const effectiveTitle = seoOverride?.title || page.seoTitle || page.title;
     const titleSuffix = globalSeo?.titleSuffix ?? " | Glass & Door Pro";
-    const titleFormatter = page.slug === "home" || isGlassServicePageSlug(page.slug)
-      ? formatBrandLastTitle
-      : formatBrandFirstTitle;
+    const titleFormatter =
+      page.slug === "home" || isGlassServicePageSlug(page.slug)
+        ? formatBrandLastTitle
+        : formatBrandFirstTitle;
     const headTitle =
       effectiveTitle && hasBrandSuffix(effectiveTitle)
         ? effectiveTitle
         : titleFormatter(effectiveTitle, titleSuffix, globalSeo?.siteName ?? "Glass & Door Pro");
     const effectiveDescription =
-      seoOverride?.description || page.seoDescription || globalSeo?.defaultMetaDescription || "";
+      seoOverride?.description ||
+      normalizeSeoDescription(page.seoDescription) ||
+      normalizeSeoDescription(globalSeo?.defaultMetaDescription) ||
+      "";
     const socialTitle = socialOverride?.ogTitle || headTitle;
     const socialDescription = socialOverride?.ogDescription || effectiveDescription;
     const origin =
       globalSeo?.siteUrl || (typeof window !== "undefined" ? window.location.origin : "");
-    const effectiveOgImage = absoluteUrl(page.ogImageUrl || globalSeo?.defaultOgImageUrl || "", origin);
+    const effectiveOgImage = absoluteUrl(
+      page.ogImageUrl || globalSeo?.defaultOgImageUrl || "",
+      origin,
+    );
 
     if (effectiveTitle) document.title = headTitle;
 
@@ -162,8 +166,7 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
     }
 
     const publicPath = getCmsPublicPath(page.slug);
-    const canonical =
-      page.canonicalUrl || (publicPath === "/" ? origin : `${origin}${publicPath}`);
+    const canonical = page.canonicalUrl || (publicPath === "/" ? origin : `${origin}${publicPath}`);
     setLink("canonical", canonical);
 
     if (page.noindex) {
@@ -189,9 +192,7 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
 
   const isHome = page.slug === "home" || page.slug === "";
 
-  const breadcrumbs = isHome
-    ? null
-    : buildBreadcrumbLd(buildGlassBreadcrumbItems(page, origin));
+  const breadcrumbs = isHome ? null : buildBreadcrumbLd(buildGlassBreadcrumbItems(page, origin));
 
   const faqItems = extractFaqItems(page.content);
   const cityArea = getGlassCityPageArea(page.slug);

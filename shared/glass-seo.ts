@@ -1,4 +1,5 @@
 import type { CmsPage } from "./schema";
+import { normalizeSeoDescription } from "./seo-description";
 
 export type JsonLdObject = Record<string, unknown>;
 
@@ -11,8 +12,14 @@ const cityServiceOffers = [
   ["Window Installation", "/services/window-installation"],
   ["Door Installation", "/services/door-installation"],
   ["Window Repair", "/services/window-repair"],
-  ["Commercial Storefront Glass Installation", "/services/commercial-storefront-glass-installation"],
-  ["Commercial Storefront Glass Replacement & Repair", "/services/commercial-storefront-glass-replacement-repair"],
+  [
+    "Commercial Storefront Glass Installation",
+    "/services/commercial-storefront-glass-installation",
+  ],
+  [
+    "Commercial Storefront Glass Replacement & Repair",
+    "/services/commercial-storefront-glass-replacement-repair",
+  ],
   ["Commercial Door Installation", "/services/commercial-door-installation"],
   ["Commercial Door Replacement & Repair", "/services/commercial-door-replacement-repair"],
   ["Commercial Window Replacement", "/services/commercial-window-replacement"],
@@ -23,8 +30,14 @@ const serviceHubOffers = [
   ["Window Installation", "/services/window-installation"],
   ["Window Repair", "/services/window-repair"],
   ["Door Installation", "/services/door-installation"],
-  ["Commercial Storefront Glass Installation", "/services/commercial-storefront-glass-installation"],
-  ["Commercial Storefront Glass Replacement & Repair", "/services/commercial-storefront-glass-replacement-repair"],
+  [
+    "Commercial Storefront Glass Installation",
+    "/services/commercial-storefront-glass-installation",
+  ],
+  [
+    "Commercial Storefront Glass Replacement & Repair",
+    "/services/commercial-storefront-glass-replacement-repair",
+  ],
   ["Commercial Door Installation", "/services/commercial-door-installation"],
   ["Commercial Door Replacement & Repair", "/services/commercial-door-replacement-repair"],
   ["Commercial Window Replacement", "/services/commercial-window-replacement"],
@@ -199,7 +212,8 @@ const servicePageNames: Record<
   "services-window-installation": {
     serviceType: "Window Installation & Replacement",
     name: "Window Installation & Replacement",
-    seoTitle: "Window Installation in Charlotte & Monroe, NC | Replacement Windows | Glass and Door Pro",
+    seoTitle:
+      "Window Installation in Charlotte & Monroe, NC | Replacement Windows | Glass and Door Pro",
     seoDescription:
       "Professional window installation and replacement for homes across Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Owner-operated, honest pricing, same-week appointments. Call (704) 771-6111.",
     description:
@@ -218,7 +232,8 @@ const servicePageNames: Record<
   "services-door-installation": {
     serviceType: "Door Installation",
     name: "Door Installation",
-    seoTitle: "Door Installation in Charlotte & Monroe, NC | Entry, Patio & Storm Doors | Glass and Door Pro",
+    seoTitle:
+      "Door Installation in Charlotte & Monroe, NC | Entry, Patio & Storm Doors | Glass and Door Pro",
     seoDescription:
       "Residential door installation for entry doors, patio doors, storm doors, and exterior doors across Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Call (704) 771-6111.",
     description:
@@ -237,7 +252,8 @@ const servicePageNames: Record<
   "services-window-repair": {
     serviceType: "Window Repair",
     name: "Window Repair",
-    seoTitle: "Window Repair in Charlotte & Monroe, NC | Foggy Glass, Broken Seals & More | Glass and Door Pro",
+    seoTitle:
+      "Window Repair in Charlotte & Monroe, NC | Foggy Glass, Broken Seals & More | Glass and Door Pro",
     seoDescription:
       "Window repair for broken seals, foggy panes, failed IGUs, broken hardware, and cracked glass. Serving Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Call (704) 771-6111.",
     description:
@@ -275,7 +291,8 @@ const servicePageNames: Record<
   "services-commercial-storefront-glass-replacement-repair": {
     serviceType: "Commercial Storefront Glass Replacement & Repair",
     name: "Commercial Storefront Glass Replacement & Repair",
-    seoTitle: "Commercial Storefront Glass Replacement & Repair in Charlotte, NC | Glass and Door Pro",
+    seoTitle:
+      "Commercial Storefront Glass Replacement & Repair in Charlotte, NC | Glass and Door Pro",
     seoDescription:
       "Emergency storefront glass repair, board-up, and replacement for Charlotte businesses. Broken storefront glass secured and replaced fast. Owner-operated, same-day response. Call (704) 771-6111.",
     description:
@@ -294,7 +311,8 @@ const servicePageNames: Record<
   "services-commercial-door-installation": {
     serviceType: "Commercial Door Installation",
     name: "Commercial Door Installation",
-    seoTitle: "Commercial Door Installation in Charlotte, NC | Storefront & Entry Doors | Glass and Door Pro",
+    seoTitle:
+      "Commercial Door Installation in Charlotte, NC | Storefront & Entry Doors | Glass and Door Pro",
     seoDescription:
       "Commercial door installation for new construction, tenant buildouts, and business renovations in Charlotte, NC. Aluminum entry doors, glass storefront doors, and commercial entrance systems. Call (704) 771-6111.",
     description:
@@ -350,7 +368,10 @@ const servicePageNames: Record<
   },
 };
 
-const cityPageData: Record<string, { city: string; state: string; name: string; description: string }> = {
+const cityPageData: Record<
+  string,
+  { city: string; state: string; name: string; description: string }
+> = {
   "areas-served-monroe-nc": {
     city: "Monroe",
     state: "North Carolina",
@@ -441,8 +462,10 @@ export function getCmsPublicPath(slug: string) {
   if (slug.startsWith("services-")) return `/services/${slug.replace(/^services-/, "")}`;
   if (slug === "areas-served-charlotte-nc") return "/service-areas/charlotte";
   if (slug === "areas-served-monroe-nc") return "/service-areas/monroe";
-  if (slug.startsWith("service-areas-")) return `/service-areas/${slug.replace(/^service-areas-/, "")}`;
-  if (slug.startsWith("areas-served-")) return `/areas-served/${slug.replace(/^areas-served-/, "")}`;
+  if (slug.startsWith("service-areas-"))
+    return `/service-areas/${slug.replace(/^service-areas-/, "")}`;
+  if (slug.startsWith("areas-served-"))
+    return `/areas-served/${slug.replace(/^areas-served-/, "")}`;
   return `/${slug}`;
 }
 
@@ -526,6 +549,7 @@ export function buildGlassServiceLdForCmsPage(
   page: Pick<CmsPage, "slug" | "seoDescription">,
   siteUrl = GLASS_SITE_URL,
 ): JsonLdObject | null {
+  const seoDescription = normalizeSeoDescription(page.seoDescription);
   const cityData = cityPageData[page.slug];
   if (cityData) {
     return {
@@ -561,7 +585,7 @@ export function buildGlassServiceLdForCmsPage(
       "@id": `${absoluteGlassUrl("/services", siteUrl)}#service`,
       serviceType: "Glass and Door Services",
       name: "Glass and Door Services",
-      description: page.seoDescription || undefined,
+      description: seoDescription || undefined,
       provider: { "@id": GLASS_BUSINESS_ID },
       hasOfferCatalog: {
         "@type": "OfferCatalog",
@@ -588,13 +612,14 @@ export function buildGlassServiceLdForCmsPage(
     "@id": `${absoluteGlassUrl(getCmsPublicPath(page.slug), siteUrl)}#service`,
     serviceType: serviceData.serviceType,
     name: serviceData.name,
-    description: serviceData.description || page.seoDescription || undefined,
+    description: serviceData.description || seoDescription || undefined,
     provider: { "@id": GLASS_BUSINESS_ID },
-    areaServed: explicitAreaServed?.length === 1
-      ? explicitAreaServed[0]
-      : explicitAreaServed?.length
-        ? explicitAreaServed
-        : buildGlassServiceAreaServed(),
+    areaServed:
+      explicitAreaServed?.length === 1
+        ? explicitAreaServed[0]
+        : explicitAreaServed?.length
+          ? explicitAreaServed
+          : buildGlassServiceAreaServed(),
     ...(serviceData.offers?.length
       ? {
           hasOfferCatalog: {
@@ -619,7 +644,10 @@ export function buildGlassServiceLdForCmsPage(
   };
 }
 
-export function buildGlassBreadcrumbItems(page: Pick<CmsPage, "slug" | "title">, siteUrl = GLASS_SITE_URL) {
+export function buildGlassBreadcrumbItems(
+  page: Pick<CmsPage, "slug" | "title">,
+  siteUrl = GLASS_SITE_URL,
+) {
   const publicPath = getCmsPublicPath(page.slug);
   const canonicalUrl = publicPath === "/" ? `${siteUrl}/` : absoluteGlassUrl(publicPath, siteUrl);
 

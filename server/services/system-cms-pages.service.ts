@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 import { storage } from "../storage";
+import { normalizeSeoDescription } from "@shared/seo-description";
 
 function id() {
   return randomUUID();
@@ -196,6 +197,20 @@ async function ensureCommercialDoorInstallationRelatedServicesBlock() {
   });
 }
 
+async function normalizeStoredSeoDescriptions() {
+  const pages = await storage.cmsPages.getAllPages();
+
+  for (const page of pages) {
+    const normalized = normalizeSeoDescription(page.seoDescription);
+    if (normalized !== page.seoDescription) {
+      await storage.cmsPages.updatePage(page.id, {
+        seoDescription: normalized,
+        updatedBy: page.updatedBy,
+      });
+    }
+  }
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -214,6 +229,8 @@ export function isSystemRetiredCmsPageContent(content: unknown) {
 }
 
 export async function ensureSystemCmsPages() {
+  await normalizeStoredSeoDescriptions();
+
   for (const retiredSlug of [
     "about",
     "contact",

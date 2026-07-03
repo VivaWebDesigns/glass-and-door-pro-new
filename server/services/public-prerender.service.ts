@@ -1,5 +1,6 @@
 import sanitizeHtml from "sanitize-html";
 import type { CmsPage, SeoSettings } from "@shared/schema";
+import { normalizeSeoDescription } from "@shared/seo-description";
 import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
 import {
   buildGlassBreadcrumbItems,
@@ -719,52 +720,60 @@ function buildCmsSnapshot(
   siteUrl: string,
 ): PublicHtmlSnapshot {
   const visiblePage = filterServiceAreaWorkGalleryFromPage(page);
+  const normalizedVisiblePage = {
+    ...visiblePage,
+    seoDescription: normalizeSeoDescription(visiblePage.seoDescription),
+  };
   const seoOverride = getGlassServiceSeoOverride(visiblePage.slug);
   const socialOverride = getGlassServiceSocialMetadata(visiblePage.slug);
-  const title = seoOverride?.title || visiblePage.seoTitle || visiblePage.title || "Page";
+  const title =
+    seoOverride?.title || normalizedVisiblePage.seoTitle || normalizedVisiblePage.title || "Page";
   const description =
     seoOverride?.description ||
-    visiblePage.seoDescription ||
-    truncate(uniqueFragments(collectTextFragments(visiblePage.content)).join(" "), 180) ||
+    normalizedVisiblePage.seoDescription ||
+    truncate(uniqueFragments(collectTextFragments(normalizedVisiblePage.content)).join(" "), 180) ||
     DEFAULT_DESCRIPTION;
-  const publicPath = getCmsPublicPath(visiblePage.slug);
+  const publicPath = getCmsPublicPath(normalizedVisiblePage.slug);
   const canonicalUrl =
-    visiblePage.canonicalUrl || (publicPath === "/" ? siteUrl : `${siteUrl}${publicPath}`);
-  const faqItems = extractFaqItems(visiblePage.content);
+    normalizedVisiblePage.canonicalUrl ||
+    (publicPath === "/" ? siteUrl : `${siteUrl}${publicPath}`);
+  const faqItems = extractFaqItems(normalizedVisiblePage.content);
   const bodyHtml = buildSimplePageBody(
-    getPrerenderHeading(visiblePage, title),
+    getPrerenderHeading(normalizedVisiblePage, title),
     description,
-    uniqueFragments(collectTextFragments(visiblePage.content)),
-    collectAnchoredSections(visiblePage.content),
+    uniqueFragments(collectTextFragments(normalizedVisiblePage.content)),
+    collectAnchoredSections(normalizedVisiblePage.content),
     [
-      buildCmsLinksHtml(visiblePage.content),
+      buildCmsLinksHtml(normalizedVisiblePage.content),
       buildFaqBodyHtml(faqItems),
       buildSeoFooterHtml(),
     ].filter(Boolean),
   );
 
   const breadcrumbs =
-    visiblePage.slug === "home"
+    normalizedVisiblePage.slug === "home"
       ? null
-      : buildBreadcrumbSchema(buildGlassBreadcrumbItems(visiblePage, siteUrl));
-  const cityArea = getGlassCityPageArea(visiblePage.slug);
+      : buildBreadcrumbSchema(buildGlassBreadcrumbItems(normalizedVisiblePage, siteUrl));
+  const cityArea = getGlassCityPageArea(normalizedVisiblePage.slug);
 
   return {
     title: buildHeadTitle(title, seo, {
-      brandLast: visiblePage.slug === "home" || isGlassServicePageSlug(visiblePage.slug),
+      brandLast:
+        normalizedVisiblePage.slug === "home" || isGlassServicePageSlug(normalizedVisiblePage.slug),
     }),
     description,
     canonicalUrl,
     ogTitle: socialOverride?.ogTitle || null,
     ogDescription: socialOverride?.ogDescription || null,
-    ogImageUrl: absoluteUrl(visiblePage.ogImageUrl || seo?.defaultOgImageUrl, siteUrl) || null,
+    ogImageUrl:
+      absoluteUrl(normalizedVisiblePage.ogImageUrl || seo?.defaultOgImageUrl, siteUrl) || null,
     twitterSite: socialOverride?.twitterSite || null,
-    robots: visiblePage.noindex ? "noindex,nofollow" : null,
+    robots: normalizedVisiblePage.noindex ? "noindex,nofollow" : null,
     bodyHtml,
-    cmsPage: visiblePage,
+    cmsPage: normalizedVisiblePage,
     jsonLd: [
       buildGlassLocalBusinessLd(siteUrl, cityArea),
-      buildGlassServiceLdForCmsPage(visiblePage, siteUrl),
+      buildGlassServiceLdForCmsPage(normalizedVisiblePage, siteUrl),
       breadcrumbs,
       buildFaqPageSchema(faqItems),
     ].filter(Boolean) as Array<Record<string, unknown>>,

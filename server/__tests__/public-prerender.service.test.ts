@@ -87,6 +87,30 @@ describe("public-prerender.service", () => {
     expect(snapshot?.canonicalUrl).toBe("https://glassanddoorpro.com/custom-landing");
   });
 
+  it("strips pasted meta description labels from CMS prerender output", async () => {
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      seoDescription: "Meta Description:\nOwner-operated glass and door services in Charlotte, NC.",
+    });
+    const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } =
+      await import("../services/public-prerender.service");
+
+    const snapshot = await getPublicHtmlSnapshot("/custom-landing");
+    const html = injectPublicHtmlSnapshot(
+      '<html><head><title>Default</title><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--><div id="root"></div></body></html>',
+      snapshot,
+    );
+
+    expect(snapshot?.description).toBe("Owner-operated glass and door services in Charlotte, NC.");
+    expect(snapshot?.cmsPage?.seoDescription).toBe(
+      "Owner-operated glass and door services in Charlotte, NC.",
+    );
+    expect(html).toContain(
+      '<meta name="description" content="Owner-operated glass and door services in Charlotte, NC." />',
+    );
+    expect(html).not.toContain("Meta Description:");
+  });
+
   it("emits CMS FAQPage schema and maps nested public routes to CMS slugs", async () => {
     mockGetSeo.mockResolvedValue({
       ...seoSettings,

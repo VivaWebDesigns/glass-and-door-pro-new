@@ -1,6 +1,15 @@
 import { db } from "../db";
 import { cmsPages, type CmsPage, type InsertCmsPage } from "@shared/schema";
+import { normalizeSeoDescription } from "@shared/seo-description";
 import { eq, desc, and, lte, asc, sql } from "drizzle-orm";
+
+function normalizeCmsPageData<T extends Partial<InsertCmsPage>>(data: T): T {
+  if (!("seoDescription" in data)) return data;
+  return {
+    ...data,
+    seoDescription: normalizeSeoDescription(data.seoDescription),
+  };
+}
 
 export class CmsPagesStorage {
   async getAllPages(): Promise<CmsPage[]> {
@@ -24,14 +33,14 @@ export class CmsPagesStorage {
   }
 
   async createPage(data: InsertCmsPage): Promise<CmsPage> {
-    const [page] = await db.insert(cmsPages).values(data).returning();
+    const [page] = await db.insert(cmsPages).values(normalizeCmsPageData(data)).returning();
     return page;
   }
 
   async updatePage(id: string, data: Partial<InsertCmsPage>): Promise<CmsPage | undefined> {
     const [page] = await db
       .update(cmsPages)
-      .set({ ...data, updatedAt: new Date() })
+      .set({ ...normalizeCmsPageData(data), updatedAt: new Date() })
       .where(eq(cmsPages.id, id))
       .returning();
     return page;
@@ -45,7 +54,12 @@ export class CmsPagesStorage {
   async publishPage(id: string, adminId: string): Promise<CmsPage | undefined> {
     const [page] = await db
       .update(cmsPages)
-      .set({ status: "published", publishedAt: new Date(), updatedBy: adminId, updatedAt: new Date() })
+      .set({
+        status: "published",
+        publishedAt: new Date(),
+        updatedBy: adminId,
+        updatedAt: new Date(),
+      })
       .where(eq(cmsPages.id, id))
       .returning();
     return page;
@@ -54,7 +68,13 @@ export class CmsPagesStorage {
   async unpublishPage(id: string, adminId: string): Promise<CmsPage | undefined> {
     const [page] = await db
       .update(cmsPages)
-      .set({ status: "draft", publishedAt: null, scheduledAt: null, updatedBy: adminId, updatedAt: new Date() })
+      .set({
+        status: "draft",
+        publishedAt: null,
+        scheduledAt: null,
+        updatedBy: adminId,
+        updatedAt: new Date(),
+      })
       .where(eq(cmsPages.id, id))
       .returning();
     return page;
@@ -63,7 +83,13 @@ export class CmsPagesStorage {
   async schedulePage(id: string, scheduledAt: Date, adminId: string): Promise<CmsPage | undefined> {
     const [page] = await db
       .update(cmsPages)
-      .set({ status: "scheduled", scheduledAt, publishedAt: null, updatedBy: adminId, updatedAt: new Date() })
+      .set({
+        status: "scheduled",
+        scheduledAt,
+        publishedAt: null,
+        updatedBy: adminId,
+        updatedAt: new Date(),
+      })
       .where(eq(cmsPages.id, id))
       .returning();
     return page;
