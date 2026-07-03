@@ -70,7 +70,7 @@ const FALLBACK_STATIC_PAGES: Record<
   "/service-areas": {
     title: "Service Areas",
     description:
-      "Glass & Door Pro serves Charlotte, Monroe, Indian Trail, Stallings, Wesley Chapel, Waxhaw, Matthews, Weddington, Indian Land, Fort Mill, Pineville, and nearby communities.",
+      "Glass & Door Pro serves Charlotte, Union County, and nearby South Carolina communities with frameless showers, window installation, door installation, window repair, and commercial glass services.",
     body: "Explore Glass & Door Pro service areas across the greater Charlotte metro, Union County, and nearby South Carolina communities.",
   },
   "/privacy-policy": {

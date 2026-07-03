@@ -334,6 +334,9 @@ describe("public-prerender.service", () => {
     const snapshot = await getPublicHtmlSnapshot("/service-areas");
 
     expect(snapshot?.title).toContain("Service Areas");
+    expect(snapshot?.description).toBe(
+      "Glass & Door Pro serves Charlotte, Union County, and nearby South Carolina communities with frameless showers, window installation, door installation, window repair, and commercial glass services.",
+    );
     expect(snapshot?.canonicalUrl).toBe("https://glassanddoorpro.com/service-areas");
     expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/charlotte">Charlotte</a>');
     expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/fort-mill">Fort Mill</a>');
