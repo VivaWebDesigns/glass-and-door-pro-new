@@ -326,6 +326,8 @@ describe("public-prerender.service", () => {
       '<a href="/services/window-installation">Window Installation</a>',
     );
     expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/monroe">Monroe</a>');
+    expect(snapshot?.jsonLd?.some((schema) => schema["@type"] === "BreadcrumbList")).toBe(false);
+    expect(snapshot?.jsonLd?.some((schema) => schema["@type"] === "ItemList")).toBe(false);
   });
 
   it("returns a service areas hub fallback snapshot with crawlable city links", async () => {
@@ -343,6 +345,41 @@ describe("public-prerender.service", () => {
     expect(snapshot?.bodyHtml).toContain(
       '<a href="/services/frameless-showers">Frameless Showers</a>',
     );
+
+    const breadcrumbSchema = snapshot?.jsonLd?.find(
+      (schema) => schema["@type"] === "BreadcrumbList",
+    ) as { itemListElement?: Array<{ position: number; name: string; item: string }> } | undefined;
+    const itemListSchema = snapshot?.jsonLd?.find((schema) => schema["@type"] === "ItemList") as
+      | { itemListElement?: Array<{ position: number; name: string; url: string }> }
+      | undefined;
+
+    expect(breadcrumbSchema?.itemListElement).toEqual([
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://glassanddoorpro.com/",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Service Areas",
+        item: "https://glassanddoorpro.com/service-areas",
+      },
+    ]);
+    expect(itemListSchema?.itemListElement).toHaveLength(11);
+    expect(itemListSchema?.itemListElement?.[0]).toEqual({
+      "@type": "ListItem",
+      position: 1,
+      name: "Charlotte",
+      url: "https://glassanddoorpro.com/service-areas/charlotte",
+    });
+    expect(itemListSchema?.itemListElement?.[10]).toEqual({
+      "@type": "ListItem",
+      position: 11,
+      name: "Pineville",
+      url: "https://glassanddoorpro.com/service-areas/pineville",
+    });
   });
 
   it("does not prerender retired legacy public sections", async () => {

@@ -584,6 +584,20 @@ function buildWebsiteSchema(seo: SeoSettings | null, siteUrl: string) {
   };
 }
 
+function buildServiceAreasHubItemListSchema(siteUrl: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Service Areas",
+    itemListElement: SERVICE_AREA_LINKS.map((link, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: link.label,
+      url: absoluteUrl(link.href, siteUrl),
+    })),
+  };
+}
+
 function buildBreadcrumbSchema(items: Array<{ name: string; url: string }>) {
   return {
     "@context": "https://schema.org",
@@ -787,6 +801,19 @@ function buildFallbackSnapshot(
 ): PublicHtmlSnapshot | null {
   const fallback = FALLBACK_STATIC_PAGES[pathname];
   if (!fallback) return null;
+  const fallbackJsonLd = [
+    buildOrganizationSchema(seo, siteUrl),
+    buildWebsiteSchema(seo, siteUrl),
+    ...(pathname === "/service-areas"
+      ? [
+          buildBreadcrumbSchema([
+            { name: "Home", url: absoluteUrl("/", siteUrl) },
+            { name: "Service Areas", url: absoluteUrl("/service-areas", siteUrl) },
+          ]),
+          buildServiceAreasHubItemListSchema(siteUrl),
+        ]
+      : []),
+  ].filter(Boolean) as Array<Record<string, unknown>>;
 
   return {
     title: buildHeadTitle(fallback.title, seo),
@@ -806,9 +833,7 @@ function buildFallbackSnapshot(
         buildSeoFooterHtml(),
       ].filter(Boolean),
     ),
-    jsonLd: [buildOrganizationSchema(seo, siteUrl), buildWebsiteSchema(seo, siteUrl)].filter(
-      Boolean,
-    ) as Array<Record<string, unknown>>,
+    jsonLd: fallbackJsonLd,
   };
 }
 
