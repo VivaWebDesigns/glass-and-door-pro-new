@@ -60,7 +60,7 @@ function jsonLdScripts() {
 }
 
 describe("JsonLd", () => {
-  it("replaces matching prerendered schema instead of duplicating it", () => {
+  it("keeps matching prerendered schema instead of duplicating it", () => {
     const prerendered = document.createElement("script");
     prerendered.type = "application/ld+json";
     prerendered.textContent = JSON.stringify(faqSchema);
@@ -70,24 +70,56 @@ describe("JsonLd", () => {
 
     const scripts = jsonLdScripts();
     expect(scripts).toHaveLength(1);
-    expect(scripts[0].id).toMatch(/^ld-json-/);
+    expect(scripts[0]).toBe(prerendered);
     expect(JSON.parse(scripts[0].textContent || "{}")).toEqual(faqSchema);
   });
 
-  it("replaces equivalent prerendered schema when non-identity fields differ", () => {
+  it("keeps equivalent prerendered schema when non-identity fields differ", () => {
     const prerendered = document.createElement("script");
     prerendered.type = "application/ld+json";
-    prerendered.textContent = JSON.stringify({
+    const prerenderedSchema = {
       ...localBusinessSchema,
       priceRange: "$",
-    });
+    };
+    prerendered.textContent = JSON.stringify(prerenderedSchema);
     document.head.appendChild(prerendered);
 
     renderJsonLd([localBusinessSchema]);
 
     const scripts = jsonLdScripts();
     expect(scripts).toHaveLength(1);
-    expect(scripts[0].id).toMatch(/^ld-json-/);
-    expect(JSON.parse(scripts[0].textContent || "{}")).toEqual(localBusinessSchema);
+    expect(scripts[0]).toBe(prerendered);
+    expect(JSON.parse(scripts[0].textContent || "{}")).toEqual(prerenderedSchema);
+  });
+
+  it("adds schemas that were not prerendered", () => {
+    const prerendered = document.createElement("script");
+    prerendered.type = "application/ld+json";
+    prerendered.textContent = JSON.stringify(faqSchema);
+    document.head.appendChild(prerendered);
+
+    renderJsonLd([faqSchema, localBusinessSchema]);
+
+    const scripts = jsonLdScripts();
+    expect(scripts).toHaveLength(2);
+    expect(scripts[0]).toBe(prerendered);
+    expect(scripts[1].id).toMatch(/^ld-json-/);
+    expect(JSON.parse(scripts[1].textContent || "{}")).toEqual(localBusinessSchema);
+  });
+
+  it("removes adopted prerendered schema on unmount", () => {
+    const prerendered = document.createElement("script");
+    prerendered.type = "application/ld+json";
+    prerendered.textContent = JSON.stringify(faqSchema);
+    document.head.appendChild(prerendered);
+
+    renderJsonLd();
+
+    act(() => {
+      root?.unmount();
+    });
+    root = null;
+
+    expect(jsonLdScripts()).toHaveLength(0);
   });
 });

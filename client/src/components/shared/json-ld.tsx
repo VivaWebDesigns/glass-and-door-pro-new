@@ -48,26 +48,35 @@ export function JsonLd({ schemas }: JsonLdProps) {
     if (valid.length === 0) return;
 
     const schemaSet = new Set(valid.map(schemaIdentity).filter((key): key is string => !!key));
+    const handledIdentities = new Set<string>();
+    const adoptedScripts: HTMLScriptElement[] = [];
+
     document
       .querySelectorAll<HTMLScriptElement>('script[type="application/ld+json"]')
       .forEach((script) => {
         const parsed = canonicalizeSchema(script.textContent);
         const identity = parsed ? schemaIdentity(parsed) : null;
-        if (identity && schemaSet.has(identity)) {
-          script.remove();
-        }
+        if (!identity || !schemaSet.has(identity)) return;
+
+        handledIdentities.add(identity);
+        adoptedScripts.push(script);
       });
 
-    const scripts: HTMLScriptElement[] = valid.map((schema, i) => {
+    const scripts: HTMLScriptElement[] = valid.flatMap((schema, i) => {
+      const identity = schemaIdentity(schema);
+      if (identity && handledIdentities.has(identity)) return [];
+
       const script = document.createElement("script");
       script.type = "application/ld+json";
       script.id = `ld-json-${uid}-${i}`;
       script.textContent = JSON.stringify(schema);
       document.head.appendChild(script);
-      return script;
+      if (identity) handledIdentities.add(identity);
+      return [script];
     });
 
     return () => {
+      adoptedScripts.forEach((s) => s.remove());
       scripts.forEach((s) => s.remove());
     };
   }, [serializedSchemas, uid]);
