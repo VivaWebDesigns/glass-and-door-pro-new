@@ -6,6 +6,8 @@ uploads
 vite.config.ts.*
 *.tar.gz
 .playwright-cli
+playwright-report
+test-results
 attached_assets/Pasted-*
 attached_assets/Screenshot_*
 attached_assets/targeted_element_*
