@@ -732,7 +732,6 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
     rating?: number;
     source?: string;
     sourceIcon?: string;
-    date?: string;
   }>(props.items);
   const shouldCarousel = items.length > 2;
 
@@ -759,11 +758,7 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
     );
   }
 
-  function SourceBadge({
-    item,
-  }: {
-    item: { source?: string; sourceIcon?: string; date?: string };
-  }) {
+  function SourceBadge({ item }: { item: { source?: string; sourceIcon?: string } }) {
     const source = item.source || "Google";
     const showGoogleIcon = (item.sourceIcon || source).toLowerCase() === "google";
 
@@ -771,7 +766,6 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
       <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
         {showGoogleIcon ? <GoogleSourceIcon /> : null}
         {!showGoogleIcon ? <span>{source}</span> : null}
-        {item.date ? <span className="font-medium text-[#1a8ead]">· {item.date}</span> : null}
       </div>
     );
   }
@@ -785,7 +779,6 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
       rating?: number;
       source?: string;
       sourceIcon?: string;
-      date?: string;
     },
     i: number,
   ) => (

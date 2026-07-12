@@ -793,7 +793,6 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
           { key: "rating", label: "Rating", type: "number", min: 1, max: 5 },
           { key: "source", label: "Source", type: "text", placeholder: "e.g. Google" },
           { key: "sourceIcon", label: "Source Icon", type: "text", placeholder: "e.g. google" },
-          { key: "date", label: "Review Date", type: "text", placeholder: "e.g. May 2024" },
         ],
       },
     ],
