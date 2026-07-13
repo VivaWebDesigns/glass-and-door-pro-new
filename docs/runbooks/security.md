@@ -62,12 +62,12 @@ Helmet is enabled with the following CSP directives:
 | Directive | Allowed Sources | Reason |
 |---|---|---|
 | `default-src` | `'self'` | Baseline restriction |
-| `script-src` | `'self'`, `https://js.stripe.com` | App scripts + Stripe.js |
-| `style-src` | `'self'`, `'unsafe-inline'`, `https://fonts.googleapis.com` | App styles, inline styles (Tiptap/shadcn), Google Fonts |
+| `script-src` | `'self'`, the hashed early-render bootstrap, Google Tag Manager, Cloudflare Insights | App scripts, the narrowly authorized bootstrap, and analytics scripts |
+| `style-src` | `'self'`, `'unsafe-inline'`, Google Fonts, `unpkg.com` | App styles, inline styles (Tiptap/shadcn), Google Fonts, map styles |
 | `font-src` | `'self'`, `https://fonts.gstatic.com`, `data:` | Google Fonts, embedded fonts |
-| `img-src` | `'self'`, `data:`, `blob:`, `*.r2.cloudflarestorage.com`, `*.r2.dev`, `*.tile.openstreetmap.org`, `unpkg.com` | App images, R2 media, Leaflet tiles/markers |
-| `connect-src` | `'self'`, `api.stripe.com`, `*.r2.cloudflarestorage.com`, `*.r2.dev`, `*.tile.openstreetmap.org` | API calls, Stripe, R2 uploads, map tiles |
-| `frame-src` | `'self'`, `https://js.stripe.com`, `https://hooks.stripe.com` | Stripe 3D Secure / Elements iframes |
+| `img-src` | `'self'`, `data:`, `blob:`, R2, OpenStreetMap, Carto, `unpkg.com` | App images, R2 media, and map tiles/markers |
+| `connect-src` | `'self'`, Google Analytics, Google Tag Manager, Cloudflare Insights, R2, OpenStreetMap, Carto | API calls, analytics, R2 uploads, and map tiles |
+| `frame-src` | `'self'` | Same-origin iframes only |
 | `media-src` | `'self'`, `blob:`, `*.r2.cloudflarestorage.com`, `*.r2.dev` | Audio/video from R2 |
 | `worker-src` | `'self'`, `blob:` | Service workers |
 | `object-src` | `'none'` | Block plugins (Flash, Java) |

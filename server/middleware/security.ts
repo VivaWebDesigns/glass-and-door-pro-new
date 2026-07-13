@@ -36,6 +36,7 @@ export function securityHeaders(): RequestHandler {
         defaultSrc: ["'self'"],
         scriptSrc: [
           "'self'",
+          "'sha256-ZnYJX5ypMaaAhxxWhSEjbMkhO2A9yPmbzEQH3LFaITA='",
           "https://www.googletagmanager.com",
           "https://static.cloudflareinsights.com",
         ],
