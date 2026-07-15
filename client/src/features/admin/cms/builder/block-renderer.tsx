@@ -679,10 +679,15 @@ function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
                 <p className="text-sm leading-relaxed text-muted-foreground">{card.description}</p>
                 {card.link && (
                   <div className="mt-auto pt-5">
-                    <span className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm">
+                    <a
+                      href={card.link}
+                      target={card.openInNewTab ? "_blank" : undefined}
+                      rel={card.openInNewTab ? "noopener noreferrer" : undefined}
+                      className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    >
                       {card.buttonText || "Learn More"}
                       <ArrowRight className="ml-1.5 h-4 w-4" />
-                    </span>
+                    </a>
                   </div>
                 )}
               </CardContent>

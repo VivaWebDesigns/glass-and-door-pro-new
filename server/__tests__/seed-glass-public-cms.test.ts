@@ -107,5 +107,23 @@ describe("seedGlassPublicCms", () => {
     expect(mockUpdateMenu).toHaveBeenCalled();
     expect(mockUpsertSetting).not.toHaveBeenCalled();
     expect(mockUpsertSeoSettings).not.toHaveBeenCalled();
+
+    const homeUpdate = mockUpdatePage.mock.calls.find(([id]) => id === "home-id")?.[1];
+    const servicesBlock = homeUpdate?.content.blocks.find(
+      (block: { type: string; props?: { anchorId?: string } }) =>
+        block.type === "cards-grid" && block.props?.anchorId === "services",
+    );
+
+    expect(servicesBlock?.props.cards.map((card: { link: string }) => card.link)).toEqual([
+      "/services/frameless-showers",
+      "/services/window-installation",
+      "/services/door-installation",
+      "/services/window-repair",
+      "/services/commercial-storefront-glass-installation",
+      "/services/commercial-storefront-glass-replacement-repair",
+      "/services/commercial-door-installation",
+      "/services/commercial-door-replacement-repair",
+      "/services/commercial-window-replacement",
+    ]);
   });
 });

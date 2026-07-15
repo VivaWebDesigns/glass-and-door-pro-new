@@ -412,6 +412,37 @@ const glassHomeContent: InsertCmsPage["content"] = {
             link: "/services/commercial-storefront-glass-installation",
             buttonText: "Learn More",
           },
+          {
+            icon: "Building2",
+            title: "Commercial Storefront Glass Replacement & Repair",
+            description:
+              "Emergency board-up, broken panel replacement, and storefront glass repair for Charlotte businesses.",
+            link: "/services/commercial-storefront-glass-replacement-repair",
+            buttonText: "Learn More",
+          },
+          {
+            icon: "DoorOpen",
+            title: "Commercial Door Installation",
+            description:
+              "Aluminum entry doors, glass storefront doors, and complete commercial entrance systems.",
+            link: "/services/commercial-door-installation",
+            buttonText: "Learn More",
+          },
+          {
+            icon: "Wrench",
+            title: "Commercial Door Replacement & Repair",
+            description:
+              "Broken glass panels, hardware failure, misaligned frames, and worn closers repaired or replaced fast.",
+            link: "/services/commercial-door-replacement-repair",
+            buttonText: "Learn More",
+          },
+          {
+            icon: "Building2",
+            title: "Commercial Window Replacement",
+            description: "Apartment and multi-family window replacement with fast mobilization.",
+            link: "/services/commercial-window-replacement",
+            buttonText: "Learn More",
+          },
         ],
       },
     },
