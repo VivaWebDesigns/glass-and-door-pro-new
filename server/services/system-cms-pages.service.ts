@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { storage } from "../storage";
 import { normalizeSeoDescription } from "@shared/seo-description";
+import { GLASS_HOMEPAGE_SERVICE_CARDS } from "@shared/glass-homepage-services";
 import type { InsertCmsPage } from "@shared/schema";
 
 function id() {
@@ -236,6 +237,43 @@ function addRelatedServicesBlock(content: unknown, currentUrl: string) {
   return insertBlockBeforeCta(content, buildRelatedServicesBlock(currentUrl));
 }
 
+function ensureHomepageServiceCards(content: unknown) {
+  if (!isRecord(content) || !Array.isArray(content.blocks)) return null;
+
+  const serviceBlockIndex = content.blocks.findIndex(
+    (block) =>
+      isRecord(block) &&
+      block.type === "cards-grid" &&
+      isRecord(block.props) &&
+      block.props.anchorId === "services",
+  );
+  if (serviceBlockIndex < 0) return null;
+
+  const serviceBlock = content.blocks[serviceBlockIndex];
+  if (!isRecord(serviceBlock) || !isRecord(serviceBlock.props)) return null;
+
+  const currentCards = Array.isArray(serviceBlock.props.cards) ? serviceBlock.props.cards : [];
+  const currentLinks = currentCards.map((card) => (isRecord(card) ? card.link : undefined));
+  const expectedLinks = GLASS_HOMEPAGE_SERVICE_CARDS.map((card) => card.link);
+  if (
+    currentLinks.length === expectedLinks.length &&
+    currentLinks.every((link, index) => link === expectedLinks[index])
+  ) {
+    return null;
+  }
+
+  const blocks = [...content.blocks];
+  blocks[serviceBlockIndex] = {
+    ...serviceBlock,
+    props: {
+      ...serviceBlock.props,
+      cards: GLASS_HOMEPAGE_SERVICE_CARDS,
+    },
+  };
+
+  return { ...content, blocks };
+}
+
 function shouldEnsureRelatedCommercialServicesBlock(content: unknown) {
   if (!isRecord(content)) return false;
   const systemMeta = content._system ?? content.system;
@@ -273,6 +311,11 @@ async function normalizeStoredCmsPages() {
     const currentResidentialUrl = residentialServicePageUrlsBySlug[page.slug];
     if (currentResidentialUrl) {
       const content = addRelatedServicesBlock(page.content, currentResidentialUrl);
+      if (content) updates.content = content as InsertCmsPage["content"];
+    }
+
+    if (page.slug === "home") {
+      const content = ensureHomepageServiceCards(page.content);
       if (content) updates.content = content as InsertCmsPage["content"];
     }
 

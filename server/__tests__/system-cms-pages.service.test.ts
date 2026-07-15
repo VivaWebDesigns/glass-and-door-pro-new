@@ -177,4 +177,59 @@ describe("ensureSystemCmsPages", () => {
       expect.objectContaining({ label: "Window Repair", url: "/services/window-repair" }),
     ]);
   });
+
+  it("adds every service page to the homepage service cards without replacing other blocks", async () => {
+    const heroBlock = { id: "hero", type: "hero", props: { heading: "Existing hero" } };
+    const faqBlock = { id: "faq", type: "faq", props: { items: [{ question: "Existing FAQ" }] } };
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "home-id",
+        slug: "home",
+        seoDescription: "Existing homepage description.",
+        content: {
+          blocks: [
+            heroBlock,
+            {
+              id: "services",
+              type: "cards-grid",
+              props: {
+                anchorId: "services",
+                title: "What We Offer",
+                cards: [
+                  {
+                    title: "Frameless Showers",
+                    link: "/services/frameless-showers",
+                  },
+                ],
+              },
+            },
+            faqBlock,
+          ],
+        },
+        updatedBy: "admin-id",
+      },
+    ]);
+    mockGetPageBySlug.mockResolvedValue(null);
+
+    const mod = await import("../services/system-cms-pages.service");
+    await mod.ensureSystemCmsPages();
+
+    expect(mockUpdatePage).toHaveBeenCalledTimes(1);
+    const [pageId, update] = mockUpdatePage.mock.calls[0];
+    expect(pageId).toBe("home-id");
+    expect(update.updatedBy).toBe("admin-id");
+    expect(update.content.blocks[0]).toEqual(heroBlock);
+    expect(update.content.blocks[2]).toEqual(faqBlock);
+    expect(update.content.blocks[1].props.cards.map((card: { link: string }) => card.link)).toEqual([
+      "/services/frameless-showers",
+      "/services/window-installation",
+      "/services/door-installation",
+      "/services/window-repair",
+      "/services/commercial-storefront-glass-installation",
+      "/services/commercial-storefront-glass-replacement-repair",
+      "/services/commercial-door-installation",
+      "/services/commercial-door-replacement-repair",
+      "/services/commercial-window-replacement",
+    ]);
+  });
 });
