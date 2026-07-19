@@ -274,6 +274,46 @@ function ensureHomepageServiceCards(content: unknown) {
   return { ...content, blocks };
 }
 
+const businessHoursReplacements = [
+  ["7am - 6pm", "7am - 7pm"],
+  ["7am – 6pm", "7am – 7pm"],
+  ["7am–6pm", "7am–7pm"],
+  ["7 AM to 6 PM", "7 AM to 7 PM"],
+] as const;
+
+function updateBusinessHours(value: unknown): unknown {
+  if (typeof value === "string") {
+    return businessHoursReplacements.reduce(
+      (text, [currentHours, newHours]) => text.replaceAll(currentHours, newHours),
+      value,
+    );
+  }
+
+  if (Array.isArray(value)) {
+    let changed = false;
+    const next = value.map((item) => {
+      const updated = updateBusinessHours(item);
+      if (updated !== item) changed = true;
+      return updated;
+    });
+    return changed ? next : value;
+  }
+
+  if (isRecord(value)) {
+    let changed = false;
+    const next = Object.fromEntries(
+      Object.entries(value).map(([key, item]) => {
+        const updated = updateBusinessHours(item);
+        if (updated !== item) changed = true;
+        return [key, updated];
+      }),
+    );
+    return changed ? next : value;
+  }
+
+  return value;
+}
+
 function shouldEnsureRelatedCommercialServicesBlock(content: unknown) {
   if (!isRecord(content)) return false;
   const systemMeta = content._system ?? content.system;
@@ -317,6 +357,11 @@ async function normalizeStoredCmsPages() {
     if (page.slug === "home") {
       const content = ensureHomepageServiceCards(page.content);
       if (content) updates.content = content as InsertCmsPage["content"];
+    }
+
+    const contentWithCurrentHours = updateBusinessHours(updates.content ?? page.content);
+    if (contentWithCurrentHours !== (updates.content ?? page.content)) {
+      updates.content = contentWithCurrentHours as InsertCmsPage["content"];
     }
 
     if (Object.keys(updates).length > 0) {

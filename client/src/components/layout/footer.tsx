@@ -355,7 +355,7 @@ export function Footer() {
                       {emailLink.label}
                     </a>
                   </ContactInfoItem>
-                  <ContactInfoItem icon={Clock}>Mon-Sat: 7am - 6pm</ContactInfoItem>
+                  <ContactInfoItem icon={Clock}>Mon-Sat: 7am - 7pm</ContactInfoItem>
                 </ul>
               </div>
             </>

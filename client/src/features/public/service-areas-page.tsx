@@ -190,7 +190,7 @@ export default function ServiceAreasPage() {
             </p>
             <p>
               <strong>
-                Mon–Sat: 7am – 6pm | Serving Charlotte, Monroe, Union County, and nearby South
+                Mon–Sat: 7am – 7pm | Serving Charlotte, Monroe, Union County, and nearby South
                 Carolina communities
               </strong>
             </p>

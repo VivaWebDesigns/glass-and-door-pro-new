@@ -102,5 +102,8 @@ describe("glass SEO helpers", () => {
       name: "Indian Land",
       containedInPlace: { "@type": "State", name: "South Carolina" },
     });
+    expect(businessSchema.openingHoursSpecification).toEqual([
+      expect.objectContaining({ opens: "07:00", closes: "19:00" }),
+    ]);
   });
 });

@@ -487,7 +487,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
           {
             icon: "Clock",
             label: "Hours",
-            value: "Mon-Sat: 7am - 6pm",
+            value: "Mon-Sat: 7am - 7pm",
           },
         ],
       },
@@ -1288,7 +1288,7 @@ const month1FramelessContent: InsertCmsPage["content"] = {
     quoteCtaBlock(
       "Ready to Transform Your Bathroom?",
       "Get a free quote for your custom frameless shower installation. Doug will come out personally, look at your bathroom, and give you a clear written estimate the same visit.",
-      "Mon–Sat: 7am – 6pm | Saturday appointments available",
+      "Mon–Sat: 7am – 7pm | Saturday appointments available",
     ),
   ],
 };
@@ -1607,7 +1607,7 @@ const glassServicesContent: InsertCmsPage["content"] = {
     quoteCtaBlock(
       "Ready to Get Started?",
       "Call, text, or fill out the form for a free quote. Doug will review the project personally and give you clear next steps.",
-      "Mon-Sat: 7am - 6pm | Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas",
+      "Mon-Sat: 7am - 7pm | Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas",
     ),
   ],
 };
@@ -1725,7 +1725,7 @@ const glassServicePages: GlassServicePageSeed[] = [
           icon: "CalendarDays",
           title: "Saturday Appointments Available",
           description:
-            "Mon–Sat, 7am–6pm. We know most homeowners can't take a weekday off for a window quote, so Saturday appointments are available by default.",
+            "Mon–Sat, 7am–7pm. We know most homeowners can't take a weekday off for a window quote, so Saturday appointments are available by default.",
         },
         {
           icon: "MapPin",
@@ -1771,7 +1771,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         heading: "Ready to Replace Your Windows?",
         body: "Call, text, or fill out the form for a free in-home quote. Doug will measure every opening personally and give you a clear, written estimate with no pressure and no surprises.",
         footerLine:
-          "Mon–Sat, 7am–6pm | Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas",
+          "Mon–Sat, 7am–7pm | Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas",
       },
     }),
   },
@@ -1878,7 +1878,7 @@ const glassServicePages: GlassServicePageSeed[] = [
           icon: "CalendarDays",
           title: "Saturday Appointments Available",
           description:
-            "Mon–Sat, 7am–6pm. Door installation doesn't have to wait for a weekday when you can take time off work.",
+            "Mon–Sat, 7am–7pm. Door installation doesn't have to wait for a weekday when you can take time off work.",
         },
         {
           icon: "Star",
@@ -1924,7 +1924,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         heading: "Ready to Install or Replace a Door?",
         body: "Call, text, or fill out the form for a free quote. Doug will measure the opening personally and give you a clear written estimate — no pressure, no surprises.",
         footerLine:
-          "Mon–Sat, 7am–6pm | Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas",
+          "Mon–Sat, 7am–7pm | Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas",
       },
     }),
   },
@@ -2075,7 +2075,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         heading: "Have a Window That Needs Attention?",
         body: "Call, text, or fill out the form and Doug will take a look. Most window repair jobs can be diagnosed quickly and scheduled within the same week.",
         footerLine:
-          "Mon–Sat, 7am–6pm | Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas",
+          "Mon–Sat, 7am–7pm | Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas",
       },
     }),
   },
@@ -2228,7 +2228,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       cta: {
         heading: "Have a Commercial Storefront Project in Charlotte?",
         body: "Call or submit a project inquiry and Doug will follow up directly. We work with GCs, project managers, and business owners — and we respond fast.",
-        footerLine: "Mon–Sat, 7am–6pm | Charlotte, NC and surrounding metro area",
+        footerLine: "Mon–Sat, 7am–7pm | Charlotte, NC and surrounding metro area",
         primaryText: "Request a Commercial Quote",
       },
     }),
@@ -2390,7 +2390,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       cta: {
         heading: "Broken Storefront Glass in Charlotte?",
         body: "Call us directly for emergency response. For non-emergency replacement and repair, fill out the form and we'll follow up same day.",
-        footerLine: "Mon–Sat, 7am–6pm | Charlotte, NC and surrounding metro area",
+        footerLine: "Mon–Sat, 7am–7pm | Charlotte, NC and surrounding metro area",
         primaryText: "Call (704) 771-6111",
         primaryAction: "custom-link",
         primaryLink: "tel:+17047716111",
@@ -2553,7 +2553,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       cta: {
         heading: "Commercial Door Project in Charlotte?",
         body: "Call or submit a project inquiry and Doug will follow up directly. We work with GCs, project managers, and business owners — and we respond fast.",
-        footerLine: "Mon–Sat, 7am–6pm | Charlotte, NC and surrounding metro area",
+        footerLine: "Mon–Sat, 7am–7pm | Charlotte, NC and surrounding metro area",
         primaryText: "Request a Commercial Quote",
       },
     }),
@@ -2717,7 +2717,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       cta: {
         heading: "Commercial Door Not Working Right in Charlotte?",
         body: "Call us directly for fast scheduling. For non-urgent repairs and replacement quotes, fill out the form and we'll follow up same day.",
-        footerLine: "Mon–Sat, 7am–6pm | Charlotte, NC and surrounding metro area",
+        footerLine: "Mon–Sat, 7am–7pm | Charlotte, NC and surrounding metro area",
         primaryText: "Call (704) 771-6111",
         primaryAction: "custom-link",
         primaryLink: "tel:+17047716111",
@@ -2890,7 +2890,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       cta: {
         heading: "Window Problem on an Apartment Project in Charlotte?",
         body: "Call Doug directly. He'll assess the situation, give you an accurate timeline, and tell you exactly what it takes to resolve it. No runaround.",
-        footerLine: "Mon–Sat, 7am–6pm | Charlotte, NC and surrounding metro area",
+        footerLine: "Mon–Sat, 7am–7pm | Charlotte, NC and surrounding metro area",
         primaryText: "Call (704) 771-6111",
         primaryAction: "custom-link",
         primaryLink: "tel:+17047716111",
@@ -3096,7 +3096,7 @@ const glassCityPages: GlassCityPageSeed[] = [
           icon: "CalendarDays",
           title: "Saturday Appointments",
           description:
-            "We work Monday through Saturday, 7 AM to 6 PM. Saturday installs and quotes are common.",
+            "We work Monday through Saturday, 7 AM to 7 PM. Saturday installs and quotes are common.",
         },
         {
           icon: "Wrench",
@@ -3188,7 +3188,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaHeading: "Ready to Get Started in Monroe?",
       ctaBody:
         "Call, text, or fill out the form for a free in-home quote. Doug will come out personally — and Saturday appointments are available.",
-      ctaFooter: "Mon–Sat: 7am – 6pm | Based in Monroe, NC",
+      ctaFooter: "Mon–Sat: 7am – 7pm | Based in Monroe, NC",
     }),
   },
   {
@@ -3230,7 +3230,7 @@ const glassCityPages: GlassCityPageSeed[] = [
           icon: "CalendarDays",
           title: "Saturday Appointments",
           description:
-            "Mon-Sat, 7 AM to 6 PM. Saturday availability is one of the most common reasons clients choose us.",
+            "Mon-Sat, 7 AM to 7 PM. Saturday availability is one of the most common reasons clients choose us.",
         },
         {
           icon: "Wrench",
@@ -3326,7 +3326,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaHeading: "Ready to Get Started in Charlotte?",
       ctaBody:
         "Call, text, or fill out the form for a free in-home quote. Doug will come out personally — and Saturday appointments are available.",
-      ctaFooter: "Mon–Sat: 7am – 6pm | Serving the greater Charlotte metro",
+      ctaFooter: "Mon–Sat: 7am – 7pm | Serving the greater Charlotte metro",
     }),
   },
   {
@@ -3386,7 +3386,7 @@ const glassCityPages: GlassCityPageSeed[] = [
           icon: "CalendarDays",
           title: "Saturday Appointments",
           description:
-            "Mon–Sat, 7am–6pm. Saturday availability is the norm, not an exception — because most homeowners can't take a weekday off for a glass quote.",
+            "Mon–Sat, 7am–7pm. Saturday availability is the norm, not an exception — because most homeowners can't take a weekday off for a glass quote.",
         },
       ],
       servicesTitle: "Our Services in Indian Trail, NC",
@@ -3459,7 +3459,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaHeading: "Ready to Get Started in Indian Trail?",
       ctaBody:
         "Call, text, or fill out the form for a free quote. Doug will come out personally, review the project, and give you clear next steps.",
-      ctaFooter: "Mon–Sat, 7am–6pm | Monroe-based, serving Indian Trail and Union County",
+      ctaFooter: "Mon–Sat, 7am–7pm | Monroe-based, serving Indian Trail and Union County",
     }),
   },
   {
@@ -3519,7 +3519,7 @@ const glassCityPages: GlassCityPageSeed[] = [
           icon: "CalendarDays",
           title: "Saturday Availability",
           description:
-            "Mon–Sat, 7am–6pm. Saturday appointments are standard, not a premium — because most of our Stallings clients work during the week.",
+            "Mon–Sat, 7am–7pm. Saturday appointments are standard, not a premium — because most of our Stallings clients work during the week.",
         },
       ],
       servicesTitle: "Our Services in Stallings, NC",
@@ -3590,7 +3590,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaHeading: "Ready to Get Started in Stallings?",
       ctaBody:
         "Call, text, or fill out the form for a free quote. Doug will come out personally and give you clear next steps.",
-      ctaFooter: "Mon–Sat, 7am–6pm | Monroe-based, serving Stallings and Union County",
+      ctaFooter: "Mon–Sat, 7am–7pm | Monroe-based, serving Stallings and Union County",
     }),
   },
   {
@@ -3650,7 +3650,7 @@ const glassCityPages: GlassCityPageSeed[] = [
           icon: "CalendarDays",
           title: "Saturday Appointments Available",
           description:
-            "We schedule Mon–Sat, 7am–6pm. Saturday is available by default — not something you have to request specially or pay extra for.",
+            "We schedule Mon–Sat, 7am–7pm. Saturday is available by default — not something you have to request specially or pay extra for.",
         },
       ],
       servicesTitle: "Our Services in Wesley Chapel, NC",
@@ -3724,7 +3724,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaHeading: "Ready to Get Started in Wesley Chapel?",
       ctaBody:
         "Call, text, or fill out the form. Doug will schedule a visit personally and walk you through next steps.",
-      ctaFooter: "Mon–Sat, 7am–6pm | Monroe-based, serving Wesley Chapel and Union County",
+      ctaFooter: "Mon–Sat, 7am–7pm | Monroe-based, serving Wesley Chapel and Union County",
     }),
   },
   {
@@ -3784,7 +3784,7 @@ const glassCityPages: GlassCityPageSeed[] = [
           icon: "CalendarDays",
           title: "Saturday Appointments Are Standard",
           description:
-            "We work Mon–Sat, 7am–6pm. Saturday availability is built into our regular schedule for Waxhaw homeowners who can't do weekday appointments.",
+            "We work Mon–Sat, 7am–7pm. Saturday availability is built into our regular schedule for Waxhaw homeowners who can't do weekday appointments.",
         },
       ],
       servicesTitle: "Our Services in Waxhaw, NC",
@@ -3857,7 +3857,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaHeading: "Ready to Get Started in Waxhaw?",
       ctaBody:
         "Call, text, or fill out the form for a free quote. Doug will come out personally and give you a clear, written estimate.",
-      ctaFooter: "Mon–Sat, 7am–6pm | Monroe-based, serving Waxhaw and Union County",
+      ctaFooter: "Mon–Sat, 7am–7pm | Monroe-based, serving Waxhaw and Union County",
     }),
   },
   {
@@ -3917,7 +3917,7 @@ const glassCityPages: GlassCityPageSeed[] = [
           icon: "CalendarDays",
           title: "Saturday Appointments Available",
           description:
-            "We work Mon–Sat, 7am–6pm, and Saturday is a standard part of our schedule — not an exception.",
+            "We work Mon–Sat, 7am–7pm, and Saturday is a standard part of our schedule — not an exception.",
         },
       ],
       servicesTitle: "Our Services in Matthews, NC",
@@ -3988,7 +3988,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaHeading: "Ready to Get Started in Matthews?",
       ctaBody:
         "Call, text, or fill out the form for a free quote. Doug will schedule a visit personally and walk you through everything.",
-      ctaFooter: "Mon–Sat, 7am–6pm | Serving Matthews and the greater Charlotte area",
+      ctaFooter: "Mon–Sat, 7am–7pm | Serving Matthews and the greater Charlotte area",
     }),
   },
   {
@@ -4048,7 +4048,7 @@ const glassCityPages: GlassCityPageSeed[] = [
           icon: "CalendarDays",
           title: "Saturday Appointments",
           description:
-            "Mon–Sat, 7am–6pm. We work around your schedule, including Saturdays — which is when most Weddington homeowners prefer to meet for project visits.",
+            "Mon–Sat, 7am–7pm. We work around your schedule, including Saturdays — which is when most Weddington homeowners prefer to meet for project visits.",
         },
       ],
       servicesTitle: "Our Services in Weddington, NC",
@@ -4120,7 +4120,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaHeading: "Ready to Get Started in Weddington?",
       ctaBody:
         "Call, text, or fill out the form. Doug will visit personally, take measurements, and give you a clear written quote.",
-      ctaFooter: "Mon–Sat, 7am–6pm | Monroe-based, serving Weddington and Union County",
+      ctaFooter: "Mon–Sat, 7am–7pm | Monroe-based, serving Weddington and Union County",
     }),
   },
   {
@@ -4180,7 +4180,7 @@ const glassCityPages: GlassCityPageSeed[] = [
           icon: "CalendarDays",
           title: "Saturday Appointments Available",
           description:
-            "Mon–Sat, 7am–6pm. We schedule around your availability, and Saturday is a standard option for Indian Land homeowners.",
+            "Mon–Sat, 7am–7pm. We schedule around your availability, and Saturday is a standard option for Indian Land homeowners.",
         },
       ],
       servicesTitle: "Our Services in Indian Land, SC",
@@ -4254,7 +4254,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaBody:
         "Call, text, or fill out the form for a free quote. Doug will come out personally, measure the project, and give you clear next steps.",
       ctaFooter:
-        "Mon–Sat, 7am–6pm | Monroe-based, serving Indian Land and the greater Charlotte area",
+        "Mon–Sat, 7am–7pm | Monroe-based, serving Indian Land and the greater Charlotte area",
     }),
   },
   {
@@ -4314,7 +4314,7 @@ const glassCityPages: GlassCityPageSeed[] = [
           icon: "CalendarDays",
           title: "Saturday Appointments Available",
           description:
-            "Mon–Sat, 7am–6pm. We accommodate Fort Mill homeowners' schedules including Saturdays.",
+            "Mon–Sat, 7am–7pm. We accommodate Fort Mill homeowners' schedules including Saturdays.",
         },
       ],
       servicesTitle: "Our Services in Fort Mill, SC",
@@ -4388,7 +4388,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaBody:
         "Call, text, or fill out the form. Doug will schedule a visit, measure the project personally, and give you clear next steps.",
       ctaFooter:
-        "Mon–Sat, 7am–6pm | Monroe-based, serving Fort Mill and the greater Charlotte area",
+        "Mon–Sat, 7am–7pm | Monroe-based, serving Fort Mill and the greater Charlotte area",
     }),
   },
   {
@@ -4448,7 +4448,7 @@ const glassCityPages: GlassCityPageSeed[] = [
           icon: "CalendarDays",
           title: "Saturday Appointments Are Standard",
           description:
-            "Mon–Sat, 7am–6pm. We don't limit Saturday availability to upsell a premium — it's part of our regular schedule for Pineville and surrounding areas.",
+            "Mon–Sat, 7am–7pm. We don't limit Saturday availability to upsell a premium — it's part of our regular schedule for Pineville and surrounding areas.",
         },
       ],
       servicesTitle: "Our Services in Pineville, NC",
@@ -4521,7 +4521,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaHeading: "Ready to Get Started in Pineville?",
       ctaBody:
         "Call, text, or fill out the form for a free quote. Doug will schedule a personal visit and walk you through everything before any work begins.",
-      ctaFooter: "Mon–Sat, 7am–6pm | Serving Pineville and the greater south Charlotte area",
+      ctaFooter: "Mon–Sat, 7am–7pm | Serving Pineville and the greater south Charlotte area",
     }),
   },
 ];

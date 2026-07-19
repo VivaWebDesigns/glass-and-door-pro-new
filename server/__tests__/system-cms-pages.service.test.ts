@@ -116,6 +116,49 @@ describe("ensureSystemCmsPages", () => {
     });
   });
 
+  it("updates published CMS hours in nested CTA and FAQ content", async () => {
+    const unchangedBlock = { id: "intro", type: "rich-text", props: { content: "Unchanged" } };
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "service-id",
+        slug: "services-commercial-storefront-glass-installation",
+        seoDescription: "Already clean.",
+        content: {
+          blocks: [
+            unchangedBlock,
+            {
+              id: "faq",
+              type: "faq",
+              props: {
+                items: [
+                  { question: "When are you open?", answer: "Mon–Sat, 7am–6pm." },
+                ],
+              },
+            },
+            {
+              id: "cta",
+              type: "cta",
+              props: { footerLine: "Mon-Sat: 7am - 6pm | Charlotte, NC" },
+            },
+          ],
+        },
+        updatedBy: "admin-id",
+      },
+    ]);
+    mockGetPageBySlug.mockResolvedValue(null);
+
+    const mod = await import("../services/system-cms-pages.service");
+    await mod.ensureSystemCmsPages();
+
+    expect(mockUpdatePage).toHaveBeenCalledTimes(1);
+    const [, update] = mockUpdatePage.mock.calls[0];
+    expect(update.content.blocks[0]).toBe(unchangedBlock);
+    expect(update.content.blocks[1].props.items[0].answer).toBe("Mon–Sat, 7am–7pm.");
+    expect(update.content.blocks[2].props.footerLine).toBe(
+      "Mon-Sat: 7am - 7pm | Charlotte, NC",
+    );
+  });
+
   it("adds missing related services blocks to residential service pages", async () => {
     mockGetAllPages.mockResolvedValue([
       {

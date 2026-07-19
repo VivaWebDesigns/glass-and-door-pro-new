@@ -125,5 +125,7 @@ describe("seedGlassPublicCms", () => {
       "/services/commercial-door-replacement-repair",
       "/services/commercial-window-replacement",
     ]);
+    expect(JSON.stringify(mockUpdatePage.mock.calls)).not.toMatch(/7am(?:\s*[-–]\s*)6pm/i);
+    expect(JSON.stringify(mockUpdatePage.mock.calls)).not.toContain("7 AM to 6 PM");
   });
 });
