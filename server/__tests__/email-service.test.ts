@@ -50,8 +50,43 @@ vi.mock("nodemailer", () => ({
 describe("Email service", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
+    vi.stubEnv("RESEND_API_KEY", "");
+    vi.stubEnv("RESEND_FROM", "");
     const mod = await import("../services/email.service");
     mod.resetMailgunConfig();
+  });
+
+  it("sends via Resend when configured", async () => {
+    vi.stubEnv("RESEND_API_KEY", "re_test_key");
+    vi.stubEnv(
+      "RESEND_FROM",
+      "Glass & Door Pro Website <website@updates.glassanddoorpro.com>"
+    );
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ id: "resend-email-id" }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const mod = await import("../services/email.service");
+    const result = await mod.sendEmail(
+      "doug@glassanddoorpro.com",
+      "New contact",
+      "<p>Hello</p>"
+    );
+
+    expect(result).toBe(true);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.resend.com/emails",
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({
+          Authorization: "Bearer re_test_key",
+        }),
+      })
+    );
+    vi.unstubAllGlobals();
   });
 
   it("sends via Mailgun when configured", async () => {

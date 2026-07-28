@@ -7,6 +7,8 @@ const SMTP_PORT = parseInt(process.env.SMTP_PORT || "587", 10);
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
 const SMTP_FROM = process.env.SMTP_FROM || "Glass & Door Pro <noreply@glassanddoorpro.com>";
+const DEFAULT_RESEND_FROM =
+  "Glass & Door Pro Website <website@updates.glassanddoorpro.com>";
 const DEFAULT_EMAIL_LOGO_URL = "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
 
 const isSmtpConfigured = !!(SMTP_HOST && SMTP_USER && SMTP_PASS);
@@ -117,6 +119,51 @@ async function sendViaMailgun(
   }
 }
 
+async function sendViaResend(
+  to: string,
+  subject: string,
+  html: string
+): Promise<boolean> {
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  if (!apiKey) return false;
+
+  const from = process.env.RESEND_FROM?.trim() || DEFAULT_RESEND_FROM;
+
+  try {
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        "User-Agent": "glass-and-door-pro/1.0",
+      },
+      body: JSON.stringify({
+        from,
+        to: [to],
+        subject,
+        html,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorBody = (await response.text()).slice(0, 500);
+      logger.email.error("Resend send failed", new Error(`HTTP ${response.status}`), {
+        to,
+        subject,
+        errorBody,
+      });
+      return false;
+    }
+
+    const result = (await response.json()) as { id?: string };
+    logger.email.info("Sent via Resend", { to, subject, emailId: result.id });
+    return true;
+  } catch (err) {
+    logger.email.error("Resend send failed", err, { to, subject });
+    return false;
+  }
+}
+
 async function sendViaSmtp(
   to: string,
   subject: string,
@@ -219,6 +266,12 @@ export async function sendEmail(
 ): Promise<boolean> {
   const { recordEmailOutcome } = await import("../utils/metrics");
 
+  const resendSent = await sendViaResend(to, subject, html);
+  if (resendSent) {
+    recordEmailOutcome(true);
+    return true;
+  }
+
   const mailgunSent = await sendViaMailgun(to, subject, html);
   if (mailgunSent) {
     recordEmailOutcome(true);
@@ -232,7 +285,15 @@ export async function sendEmail(
   }
 
   recordEmailOutcome(false);
-  logger.email.warn("No email provider configured", { to, subject });
+  const hasConfiguredProvider = Boolean(
+    process.env.RESEND_API_KEY || cachedMailgunConfig || isSmtpConfigured
+  );
+  logger.email.warn(
+    hasConfiguredProvider
+      ? "All configured email providers failed"
+      : "No email provider configured",
+    { to, subject }
+  );
   return false;
 }
 
