@@ -59,11 +59,15 @@ export const SYSTEM_EMAIL_TEMPLATE_DEFAULTS: InsertEmailTemplate[] = [
     name: "Contact Form Submission (Admin)",
     subject: "New Glass & Door Pro Contact Form: {{senderName}}",
     description: "Sent to admin(s) when someone submits the contact form.",
-    variables: ["senderName", "senderEmail", "messageBody"],
+    variables: ["senderName", "senderEmail", "senderPhone", "contactPreference", "subject", "messageBody"],
     htmlBody: baseWrap("New Contact Form Submission", `
     <p style="color:#374151;font-size:15px;line-height:1.6;">A new message has been submitted through the Glass & Door Pro contact form.</p>
     <div style="background:#f3f4f6;border-radius:6px;padding:16px;margin:16px 0;">
-      <p style="margin:0 0 8px;color:#374151;font-size:14px;"><strong>From:</strong> {{senderName}} ({{senderEmail}})</p>
+      <p style="margin:0 0 8px;color:#374151;font-size:14px;"><strong>From:</strong> {{senderName}}</p>
+      <p style="margin:0 0 8px;color:#374151;font-size:14px;"><strong>Phone:</strong> {{senderPhone}}</p>
+      <p style="margin:0 0 8px;color:#374151;font-size:14px;"><strong>Email:</strong> {{senderEmail}}</p>
+      <p style="margin:0 0 8px;color:#374151;font-size:14px;"><strong>Preferred contact:</strong> {{contactPreference}}</p>
+      <p style="margin:0 0 8px;color:#374151;font-size:14px;"><strong>Subject:</strong> {{subject}}</p>
       <p style="margin:8px 0 0;color:#374151;font-size:14px;"><strong>Message:</strong></p>
       <p style="margin:4px 0 0;color:#374151;font-size:14px;">{{messageBody}}</p>
     </div>`),
@@ -96,7 +100,12 @@ export async function ensureSystemEmailTemplates(refreshExisting = false) {
         existing &&
         (template.slug === "contact-form-submission" || template.slug === "managed-form-submission")
       ) {
-        const nextHtmlBody = removeLegacyAdminCta(existing.htmlBody);
+        const contactTemplateNeedsUpgrade =
+          template.slug === "contact-form-submission" &&
+          !existing.variables.includes("senderPhone");
+        const nextHtmlBody = contactTemplateNeedsUpgrade
+          ? template.htmlBody
+          : removeLegacyAdminCta(existing.htmlBody);
         const nextVariables = template.variables;
         const variablesChanged = JSON.stringify(existing.variables) !== JSON.stringify(nextVariables);
 

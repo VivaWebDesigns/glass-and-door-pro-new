@@ -29,6 +29,7 @@ function field(
 
 function settings(overrides: Partial<CmsFormSettings>): CmsFormSettings {
   return {
+    schemaVersion: 0,
     submitButtonText: "Submit",
     successMessage: "Thanks! Your submission has been received.",
     mailchimpEnabled: false,
@@ -51,11 +52,31 @@ const SYSTEM_FORMS: ManagedSystemForm[] = [
     isActive: true,
     fields: [
       field("name", "name", "Name", "text", { placeholder: "Your name", required: true, width: "half" }),
-      field("email", "email", "Email", "email", { placeholder: "you@example.com", required: true, width: "half" }),
+      field("phone", "phone", "Phone", "tel", {
+        placeholder: "(704) 555-0123",
+        helpText: "Best number for a callback",
+        required: true,
+        width: "half",
+      }),
+      field("email", "email", "Email", "email", {
+        placeholder: "you@example.com",
+        helpText: "Optional unless you prefer an email response",
+        required: false,
+        width: "half",
+      }),
+      field("contact-preference", "contactPreference", "How should we contact you?", "radio", {
+        required: true,
+        options: [
+          { label: "Call me", value: "phone", imageUrl: "" },
+          { label: "Email me", value: "email", imageUrl: "" },
+        ],
+        config: { choiceLayout: "inline", defaultValue: "phone" },
+      }),
       field("subject", "subject", "Subject", "text", { placeholder: "What is this about?", required: true }),
       field("message", "message", "Message", "textarea", { placeholder: "Tell us more...", required: true }),
     ],
     settings: settings({
+      schemaVersion: 2,
       submitButtonText: "Send Message",
       successMessage: "Thanks for reaching out. We'll get back to you soon.",
       mailchimpEnabled: false,
@@ -72,6 +93,16 @@ export async function ensureSystemForms() {
   for (const systemForm of SYSTEM_FORMS) {
     const existing = await storage.forms.getBySlug(systemForm.slug);
     if (existing) {
+      const existingSettings =
+        (typeof existing.settings === "object" && existing.settings
+          ? existing.settings
+          : {}) as Partial<CmsFormSettings>;
+      const existingSchemaVersion =
+        typeof existingSettings.schemaVersion === "number" ? existingSettings.schemaVersion : 0;
+      const systemSchemaVersion =
+        typeof systemForm.settings.schemaVersion === "number" ? systemForm.settings.schemaVersion : 0;
+      const shouldUpgradeFields = existingSchemaVersion < systemSchemaVersion;
+
       await storage.forms.update(existing.id, {
         name: existing.name || systemForm.name,
         description: existing.description ?? systemForm.description ?? "",
@@ -79,13 +110,14 @@ export async function ensureSystemForms() {
         isSystem: true,
         isActive: existing.isActive ?? true,
         fields:
-          Array.isArray(existing.fields) && existing.fields.length > 0
+          !shouldUpgradeFields && Array.isArray(existing.fields) && existing.fields.length > 0
             ? existing.fields
             : systemForm.fields,
         settings:
           {
             ...systemForm.settings,
-            ...(typeof existing.settings === "object" && existing.settings ? existing.settings : {}),
+            ...existingSettings,
+            schemaVersion: Math.max(existingSchemaVersion, systemSchemaVersion),
           },
       });
       continue;

@@ -207,6 +207,13 @@ function validateField(field: CmsFormField, raw: unknown) {
     }
   }
 
+  if (field.type === "tel") {
+    const digitCount = value.replace(/\D/g, "").length;
+    if (digitCount < 7 || digitCount > 15) {
+      return { error: `${field.label} must be a valid phone number` };
+    }
+  }
+
   if (field.type === "website") {
     try {
       value = normalizeUrl(value);
@@ -233,6 +240,10 @@ function validateSubmissionData(form: CmsForm, data: unknown) {
       throw new AppError(result.error, 400);
     }
     validated[field.key] = result.value ?? "";
+  }
+
+  if (stringValue(validated.contactPreference) === "email" && !stringValue(validated.email)) {
+    throw new AppError("Email is required when email is your preferred contact method", 400);
   }
 
   return validated;
@@ -307,30 +318,49 @@ async function handleContactFormEffects(form: CmsForm, data: Record<string, unkn
 
   const name = stringValue(data.name);
   const email = stringValue(data.email);
+  const phone = stringValue(data.phone);
+  const contactPreference = stringValue(data.contactPreference);
   const subject = stringValue(data.subject);
   const message = stringValue(data.message);
 
-  if (!name || !email || !subject || !message) {
+  if (!name || !phone || !contactPreference || !subject || !message) {
     return;
   }
 
-  await storage.contacts.createMessage({ name, email, subject, message });
+  const contactMessage = [
+    `Preferred contact: ${contactPreference === "email" ? "Email" : "Phone"}`,
+    `Phone: ${phone}`,
+    `Email: ${email || "Not provided"}`,
+    "",
+    message,
+  ].join("\n");
+
+  await storage.contacts.createMessage({
+    name,
+    email: email || "Not provided",
+    subject,
+    message: contactMessage,
+  });
 
   if (!settings.notifyAdmins) return;
 
-  const assignedUsers = await storage.users.getFormNotificationUsers(form.id);
-  const recipientEmails = assignedUsers.map((user) => user.email).filter(Boolean);
-  const adminEmails =
-    recipientEmails.length > 0
-      ? recipientEmails
-      : (await storage.users.getUsersByRole("admin")).map((admin) => admin.email).filter(Boolean);
+  const configuredRecipients = (process.env.CONTACT_FORM_RECIPIENTS || "doug@glassanddoorpro.com")
+    .split(",")
+    .map((recipient) => recipient.trim())
+    .filter(Boolean);
+  const adminEmails = Array.from(new Set(configuredRecipients));
   if (adminEmails.length === 0) return;
 
   sendContactFormEmail(
     adminEmails,
-    name,
-    email,
-    message,
+    {
+      senderName: name,
+      senderEmail: email,
+      senderPhone: phone,
+      contactPreference,
+      subject,
+      messageBody: message,
+    },
     `${baseUrl ?? process.env.APP_URL ?? ""}/admin`
   ).catch((err) => {
     logger.email.warn("Failed to send contact form notification", {

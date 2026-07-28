@@ -68,7 +68,10 @@ function buildInitialValues(fields: CmsFormField[]) {
         case "hidden":
           return [field.key, field.config?.defaultValue ?? ""];
         default:
-          return [field.key, ""];
+          return [
+            field.key,
+            typeof field.config?.defaultValue === "string" ? field.config.defaultValue : "",
+          ];
       }
     })
   ) as FormValues;
@@ -167,6 +170,10 @@ function validatePageFields(fields: CmsFormField[], values: FormValues) {
     if (!text(value)) {
       return `${field.label} is required`;
     }
+  }
+
+  if (text(values.contactPreference) === "email" && !text(values.email)) {
+    return "Email is required when you select email as your preferred contact method";
   }
 
   return null;
@@ -614,6 +621,11 @@ export function PublicFormRenderer({
         className={cn("space-y-4", compact ? "space-y-3" : "space-y-4")}
         onSubmit={(event) => {
           event.preventDefault();
+          const error = validatePageFields(fields, values);
+          if (error) {
+            toast({ title: "Check your information", description: error, variant: "destructive" });
+            return;
+          }
           mutation.mutate();
         }}
       >

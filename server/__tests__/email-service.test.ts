@@ -105,6 +105,27 @@ describe("Email service", () => {
     expect(result).toBe(false);
   });
 
+  it("reports a failed contact notification when no provider is configured", async () => {
+    mockGetDecryptedCategory.mockResolvedValue({});
+    mockGetTemplate.mockResolvedValue(undefined);
+
+    const mod = await import("../services/email.service");
+    await expect(
+      mod.sendContactFormEmail(
+        ["doug@glassanddoorpro.com"],
+        {
+          senderName: "Jane Doe",
+          senderEmail: "",
+          senderPhone: "(704) 555-0123",
+          contactPreference: "phone",
+          subject: "Shower enclosure",
+          messageBody: "Please call me.",
+        },
+        "https://glassanddoorpro.com/admin"
+      )
+    ).rejects.toThrow("doug@glassanddoorpro.com");
+  });
+
   it("falls back gracefully when Mailgun send fails", async () => {
     mockGetDecryptedCategory.mockResolvedValue({
       mailgun_api_key: "key-123",

@@ -280,6 +280,7 @@ function createBlankForm(): EditableForm {
     isActive: true,
     fields: [],
     settings: {
+      schemaVersion: 0,
       submitButtonText: "Submit",
       successMessage: "Thanks! Your submission has been received.",
       mailchimpEnabled: false,
@@ -301,6 +302,8 @@ function normalizeEditableForm(form: CmsForm): EditableForm {
     isActive: Boolean(form.isActive),
     fields: Array.isArray(form.fields) ? form.fields.map(normalizeField) : [],
     settings: {
+      schemaVersion:
+        typeof form.settings?.schemaVersion === "number" ? form.settings.schemaVersion : 0,
       submitButtonText:
         typeof form.settings?.submitButtonText === "string" ? form.settings.submitButtonText : "Submit",
       successMessage:

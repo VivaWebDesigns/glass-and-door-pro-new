@@ -271,23 +271,38 @@ export async function sendWelcomeEmail(
 
 export async function sendContactFormEmail(
   adminEmails: string[],
-  senderName: string,
-  senderEmail: string,
-  messageBody: string,
+  submission: {
+    senderName: string;
+    senderEmail: string;
+    senderPhone: string;
+    contactPreference: string;
+    subject: string;
+    messageBody: string;
+  },
   dashboardUrl: string
 ): Promise<void> {
-  const vars = { senderName, senderEmail, messageBody, dashboardUrl };
+  const vars = {
+    ...submission,
+    senderEmail: submission.senderEmail || "Not provided",
+    contactPreference: submission.contactPreference === "email" ? "Email" : "Phone",
+    dashboardUrl,
+  };
   const { subject, html, isActive } = await getTemplateHtml(
     "contact-form-submission",
     vars,
-    `New Contact Form: ${senderName}`,
-    `<p>New message from ${senderName} (${senderEmail}): ${messageBody}</p>`
+    `New Contact Form: ${submission.senderName}`,
+    `<p>New message from ${submission.senderName}. Phone: ${submission.senderPhone}. Email: ${vars.senderEmail}. Preferred contact: ${vars.contactPreference}. Subject: ${submission.subject}. Message: ${submission.messageBody}</p>`
   );
   if (!isActive) return;
-  for (const email of adminEmails) {
-    sendEmail(email, subject, html).catch((err) => {
-      logger.email.warn("Failed to notify admin of contact form", { adminEmail: email, error: err instanceof Error ? err.message : String(err) });
-    });
+  const results = await Promise.all(
+    adminEmails.map(async (email) => ({
+      email,
+      sent: await sendEmail(email, subject, html),
+    }))
+  );
+  const failedRecipients = results.filter((result) => !result.sent).map((result) => result.email);
+  if (failedRecipients.length > 0) {
+    throw new Error(`Contact form notification was not sent to: ${failedRecipients.join(", ")}`);
   }
 }
 

@@ -55,6 +55,7 @@ describe("ensureSystemForms", () => {
             },
           ],
           settings: {
+            schemaVersion: 2,
             submitButtonText: "Send",
             successMessage: "Custom contact success",
             mailchimpEnabled: true,
@@ -80,6 +81,46 @@ describe("ensureSystemForms", () => {
     expect(contactUpdate[1].fields).toHaveLength(1);
     expect(contactUpdate[1].fields[0].label).toBe("How can we help?");
     expect(contactUpdate[1].settings.successMessage).toBe("Custom contact success");
+  });
+
+  it("upgrades legacy contact form fields", async () => {
+    mockGetBySlug.mockResolvedValue({
+      id: "contact-form-id",
+      name: "Contact Form",
+      slug: "contact-form",
+      description: "Legacy contact form",
+      kind: "contact",
+      isSystem: true,
+      isActive: true,
+      fields: [],
+      settings: {
+        submitButtonText: "Send",
+        successMessage: "Thanks",
+        mailchimpEnabled: false,
+        mailchimpTag: "",
+        notifyAdmins: true,
+        storeAsContactMessage: true,
+      },
+    });
+
+    const mod = await import("../services/system-forms.service");
+    await mod.ensureSystemForms();
+
+    const contactUpdate = mockUpdate.mock.calls.find(
+      ([id]: [string]) => id === "contact-form-id"
+    );
+
+    expect(contactUpdate[1].fields.map((formField: { key: string }) => formField.key)).toEqual([
+      "name",
+      "phone",
+      "email",
+      "contactPreference",
+      "subject",
+      "message",
+    ]);
+    expect(contactUpdate[1].fields.find((formField: { key: string }) => formField.key === "phone").required).toBe(true);
+    expect(contactUpdate[1].fields.find((formField: { key: string }) => formField.key === "email").required).toBe(false);
+    expect(contactUpdate[1].settings.schemaVersion).toBe(2);
   });
 
   it("creates missing system forms on a clean install", async () => {

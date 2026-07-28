@@ -88,6 +88,7 @@ export const cmsFormFieldSchema = z.object({
 export type CmsFormField = z.infer<typeof cmsFormFieldSchema>;
 
 export const cmsFormSettingsSchema = z.object({
+  schemaVersion: z.number().int().nonnegative().optional().default(0),
   submitButtonText: z.string().optional().default("Submit"),
   successMessage: z.string().optional().default("Thanks! Your submission has been received."),
   mailchimpEnabled: z.boolean().optional().default(false),
