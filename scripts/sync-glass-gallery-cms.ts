@@ -7,6 +7,8 @@ interface GalleryImage {
   legacyUrls?: string[];
 }
 
+type CmsGalleryImage = Omit<GalleryImage, "legacyUrls">;
+
 interface GalleryCategory {
   anchorId: string;
   cardTitle: string;
@@ -101,6 +103,14 @@ function galleryImageUrl(value: unknown) {
   return typeof url === "string" ? url : null;
 }
 
+function cmsGalleryImage(image: GalleryImage): CmsGalleryImage {
+  return {
+    url: image.url,
+    alt: image.alt,
+    caption: image.caption,
+  };
+}
+
 export function mergeNewGalleryImages(content: unknown) {
   if (!isGalleryContent(content)) {
     throw new Error("Gallery CMS page does not contain builder blocks");
@@ -125,19 +135,29 @@ export function mergeNewGalleryImages(content: unknown) {
       ? imageBlock.props.images
       : [];
     const existingUrls = new Set(currentImages.map(galleryImageUrl).filter(Boolean));
-    const missingImages: GalleryImage[] = [];
+    const missingImages: CmsGalleryImage[] = [];
     for (const image of category.images) {
-      if (existingUrls.has(image.url)) continue;
+      const currentIndex = currentImages.findIndex(
+        (currentImage) => galleryImageUrl(currentImage) === image.url,
+      );
+      if (currentIndex >= 0) {
+        const normalizedImage = cmsGalleryImage(image);
+        if (JSON.stringify(currentImages[currentIndex]) !== JSON.stringify(normalizedImage)) {
+          currentImages[currentIndex] = normalizedImage;
+          replacedImages += 1;
+        }
+        continue;
+      }
 
       const legacyIndex = currentImages.findIndex((currentImage) => {
         const currentUrl = galleryImageUrl(currentImage);
         return Boolean(currentUrl && image.legacyUrls?.includes(currentUrl));
       });
       if (legacyIndex >= 0) {
-        currentImages[legacyIndex] = image;
+        currentImages[legacyIndex] = cmsGalleryImage(image);
         replacedImages += 1;
       } else {
-        missingImages.push(image);
+        missingImages.push(cmsGalleryImage(image));
       }
     }
 

@@ -86,5 +86,10 @@ describe("mergeNewGalleryImages", () => {
       "/images/glass-door-pro/gallery/commercial-glass/commercial-double-glass-door-installation.webp",
     );
     expect(urls).not.toContain("/images/glass-door-pro/gallery/commercial-glass/06.webp");
+    expect(
+      (updatedCommercialBlock?.props.images as Array<Record<string, unknown>>).some(
+        (image) => "legacyUrls" in image,
+      ),
+    ).toBe(false);
   });
 });
