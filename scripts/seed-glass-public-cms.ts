@@ -497,6 +497,11 @@ const glassHomeContent: InsertCmsPage["content"] = {
 
 const framelessShowerImages = [
   {
+    url: "/images/glass-door-pro/gallery/frameless-showers/18.webp",
+    alt: "Frameless shower door installation by Glass & Door Pro",
+    caption: "Frameless Shower Door Installation",
+  },
+  {
     url: "/images/glass-door-pro/gallery/frameless-showers/03.webp",
     alt: "Black frame glass shower enclosure with marble walls and freestanding tub installed by Glass & Door Pro in SouthPark, Charlotte, NC",
     caption: "Frameless Shower Install - SouthPark",
@@ -580,6 +585,21 @@ const framelessShowerImages = [
 
 const windowGalleryImages = [
   {
+    url: "/images/glass-door-pro/gallery/windows/10.webp",
+    alt: "Residential picture window installation by Glass & Door Pro",
+    caption: "Residential Picture Window Installation",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/windows/11.webp",
+    alt: "Double-hung window installation by Glass & Door Pro",
+    caption: "Double-Hung Window Installation",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/windows/12.webp",
+    alt: "Dormer window installation by Glass & Door Pro",
+    caption: "Dormer Window Installation",
+  },
+  {
     url: "/images/glass-door-pro/gallery/windows/01.webp",
     alt: "Residential double window installation by Glass & Door Pro",
     caption: "Residential Window Installation - Double Window",
@@ -628,6 +648,16 @@ const windowGalleryImages = [
 
 const doorGalleryImages = [
   {
+    url: "/images/glass-door-pro/gallery/doors/05.webp",
+    alt: "Entry door installation in progress by Glass & Door Pro",
+    caption: "Entry Door Installation - In Progress",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/doors/06.webp",
+    alt: "Sliding patio door installation by Glass & Door Pro",
+    caption: "Sliding Patio Door Installation",
+  },
+  {
     url: "/images/glass-door-pro/gallery/doors/01.webp",
     alt: "Decorative entry door installation by Glass & Door Pro",
     caption: "Decorative Entry Door Installation",
@@ -650,6 +680,16 @@ const doorGalleryImages = [
 ];
 
 const commercialGlassGalleryImages = [
+  {
+    url: "/images/glass-door-pro/gallery/commercial-glass/06.webp",
+    alt: "Commercial double glass door installation by Glass & Door Pro",
+    caption: "Commercial Double Glass Door Installation",
+  },
+  {
+    url: "/images/glass-door-pro/gallery/commercial-glass/07.webp",
+    alt: "Commercial glass door installation by Glass & Door Pro",
+    caption: "Commercial Glass Door Installation",
+  },
   {
     url: "/images/glass-door-pro/gallery/commercial-glass/01.webp",
     alt: "Commercial office glass conference room installed by Glass & Door Pro",
