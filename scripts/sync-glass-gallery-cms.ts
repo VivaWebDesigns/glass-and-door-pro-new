@@ -13,6 +13,18 @@ const RETIRED_GALLERY_URLS = new Set([
   "/images/glass-door-pro/gallery/doors/05.webp",
 ]);
 
+const GALLERY_CATEGORY_MOVES = [
+  {
+    fromUrl: "/images/glass-door-pro/gallery/doors/02.webp",
+    toAnchorId: "commercial-glass",
+    image: {
+      url: "/images/glass-door-pro/gallery/commercial-glass/commercial-glass-entry-door-installation.webp",
+      alt: "Commercial glass entry door installation by Glass & Door Pro",
+      caption: "Commercial Glass Entry Door Installation",
+    },
+  },
+];
+
 interface GalleryCategory {
   anchorId: string;
   cardTitle: string;
@@ -131,6 +143,7 @@ export function mergeNewGalleryImages(content: unknown) {
   let addedImages = 0;
   let replacedImages = 0;
   let removedImages = 0;
+  let movedImages = 0;
   let updatedCounts = 0;
 
   for (const block of nextContent.blocks.filter((item) => item.type === "image-grid")) {
@@ -140,6 +153,44 @@ export function mergeNewGalleryImages(content: unknown) {
     );
     removedImages += block.props.images.length - visibleImages.length;
     block.props.images = visibleImages;
+  }
+
+  for (const move of GALLERY_CATEGORY_MOVES) {
+    const imageBlocks = nextContent.blocks.filter((item) => item.type === "image-grid");
+    const targetBlock = imageBlocks.find(
+      (block) => block.props.anchorId === move.toAnchorId,
+    );
+    if (!targetBlock) {
+      throw new Error(`Gallery image block not found: ${move.toAnchorId}`);
+    }
+
+    let removedFromSource = false;
+    for (const block of imageBlocks) {
+      if (!Array.isArray(block.props.images)) continue;
+      const retainedImages = block.props.images.filter((image) => {
+        if (galleryImageUrl(image) !== move.fromUrl) return true;
+        removedFromSource = true;
+        return false;
+      });
+      block.props.images = retainedImages;
+    }
+
+    const targetImages = Array.isArray(targetBlock.props.images)
+      ? targetBlock.props.images
+      : [];
+    const targetIndex = targetImages.findIndex(
+      (image) => galleryImageUrl(image) === move.image.url,
+    );
+    if (targetIndex >= 0) {
+      const normalizedImage = cmsGalleryImage(move.image);
+      if (!isSameCmsGalleryImage(targetImages[targetIndex], normalizedImage)) {
+        targetImages[targetIndex] = normalizedImage;
+        replacedImages += 1;
+      }
+    } else if (removedFromSource) {
+      targetBlock.props.images = [cmsGalleryImage(move.image), ...targetImages];
+      movedImages += 1;
+    }
   }
 
   for (const category of NEW_GALLERY_CATEGORIES) {
@@ -213,6 +264,7 @@ export function mergeNewGalleryImages(content: unknown) {
     addedImages,
     replacedImages,
     removedImages,
+    movedImages,
     updatedCounts,
   };
 }
@@ -229,6 +281,7 @@ export async function syncGlassGalleryCms() {
     merged.addedImages === 0 &&
     merged.replacedImages === 0 &&
     merged.removedImages === 0 &&
+    merged.movedImages === 0 &&
     merged.updatedCounts === 0
   ) {
     console.log("Gallery CMS page already contains the new images.");
@@ -241,12 +294,12 @@ export async function syncGlassGalleryCms() {
     content: page.content as Record<string, unknown>,
     status: page.status,
     changedBy: page.updatedBy ?? page.createdBy ?? undefined,
-    changeNote: "Added July 2026 gallery image batch",
+    changeNote: "Synchronized July 2026 gallery updates",
   });
   await storage.cmsPages.updatePage(page.id, { content: merged.content });
 
   console.log(
-    `Updated gallery CMS page: ${merged.addedImages} images added, ${merged.replacedImages} references replaced, ${merged.removedImages} images removed, ${merged.updatedCounts} counts updated.`,
+    `Updated gallery CMS page: ${merged.addedImages} images added, ${merged.replacedImages} references replaced, ${merged.removedImages} images removed, ${merged.movedImages} images moved, ${merged.updatedCounts} counts updated.`,
   );
 }
 

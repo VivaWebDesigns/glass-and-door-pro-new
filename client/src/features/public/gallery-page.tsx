@@ -49,7 +49,6 @@ const windowImages = [
 const doorImages = [
   ["06.webp", "Sliding Patio Door Installation"],
   ["01.webp", "Decorative Entry Door Installation"],
-  ["02.webp", "Glass Entry Door Installation"],
   ["03.webp", "Glass Door Replacement - Cornelius"],
   ["04.webp", "Luxury Pivot Door Installation"],
 ].map(([file, caption]) => ({
@@ -59,6 +58,7 @@ const doorImages = [
 }));
 
 const commercialGlassImages = [
+  ["commercial-glass-entry-door-installation.webp", "Commercial Glass Entry Door Installation"],
   ["commercial-double-glass-door-installation.webp", "Commercial Double Glass Door Installation"],
   ["07.webp", "Commercial Glass Door Installation"],
   ["01.webp", "Commercial Office Glass Conference Room"],

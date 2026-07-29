@@ -50,10 +50,12 @@ describe("mergeNewGalleryImages", () => {
     expect(first.addedImages).toBe(7);
     expect(first.replacedImages).toBe(0);
     expect(first.removedImages).toBe(0);
+    expect(first.movedImages).toBe(0);
     expect(first.updatedCounts).toBe(4);
     expect(second.addedImages).toBe(0);
     expect(second.replacedImages).toBe(0);
     expect(second.removedImages).toBe(0);
+    expect(second.movedImages).toBe(0);
     expect(second.updatedCounts).toBe(0);
 
     const imageCounts = first.content.blocks
@@ -126,5 +128,38 @@ describe("mergeNewGalleryImages", () => {
 
     expect(merged.removedImages).toBe(1);
     expect(urls).not.toContain("/images/glass-door-pro/gallery/doors/05.webp");
+  });
+
+  it("moves the glass entry door from doors to commercial glass", () => {
+    const fixture = galleryFixture();
+    const doorBlock = fixture.blocks.find((block) => block.props.anchorId === "doors");
+    doorBlock!.props.images = [
+      {
+        url: "/images/glass-door-pro/gallery/doors/02.webp",
+        alt: "Glass entry door installation by Glass & Door Pro",
+        caption: "Glass Entry Door Installation",
+      },
+      ...(doorBlock!.props.images as unknown[]),
+    ];
+
+    const merged = mergeNewGalleryImages(fixture);
+    const updatedDoorBlock = merged.content.blocks.find(
+      (block) => block.props.anchorId === "doors",
+    );
+    const updatedCommercialBlock = merged.content.blocks.find(
+      (block) => block.props.anchorId === "commercial-glass",
+    );
+    const doorUrls = (updatedDoorBlock?.props.images as Array<{ url: string }>).map(
+      (image) => image.url,
+    );
+    const commercialUrls = (
+      updatedCommercialBlock?.props.images as Array<{ url: string }>
+    ).map((image) => image.url);
+
+    expect(merged.movedImages).toBe(1);
+    expect(doorUrls).not.toContain("/images/glass-door-pro/gallery/doors/02.webp");
+    expect(commercialUrls).toContain(
+      "/images/glass-door-pro/gallery/commercial-glass/commercial-glass-entry-door-installation.webp",
+    );
   });
 });

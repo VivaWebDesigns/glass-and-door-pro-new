@@ -658,11 +658,6 @@ const doorGalleryImages = [
     caption: "Decorative Entry Door Installation",
   },
   {
-    url: "/images/glass-door-pro/gallery/doors/02.webp",
-    alt: "Glass entry door installation by Glass & Door Pro",
-    caption: "Glass Entry Door Installation",
-  },
-  {
     url: "/images/glass-door-pro/gallery/doors/03.webp",
     alt: "Glass door replacement in Cornelius by Glass & Door Pro",
     caption: "Glass Door Replacement - Cornelius",
@@ -675,6 +670,11 @@ const doorGalleryImages = [
 ];
 
 const commercialGlassGalleryImages = [
+  {
+    url: "/images/glass-door-pro/gallery/commercial-glass/commercial-glass-entry-door-installation.webp",
+    alt: "Commercial glass entry door installation by Glass & Door Pro",
+    caption: "Commercial Glass Entry Door Installation",
+  },
   {
     url: "/images/glass-door-pro/gallery/commercial-glass/commercial-double-glass-door-installation.webp",
     alt: "Commercial double glass door installation by Glass & Door Pro",
