@@ -36,6 +36,15 @@ function galleryFixture() {
 describe("mergeNewGalleryImages", () => {
   it("adds the new batch, updates category counts, and remains idempotent", () => {
     const first = mergeNewGalleryImages(galleryFixture());
+    for (const block of first.content.blocks.filter((item) => item.type === "image-grid")) {
+      block.props.images = (block.props.images as Array<Record<string, unknown>>).map(
+        (image) => ({
+          alt: image.alt,
+          url: image.url,
+          caption: image.caption,
+        }),
+      );
+    }
     const second = mergeNewGalleryImages(first.content);
 
     expect(first.addedImages).toBe(8);

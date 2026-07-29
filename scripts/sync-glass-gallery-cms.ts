@@ -111,6 +111,18 @@ function cmsGalleryImage(image: GalleryImage): CmsGalleryImage {
   };
 }
 
+function isSameCmsGalleryImage(value: unknown, image: CmsGalleryImage) {
+  if (!value || typeof value !== "object") return false;
+  const current = value as Record<string, unknown>;
+  const allowedKeys = new Set(["url", "alt", "caption"]);
+  return (
+    current.url === image.url &&
+    current.alt === image.alt &&
+    current.caption === image.caption &&
+    Object.keys(current).every((key) => allowedKeys.has(key))
+  );
+}
+
 export function mergeNewGalleryImages(content: unknown) {
   if (!isGalleryContent(content)) {
     throw new Error("Gallery CMS page does not contain builder blocks");
@@ -142,7 +154,7 @@ export function mergeNewGalleryImages(content: unknown) {
       );
       if (currentIndex >= 0) {
         const normalizedImage = cmsGalleryImage(image);
-        if (JSON.stringify(currentImages[currentIndex]) !== JSON.stringify(normalizedImage)) {
+        if (!isSameCmsGalleryImage(currentImages[currentIndex], normalizedImage)) {
           currentImages[currentIndex] = normalizedImage;
           replacedImages += 1;
         }
