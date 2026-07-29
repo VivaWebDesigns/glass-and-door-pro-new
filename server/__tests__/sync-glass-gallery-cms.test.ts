@@ -47,23 +47,25 @@ describe("mergeNewGalleryImages", () => {
     }
     const second = mergeNewGalleryImages(first.content);
 
-    expect(first.addedImages).toBe(8);
+    expect(first.addedImages).toBe(7);
     expect(first.replacedImages).toBe(0);
+    expect(first.removedImages).toBe(0);
     expect(first.updatedCounts).toBe(4);
     expect(second.addedImages).toBe(0);
     expect(second.replacedImages).toBe(0);
+    expect(second.removedImages).toBe(0);
     expect(second.updatedCounts).toBe(0);
 
     const imageCounts = first.content.blocks
       .filter((block) => block.type === "image-grid")
       .map((block) => (block.props.images as unknown[]).length);
-    expect(imageCounts).toEqual([2, 4, 3, 3]);
+    expect(imageCounts).toEqual([2, 4, 2, 3]);
 
     const cardsBlock = first.content.blocks.find((block) => block.type === "cards-grid");
     expect(cardsBlock?.props.cards).toEqual([
       { title: "Frameless Showers", buttonText: "2 Photos" },
       { title: "Windows", buttonText: "4 Photos" },
-      { title: "Doors", buttonText: "3 Photos" },
+      { title: "Doors", buttonText: "2 Photos" },
       { title: "Commercial Glass", buttonText: "3 Photos" },
     ]);
   });
@@ -89,7 +91,7 @@ describe("mergeNewGalleryImages", () => {
       (image) => image.url,
     );
 
-    expect(merged.addedImages).toBe(7);
+    expect(merged.addedImages).toBe(6);
     expect(merged.replacedImages).toBe(1);
     expect(urls).toContain(
       "/images/glass-door-pro/gallery/commercial-glass/commercial-double-glass-door-installation.webp",
@@ -100,5 +102,29 @@ describe("mergeNewGalleryImages", () => {
         (image) => "legacyUrls" in image,
       ),
     ).toBe(false);
+  });
+
+  it("removes retired gallery images and updates the affected count", () => {
+    const fixture = galleryFixture();
+    const doorBlock = fixture.blocks.find((block) => block.props.anchorId === "doors");
+    doorBlock!.props.images = [
+      {
+        url: "/images/glass-door-pro/gallery/doors/05.webp",
+        alt: "Entry door installation in progress by Glass & Door Pro",
+        caption: "Entry Door Installation - In Progress",
+      },
+      ...(doorBlock!.props.images as unknown[]),
+    ];
+
+    const merged = mergeNewGalleryImages(fixture);
+    const updatedDoorBlock = merged.content.blocks.find(
+      (block) => block.props.anchorId === "doors",
+    );
+    const urls = (updatedDoorBlock?.props.images as Array<{ url: string }>).map(
+      (image) => image.url,
+    );
+
+    expect(merged.removedImages).toBe(1);
+    expect(urls).not.toContain("/images/glass-door-pro/gallery/doors/05.webp");
   });
 });

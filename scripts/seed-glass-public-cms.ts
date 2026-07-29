@@ -648,11 +648,6 @@ const windowGalleryImages = [
 
 const doorGalleryImages = [
   {
-    url: "/images/glass-door-pro/gallery/doors/05.webp",
-    alt: "Entry door installation in progress by Glass & Door Pro",
-    caption: "Entry Door Installation - In Progress",
-  },
-  {
     url: "/images/glass-door-pro/gallery/doors/06.webp",
     alt: "Sliding patio door installation by Glass & Door Pro",
     caption: "Sliding Patio Door Installation",

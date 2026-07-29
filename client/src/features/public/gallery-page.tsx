@@ -47,7 +47,6 @@ const windowImages = [
 }));
 
 const doorImages = [
-  ["05.webp", "Entry Door Installation - In Progress"],
   ["06.webp", "Sliding Patio Door Installation"],
   ["01.webp", "Decorative Entry Door Installation"],
   ["02.webp", "Glass Entry Door Installation"],

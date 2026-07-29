@@ -9,6 +9,10 @@ interface GalleryImage {
 
 type CmsGalleryImage = Omit<GalleryImage, "legacyUrls">;
 
+const RETIRED_GALLERY_URLS = new Set([
+  "/images/glass-door-pro/gallery/doors/05.webp",
+]);
+
 interface GalleryCategory {
   anchorId: string;
   cardTitle: string;
@@ -61,11 +65,6 @@ const NEW_GALLERY_CATEGORIES: GalleryCategory[] = [
     anchorId: "doors",
     cardTitle: "Doors",
     images: [
-      {
-        url: "/images/glass-door-pro/gallery/doors/05.webp",
-        alt: "Entry door installation in progress by Glass & Door Pro",
-        caption: "Entry Door Installation - In Progress",
-      },
       {
         url: "/images/glass-door-pro/gallery/doors/06.webp",
         alt: "Sliding patio door installation by Glass & Door Pro",
@@ -131,7 +130,17 @@ export function mergeNewGalleryImages(content: unknown) {
   const nextContent = structuredClone(content);
   let addedImages = 0;
   let replacedImages = 0;
+  let removedImages = 0;
   let updatedCounts = 0;
+
+  for (const block of nextContent.blocks.filter((item) => item.type === "image-grid")) {
+    if (!Array.isArray(block.props.images)) continue;
+    const visibleImages = block.props.images.filter(
+      (image) => !RETIRED_GALLERY_URLS.has(galleryImageUrl(image) ?? ""),
+    );
+    removedImages += block.props.images.length - visibleImages.length;
+    block.props.images = visibleImages;
+  }
 
   for (const category of NEW_GALLERY_CATEGORIES) {
     const imageBlock = nextContent.blocks.find(
@@ -199,7 +208,13 @@ export function mergeNewGalleryImages(content: unknown) {
     }
   }
 
-  return { content: nextContent, addedImages, replacedImages, updatedCounts };
+  return {
+    content: nextContent,
+    addedImages,
+    replacedImages,
+    removedImages,
+    updatedCounts,
+  };
 }
 
 export async function syncGlassGalleryCms() {
@@ -213,6 +228,7 @@ export async function syncGlassGalleryCms() {
   if (
     merged.addedImages === 0 &&
     merged.replacedImages === 0 &&
+    merged.removedImages === 0 &&
     merged.updatedCounts === 0
   ) {
     console.log("Gallery CMS page already contains the new images.");
@@ -230,7 +246,7 @@ export async function syncGlassGalleryCms() {
   await storage.cmsPages.updatePage(page.id, { content: merged.content });
 
   console.log(
-    `Updated gallery CMS page: ${merged.addedImages} images added, ${merged.replacedImages} references replaced, ${merged.updatedCounts} counts updated.`,
+    `Updated gallery CMS page: ${merged.addedImages} images added, ${merged.replacedImages} references replaced, ${merged.removedImages} images removed, ${merged.updatedCounts} counts updated.`,
   );
 }
 
