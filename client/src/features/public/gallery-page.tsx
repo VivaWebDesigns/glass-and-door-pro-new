@@ -60,7 +60,7 @@ const doorImages = [
 }));
 
 const commercialGlassImages = [
-  ["06.webp", "Commercial Double Glass Door Installation"],
+  ["commercial-double-glass-door-installation.webp", "Commercial Double Glass Door Installation"],
   ["07.webp", "Commercial Glass Door Installation"],
   ["01.webp", "Commercial Office Glass Conference Room"],
   ["02.webp", "Commercial Glass Entry Doors"],

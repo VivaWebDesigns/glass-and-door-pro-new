@@ -681,7 +681,7 @@ const doorGalleryImages = [
 
 const commercialGlassGalleryImages = [
   {
-    url: "/images/glass-door-pro/gallery/commercial-glass/06.webp",
+    url: "/images/glass-door-pro/gallery/commercial-glass/commercial-double-glass-door-installation.webp",
     alt: "Commercial double glass door installation by Glass & Door Pro",
     caption: "Commercial Double Glass Door Installation",
   },

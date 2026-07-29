@@ -4,6 +4,7 @@ interface GalleryImage {
   url: string;
   alt: string;
   caption: string;
+  legacyUrls?: string[];
 }
 
 interface GalleryCategory {
@@ -75,9 +76,10 @@ const NEW_GALLERY_CATEGORIES: GalleryCategory[] = [
     cardTitle: "Commercial Glass",
     images: [
       {
-        url: "/images/glass-door-pro/gallery/commercial-glass/06.webp",
+        url: "/images/glass-door-pro/gallery/commercial-glass/commercial-double-glass-door-installation.webp",
         alt: "Commercial double glass door installation by Glass & Door Pro",
         caption: "Commercial Double Glass Door Installation",
+        legacyUrls: ["/images/glass-door-pro/gallery/commercial-glass/06.webp"],
       },
       {
         url: "/images/glass-door-pro/gallery/commercial-glass/07.webp",
@@ -106,6 +108,7 @@ export function mergeNewGalleryImages(content: unknown) {
 
   const nextContent = structuredClone(content);
   let addedImages = 0;
+  let replacedImages = 0;
   let updatedCounts = 0;
 
   for (const category of NEW_GALLERY_CATEGORIES) {
@@ -122,11 +125,27 @@ export function mergeNewGalleryImages(content: unknown) {
       ? imageBlock.props.images
       : [];
     const existingUrls = new Set(currentImages.map(galleryImageUrl).filter(Boolean));
-    const missingImages = category.images.filter((image) => !existingUrls.has(image.url));
+    const missingImages: GalleryImage[] = [];
+    for (const image of category.images) {
+      if (existingUrls.has(image.url)) continue;
+
+      const legacyIndex = currentImages.findIndex((currentImage) => {
+        const currentUrl = galleryImageUrl(currentImage);
+        return Boolean(currentUrl && image.legacyUrls?.includes(currentUrl));
+      });
+      if (legacyIndex >= 0) {
+        currentImages[legacyIndex] = image;
+        replacedImages += 1;
+      } else {
+        missingImages.push(image);
+      }
+    }
 
     if (missingImages.length > 0) {
       imageBlock.props.images = [...missingImages, ...currentImages];
       addedImages += missingImages.length;
+    } else {
+      imageBlock.props.images = currentImages;
     }
 
     const imageCount = (imageBlock.props.images as unknown[]).length;
@@ -148,7 +167,7 @@ export function mergeNewGalleryImages(content: unknown) {
     }
   }
 
-  return { content: nextContent, addedImages, updatedCounts };
+  return { content: nextContent, addedImages, replacedImages, updatedCounts };
 }
 
 export async function syncGlassGalleryCms() {
@@ -159,7 +178,11 @@ export async function syncGlassGalleryCms() {
   }
 
   const merged = mergeNewGalleryImages(page.content);
-  if (merged.addedImages === 0 && merged.updatedCounts === 0) {
+  if (
+    merged.addedImages === 0 &&
+    merged.replacedImages === 0 &&
+    merged.updatedCounts === 0
+  ) {
     console.log("Gallery CMS page already contains the new images.");
     return;
   }
@@ -175,7 +198,7 @@ export async function syncGlassGalleryCms() {
   await storage.cmsPages.updatePage(page.id, { content: merged.content });
 
   console.log(
-    `Updated gallery CMS page: ${merged.addedImages} images added, ${merged.updatedCounts} counts updated.`,
+    `Updated gallery CMS page: ${merged.addedImages} images added, ${merged.replacedImages} references replaced, ${merged.updatedCounts} counts updated.`,
   );
 }
 
