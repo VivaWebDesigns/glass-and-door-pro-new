@@ -4,6 +4,7 @@ import { PublicPageRenderer } from "@/features/public/public-block-renderer";
 import type { BlockInstance } from "@/features/admin/cms/builder/block-registry";
 
 const framelessShowerImages = [
+  ["18.webp", "Frameless Shower Door Installation"],
   ["03.webp", "Frameless Shower Install - SouthPark"],
   ["01.webp", "Frameless Shower Install - Myers Park"],
   ["06.webp", "Frameless Shower Install - Weddington"],
@@ -27,6 +28,9 @@ const framelessShowerImages = [
 }));
 
 const windowImages = [
+  ["10.webp", "Residential Picture Window Installation"],
+  ["11.webp", "Double-Hung Window Installation"],
+  ["12.webp", "Dormer Window Installation"],
   ["01.webp", "Residential Window Installation - Double Window"],
   ["02.webp", "Residential Window Installation - Single Window"],
   ["03.webp", "Residential Window Installation - Exterior Windows"],
@@ -43,6 +47,8 @@ const windowImages = [
 }));
 
 const doorImages = [
+  ["05.webp", "Entry Door Installation - In Progress"],
+  ["06.webp", "Sliding Patio Door Installation"],
   ["01.webp", "Decorative Entry Door Installation"],
   ["02.webp", "Glass Entry Door Installation"],
   ["03.webp", "Glass Door Replacement - Cornelius"],
@@ -54,6 +60,8 @@ const doorImages = [
 }));
 
 const commercialGlassImages = [
+  ["06.webp", "Commercial Double Glass Door Installation"],
+  ["07.webp", "Commercial Glass Door Installation"],
   ["01.webp", "Commercial Office Glass Conference Room"],
   ["02.webp", "Commercial Glass Entry Doors"],
   ["04.webp", "Commercial Window Replacement - Charlotte"],
