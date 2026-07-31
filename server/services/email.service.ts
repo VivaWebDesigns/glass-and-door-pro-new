@@ -7,8 +7,7 @@ const SMTP_PORT = parseInt(process.env.SMTP_PORT || "587", 10);
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
 const SMTP_FROM = process.env.SMTP_FROM || "Glass & Door Pro <noreply@glassanddoorpro.com>";
-const DEFAULT_RESEND_FROM =
-  "Glass & Door Pro Website <website@updates.glassanddoorpro.com>";
+const DEFAULT_RESEND_FROM = "Glass & Door Pro Website <website@updates.glassanddoorpro.com>";
 const DEFAULT_EMAIL_LOGO_URL = "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
 
 const isSmtpConfigured = !!(SMTP_HOST && SMTP_USER && SMTP_PASS);
@@ -27,6 +26,10 @@ interface MailgunConfig {
   apiKey: string;
   domain: string;
   fromAddress: string;
+}
+
+interface SendEmailOptions {
+  replyTo?: string;
 }
 
 let cachedMailgunConfig: MailgunConfig | null = null;
@@ -58,7 +61,9 @@ async function getMailgunConfig(): Promise<MailgunConfig | null> {
     }
     mailgunConfigFetched = true;
   } catch (err) {
-    logger.email.warn("Failed to load Mailgun configuration", { error: err instanceof Error ? err.message : String(err) });
+    logger.email.warn("Failed to load Mailgun configuration", {
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
   return cachedMailgunConfig;
 }
@@ -95,7 +100,8 @@ async function getEmailLogoUrl(): Promise<string | null> {
 async function sendViaMailgun(
   to: string,
   subject: string,
-  html: string
+  html: string,
+  options: SendEmailOptions = {},
 ): Promise<boolean> {
   const config = await getMailgunConfig();
   if (!config) return false;
@@ -110,6 +116,7 @@ async function sendViaMailgun(
       to: [to],
       subject,
       html,
+      ...(options.replyTo ? { "h:Reply-To": options.replyTo } : {}),
     });
     logger.email.info("Sent via Mailgun", { to, subject });
     return true;
@@ -122,7 +129,8 @@ async function sendViaMailgun(
 async function sendViaResend(
   to: string,
   subject: string,
-  html: string
+  html: string,
+  options: SendEmailOptions = {},
 ): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   if (!apiKey) return false;
@@ -142,6 +150,7 @@ async function sendViaResend(
         to: [to],
         subject,
         html,
+        ...(options.replyTo ? { reply_to: options.replyTo } : {}),
       }),
     });
 
@@ -167,11 +176,18 @@ async function sendViaResend(
 async function sendViaSmtp(
   to: string,
   subject: string,
-  html: string
+  html: string,
+  options: SendEmailOptions = {},
 ): Promise<boolean> {
   if (!transporter) return false;
   try {
-    await transporter.sendMail({ from: SMTP_FROM, to, subject, html });
+    await transporter.sendMail({
+      from: SMTP_FROM,
+      to,
+      subject,
+      html,
+      ...(options.replyTo ? { replyTo: options.replyTo } : {}),
+    });
     logger.email.info("Sent via SMTP", { to, subject });
     return true;
   } catch (err) {
@@ -180,7 +196,11 @@ async function sendViaSmtp(
   }
 }
 
-function baseTemplate(title: string, body: string, options: { logoUrl?: string | null } = {}): string {
+function baseTemplate(
+  title: string,
+  body: string,
+  options: { logoUrl?: string | null } = {},
+): string {
   const logoMarkup = options.logoUrl
     ? `<img src="${options.logoUrl}" alt="Glass & Door Pro" style="display:block;max-width:220px;max-height:52px;height:auto;width:auto;margin:0 auto;" />`
     : `<div style="color:#1e3a5f;font-size:22px;font-weight:600;text-align:center;">Glass & Door Pro</div>`;
@@ -200,7 +220,7 @@ function baseTemplate(title: string, body: string, options: { logoUrl?: string |
           ${body}
         </td></tr>
         <tr><td style="background:#f9fafb;padding:20px 32px;border-top:1px solid #e5e7eb;">
-          <p style="margin:0;color:#6b7280;font-size:13px;">This is an automated message from Glass & Door Pro. Please do not reply directly to this email.</p>
+          <p style="margin:0;color:#6b7280;font-size:13px;">This is an automated message from Glass & Door Pro.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -217,32 +237,59 @@ export async function renderEmailShell(title: string, body: string): Promise<str
 function renderTemplate(template: string, vars: Record<string, string | null>): string {
   let result = template;
   for (const [key, val] of Object.entries(vars)) {
-    result = result.replace(new RegExp(`\\{\\{${key}\\}\\}`, "g"), val || "");
+    result = result.replace(new RegExp(`\\{\\{${key}\\}\\}`, "g"), () => val || "");
     if (val) {
       result = result.replace(new RegExp(`\\{\\{#${key}\\}\\}`, "g"), "");
       result = result.replace(new RegExp(`\\{\\{/${key}\\}\\}`, "g"), "");
     } else {
       result = result.replace(
         new RegExp(`\\{\\{#${key}\\}\\}[\\s\\S]*?\\{\\{/${key}\\}\\}`, "g"),
-        ""
+        "",
       );
     }
   }
   return result;
 }
 
+function escapeHtml(value: string): string {
+  return value.replace(
+    /[&<>"']/g,
+    (character) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[character] ?? character,
+  );
+}
+
+function normalizeReplyTo(value: string): string | undefined {
+  const email = value.trim();
+  if (!email || /[\r\n]/.test(email) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return undefined;
+  }
+  return email;
+}
+
+function sanitizeEmailSubject(value: string): string {
+  return value.replace(/[\r\n]+/g, " ").trim();
+}
+
 async function getTemplateHtml(
   slug: string,
   vars: Record<string, string | null>,
   fallbackTitle: string,
-  fallbackBody: string
+  fallbackBody: string,
+  subjectVars: Record<string, string | null> = vars,
 ): Promise<{ subject: string; html: string; isActive: boolean }> {
   try {
     const { storage } = await import("../storage/index");
     const template = await storage.emailTemplates.getTemplate(slug);
     if (template) {
       const renderedBody = renderTemplate(template.htmlBody, vars);
-      const renderedSubject = renderTemplate(template.subject, vars);
+      const renderedSubject = renderTemplate(template.subject, subjectVars);
       return {
         subject: renderedSubject,
         html: await renderEmailShell("", renderedBody),
@@ -250,7 +297,10 @@ async function getTemplateHtml(
       };
     }
   } catch (err) {
-    logger.email.warn("Failed to load email template, using fallback", { slug, error: err instanceof Error ? err.message : String(err) });
+    logger.email.warn("Failed to load email template, using fallback", {
+      slug,
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
   return {
     subject: fallbackTitle,
@@ -262,23 +312,24 @@ async function getTemplateHtml(
 export async function sendEmail(
   to: string,
   subject: string,
-  html: string
+  html: string,
+  options: SendEmailOptions = {},
 ): Promise<boolean> {
   const { recordEmailOutcome } = await import("../utils/metrics");
 
-  const resendSent = await sendViaResend(to, subject, html);
+  const resendSent = await sendViaResend(to, subject, html, options);
   if (resendSent) {
     recordEmailOutcome(true);
     return true;
   }
 
-  const mailgunSent = await sendViaMailgun(to, subject, html);
+  const mailgunSent = await sendViaMailgun(to, subject, html, options);
   if (mailgunSent) {
     recordEmailOutcome(true);
     return true;
   }
 
-  const smtpSent = await sendViaSmtp(to, subject, html);
+  const smtpSent = await sendViaSmtp(to, subject, html, options);
   if (smtpSent) {
     recordEmailOutcome(true);
     return true;
@@ -286,13 +337,13 @@ export async function sendEmail(
 
   recordEmailOutcome(false);
   const hasConfiguredProvider = Boolean(
-    process.env.RESEND_API_KEY || cachedMailgunConfig || isSmtpConfigured
+    process.env.RESEND_API_KEY || cachedMailgunConfig || isSmtpConfigured,
   );
   logger.email.warn(
     hasConfiguredProvider
       ? "All configured email providers failed"
       : "No email provider configured",
-    { to, subject }
+    { to, subject },
   );
   return false;
 }
@@ -300,14 +351,14 @@ export async function sendEmail(
 export async function sendPasswordResetEmail(
   email: string,
   firstName: string | null,
-  resetUrl: string
+  resetUrl: string,
 ): Promise<boolean> {
   const vars = { firstName: firstName || "there", resetUrl };
   const { subject, html, isActive } = await getTemplateHtml(
     "password-reset",
     vars,
     "Reset Your Password",
-    `<p>Hi ${vars.firstName}, click here to reset your password: ${resetUrl}</p>`
+    `<p>Hi ${vars.firstName}, click here to reset your password: ${resetUrl}</p>`,
   );
   if (!isActive) return false;
   return sendEmail(email, subject, html);
@@ -317,14 +368,14 @@ export async function sendWelcomeEmail(
   email: string,
   firstName: string | null,
   loginUrl: string,
-  tempPassword: string | null
+  tempPassword: string | null,
 ): Promise<boolean> {
   const vars = { firstName: firstName || "there", loginUrl, tempPassword };
   const { subject, html, isActive } = await getTemplateHtml(
     "welcome-new-user",
     vars,
     "Welcome to Glass & Door Pro",
-    `<p>Hi ${vars.firstName}, an admin account has been created for you on the Glass & Door Pro website.</p>`
+    `<p>Hi ${vars.firstName}, an admin account has been created for you on the Glass & Door Pro website.</p>`,
   );
   if (!isActive) return false;
   return sendEmail(email, subject, html);
@@ -340,26 +391,62 @@ export async function sendContactFormEmail(
     subject: string;
     messageBody: string;
   },
-  dashboardUrl: string
+  dashboardUrl: string,
 ): Promise<void> {
+  const replyTo = normalizeReplyTo(submission.senderEmail);
+  const escapedName = escapeHtml(submission.senderName);
+  const escapedEmail = replyTo ? escapeHtml(replyTo) : "";
+  const escapedPhone = escapeHtml(submission.senderPhone);
+  const escapedSubject = escapeHtml(submission.subject);
+  const escapedMessage = escapeHtml(submission.messageBody).replace(/\r?\n/g, "<br>");
+  const contactPreference = submission.contactPreference === "email" ? "Email" : "Phone";
   const vars = {
-    ...submission,
-    senderEmail: submission.senderEmail || "Not provided",
-    contactPreference: submission.contactPreference === "email" ? "Email" : "Phone",
+    senderName: escapedName,
+    senderEmail: escapedEmail,
+    senderPhone: escapedPhone,
+    contactPreference,
+    subject: escapedSubject,
+    messageBody: escapedMessage,
+    replyToEmail: escapedEmail || null,
+    emailNotProvided: replyTo ? null : "true",
+    dashboardUrl: escapeHtml(dashboardUrl),
+  };
+  const subjectVars = {
+    senderName: sanitizeEmailSubject(submission.senderName),
+    senderEmail: replyTo ?? "",
+    senderPhone: sanitizeEmailSubject(submission.senderPhone),
+    contactPreference,
+    subject: sanitizeEmailSubject(submission.subject),
+    messageBody: sanitizeEmailSubject(submission.messageBody),
+    replyToEmail: replyTo ?? null,
+    emailNotProvided: replyTo ? null : "true",
     dashboardUrl,
   };
   const { subject, html, isActive } = await getTemplateHtml(
     "contact-form-submission",
     vars,
-    `New Contact Form: ${submission.senderName}`,
-    `<p>New message from ${submission.senderName}. Phone: ${submission.senderPhone}. Email: ${vars.senderEmail}. Preferred contact: ${vars.contactPreference}. Subject: ${submission.subject}. Message: ${submission.messageBody}</p>`
+    `New Contact Form: ${sanitizeEmailSubject(submission.senderName)}`,
+    `<p>New message from ${escapedName}.</p>
+    <p><strong>Phone:</strong> ${escapedPhone}<br>
+    <strong>Email:</strong> ${
+      replyTo ? `<a href="mailto:${escapedEmail}">${escapedEmail}</a>` : "Not provided"
+    }<br>
+    <strong>Preferred contact:</strong> ${contactPreference}<br>
+    <strong>Subject:</strong> ${escapedSubject}</p>
+    <p><strong>Message:</strong><br>${escapedMessage}</p>
+    ${
+      replyTo
+        ? `<p style="margin:24px 0;"><a href="mailto:${escapedEmail}" style="display:inline-block;background:#1e3a5f;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600;">Reply to ${escapedName}</a></p>`
+        : ""
+    }`,
+    subjectVars,
   );
   if (!isActive) return;
   const results = await Promise.all(
     adminEmails.map(async (email) => ({
       email,
-      sent: await sendEmail(email, subject, html),
-    }))
+      sent: await sendEmail(email, subject, html, { replyTo }),
+    })),
   );
   const failedRecipients = results.filter((result) => !result.sent).map((result) => result.email);
   if (failedRecipients.length > 0) {
@@ -371,14 +458,14 @@ export async function sendManagedFormSubmissionEmail(
   recipientEmails: string[],
   formName: string,
   submissionSummary: string,
-  dashboardUrl: string
+  dashboardUrl: string,
 ): Promise<void> {
   const vars = { formName, submissionSummary, dashboardUrl };
   const { subject, html, isActive } = await getTemplateHtml(
     "managed-form-submission",
     vars,
     `New Form Submission: ${formName}`,
-    `<p>A new submission was received for ${formName}.</p><p>${submissionSummary}</p>`
+    `<p>A new submission was received for ${formName}.</p><p>${submissionSummary}</p>`,
   );
   if (!isActive) return;
 
@@ -416,7 +503,7 @@ export async function sendNewMessageEmail(
   to: string,
   recipientName: string | null,
   senderName: string,
-  loginUrl: string
+  loginUrl: string,
 ): Promise<boolean> {
   const firstName = recipientName || "there";
   const html = await renderEmailShell(
@@ -429,7 +516,7 @@ export async function sendNewMessageEmail(
         Go to Message Center
       </a>
     </p>
-    <p style="color:#6b7280;font-size:13px;">If you did not expect this message, you can safely ignore this email.</p>`
+    <p style="color:#6b7280;font-size:13px;">If you did not expect this message, you can safely ignore this email.</p>`,
   );
   return sendEmail(to, `New message from ${senderName} — Glass & Door Pro`, html);
 }
