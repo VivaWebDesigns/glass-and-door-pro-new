@@ -364,8 +364,20 @@ export function Footer() {
 
         <div className="mt-10 border-t border-slate-800 pt-8 text-sm text-slate-500">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <p data-testid="text-copyright">
-              &copy; {new Date().getFullYear()} {brandName}. All rights reserved.
+            <p className="text-center md:text-left" data-testid="text-copyright">
+              &copy; {new Date().getFullYear()} {brandName}. All rights reserved.{" "}
+              <span className="inline-block whitespace-nowrap">
+                <span aria-hidden="true">&middot;</span> Website by{" "}
+                <a
+                  href="https://vivawebdesigns.com/"
+                  target="_blank"
+                  rel="noopener"
+                  className="text-slate-400 transition-colors hover:text-slate-200 focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+                  data-testid="link-footer-viva-web-designs"
+                >
+                  Viva Web Designs
+                </a>
+              </span>
             </p>
             <nav aria-label="Legal links">
               <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
