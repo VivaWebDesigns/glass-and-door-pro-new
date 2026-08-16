@@ -49,7 +49,7 @@ export async function loadGa4IfConsented() {
 
 declare global {
   interface Window {
-    dataLayer?: unknown[][];
+    dataLayer?: Array<Record<string, unknown> | unknown[]>;
     gtag?: (...args: unknown[]) => void;
   }
 }

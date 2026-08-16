@@ -37,6 +37,7 @@ export function securityHeaders(): RequestHandler {
         scriptSrc: [
           "'self'",
           "'sha256-ZnYJX5ypMaaAhxxWhSEjbMkhO2A9yPmbzEQH3LFaITA='",
+          "'sha256-yARQDD+4mSkkspLqSG30G22FcU/XqEzDZghrEOmiJNk='",
           "https://www.googletagmanager.com",
           "https://static.cloudflareinsights.com",
         ],
@@ -63,7 +64,7 @@ export function securityHeaders(): RequestHandler {
           "https://*.tile.openstreetmap.org",
           "https://*.basemaps.cartocdn.com",
         ],
-        frameSrc: ["'self'"],
+        frameSrc: ["'self'", "https://www.googletagmanager.com"],
         objectSrc: ["'none'"],
         baseUri: ["'self'"],
         formAction: ["'self'"],

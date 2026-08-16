@@ -7,15 +7,15 @@ import { describe, expect, it } from "vitest";
 import { securityHeaders } from "../middleware/security";
 
 describe("securityHeaders", () => {
-  it("allows the inline JavaScript bootstrap by its exact CSP hash", async () => {
+  it("allows every inline JavaScript bootstrap by its exact CSP hash", async () => {
     const html = await readFile(new URL("../../client/index.html", import.meta.url), "utf8");
-    const bootstrapScript = html.match(
-      /<script>([\s\S]*?document\.documentElement\.classList\.add\("js"\);[\s\S]*?)<\/script>/,
-    )?.[1];
+    const bootstrapScripts = Array.from(html.matchAll(/<script>([\s\S]*?)<\/script>/g), (match) => match[1]);
 
-    expect(bootstrapScript).toBeDefined();
+    expect(bootstrapScripts).toHaveLength(2);
 
-    const bootstrapHash = createHash("sha256").update(bootstrapScript!).digest("base64");
+    const bootstrapHashes = bootstrapScripts.map((script) =>
+      createHash("sha256").update(script).digest("base64"),
+    );
     const app = express();
     app.use(securityHeaders());
     app.get("/", (_request, response) => response.sendStatus(204));
@@ -31,7 +31,9 @@ describe("securityHeaders", () => {
         ?.split(";")
         .find((directive) => directive.trimStart().startsWith("script-src"));
 
-      expect(scriptSourceDirective).toContain(`'sha256-${bootstrapHash}'`);
+      for (const bootstrapHash of bootstrapHashes) {
+        expect(scriptSourceDirective).toContain(`'sha256-${bootstrapHash}'`);
+      }
       expect(scriptSourceDirective).not.toContain("'unsafe-inline'");
     } finally {
       await new Promise<void>((resolve, reject) =>

@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { CmsForm, CmsFormField, CmsFormListColumn } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { pushGlassDoorProLeadSuccess } from "@/lib/lead-tracking";
 
 interface PublicFormRendererProps {
   slug: string;
@@ -542,7 +542,11 @@ export function PublicFormRenderer({
         credentials: "include",
         body: JSON.stringify(values),
       });
-      const payload = (await response.json().catch(() => ({}))) as { message?: string; error?: string };
+      const payload = (await response.json().catch(() => ({}))) as {
+        message?: string;
+        error?: string;
+        submissionId?: string;
+      };
 
       if (!response.ok) {
         throw new Error(payload.message || payload.error || "Failed to submit form.");
@@ -551,6 +555,14 @@ export function PublicFormRenderer({
       return payload;
     },
     onSuccess: (payload) => {
+      if (payload.submissionId) {
+        pushGlassDoorProLeadSuccess({
+          leadType: form?.kind || "custom",
+          formName: form?.slug || slug,
+          leadEventId: payload.submissionId,
+        });
+      }
+
       toast({
         title: "Form submitted",
         description: payload.message || "Thanks! Your submission has been received.",
