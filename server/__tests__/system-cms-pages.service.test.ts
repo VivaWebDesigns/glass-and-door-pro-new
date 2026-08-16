@@ -116,6 +116,48 @@ describe("ensureSystemCmsPages", () => {
     });
   });
 
+  it("replaces only the legacy Glass & Door Pro privacy policy", async () => {
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "privacy-id",
+        slug: "privacy-policy",
+        seoDescription: "Existing privacy description.",
+        content: {
+          blocks: [
+            {
+              id: "legacy-policy",
+              type: "rich-text",
+              props: {
+                content:
+                  "Our website may use cookies and analytics tools, such as Google Analytics",
+              },
+            },
+          ],
+        },
+        updatedBy: "admin-id",
+      },
+    ]);
+    mockGetPageBySlug.mockImplementation(async (slug: string) => ({
+      id: `${slug}-id`,
+      slug,
+      status: "published",
+      noindex: false,
+      content: { blocks: [] },
+      updatedBy: "admin-id",
+    }));
+
+    const mod = await import("../services/system-cms-pages.service");
+    await mod.ensureSystemCmsPages();
+
+    expect(mockUpdatePage).toHaveBeenCalledTimes(1);
+    const [pageId, update] = mockUpdatePage.mock.calls[0];
+    expect(pageId).toBe("privacy-id");
+    expect(update.updatedBy).toBe("admin-id");
+    expect(JSON.stringify(update.content)).toContain("Google Analytics 4");
+    expect(JSON.stringify(update.content)).toContain("generate_lead");
+    expect(JSON.stringify(update.content)).not.toContain("This data is aggregated");
+  });
+
   it("updates published CMS hours in nested CTA and FAQ content", async () => {
     const unchangedBlock = { id: "intro", type: "rich-text", props: { content: "Unchanged" } };
     mockGetAllPages.mockResolvedValue([
