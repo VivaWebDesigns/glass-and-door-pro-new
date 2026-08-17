@@ -424,7 +424,9 @@ describe("ensureSystemCmsPages", () => {
     expect(updates).not.toMatch(/Monroe[- ]based|based in Monroe|Monroe is close|Monroe is just/i);
     expect(updates).toContain("Charlotte-based glass company");
     expect(updates).toContain("Do you serve Indian Trail from Charlotte?");
+    expect(updates).toContain("Charlotte-Based, Union County Service");
     expect(updates).toContain("Do you serve Matthews from Charlotte?");
+    expect(updates).toContain("Charlotte-Based, Regular Fort Mill Service");
     expect(updates).toContain("South Charlotte home base");
   });
 
