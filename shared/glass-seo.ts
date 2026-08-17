@@ -527,10 +527,10 @@ export function buildGlassLocalBusinessLd(
     priceRange: "$$",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "2341 Waverly Dr",
-      addressLocality: "Monroe",
+      streetAddress: "6135 Park South Drive Suite 542",
+      addressLocality: "Charlotte",
       addressRegion: "NC",
-      postalCode: "28112",
+      postalCode: "28210",
       addressCountry: "US",
     },
     openingHoursSpecification: [

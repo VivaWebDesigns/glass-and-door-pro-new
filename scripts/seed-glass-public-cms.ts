@@ -1308,7 +1308,7 @@ const month1FramelessContent: InsertCmsPage["content"] = {
       {
         question: "What areas do you serve for frameless shower installation?",
         answer:
-          "<p>Glass and Door Pro serves the greater Charlotte metro area including Charlotte, Matthews, Mint Hill, Monroe, Pineville, Huntersville, Cornelius, Davidson, Concord, Tega Cay, Waxhaw, Weddington, Wesley Chapel, Indian Trail, Stallings, Fort Mill, Indian Land, Rock Hill, and surrounding areas. We're based in Monroe, NC.</p>",
+          "<p>Glass and Door Pro serves the greater Charlotte metro area including Charlotte, Matthews, Mint Hill, Monroe, Pineville, Huntersville, Cornelius, Davidson, Concord, Tega Cay, Waxhaw, Weddington, Wesley Chapel, Indian Trail, Stallings, Fort Mill, Indian Land, Rock Hill, and surrounding areas. We're based in Charlotte, NC.</p>",
       },
     ]),
     block("rich-text", {
@@ -1635,7 +1635,7 @@ const glassServicesContent: InsertCmsPage["content"] = {
       title: "Owner-Operated Glass and Door Work",
       alignment: "left",
       content:
-        "<p>Glass & Door Pro is based in Monroe and serves homeowners and businesses throughout the greater Charlotte area. Doug handles measurements, planning, and installation personally, so you work directly with the person responsible for the finished result.</p><p>Whether you need a custom frameless shower, replacement windows, a better-fitting exterior door, foggy window repair, or commercial glass support, the process starts with a clear in-home or on-site quote.</p>",
+        "<p>Glass & Door Pro is based in Charlotte and serves homeowners and businesses throughout the greater Charlotte area. Doug handles measurements, planning, and installation personally, so you work directly with the person responsible for the finished result.</p><p>Whether you need a custom frameless shower, replacement windows, a better-fitting exterior door, foggy window repair, or commercial glass support, the process starts with a clear in-home or on-site quote.</p>",
       sectionBackgroundColor: "#f8fafc",
       sectionPaddingTop: "lg",
       sectionPaddingBottom: "lg",
@@ -1767,7 +1767,7 @@ const glassServicePages: GlassServicePageSeed[] = [
           icon: "MapPin",
           title: "Local, Not a Franchise",
           description:
-            "Glass and Door Pro is a Monroe-based, owner-operated business — not a national franchise with local name recognition and distant management. When you call, Doug answers.",
+            "Glass and Door Pro is a Charlotte-based, owner-operated business — not a national franchise with local name recognition and distant management. When you call, Doug answers.",
         },
       ],
       faqTitle: "Frequently Asked Questions — Window Installation",
@@ -2071,7 +2071,7 @@ const glassServicePages: GlassServicePageSeed[] = [
           icon: "MapPin",
           title: "Serving the Full Charlotte Metro",
           description:
-            "Monroe-based, serving Charlotte, Indian Trail, Matthews, Waxhaw, Weddington, and surrounding communities. No travel surcharges for nearby areas.",
+            "Charlotte-based, serving Charlotte, Indian Trail, Matthews, Waxhaw, Weddington, and surrounding communities. No travel surcharges for nearby areas.",
         },
       ],
       faqTitle: "Frequently Asked Questions — Window Repair",
@@ -3107,7 +3107,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       hero: {
         heading: "Glass & Door Services in Monroe, NC",
         subheading:
-          "Frameless shower doors, window and door installation, window repair, and commercial glass — installed personally by Doug, your Monroe-based owner-operator with 15+ years of experience. Same-week appointments. Saturday hours available.",
+          "Frameless shower doors, window and door installation, window repair, and commercial glass — installed personally by Doug, your Charlotte-based owner-operator with 15+ years of experience. Same-week appointments. Saturday hours available.",
         imageUrl: "/images/glass-door-pro/city-monroe-hero.webp",
         imagePositionY: 45,
       },
@@ -3191,9 +3191,9 @@ const glassCityPages: GlassCityPageSeed[] = [
       faqTitle: "Frequently Asked Questions — Monroe, NC",
       faqs: [
         {
-          question: "Are you actually based in Monroe, NC?",
+          question: "Do you still serve Monroe, NC?",
           answer:
-            "<p>Yes. Glass and Door Pro is based right here in Monroe. Doug lives and works in Union County, which means shorter response times for Monroe homeowners and a real local presence — not a Charlotte-based company driving an hour into Union County for a quote.</p>",
+            "<p>Yes. Monroe remains a regular part of our service area. Doug works throughout Union County, including Monroe, and handles every quote and installation personally.</p>",
         },
         {
           question: "How quickly can you get out for a quote in Monroe?",
@@ -3247,7 +3247,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       },
       introTitle: "Personal Service for Charlotte Homeowners",
       introContent:
-        "<p>Charlotte has no shortage of glass and door companies — but most of them have something in common: when you call, you talk to a salesperson. When the crew shows up, they're subcontractors. When something needs follow-up, you're calling a 1-800 number.</p><p>Glass and Door Pro is different. I'm Doug — owner, operator, and the person who'll actually come measure your project, plan it with you, and install it myself. I've been doing this work in the greater Charlotte area for 15+ years, and the reason I keep getting referrals is simple: the person who quotes the job is the person who does the job.</p><p>We're based in Monroe, just 30-40 minutes from most Charlotte addresses, and the greater Charlotte metro is our primary service area. Whether you're remodeling a master bathroom in SouthPark, replacing a foggy bedroom window in NoDa, or putting a new entry door on a craftsman bungalow in Dilworth, this is the work I do every week.</p>",
+        "<p>Charlotte has no shortage of glass and door companies — but most of them have something in common: when you call, you talk to a salesperson. When the crew shows up, they're subcontractors. When something needs follow-up, you're calling a 1-800 number.</p><p>Glass and Door Pro is different. I'm Doug — owner, operator, and the person who'll actually come measure your project, plan it with you, and install it myself. I've been doing this work in the greater Charlotte area for 15+ years, and the reason I keep getting referrals is simple: the person who quotes the job is the person who does the job.</p><p>We're based in South Charlotte, and the greater Charlotte metro is our primary service area. Whether you're remodeling a master bathroom in SouthPark, replacing a foggy bedroom window in NoDa, or putting a new entry door on a craftsman bungalow in Dilworth, this is the work I do every week.</p>",
       benefitsTitle: "Why Charlotte Homeowners Choose Glass and Door Pro",
       benefits: [
         {
@@ -3325,7 +3325,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         {
           question: "Do you actually come into Charlotte, or do you stay in Union County?",
           answer:
-            "<p>We work throughout Charlotte regularly. Glass and Door Pro is based in Monroe, but the greater Charlotte metro is our primary service area. We have clients across South Charlotte, Ballantyne, SouthPark, Myers Park, Dilworth, Cotswold, and most other Charlotte neighborhoods. We're typically less than 40 minutes from any Charlotte address.</p>",
+            "<p>We work throughout Charlotte regularly. Glass and Door Pro is based in Charlotte, and the greater Charlotte metro is our primary service area. We have clients across South Charlotte, Ballantyne, SouthPark, Myers Park, Dilworth, Cotswold, and most other Charlotte neighborhoods.</p>",
         },
         {
           question: "Is there a travel fee for working in Charlotte?",
@@ -3343,9 +3343,9 @@ const glassCityPages: GlassCityPageSeed[] = [
             "<p>Usually within a few business days. Saturday appointments are available, which is one of the most common reasons Charlotte homeowners choose us — most glass and door companies are weekday-only, and Saturday quotes work much better around busy schedules.</p>",
         },
         {
-          question: "Why would I choose a Monroe-based company over a Charlotte-based one?",
+          question: "Why choose Glass and Door Pro over a larger Charlotte glass company?",
           answer:
-            "<p>Three reasons most clients tell us. First, Doug personally handles every project — no sales reps, no subcontracted crews. Second, our pricing tends to be more competitive than the larger Charlotte shops because our overhead is lower. Third, Saturday availability — we work Monday through Saturday. The Monroe location is only a disadvantage if you assume we don't actually work in Charlotte, which we do, every week.</p>",
+            "<p>Three reasons most clients tell us. First, Doug personally handles every project — no sales reps, no subcontracted crews. Second, our pricing tends to be more competitive than larger shops because our overhead is lower. Third, Saturday availability — we work Monday through Saturday.</p>",
         },
         {
           question:
@@ -3379,13 +3379,13 @@ const glassCityPages: GlassCityPageSeed[] = [
       hero: {
         heading: "Glass & Door Services in Indian Trail, NC",
         subheading:
-          "Frameless shower doors, window installation, door installation, window repair, and commercial glass services for Indian Trail homeowners and businesses. Owner-operated with 15+ years of experience. Monroe-based, locally serving Union County. Saturday appointments available.",
+          "Frameless shower doors, window installation, door installation, window repair, and commercial glass services for Indian Trail homeowners and businesses. Owner-operated with 15+ years of experience. Charlotte-based, locally serving Union County. Saturday appointments available.",
         imageUrl: "/images/glass-door-pro/city-indian-trail-hero.webp",
         imagePositionY: 45,
       },
       introTitle: "Your Local Glass and Door Company in Indian Trail",
       introContent:
-        "<p>Indian Trail has grown fast — and with that growth comes a lot of homeowners upgrading aging houses, finishing bathrooms that were never quite done, and putting real money into properties that now sit at real values. The glass and door work that gets done in Indian Trail reflects that — more frameless shower enclosures, more window replacements in homes from the late 90s and early 2000s, more entry door upgrades as people put finishing touches on homes they plan to stay in.</p><p>Glass and Door Pro is based in Monroe, which means Indian Trail is right in our backyard. Doug handles every project personally — there's no subcontractor showing up, no crew you haven't met. When you call for a quote, you're talking to the person who will measure the job and install the work. That's a different experience than calling a franchise and getting whoever is available.</p><p>Whether you're adding a frameless glass enclosure to a master bath remodel, replacing foggy windows in a guest room, or installing a new entry door before a home sale, the process starts with a clear quote and ends with work you're happy with. Saturday appointments are available for homeowners who can't take a weekday off.</p>",
+        "<p>Indian Trail has grown fast — and with that growth comes a lot of homeowners upgrading aging houses, finishing bathrooms that were never quite done, and putting real money into properties that now sit at real values. The glass and door work that gets done in Indian Trail reflects that — more frameless shower enclosures, more window replacements in homes from the late 90s and early 2000s, more entry door upgrades as people put finishing touches on homes they plan to stay in.</p><p>Glass and Door Pro is based in Charlotte and serves Indian Trail regularly. Doug handles every project personally — there's no subcontractor showing up, no crew you haven't met. When you call for a quote, you're talking to the person who will measure the job and install the work. That's a different experience than calling a franchise and getting whoever is available.</p><p>Whether you're adding a frameless glass enclosure to a master bath remodel, replacing foggy windows in a guest room, or installing a new entry door before a home sale, the process starts with a clear quote and ends with work you're happy with. Saturday appointments are available for homeowners who can't take a weekday off.</p>",
       benefitsTitle: "Why Indian Trail Homeowners Choose Glass and Door Pro",
       benefits: [
         {
@@ -3396,9 +3396,9 @@ const glassCityPages: GlassCityPageSeed[] = [
         },
         {
           icon: "MapPin",
-          title: "Monroe-Based, Truly Local",
+          title: "Charlotte-Based, Union County Service",
           description:
-            "We're not a Charlotte company that occasionally drives to Union County. Glass and Door Pro is based in Monroe and Indian Trail is one of our most consistent service areas.",
+            "Glass and Door Pro is based in Charlotte, and Indian Trail is one of our most consistent Union County service areas.",
         },
         {
           icon: "FileText",
@@ -3462,9 +3462,9 @@ const glassCityPages: GlassCityPageSeed[] = [
       faqTitle: "Frequently Asked Questions — Indian Trail, NC",
       faqs: [
         {
-          question: "Are you actually based near Indian Trail, or do you come from Charlotte?",
+          question: "Do you serve Indian Trail from Charlotte?",
           answer:
-            "<p>Glass and Door Pro is based in Monroe, NC — which puts us right in Indian Trail's backyard. We work in Indian Trail regularly and don't charge travel fees for Union County service areas. When you call, you're getting a local company, not a Charlotte franchise routing work to whoever is closest.</p>",
+            "<p>Yes. Glass and Door Pro is based in Charlotte and works in Indian Trail regularly. We don't charge travel fees for Union County service areas, and every project is handled directly by Doug.</p>",
         },
         {
           question: "How quickly can you get out to Indian Trail for a quote?",
@@ -3495,7 +3495,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaHeading: "Ready to Get Started in Indian Trail?",
       ctaBody:
         "Call, text, or fill out the form for a free quote. Doug will come out personally, review the project, and give you clear next steps.",
-      ctaFooter: "Mon–Sat, 7am–7pm | Monroe-based, serving Indian Trail and Union County",
+      ctaFooter: "Mon–Sat, 7am–7pm | Charlotte-based, serving Indian Trail and Union County",
     }),
   },
   {
@@ -3504,7 +3504,7 @@ const glassCityPages: GlassCityPageSeed[] = [
     path: "/service-areas/stallings",
     seoTitle: "Glass and Door Services in Stallings, NC | Glass and Door Pro",
     seoDescription:
-      "Frameless showers, window installation, window repair, and door installation in Stallings, NC. Monroe-based, owner-operated, Saturday appointments available. Call (704) 771-6111.",
+      "Frameless showers, window installation, window repair, and door installation in Stallings, NC. Charlotte-based, owner-operated, Saturday appointments available. Call (704) 771-6111.",
     seoKeywords:
       "glass services Stallings NC, frameless shower doors Stallings NC, window installation Stallings NC, door installation Stallings NC, window repair Stallings NC",
     ogImageUrl: "/images/glass-door-pro/city-stallings-hero.webp",
@@ -3512,13 +3512,13 @@ const glassCityPages: GlassCityPageSeed[] = [
       hero: {
         heading: "Glass & Door Services in Stallings, NC",
         subheading:
-          "Frameless shower enclosures, replacement windows, door installation, and window repair for Stallings homeowners. Monroe-based and owner-operated — Doug handles every project personally. Saturday appointments available.",
+          "Frameless shower enclosures, replacement windows, door installation, and window repair for Stallings homeowners. Charlotte-based and owner-operated — Doug handles every project personally. Saturday appointments available.",
         imageUrl: "/images/glass-door-pro/city-stallings-hero.webp",
         imagePositionY: 45,
       },
       introTitle: "Glass and Door Pro — Serving Stallings Homeowners",
       introContent:
-        "<p>Stallings sits in a pocket of Union County where established neighborhoods mix with newer developments, and the homes reflect that — everything from early 2000s construction that's ready for bathroom upgrades and window replacements, to recently built homes where owners are customizing beyond the builder standard. Glass and door work in Stallings tends to be detail-oriented, done by homeowners who care about how things look and want the work done right.</p><p>Glass and Door Pro is a Monroe-based business, which makes Stallings one of our closest and most regular service areas. Doug doesn't hand off projects to other installers — he measures, plans, and installs every job himself. That personal accountability is something homeowners in Stallings notice and mention when they refer us to neighbors.</p><p>The most common calls we get from Stallings are frameless glass shower enclosures for master bath remodels, fogged window replacement, and front entry door upgrades. We also handle window repair when replacement isn't necessary — and we'll always give you an honest read on which one makes sense for your situation.</p>",
+        "<p>Stallings sits in a pocket of Union County where established neighborhoods mix with newer developments, and the homes reflect that — everything from early 2000s construction that's ready for bathroom upgrades and window replacements, to recently built homes where owners are customizing beyond the builder standard. Glass and door work in Stallings tends to be detail-oriented, done by homeowners who care about how things look and want the work done right.</p><p>Glass and Door Pro is a Charlotte-based business, which makes Stallings one of our closest and most regular service areas. Doug doesn't hand off projects to other installers — he measures, plans, and installs every job himself. That personal accountability is something homeowners in Stallings notice and mention when they refer us to neighbors.</p><p>The most common calls we get from Stallings are frameless glass shower enclosures for master bath remodels, fogged window replacement, and front entry door upgrades. We also handle window repair when replacement isn't necessary — and we'll always give you an honest read on which one makes sense for your situation.</p>",
       benefitsTitle: "Why Stallings Homeowners Choose Glass and Door Pro",
       benefits: [
         {
@@ -3593,9 +3593,9 @@ const glassCityPages: GlassCityPageSeed[] = [
       faqTitle: "Frequently Asked Questions — Stallings, NC",
       faqs: [
         {
-          question: "Do you serve Stallings, or is it too far from Monroe?",
+          question: "Do you serve Stallings, or is it too far from Charlotte?",
           answer:
-            "<p>Stallings is one of our most regular service areas — it's right next door to Monroe and Indian Trail, and we're out there multiple times a week. No travel fees, no minimum project size for the area.</p>",
+            "<p>Stallings is one of our most regular Union County service areas, and we're out there often. No travel fees, no minimum project size for the area.</p>",
         },
         {
           question: "What glass and door projects are most common in Stallings?",
@@ -3626,7 +3626,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaHeading: "Ready to Get Started in Stallings?",
       ctaBody:
         "Call, text, or fill out the form for a free quote. Doug will come out personally and give you clear next steps.",
-      ctaFooter: "Mon–Sat, 7am–7pm | Monroe-based, serving Stallings and Union County",
+      ctaFooter: "Mon–Sat, 7am–7pm | Charlotte-based, serving Stallings and Union County",
     }),
   },
   {
@@ -3635,7 +3635,7 @@ const glassCityPages: GlassCityPageSeed[] = [
     path: "/service-areas/wesley-chapel",
     seoTitle: "Glass and Door Services in Wesley Chapel, NC | Glass and Door Pro",
     seoDescription:
-      "Frameless shower doors, window installation, window repair, and door installation in Wesley Chapel, NC. Monroe-based, owner-operated, Saturday appointments. Call (704) 771-6111.",
+      "Frameless shower doors, window installation, window repair, and door installation in Wesley Chapel, NC. Charlotte-based, owner-operated, Saturday appointments. Call (704) 771-6111.",
     seoKeywords:
       "glass services Wesley Chapel NC, frameless shower doors Wesley Chapel NC, window installation Wesley Chapel NC, door installation Wesley Chapel NC, window repair Wesley Chapel NC",
     ogImageUrl: "/images/glass-door-pro/city-wesley-chapel-hero.webp",
@@ -3643,20 +3643,20 @@ const glassCityPages: GlassCityPageSeed[] = [
       hero: {
         heading: "Glass & Door Services in Wesley Chapel, NC",
         subheading:
-          "Frameless shower enclosures, window replacement, door installation, and window repair for Wesley Chapel homeowners. Monroe-based and owner-operated — every project handled personally by Doug Adams. Saturday appointments available.",
+          "Frameless shower enclosures, window replacement, door installation, and window repair for Wesley Chapel homeowners. Charlotte-based and owner-operated — every project handled personally by Doug Adams. Saturday appointments available.",
         imageUrl: "/images/glass-door-pro/city-wesley-chapel-hero.webp",
         imagePositionY: 45,
       },
       introTitle: "Glass and Door Services Right Here in Wesley Chapel",
       introContent:
-        "<p>Wesley Chapel is one of the fastest-growing areas in Union County — and the homes here reflect a range of eras and upgrade needs. Newer subdivisions where buyers are customizing above builder standard sit alongside established communities where owners are making long-term investments in their properties. Glass and door work in Wesley Chapel tends to involve homeowners who have done their research and want the job done by someone who knows what they're doing.</p><p>Glass and Door Pro is based in Monroe, which makes Wesley Chapel a short drive and a regular part of our weekly schedule. Doug handles every project personally from the initial measurement through the finished installation. You won't be handed off to a subcontractor, and you won't get a different person showing up than the one who gave you the quote.</p><p>We work throughout Wesley Chapel on frameless glass shower installations, window replacement and repair, and exterior door upgrades. If you're in the middle of a bathroom remodel and want a frameless enclosure to finish it off, or you've got a handful of fogged windows that need addressing, or your front door is due for an upgrade — we handle all of it, and the process is straightforward from first call to finished job.</p>",
+        "<p>Wesley Chapel is one of the fastest-growing areas in Union County — and the homes here reflect a range of eras and upgrade needs. Newer subdivisions where buyers are customizing above builder standard sit alongside established communities where owners are making long-term investments in their properties. Glass and door work in Wesley Chapel tends to involve homeowners who have done their research and want the job done by someone who knows what they're doing.</p><p>Glass and Door Pro is based in Charlotte and keeps Wesley Chapel in our regular service rotation. Doug handles every project personally from the initial measurement through the finished installation. You won't be handed off to a subcontractor, and you won't get a different person showing up than the one who gave you the quote.</p><p>We work throughout Wesley Chapel on frameless glass shower installations, window replacement and repair, and exterior door upgrades. If you're in the middle of a bathroom remodel and want a frameless enclosure to finish it off, or you've got a handful of fogged windows that need addressing, or your front door is due for an upgrade — we handle all of it, and the process is straightforward from first call to finished job.</p>",
       benefitsTitle: "Why Wesley Chapel Homeowners Choose Glass and Door Pro",
       benefits: [
         {
           icon: "MapPin",
-          title: "Monroe-Based, Genuinely Local",
+          title: "Charlotte-Based, Regular Local Service",
           description:
-            "We're not a large Charlotte operation that services Union County when it's convenient. Monroe is home base, and Wesley Chapel is right in our regular service rotation.",
+            "We're not a large operation routing you to whoever is available. Charlotte is home base, and Wesley Chapel is right in our regular service rotation.",
         },
         {
           icon: "User",
@@ -3760,7 +3760,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaHeading: "Ready to Get Started in Wesley Chapel?",
       ctaBody:
         "Call, text, or fill out the form. Doug will schedule a visit personally and walk you through next steps.",
-      ctaFooter: "Mon–Sat, 7am–7pm | Monroe-based, serving Wesley Chapel and Union County",
+      ctaFooter: "Mon–Sat, 7am–7pm | Charlotte-based, serving Wesley Chapel and Union County",
     }),
   },
   {
@@ -3769,7 +3769,7 @@ const glassCityPages: GlassCityPageSeed[] = [
     path: "/service-areas/waxhaw",
     seoTitle: "Glass and Door Services in Waxhaw, NC | Glass and Door Pro",
     seoDescription:
-      "Frameless shower doors, window installation, window repair, and door installation in Waxhaw, NC. Monroe-based, owner-operated, honest pricing. Saturday appointments available. Call (704) 771-6111.",
+      "Frameless shower doors, window installation, window repair, and door installation in Waxhaw, NC. Charlotte-based, owner-operated, honest pricing. Saturday appointments available. Call (704) 771-6111.",
     seoKeywords:
       "glass services Waxhaw NC, frameless shower doors Waxhaw NC, window installation Waxhaw NC, door installation Waxhaw NC, window repair Waxhaw NC",
     ogImageUrl: "/images/glass-door-pro/city-waxhaw-hero.webp",
@@ -3777,13 +3777,13 @@ const glassCityPages: GlassCityPageSeed[] = [
       hero: {
         heading: "Glass & Door Services in Waxhaw, NC",
         subheading:
-          "Custom frameless shower enclosures, window replacement, door installation, and window repair for Waxhaw homeowners. Monroe-based, owner-operated, and personally handled by Doug Adams on every project. Saturday appointments available.",
+          "Custom frameless shower enclosures, window replacement, door installation, and window repair for Waxhaw homeowners. Charlotte-based, owner-operated, and personally handled by Doug Adams on every project. Saturday appointments available.",
         imageUrl: "/images/glass-door-pro/city-waxhaw-hero.webp",
         imagePositionY: 45,
       },
       introTitle: "Your Glass and Door Company in Waxhaw",
       introContent:
-        "<p>Waxhaw homeowners tend to have high standards for how their homes are finished — it's that kind of community. When someone in Waxhaw is putting in a frameless glass shower, they're not looking for the cheapest option. They want it measured right, installed cleanly, and finished with hardware that matches the rest of the bathroom. That's exactly the kind of work Glass and Door Pro does.</p><p>Doug is based in Monroe and has been working in Waxhaw for years. He knows the neighborhoods, he knows the home styles, and he's installed glass and doors in enough Waxhaw bathrooms and entryways to know what works and what doesn't. When he comes out for a quote, you're getting real expertise — not a salesperson reading from a product catalog.</p><p>Waxhaw's housing mix means we see everything from custom homes where the finishes need to be exactly right, to more modest properties where the goal is a quality upgrade without overspending. We approach both with the same care. A clear quote, honest advice, and work that holds up.</p>",
+        "<p>Waxhaw homeowners tend to have high standards for how their homes are finished — it's that kind of community. When someone in Waxhaw is putting in a frameless glass shower, they're not looking for the cheapest option. They want it measured right, installed cleanly, and finished with hardware that matches the rest of the bathroom. That's exactly the kind of work Glass and Door Pro does.</p><p>Doug is based in Charlotte and has been working in Waxhaw for years. He knows the neighborhoods, he knows the home styles, and he's installed glass and doors in enough Waxhaw bathrooms and entryways to know what works and what doesn't. When he comes out for a quote, you're getting real expertise — not a salesperson reading from a product catalog.</p><p>Waxhaw's housing mix means we see everything from custom homes where the finishes need to be exactly right, to more modest properties where the goal is a quality upgrade without overspending. We approach both with the same care. A clear quote, honest advice, and work that holds up.</p>",
       benefitsTitle: "Why Waxhaw Homeowners Choose Glass and Door Pro",
       benefits: [
         {
@@ -3861,7 +3861,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         {
           question: "Do you work in Waxhaw regularly, or is it far from your base?",
           answer:
-            "<p>Waxhaw is one of our most consistent service areas. We're based in Monroe, which is just up the road, and we have clients throughout Waxhaw's neighborhoods. No travel fees, no minimum project size.</p>",
+            "<p>Waxhaw is one of our most consistent service areas. We're based in Charlotte and have clients throughout Waxhaw's neighborhoods. No travel fees, no minimum project size.</p>",
         },
         {
           question: "What are the most popular projects in Waxhaw?",
@@ -3893,7 +3893,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaHeading: "Ready to Get Started in Waxhaw?",
       ctaBody:
         "Call, text, or fill out the form for a free quote. Doug will come out personally and give you a clear, written estimate.",
-      ctaFooter: "Mon–Sat, 7am–7pm | Monroe-based, serving Waxhaw and Union County",
+      ctaFooter: "Mon–Sat, 7am–7pm | Charlotte-based, serving Waxhaw and Union County",
     }),
   },
   {
@@ -3916,7 +3916,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       },
       introTitle: "Glass and Door Services for Matthews Homeowners",
       introContent:
-        "<p>Matthews has an established character — mature neighborhoods, well-maintained homes, and homeowners who've been in place long enough to know exactly what they want when they're upgrading. Glass and door work in Matthews reflects that. Frameless shower installations going into bathrooms that are being properly remodeled, not just touched up. Window replacements on homes where the original windows are finally past their useful life. Entry door upgrades that make a real difference to a home's appearance.</p><p>Glass and Door Pro serves Matthews regularly. Doug is Monroe-based, which puts Matthews on the eastern edge of the Charlotte side of his service area — close enough that scheduling is easy and there are no travel fees. He handles every project personally, which Matthews homeowners tend to appreciate. When you call, you're getting the person who will actually do the work.</p><p>Matthews sits in Mecklenburg County, and we work throughout the town — from the neighborhoods near downtown Matthews to the subdivisions along the Mecklenburg-Union County line. If you've been putting off a glass or door project because you weren't sure who to call, Glass and Door Pro is a straightforward choice.</p>",
+        "<p>Matthews has an established character — mature neighborhoods, well-maintained homes, and homeowners who've been in place long enough to know exactly what they want when they're upgrading. Glass and door work in Matthews reflects that. Frameless shower installations going into bathrooms that are being properly remodeled, not just touched up. Window replacements on homes where the original windows are finally past their useful life. Entry door upgrades that make a real difference to a home's appearance.</p><p>Glass and Door Pro serves Matthews regularly. Doug is Charlotte-based, which puts Matthews on the eastern edge of the Charlotte side of his service area — close enough that scheduling is easy and there are no travel fees. He handles every project personally, which Matthews homeowners tend to appreciate. When you call, you're getting the person who will actually do the work.</p><p>Matthews sits in Mecklenburg County, and we work throughout the town — from the neighborhoods near downtown Matthews to the subdivisions along the Mecklenburg-Union County line. If you've been putting off a glass or door project because you weren't sure who to call, Glass and Door Pro is a straightforward choice.</p>",
       benefitsTitle: "Why Matthews Homeowners Choose Glass and Door Pro",
       benefits: [
         {
@@ -3990,9 +3990,9 @@ const glassCityPages: GlassCityPageSeed[] = [
       faqTitle: "Frequently Asked Questions — Matthews, NC",
       faqs: [
         {
-          question: "Do you serve Matthews even though you're based in Monroe?",
+          question: "Do you serve Matthews from Charlotte?",
           answer:
-            "<p>Yes. Matthews is a regular part of our service area — we're out there consistently and don't add travel fees for Mecklenburg County locations. Monroe is close enough that Matthews is a short drive, and we schedule Matthews visits the same way as any other area.</p>",
+            "<p>Yes. Matthews is a regular part of our service area — we're out there consistently and don't add travel fees for Mecklenburg County locations. We schedule Matthews visits the same way as any other area we serve.</p>",
         },
         {
           question: "What glass and door projects are most common in Matthews?",
@@ -4047,7 +4047,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       },
       introTitle: "Custom Glass and Door Work in Weddington",
       introContent:
-        "<p>Weddington is one of Union County's most established communities — larger homes, carefully maintained properties, and homeowners who expect quality work to match the quality of what's already there. Glass and door work in Weddington tends toward the custom end: frameless shower enclosures in primary baths that are being properly renovated, entry door replacements that make a statement at the front of the house, and window upgrades across homes where the original windows have simply reached the end of a long life.</p><p>Glass and Door Pro brings that same attention to detail to every Weddington project. Doug measures every job himself, orders materials to the exact specifications of the opening, and does the installation personally. If you're putting a frameless glass enclosure into a primary bath remodel that you've invested real money in, you want it done by someone who cares about the result. That's the work we do.</p><p>Weddington is a short drive from Monroe, and we've worked throughout the town's neighborhoods for years. No travel fees, consistent availability, and a direct line to the person responsible for the work on every project.</p>",
+        "<p>Weddington is one of Union County's most established communities — larger homes, carefully maintained properties, and homeowners who expect quality work to match the quality of what's already there. Glass and door work in Weddington tends toward the custom end: frameless shower enclosures in primary baths that are being properly renovated, entry door replacements that make a statement at the front of the house, and window upgrades across homes where the original windows have simply reached the end of a long life.</p><p>Glass and Door Pro brings that same attention to detail to every Weddington project. Doug measures every job himself, orders materials to the exact specifications of the opening, and does the installation personally. If you're putting a frameless glass enclosure into a primary bath remodel that you've invested real money in, you want it done by someone who cares about the result. That's the work we do.</p><p>Weddington is a short drive from Charlotte, and we've worked throughout the town's neighborhoods for years. No travel fees, consistent availability, and a direct line to the person responsible for the work on every project.</p>",
       benefitsTitle: "Why Weddington Homeowners Choose Glass and Door Pro",
       benefits: [
         {
@@ -4124,7 +4124,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         {
           question: "Do you work in Weddington regularly?",
           answer:
-            "<p>Yes. Weddington is one of our most consistent Union County service areas. We're based in Monroe and have worked throughout Weddington's neighborhoods for years. No travel fees, consistent availability, and direct access to Doug on every project.</p>",
+            "<p>Yes. Weddington is one of our most consistent Union County service areas. We're based in Charlotte and have worked throughout Weddington's neighborhoods for years. No travel fees, consistent availability, and direct access to Doug on every project.</p>",
         },
         {
           question: "What's the most popular project you do in Weddington?",
@@ -4156,7 +4156,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaHeading: "Ready to Get Started in Weddington?",
       ctaBody:
         "Call, text, or fill out the form. Doug will visit personally, take measurements, and give you a clear written quote.",
-      ctaFooter: "Mon–Sat, 7am–7pm | Monroe-based, serving Weddington and Union County",
+      ctaFooter: "Mon–Sat, 7am–7pm | Charlotte-based, serving Weddington and Union County",
     }),
   },
   {
@@ -4165,7 +4165,7 @@ const glassCityPages: GlassCityPageSeed[] = [
     path: "/service-areas/indian-land",
     seoTitle: "Glass and Door Services in Indian Land, SC | Glass and Door Pro",
     seoDescription:
-      "Frameless shower doors, window installation, window repair, and door installation in Indian Land, SC. Monroe-based, owner-operated, Saturday appointments available. Call (704) 771-6111.",
+      "Frameless shower doors, window installation, window repair, and door installation in Indian Land, SC. Charlotte-based, owner-operated, Saturday appointments available. Call (704) 771-6111.",
     seoKeywords:
       "glass services Indian Land SC, frameless shower doors Indian Land SC, window installation Indian Land SC, door installation Indian Land SC, window repair Indian Land SC",
     ogImageUrl: "/images/glass-door-pro/city-indian-land-hero.webp",
@@ -4173,13 +4173,13 @@ const glassCityPages: GlassCityPageSeed[] = [
       hero: {
         heading: "Glass & Door Services in Indian Land, SC",
         subheading:
-          "Frameless shower enclosures, window replacement, door installation, and window repair for Indian Land homeowners. Monroe-based and owner-operated — Doug handles every project personally. Saturday appointments available.",
+          "Frameless shower enclosures, window replacement, door installation, and window repair for Indian Land homeowners. Charlotte-based and owner-operated — Doug handles every project personally. Saturday appointments available.",
         imageUrl: "/images/glass-door-pro/city-indian-land-hero.webp",
         imagePositionY: 45,
       },
       introTitle: "Glass and Door Pro — Serving Indian Land Homeowners",
       introContent:
-        "<p>Indian Land has grown into one of the fastest-developing communities in the greater Charlotte area, with new construction happening alongside more established neighborhoods that are ready for upgrades. The housing mix here runs from recent builds where homeowners are customizing above the builder standard to homes that are 10–15 years old and ready for bathroom and window improvements.</p><p>Glass and Door Pro is based in Monroe, NC, which puts Indian Land just across the state line and well within our regular service area. Doug works in Indian Land regularly — there's no border fee, no minimum project requirement, and no difference in how we approach a project here versus anywhere else in our service area. You're getting the same owner-operated, personally managed service that clients across Union County and the Charlotte metro have come to rely on.</p><p>The most common projects we handle in Indian Land are frameless glass shower enclosures for homeowners investing in bathroom upgrades, window replacement for fogged or aging double-pane units, and exterior door installations. Whatever the project, the process is the same: Doug comes out, measures in person, gives you a clear written quote, and does the work himself.</p>",
+        "<p>Indian Land has grown into one of the fastest-developing communities in the greater Charlotte area, with new construction happening alongside more established neighborhoods that are ready for upgrades. The housing mix here runs from recent builds where homeowners are customizing above the builder standard to homes that are 10–15 years old and ready for bathroom and window improvements.</p><p>Glass and Door Pro is based in Charlotte, NC, and Indian Land is well within our regular service area. Doug works in Indian Land regularly — there's no border fee, no minimum project requirement, and no difference in how we approach a project here versus anywhere else in our service area. You're getting the same owner-operated, personally managed service that clients across Union County and the Charlotte metro have come to rely on.</p><p>The most common projects we handle in Indian Land are frameless glass shower enclosures for homeowners investing in bathroom upgrades, window replacement for fogged or aging double-pane units, and exterior door installations. Whatever the project, the process is the same: Doug comes out, measures in person, gives you a clear written quote, and does the work himself.</p>",
       benefitsTitle: "Why Indian Land Homeowners Choose Glass and Door Pro",
       benefits: [
         {
@@ -4257,7 +4257,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         {
           question: "Do you cross into South Carolina to serve Indian Land?",
           answer:
-            "<p>Yes. Indian Land is a regular part of our service area — we're based in Monroe, NC, just across the state line, and work in Indian Land consistently. No additional fees for the SC location.</p>",
+            "<p>Yes. Indian Land is a regular part of our service area. We're based in Charlotte, NC, and work in Indian Land consistently. No additional fees for the SC location.</p>",
         },
         {
           question: "What are the most common projects in Indian Land?",
@@ -4290,7 +4290,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaBody:
         "Call, text, or fill out the form for a free quote. Doug will come out personally, measure the project, and give you clear next steps.",
       ctaFooter:
-        "Mon–Sat, 7am–7pm | Monroe-based, serving Indian Land and the greater Charlotte area",
+        "Mon–Sat, 7am–7pm | Charlotte-based, serving Indian Land and the greater Charlotte area",
     }),
   },
   {
@@ -4299,7 +4299,7 @@ const glassCityPages: GlassCityPageSeed[] = [
     path: "/service-areas/fort-mill",
     seoTitle: "Glass and Door Services in Fort Mill, SC | Glass and Door Pro",
     seoDescription:
-      "Frameless shower doors, window installation, window repair, and door installation in Fort Mill, SC. Monroe-based, owner-operated, Saturday appointments. Call (704) 771-6111.",
+      "Frameless shower doors, window installation, window repair, and door installation in Fort Mill, SC. Charlotte-based, owner-operated, Saturday appointments. Call (704) 771-6111.",
     seoKeywords:
       "glass services Fort Mill SC, frameless shower doors Fort Mill SC, window installation Fort Mill SC, door installation Fort Mill SC, window repair Fort Mill SC",
     ogImageUrl: "/images/glass-door-pro/city-fort-mill-hero.webp",
@@ -4307,18 +4307,18 @@ const glassCityPages: GlassCityPageSeed[] = [
       hero: {
         heading: "Glass & Door Services in Fort Mill, SC",
         subheading:
-          "Frameless shower enclosures, window replacement, door installation, and window repair for Fort Mill homeowners. Monroe-based, owner-operated, and personally handled by Doug Adams on every project. Saturday appointments available.",
+          "Frameless shower enclosures, window replacement, door installation, and window repair for Fort Mill homeowners. Charlotte-based, owner-operated, and personally handled by Doug Adams on every project. Saturday appointments available.",
         imageUrl: "/images/glass-door-pro/city-fort-mill-hero.webp",
         imagePositionY: 45,
       },
       introTitle: "Local Glass and Door Service for Fort Mill Homeowners",
       introContent:
-        "<p>Fort Mill has become one of the most sought-after communities in the greater Charlotte area — and the homes here reflect that growth. Established neighborhoods mix with significant newer development, and homeowners across Fort Mill are investing in properties that have real value and that they intend to improve. Glass and door work here ranges from frameless shower upgrades in homes that have been owned for a decade or more, to window replacements in newer construction where the builder's spec units are starting to show their limitations.</p><p>Glass and Door Pro is based in Monroe, NC, right across the South Carolina border, and Fort Mill is a regular part of our service schedule. Doug works in Fort Mill the same way he works everywhere — personally, with a clear quote before anything starts, and with himself doing the installation. There's no dispatch, no subcontractors, no variation in the quality of work based on who happened to be available.</p><p>Fort Mill homeowners have a wide range of glass and door needs and we handle all of them. If you've been putting a project off because you weren't sure who to call in this area, Glass and Door Pro is a local, accountable option that shows up when scheduled and finishes what it starts.</p>",
+        "<p>Fort Mill has become one of the most sought-after communities in the greater Charlotte area — and the homes here reflect that growth. Established neighborhoods mix with significant newer development, and homeowners across Fort Mill are investing in properties that have real value and that they intend to improve. Glass and door work here ranges from frameless shower upgrades in homes that have been owned for a decade or more, to window replacements in newer construction where the builder's spec units are starting to show their limitations.</p><p>Glass and Door Pro is based in Charlotte, NC, and Fort Mill is a regular part of our service schedule. Doug works in Fort Mill the same way he works everywhere — personally, with a clear quote before anything starts, and with himself doing the installation. There's no dispatch, no subcontractors, no variation in the quality of work based on who happened to be available.</p><p>Fort Mill homeowners have a wide range of glass and door needs and we handle all of them. If you've been putting a project off because you weren't sure who to call in this area, Glass and Door Pro is a local, accountable option that shows up when scheduled and finishes what it starts.</p>",
       benefitsTitle: "Why Fort Mill Homeowners Choose Glass and Door Pro",
       benefits: [
         {
           icon: "MapPin",
-          title: "Monroe-Based, Right Across the Border",
+          title: "Charlotte-Based, Regular Fort Mill Service",
           description:
             "We're closer to Fort Mill than most Charlotte glass companies. Monroe is just across the state line, and Fort Mill is a regular part of our weekly schedule.",
         },
@@ -4391,7 +4391,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         {
           question: "Do you serve Fort Mill even though you're based in North Carolina?",
           answer:
-            "<p>Yes. Fort Mill is a regular part of our service area. We're based in Monroe, NC, just across the state line, and work in Fort Mill and the surrounding York County area consistently. No additional fees or charges for the SC location.</p>",
+            "<p>Yes. Fort Mill is a regular part of our service area. We're based in Charlotte, NC, and work in Fort Mill and the surrounding York County area consistently. No additional fees or charges for the SC location.</p>",
         },
         {
           question: "What glass and door projects are most common in Fort Mill?",
@@ -4424,7 +4424,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaBody:
         "Call, text, or fill out the form. Doug will schedule a visit, measure the project personally, and give you clear next steps.",
       ctaFooter:
-        "Mon–Sat, 7am–7pm | Monroe-based, serving Fort Mill and the greater Charlotte area",
+        "Mon–Sat, 7am–7pm | Charlotte-based, serving Fort Mill and the greater Charlotte area",
     }),
   },
   {
@@ -4433,7 +4433,7 @@ const glassCityPages: GlassCityPageSeed[] = [
     path: "/service-areas/pineville",
     seoTitle: "Glass and Door Services in Pineville, NC | Glass and Door Pro",
     seoDescription:
-      "Frameless shower doors, window installation, window repair, and door installation in Pineville, NC. Owner-operated, Monroe-based, Saturday appointments available. Call (704) 771-6111.",
+      "Frameless shower doors, window installation, window repair, and door installation in Pineville, NC. Owner-operated, Charlotte-based, Saturday appointments available. Call (704) 771-6111.",
     seoKeywords:
       "glass services Pineville NC, frameless shower doors Pineville NC, window installation Pineville NC, door installation Pineville NC, window repair Pineville NC",
     ogImageUrl: "/images/glass-door-pro/city-pineville-hero.webp",
@@ -4523,9 +4523,9 @@ const glassCityPages: GlassCityPageSeed[] = [
       faqTitle: "Frequently Asked Questions — Pineville, NC",
       faqs: [
         {
-          question: "Do you serve Pineville from Monroe — isn't that far?",
+          question: "Do you serve Pineville from Charlotte?",
           answer:
-            "<p>Not at all. Pineville is on the south side of Charlotte and Monroe is on the southeast — it's a straightforward drive and a regular part of our service area. No travel fees for Pineville and no difference in scheduling compared to any other area we serve.</p>",
+            "<p>Yes. Pineville is on the south side of Charlotte and is a regular part of our service area. No travel fees for Pineville and no difference in scheduling compared to any other area we serve.</p>",
         },
         {
           question: "What projects do you most commonly handle in Pineville?",
@@ -4729,7 +4729,7 @@ const brandingSettings: Record<string, string> = {
   frontend_logo_url: "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp",
   favicon_url: "/favicon-32x32.png?v=large-2",
   company_name: "Glass & Door Pro",
-  company_address: "2341 Waverly Dr\nMonroe, NC 28112",
+  company_address: "6135 Park South Drive\nSuite 542\nCharlotte, NC 28210",
   company_phone_numbers: "(704) 771-6111",
   frontend_body_font: "nunito-sans",
   frontend_heading_font: "playfair-display",
@@ -4803,7 +4803,7 @@ const glassTermsOfServiceContent = {
       props: {
         alignment: "left",
         content:
-          '<p><strong>Last updated:</strong> June 9, 2026</p><h2>1. About This Website</h2><p>This website is operated by Glass &amp; Door Pro, located at 2341 Waverly Dr, Monroe, NC 28112. By accessing or using this website, you agree to these terms. If you do not agree, please do not use the site.</p><h2>2. Informational Purpose Only</h2><p>The content on this website, including service descriptions, pricing references, process descriptions, project photos, reviews, and any other information, is provided for general informational purposes only. Nothing on this website constitutes a binding estimate, quote, contract, warranty, or commitment to perform any service.</p><p>All project details, pricing, scope of work, scheduling, and warranty terms are established directly between Glass &amp; Door Pro and the customer through a separate estimate and service agreement process. No website content creates or modifies that agreement.</p><h2>3. Estimates and Service Agreements</h2><p>Submitting a contact form or requesting an estimate through this website does not create a service agreement or obligate Glass &amp; Door Pro to perform any work. A binding service agreement is formed only when both parties have agreed in writing to a specific scope of work, pricing, and terms.</p><p>Free estimates are offered as a courtesy and do not guarantee availability, pricing, or scheduling. Glass &amp; Door Pro reserves the right to decline any project at its discretion.</p><h2>4. Accuracy of Information</h2><p>Glass &amp; Door Pro makes reasonable efforts to keep the information on this website accurate and current. However, we do not warrant that all content is complete, accurate, or up to date at all times. Service offerings, product availability, hours, service areas, and other details may change. Confirm current information directly with Glass &amp; Door Pro before making decisions based on website content.</p><h2>5. Intellectual Property</h2><p>All content on this website, including text, photography, graphics, logos, and page structure, is the property of Glass &amp; Door Pro or is used with permission. You may not reproduce, distribute, republish, or use any content from this website for commercial purposes without express written permission from Glass &amp; Door Pro.</p><p>Customer reviews displayed on this website are reproduced with the understanding that they were submitted as public reviews. If you believe your content has been used in error, contact us and we will address it promptly.</p><h2>6. Third-Party Links</h2><p>This website may contain links to third-party websites, including Google Maps, Google Business Profile, manufacturer websites, review platforms, and other external services. These links are provided for convenience only. Glass &amp; Door Pro does not control third-party sites and is not responsible for their content, accuracy, or privacy practices. Accessing a third-party site from a link on our website is at your own risk. See our Privacy Policy for more information about how we handle information submitted through this website.</p><h2>7. Limitation of Liability</h2><p>To the fullest extent permitted by applicable law, Glass &amp; Door Pro and its owners, employees, contractors, and agents shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of this website or reliance on any information contained herein.</p><h2>8. Disclaimer of Warranties</h2><p>This website is provided "as is" without warranties of any kind, express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, or non-infringement. Glass &amp; Door Pro does not warrant that the website will be available without interruption or free from errors.</p><h2>9. Governing Law</h2><p>These terms are governed by the laws of the State of North Carolina, without regard to its conflict of law provisions. Any disputes arising from the use of this website shall be subject to the exclusive jurisdiction of the courts of Union County, North Carolina.</p><h2>10. Changes to These Terms</h2><p>Glass &amp; Door Pro reserves the right to update or modify these terms at any time without prior notice. The date at the top of this page reflects the most recent update. Continued use of the website after changes are posted constitutes acceptance of the updated terms.</p><h2>11. Contact</h2><p>Questions about these terms can be directed to Glass &amp; Door Pro:</p><p>Glass &amp; Door Pro<br>2341 Waverly Dr<br>Monroe, NC 28112<br><a href="tel:+17047716111">(704) 771-6111</a></p>',
+          '<p><strong>Last updated:</strong> June 9, 2026</p><h2>1. About This Website</h2><p>This website is operated by Glass &amp; Door Pro, located at 6135 Park South Drive Suite 542, Charlotte, NC 28210. By accessing or using this website, you agree to these terms. If you do not agree, please do not use the site.</p><h2>2. Informational Purpose Only</h2><p>The content on this website, including service descriptions, pricing references, process descriptions, project photos, reviews, and any other information, is provided for general informational purposes only. Nothing on this website constitutes a binding estimate, quote, contract, warranty, or commitment to perform any service.</p><p>All project details, pricing, scope of work, scheduling, and warranty terms are established directly between Glass &amp; Door Pro and the customer through a separate estimate and service agreement process. No website content creates or modifies that agreement.</p><h2>3. Estimates and Service Agreements</h2><p>Submitting a contact form or requesting an estimate through this website does not create a service agreement or obligate Glass &amp; Door Pro to perform any work. A binding service agreement is formed only when both parties have agreed in writing to a specific scope of work, pricing, and terms.</p><p>Free estimates are offered as a courtesy and do not guarantee availability, pricing, or scheduling. Glass &amp; Door Pro reserves the right to decline any project at its discretion.</p><h2>4. Accuracy of Information</h2><p>Glass &amp; Door Pro makes reasonable efforts to keep the information on this website accurate and current. However, we do not warrant that all content is complete, accurate, or up to date at all times. Service offerings, product availability, hours, service areas, and other details may change. Confirm current information directly with Glass &amp; Door Pro before making decisions based on website content.</p><h2>5. Intellectual Property</h2><p>All content on this website, including text, photography, graphics, logos, and page structure, is the property of Glass &amp; Door Pro or is used with permission. You may not reproduce, distribute, republish, or use any content from this website for commercial purposes without express written permission from Glass &amp; Door Pro.</p><p>Customer reviews displayed on this website are reproduced with the understanding that they were submitted as public reviews. If you believe your content has been used in error, contact us and we will address it promptly.</p><h2>6. Third-Party Links</h2><p>This website may contain links to third-party websites, including Google Maps, Google Business Profile, manufacturer websites, review platforms, and other external services. These links are provided for convenience only. Glass &amp; Door Pro does not control third-party sites and is not responsible for their content, accuracy, or privacy practices. Accessing a third-party site from a link on our website is at your own risk. See our Privacy Policy for more information about how we handle information submitted through this website.</p><h2>7. Limitation of Liability</h2><p>To the fullest extent permitted by applicable law, Glass &amp; Door Pro and its owners, employees, contractors, and agents shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of this website or reliance on any information contained herein.</p><h2>8. Disclaimer of Warranties</h2><p>This website is provided "as is" without warranties of any kind, express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, or non-infringement. Glass &amp; Door Pro does not warrant that the website will be available without interruption or free from errors.</p><h2>9. Governing Law</h2><p>These terms are governed by the laws of the State of North Carolina, without regard to its conflict of law provisions. Any disputes arising from the use of this website shall be subject to the exclusive jurisdiction of the courts of Union County, North Carolina.</p><h2>10. Changes to These Terms</h2><p>Glass &amp; Door Pro reserves the right to update or modify these terms at any time without prior notice. The date at the top of this page reflects the most recent update. Continued use of the website after changes are posted constitutes acceptance of the updated terms.</p><h2>11. Contact</h2><p>Questions about these terms can be directed to Glass &amp; Door Pro:</p><p>Glass &amp; Door Pro<br>6135 Park South Drive<br>Suite 542<br>Charlotte, NC 28210<br><a href="tel:+17047716111">(704) 771-6111</a></p>',
       },
     },
   ],
@@ -4829,7 +4829,7 @@ const glassDisclaimerContent = {
       props: {
         alignment: "left",
         content:
-          "<p><strong>Last updated:</strong> June 9, 2026</p><h2>General Information Only</h2><p>The content published on this website is provided for general informational purposes only. It describes the types of services Glass &amp; Door Pro typically offers and the general conditions under which those services are performed. It does not constitute professional advice, a formal assessment, or a recommendation specific to any individual property, window, glass unit, door, shower enclosure, commercial opening, or building condition.</p><h2>Conditions Vary by Property</h2><p>Glass, window, door, shower, and commercial glass recommendations depend heavily on the specific condition of the product, the installation, the surrounding structure, and factors that can only be assessed through an in-person inspection. Information on this website, including descriptions of repair versus replacement criteria, typical repair processes, and expected outcomes, reflects general experience and may not apply to your specific situation. No assessment or recommendation is valid without a direct evaluation by Glass &amp; Door Pro.</p><h2>Manufacturer Warranty Coverage</h2><p>References to manufacturer warranties, warranty service, product defects, or product eligibility on this website are general in nature. Warranty coverage for any specific product depends on the manufacturer's warranty terms, the product's eligibility, proof of purchase, installation documentation, the nature of the defect or failure, and other factors determined by the manufacturer. Glass &amp; Door Pro cannot confirm warranty coverage or eligibility without reviewing the product and documentation directly. Any manufacturer or product reference does not guarantee that a specific claim will be approved by the manufacturer. Contact Glass &amp; Door Pro for project-specific questions.</p><h2>Pricing and Availability</h2><p>Any pricing references, ranges, or cost comparisons on this website are general in nature and do not constitute a quote or estimate for any specific project. Actual pricing depends on product specifications, site conditions, measurements, finish selections, hardware, parts availability, access requirements, and other factors assessed at the time of the estimate. Availability of services, scheduling, and parts is subject to change without notice. See our Terms of Service for additional information about estimates and service agreements.</p><h2>Commercial Work</h2><p>Descriptions of commercial glass services on this website are general in nature. Commercial project scope, access requirements, permitting, insurance requirements, and applicable code standards vary significantly by property type, location, and jurisdiction. No description on this website should be relied upon as a complete characterization of what a commercial project will require.</p><h2>No Liability</h2><p>Glass &amp; Door Pro makes reasonable efforts to ensure the accuracy of information on this website but does not warrant that all content is current, complete, or error-free. Glass &amp; Door Pro and its owners, employees, contractors, and agents are not liable for any decisions made or actions taken in reliance on information published on this website.</p><h2>Contact</h2><p>If you have questions about a specific project or situation, contact us directly rather than relying on website content.</p><p>Glass &amp; Door Pro<br>2341 Waverly Dr<br>Monroe, NC 28112<br><a href=\"tel:+17047716111\">(704) 771-6111</a></p>",
+          "<p><strong>Last updated:</strong> June 9, 2026</p><h2>General Information Only</h2><p>The content published on this website is provided for general informational purposes only. It describes the types of services Glass &amp; Door Pro typically offers and the general conditions under which those services are performed. It does not constitute professional advice, a formal assessment, or a recommendation specific to any individual property, window, glass unit, door, shower enclosure, commercial opening, or building condition.</p><h2>Conditions Vary by Property</h2><p>Glass, window, door, shower, and commercial glass recommendations depend heavily on the specific condition of the product, the installation, the surrounding structure, and factors that can only be assessed through an in-person inspection. Information on this website, including descriptions of repair versus replacement criteria, typical repair processes, and expected outcomes, reflects general experience and may not apply to your specific situation. No assessment or recommendation is valid without a direct evaluation by Glass &amp; Door Pro.</p><h2>Manufacturer Warranty Coverage</h2><p>References to manufacturer warranties, warranty service, product defects, or product eligibility on this website are general in nature. Warranty coverage for any specific product depends on the manufacturer's warranty terms, the product's eligibility, proof of purchase, installation documentation, the nature of the defect or failure, and other factors determined by the manufacturer. Glass &amp; Door Pro cannot confirm warranty coverage or eligibility without reviewing the product and documentation directly. Any manufacturer or product reference does not guarantee that a specific claim will be approved by the manufacturer. Contact Glass &amp; Door Pro for project-specific questions.</p><h2>Pricing and Availability</h2><p>Any pricing references, ranges, or cost comparisons on this website are general in nature and do not constitute a quote or estimate for any specific project. Actual pricing depends on product specifications, site conditions, measurements, finish selections, hardware, parts availability, access requirements, and other factors assessed at the time of the estimate. Availability of services, scheduling, and parts is subject to change without notice. See our Terms of Service for additional information about estimates and service agreements.</p><h2>Commercial Work</h2><p>Descriptions of commercial glass services on this website are general in nature. Commercial project scope, access requirements, permitting, insurance requirements, and applicable code standards vary significantly by property type, location, and jurisdiction. No description on this website should be relied upon as a complete characterization of what a commercial project will require.</p><h2>No Liability</h2><p>Glass &amp; Door Pro makes reasonable efforts to ensure the accuracy of information on this website but does not warrant that all content is current, complete, or error-free. Glass &amp; Door Pro and its owners, employees, contractors, and agents are not liable for any decisions made or actions taken in reliance on information published on this website.</p><h2>Contact</h2><p>If you have questions about a specific project or situation, contact us directly rather than relying on website content.</p><p>Glass &amp; Door Pro<br>6135 Park South Drive<br>Suite 542<br>Charlotte, NC 28210<br><a href=\"tel:+17047716111\">(704) 771-6111</a></p>",
       },
     },
   ],

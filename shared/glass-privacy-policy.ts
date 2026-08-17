@@ -2,7 +2,7 @@ export const GLASS_PRIVACY_POLICY_LEGACY_MARKER =
   "Our website may use cookies and analytics tools, such as Google Analytics";
 
 export const GLASS_PRIVACY_POLICY_HTML = `<p><strong>Last updated:</strong> August 16, 2026</p>
-<p>Glass &amp; Door Pro is a glass, window, and door company located at 2341 Waverly Dr, Monroe, NC 28112. Our website address is <a href="https://glassanddoorpro.com">glassanddoorpro.com</a>.</p>
+<p>Glass &amp; Door Pro is a glass, window, and door company located at 6135 Park South Drive Suite 542, Charlotte, NC 28210. Our website address is <a href="https://glassanddoorpro.com">glassanddoorpro.com</a>.</p>
 <h2>Information We Collect</h2>
 <p><strong>Information you provide.</strong> When you contact us by website form, phone, text message, or email, we may collect your name, phone number, email address, service address if provided, contact preference, and information about your glass, window, door, shower, or commercial glass project. We receive and store information submitted through our contact form so we can respond to and manage your request.</p>
 <p><strong>Technical and usage information.</strong> When you use our website, we and our analytics provider may collect information such as the pages you view, the website or source that referred you, visit dates and times, browser and device information, general interaction data, cookies or similar identifiers, and approximate location derived from your internet connection.</p>
@@ -31,4 +31,4 @@ export const GLASS_PRIVACY_POLICY_HTML = `<p><strong>Last updated:</strong> Augu
 <p>We may update this privacy policy from time to time. The date at the top of this page reflects the most recent update.</p>
 <h2>Contact Us</h2>
 <p>Questions or privacy requests can be directed to:</p>
-<p>Glass &amp; Door Pro<br>2341 Waverly Dr<br>Monroe, NC 28112<br><a href="tel:+17047716111">(704) 771-6111</a><br><a href="mailto:Doug@GlassandDoorPro.com">Doug@GlassandDoorPro.com</a><br><a href="https://glassanddoorpro.com/forms/contact-form">Contact form</a></p>`;
+<p>Glass &amp; Door Pro<br>6135 Park South Drive<br>Suite 542<br>Charlotte, NC 28210<br><a href="tel:+17047716111">(704) 771-6111</a><br><a href="mailto:Doug@GlassandDoorPro.com">Doug@GlassandDoorPro.com</a><br><a href="https://glassanddoorpro.com/forms/contact-form">Contact form</a></p>`;

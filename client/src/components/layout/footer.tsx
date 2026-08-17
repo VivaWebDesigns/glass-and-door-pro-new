@@ -260,7 +260,7 @@ export function Footer() {
 
   const brandLogo = frontendLogoUrl || "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
   const brandName = companyName || "Glass & Door Pro";
-  const address = (companyAddress || "2341 Waverly Dr, Monroe, NC 28112").replace(/\s*\n\s*/g, ", ");
+  const address = (companyAddress || "6135 Park South Drive Suite 542, Charlotte, NC 28210").replace(/\s*\n\s*/g, ", ");
   const phone = companyPhoneNumbers || "(704) 771-6111";
   const phoneLink = companyLinks.find((link) => link.href.startsWith("tel:"))?.href || "tel:+17047716111";
   const emailLink =

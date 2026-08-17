@@ -198,7 +198,7 @@ export const DEFAULT_BRANDING_SETTINGS: BrandingSettings = {
   frontendLogoUrl: "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp",
   faviconUrl: "/favicon-32x32.png?v=large-2",
   companyName: "Glass & Door Pro",
-  companyAddress: "2341 Waverly Dr\nMonroe, NC 28112",
+  companyAddress: "6135 Park South Drive\nSuite 542\nCharlotte, NC 28210",
   companyPhoneNumbers: "(704) 771-6111",
   companyGoogleBusinessUrl: null,
   bodyFont: null,

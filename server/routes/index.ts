@@ -52,7 +52,8 @@ export function registerApiRoutes(app: Express) {
         ),
         faviconUrl: resolveLocalUploadUrlOrFallback(branding.favicon_url, DEFAULT_FAVICON_URL),
         companyName: branding.company_name || "Glass & Door Pro",
-        companyAddress: branding.company_address || "2341 Waverly Dr\nMonroe, NC 28112",
+        companyAddress:
+          branding.company_address || "6135 Park South Drive\nSuite 542\nCharlotte, NC 28210",
         companyPhoneNumbers: branding.company_phone_numbers || "(704) 771-6111",
         companyGoogleBusinessUrl: branding.company_google_business_url || null,
         bodyFont: branding.frontend_body_font || null,
@@ -111,7 +112,7 @@ export function registerApiRoutes(app: Express) {
         frontendLogoUrl: DEFAULT_FRONTEND_LOGO_URL,
         faviconUrl: DEFAULT_FAVICON_URL,
         companyName: "Glass & Door Pro",
-        companyAddress: "2341 Waverly Dr\nMonroe, NC 28112",
+        companyAddress: "6135 Park South Drive\nSuite 542\nCharlotte, NC 28210",
         companyPhoneNumbers: "(704) 771-6111",
         companyGoogleBusinessUrl: null,
         bodyFont: null,

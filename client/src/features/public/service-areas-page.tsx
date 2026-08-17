@@ -161,7 +161,7 @@ export default function ServiceAreasPage() {
               </div>
               <div className="public-prose prose prose-sm max-w-none text-left">
                 <p>
-                  Glass & Door Pro is based in Monroe and serves homeowners and businesses across
+                  Glass & Door Pro is based in Charlotte and serves homeowners and businesses across
                   the greater Charlotte metro and nearby South Carolina communities. Doug handles
                   measurements, planning, and installation personally, so you work directly with the
                   person responsible for the finished result — no matter which city you're in.
