@@ -389,6 +389,64 @@ const cityPositioningUpdates: Record<
   },
 };
 
+const legacyMonroeBaseReplacements: readonly TextReplacement[] = [
+  [
+    "<p>Indian Trail has grown fast — and with that growth comes a lot of homeowners upgrading aging houses, finishing bathrooms that were never quite done, and putting real money into properties that now sit at real values. The glass and door work that gets done in Indian Trail reflects that — more frameless shower enclosures, more window replacements in homes from the late 90s and early 2000s, more entry door upgrades as people put finishing touches on homes they plan to stay in.</p><p>Glass and Door Pro is based in Monroe, which means Indian Trail is right in our backyard. Doug handles every project personally — there's no subcontractor showing up, no crew you haven't met. When you call for a quote, you're talking to the person who will measure the job and install the work. That's a different experience than calling a franchise and getting whoever is available.</p><p>Whether you're adding a frameless glass enclosure to a master bath remodel, replacing foggy windows in a guest room, or installing a new entry door before a home sale, the process starts with a clear quote and ends with work you're happy with. Saturday appointments are available for homeowners who can't take a weekday off.</p>",
+    "<p>Indian Trail has grown fast — and with that growth comes a lot of homeowners upgrading aging houses, finishing bathrooms that were never quite done, and putting real money into properties that now sit at real values. The glass and door work that gets done in Indian Trail reflects that — more frameless shower enclosures, more window replacements in homes from the late 90s and early 2000s, more entry door upgrades as people put finishing touches on homes they plan to stay in.</p><p>Glass and Door Pro is based in Charlotte and serves Indian Trail regularly. Doug handles every project personally — there's no subcontractor showing up, no crew you haven't met. When you call for a quote, you're talking to the person who will measure the job and install the work. That's a different experience than calling a franchise and getting whoever is available.</p><p>Whether you're adding a frameless glass enclosure to a master bath remodel, replacing foggy windows in a guest room, or installing a new entry door before a home sale, the process starts with a clear quote and ends with work you're happy with. Saturday appointments are available for homeowners who can't take a weekday off.</p>",
+  ],
+  [
+    "We're not a Charlotte company that occasionally drives to Union County. Glass and Door Pro is based in Monroe and Indian Trail is one of our most consistent service areas.",
+    "Glass and Door Pro is based in Charlotte, and Indian Trail is one of our most consistent Union County service areas.",
+  ],
+  [
+    "Are you actually based near Indian Trail, or do you come from Charlotte?",
+    "Do you serve Indian Trail from Charlotte?",
+  ],
+  [
+    "<p>Glass and Door Pro is based in Monroe, NC — which puts us right in Indian Trail's backyard. We work in Indian Trail regularly and don't charge travel fees for Union County service areas. When you call, you're getting a local company, not a Charlotte franchise routing work to whoever is closest.</p>",
+    "<p>Yes. Glass and Door Pro is based in Charlotte and works in Indian Trail regularly. We don't charge travel fees for Union County service areas, and every project is handled directly by Doug.</p>",
+  ],
+  [
+    "Based in Monroe, we're closer to Stallings than most Charlotte-based glass companies. No travel surcharges, no scheduling delays because we're booked out across the metro.",
+    "Stallings is a regular part of our service area, with no travel surcharges and straightforward scheduling from our Charlotte home base.",
+  ],
+  [
+    "We're not a large Charlotte operation that services Union County when it's convenient. Monroe is home base, and Wesley Chapel is right in our regular service rotation.",
+    "We're not a large operation routing you to whoever is available. Charlotte is home base, and Wesley Chapel is right in our regular service rotation.",
+  ],
+  [
+    "<p>Wesley Chapel is a regular part of our schedule — we're out there multiple times a week. Based in Monroe, we cover all of Union County without travel fees or minimum project requirements.</p>",
+    "<p>Wesley Chapel is a regular part of our schedule. From our Charlotte home base, we serve Union County without travel fees or minimum project requirements.</p>",
+  ],
+  [
+    "We're based right next door in Monroe. Waxhaw is a regular part of our weekly schedule, not an occasional out-of-area trip.",
+    "Waxhaw is a regular part of our weekly schedule from our Charlotte home base, not an occasional out-of-area trip.",
+  ],
+  [
+    "Do you serve Matthews even though you're based in Monroe?",
+    "Do you serve Matthews from Charlotte?",
+  ],
+  [
+    "<p>Yes. Matthews is a regular part of our service area — we're out there consistently and don't add travel fees for Mecklenburg County locations. Monroe is close enough that Matthews is a short drive, and we schedule Matthews visits the same way as any other area.</p>",
+    "<p>Yes. Matthews is a regular part of our service area from our Charlotte home base. We work there consistently and don't add travel fees for Mecklenburg County locations.</p>",
+  ],
+  [
+    "Monroe is right across the border from Indian Land. We're closer to many Indian Land neighborhoods than most Charlotte-based glass companies.",
+    "Indian Land is a regular part of our service area from our South Charlotte home base, with no additional location fees.",
+  ],
+  [
+    "We're closer to Fort Mill than most Charlotte glass companies. Monroe is just across the state line, and Fort Mill is a regular part of our weekly schedule.",
+    "Fort Mill is a regular part of our weekly schedule from our South Charlotte home base, with no additional location fees.",
+  ],
+  ["Monroe is home base", "Charlotte is home base"],
+  ["Monroe-Based", "Charlotte-Based"],
+  ["Monroe-based", "Charlotte-based"],
+  ["based in Monroe, NC", "based in Charlotte, NC"],
+  ["Based in Monroe, NC", "Based in Charlotte, NC"],
+  ["based in Monroe", "based in Charlotte"],
+  ["Based in Monroe", "Based in Charlotte"],
+];
+
 function replaceStoredStrings(value: unknown, replacements: readonly TextReplacement[]): unknown {
   if (typeof value === "string") {
     return replacements.reduce(
@@ -498,6 +556,23 @@ async function normalizeStoredCmsPages() {
       if (positionedContent !== (updates.content ?? page.content)) {
         updates.content = positionedContent as InsertCmsPage["content"];
       }
+    }
+
+    const currentSeoDescription = updates.seoDescription ?? page.seoDescription;
+    const seoDescriptionWithoutLegacyMonroeBase = replaceStoredStrings(
+      currentSeoDescription,
+      legacyMonroeBaseReplacements,
+    );
+    if (seoDescriptionWithoutLegacyMonroeBase !== currentSeoDescription) {
+      updates.seoDescription = seoDescriptionWithoutLegacyMonroeBase as string;
+    }
+
+    const contentWithoutLegacyMonroeBase = replaceStoredStrings(
+      updates.content ?? page.content,
+      legacyMonroeBaseReplacements,
+    );
+    if (contentWithoutLegacyMonroeBase !== (updates.content ?? page.content)) {
+      updates.content = contentWithoutLegacyMonroeBase as InsertCmsPage["content"];
     }
 
     const contentWithCurrentBusinessDetails = updateStoredBusinessDetails(

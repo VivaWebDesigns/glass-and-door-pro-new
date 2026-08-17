@@ -329,6 +329,105 @@ describe("ensureSystemCmsPages", () => {
     expect(charlotteContent).not.toContain("We're based in Monroe");
   });
 
+  it("removes legacy Monroe home-base claims from every stored CMS page", async () => {
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "services-id",
+        slug: "services",
+        seoDescription: "A Monroe-based glass company serving Charlotte.",
+        content: {
+          blocks: [
+            {
+              id: "services-intro",
+              type: "rich-text",
+              props: {
+                content:
+                  "<p>Glass & Door Pro is based in Monroe and serves homeowners and businesses throughout the greater Charlotte area.</p>",
+              },
+            },
+          ],
+        },
+        updatedBy: "admin-id",
+      },
+      {
+        id: "indian-trail-id",
+        slug: "service-areas-indian-trail",
+        seoDescription: "Already clean.",
+        content: {
+          blocks: [
+            {
+              id: "indian-trail-benefit",
+              type: "cards-grid",
+              props: {
+                title: "Monroe-Based, Truly Local",
+                description:
+                  "We're not a Charlotte company that occasionally drives to Union County. Glass and Door Pro is based in Monroe and Indian Trail is one of our most consistent service areas.",
+              },
+            },
+            {
+              id: "indian-trail-faq",
+              type: "faq",
+              props: {
+                question: "Are you actually based near Indian Trail, or do you come from Charlotte?",
+              },
+            },
+          ],
+        },
+        updatedBy: "admin-id",
+      },
+      {
+        id: "matthews-id",
+        slug: "service-areas-matthews",
+        seoDescription: "Already clean.",
+        content: {
+          blocks: [
+            {
+              id: "matthews-faq",
+              type: "faq",
+              props: {
+                question: "Do you serve Matthews even though you're based in Monroe?",
+                answer:
+                  "<p>Yes. Matthews is a regular part of our service area — we're out there consistently and don't add travel fees for Mecklenburg County locations. Monroe is close enough that Matthews is a short drive, and we schedule Matthews visits the same way as any other area.</p>",
+              },
+            },
+          ],
+        },
+        updatedBy: "admin-id",
+      },
+      {
+        id: "fort-mill-id",
+        slug: "service-areas-fort-mill",
+        seoDescription: "Already clean.",
+        content: {
+          blocks: [
+            {
+              id: "fort-mill-benefit",
+              type: "cards-grid",
+              props: {
+                title: "Monroe-Based, Right Across the Border",
+                description:
+                  "We're closer to Fort Mill than most Charlotte glass companies. Monroe is just across the state line, and Fort Mill is a regular part of our weekly schedule.",
+              },
+            },
+          ],
+        },
+        updatedBy: "admin-id",
+      },
+    ]);
+    mockGetPageBySlug.mockResolvedValue(null);
+
+    const mod = await import("../services/system-cms-pages.service");
+    await mod.ensureSystemCmsPages();
+
+    expect(mockUpdatePage).toHaveBeenCalledTimes(4);
+    const updates = JSON.stringify(mockUpdatePage.mock.calls);
+    expect(updates).not.toMatch(/Monroe[- ]based|based in Monroe|Monroe is close|Monroe is just/i);
+    expect(updates).toContain("Charlotte-based glass company");
+    expect(updates).toContain("Do you serve Indian Trail from Charlotte?");
+    expect(updates).toContain("Do you serve Matthews from Charlotte?");
+    expect(updates).toContain("South Charlotte home base");
+  });
+
   it("adds missing related services blocks to residential service pages", async () => {
     mockGetAllPages.mockResolvedValue([
       {

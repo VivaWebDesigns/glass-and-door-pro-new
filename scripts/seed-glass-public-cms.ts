@@ -3523,9 +3523,9 @@ const glassCityPages: GlassCityPageSeed[] = [
       benefits: [
         {
           icon: "MapPin",
-          title: "Truly Local",
+          title: "Charlotte-Based, Regular Stallings Service",
           description:
-            "Based in Monroe, we're closer to Stallings than most Charlotte-based glass companies. No travel surcharges, no scheduling delays because we're booked out across the metro.",
+            "Stallings is a regular part of our service area, with no travel surcharges and straightforward scheduling from our Charlotte home base.",
         },
         {
           icon: "User",
@@ -3726,7 +3726,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         {
           question: "Do you come to Wesley Chapel regularly, or is it out of your usual area?",
           answer:
-            "<p>Wesley Chapel is a regular part of our schedule — we're out there multiple times a week. Based in Monroe, we cover all of Union County without travel fees or minimum project requirements.</p>",
+            "<p>Wesley Chapel is a regular part of our schedule. From our Charlotte home base, we serve Union County without travel fees or minimum project requirements.</p>",
         },
         {
           question: "How does the frameless shower quote process work in Wesley Chapel?",
@@ -3794,9 +3794,9 @@ const glassCityPages: GlassCityPageSeed[] = [
         },
         {
           icon: "MapPin",
-          title: "Monroe-Based, No Travel Fees",
+          title: "Charlotte-Based, Regular Waxhaw Service",
           description:
-            "We're based right next door in Monroe. Waxhaw is a regular part of our weekly schedule, not an occasional out-of-area trip.",
+            "Waxhaw is a regular part of our weekly schedule from our Charlotte home base, not an occasional out-of-area trip.",
         },
         {
           icon: "Droplets",
@@ -4070,7 +4070,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         },
         {
           icon: "MapPin",
-          title: "Monroe-Based, No Travel Fees",
+          title: "Charlotte-Based, No Travel Fees",
           description:
             "Weddington is part of our regular Union County service area. No additional charges for location.",
         },
@@ -4196,9 +4196,9 @@ const glassCityPages: GlassCityPageSeed[] = [
         },
         {
           icon: "MapPinned",
-          title: "Monroe-Based, Short Drive Away",
+          title: "Charlotte-Based, Regular Indian Land Service",
           description:
-            "Monroe is right across the border from Indian Land. We're closer to many Indian Land neighborhoods than most Charlotte-based glass companies.",
+            "Indian Land is a regular part of our service area from our South Charlotte home base, with no additional location fees.",
         },
         {
           icon: "Droplets",
@@ -4320,7 +4320,7 @@ const glassCityPages: GlassCityPageSeed[] = [
           icon: "MapPin",
           title: "Charlotte-Based, Regular Fort Mill Service",
           description:
-            "We're closer to Fort Mill than most Charlotte glass companies. Monroe is just across the state line, and Fort Mill is a regular part of our weekly schedule.",
+            "Fort Mill is a regular part of our weekly schedule from our South Charlotte home base, with no additional location fees.",
         },
         {
           icon: "BadgeCheck",
