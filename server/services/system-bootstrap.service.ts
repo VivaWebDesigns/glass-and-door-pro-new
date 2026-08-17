@@ -1,4 +1,5 @@
 import { logger } from "../utils/logger";
+import { ensureSystemBranding } from "./system-branding.service";
 import { ensureSystemCmsPages } from "./system-cms-pages.service";
 import { ensureSystemCmsMenus } from "./system-cms-menus.service";
 import { ensureSystemCmsSections } from "./system-cms-sections.service";
@@ -9,6 +10,7 @@ import { ensureSystemForms } from "./system-forms.service";
 export async function runSystemBootstrap() {
   logger.app.info("Running system bootstrap");
 
+  await ensureSystemBranding();
   await ensureSystemCmsPages();
   await ensureSystemCmsMenus();
   await ensureSystemCmsSections();

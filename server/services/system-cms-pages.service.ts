@@ -284,18 +284,37 @@ const businessHoursReplacements = [
   ["7 AM to 6 PM", "7 AM to 7 PM"],
 ] as const;
 
-function updateBusinessHours(value: unknown): unknown {
+const businessAddressReplacements = [
+  [
+    "2341 Waverly Dr<br>Monroe, NC 28112",
+    "6135 Park South Drive<br>Suite 542<br>Charlotte, NC 28210",
+  ],
+  [
+    "2341 Waverly Dr\nMonroe, NC 28112",
+    "6135 Park South Drive\nSuite 542\nCharlotte, NC 28210",
+  ],
+  [
+    "2341 Waverly Dr, Monroe, NC 28112",
+    "6135 Park South Drive Suite 542, Charlotte, NC 28210",
+  ],
+] as const;
+
+function updateStoredBusinessDetails(value: unknown): unknown {
   if (typeof value === "string") {
-    return businessHoursReplacements.reduce(
+    const currentHours = businessHoursReplacements.reduce(
       (text, [currentHours, newHours]) => text.replaceAll(currentHours, newHours),
       value,
+    );
+    return businessAddressReplacements.reduce(
+      (text, [currentAddress, newAddress]) => text.replaceAll(currentAddress, newAddress),
+      currentHours,
     );
   }
 
   if (Array.isArray(value)) {
     let changed = false;
     const next = value.map((item) => {
-      const updated = updateBusinessHours(item);
+      const updated = updateStoredBusinessDetails(item);
       if (updated !== item) changed = true;
       return updated;
     });
@@ -306,7 +325,7 @@ function updateBusinessHours(value: unknown): unknown {
     let changed = false;
     const next = Object.fromEntries(
       Object.entries(value).map(([key, item]) => {
-        const updated = updateBusinessHours(item);
+        const updated = updateStoredBusinessDetails(item);
         if (updated !== item) changed = true;
         return [key, updated];
       }),
@@ -369,9 +388,11 @@ async function normalizeStoredCmsPages() {
       updates.content = buildPrivacyPolicyContent();
     }
 
-    const contentWithCurrentHours = updateBusinessHours(updates.content ?? page.content);
-    if (contentWithCurrentHours !== (updates.content ?? page.content)) {
-      updates.content = contentWithCurrentHours as InsertCmsPage["content"];
+    const contentWithCurrentBusinessDetails = updateStoredBusinessDetails(
+      updates.content ?? page.content,
+    );
+    if (contentWithCurrentBusinessDetails !== (updates.content ?? page.content)) {
+      updates.content = contentWithCurrentBusinessDetails as InsertCmsPage["content"];
     }
 
     if (Object.keys(updates).length > 0) {

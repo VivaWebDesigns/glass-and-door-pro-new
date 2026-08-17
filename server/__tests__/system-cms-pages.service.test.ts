@@ -201,6 +201,43 @@ describe("ensureSystemCmsPages", () => {
     );
   });
 
+  it("updates the former business address in stored CMS content", async () => {
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "terms-id",
+        slug: "terms-of-service",
+        seoDescription: "Already clean.",
+        content: {
+          blocks: [
+            {
+              id: "terms",
+              type: "rich-text",
+              props: {
+                content:
+                  "Located at 2341 Waverly Dr, Monroe, NC 28112.<br>Glass &amp; Door Pro<br>2341 Waverly Dr<br>Monroe, NC 28112",
+              },
+            },
+          ],
+        },
+        updatedBy: "admin-id",
+      },
+    ]);
+    mockGetPageBySlug.mockResolvedValue(null);
+
+    const mod = await import("../services/system-cms-pages.service");
+    await mod.ensureSystemCmsPages();
+
+    expect(mockUpdatePage).toHaveBeenCalledTimes(1);
+    const [, update] = mockUpdatePage.mock.calls[0];
+    expect(update.content.blocks[0].props.content).toContain(
+      "6135 Park South Drive Suite 542, Charlotte, NC 28210",
+    );
+    expect(update.content.blocks[0].props.content).toContain(
+      "6135 Park South Drive<br>Suite 542<br>Charlotte, NC 28210",
+    );
+    expect(update.content.blocks[0].props.content).not.toContain("2341 Waverly");
+  });
+
   it("adds missing related services blocks to residential service pages", async () => {
     mockGetAllPages.mockResolvedValue([
       {
