@@ -3002,7 +3002,7 @@ function cityPageContent(props: {
         title: "Meet Doug Adams",
         alignment: "left",
         content:
-          "<p>I'm Doug, and I've been installing glass and doors in the Charlotte area for over 15 years. I started Glass and Door Pro because I wanted to do this the way I think it should be done: one craftsman, one project at a time, with the person who quotes the job actually being the person who shows up to install it.</p><p>Most of what I do is frameless shower doors, windows, and door installation, but I also handle everything from brand-new construction to historic homes — and the tricky, custom projects other contractors don't want to mess with are usually the ones I actually enjoy the most.</p><p>Based in Monroe. Serving Charlotte and surrounding areas. Saturday appointments available.</p>",
+          "<p>I'm Doug, and I've been installing glass and doors in the Charlotte area for over 15 years. I started Glass and Door Pro because I wanted to do this the way I think it should be done: one craftsman, one project at a time, with the person who quotes the job actually being the person who shows up to install it.</p><p>Most of what I do is frameless shower doors, windows, and door installation, but I also handle everything from brand-new construction to historic homes — and the tricky, custom projects other contractors don't want to mess with are usually the ones I actually enjoy the most.</p><p>Based in Charlotte. Serving the greater Charlotte metro and surrounding areas. Saturday appointments available.</p>",
         sectionBackgroundColor: "#f8fafc",
         sectionPaddingTop: "lg",
         sectionPaddingBottom: "lg",
@@ -3099,7 +3099,7 @@ const glassCityPages: GlassCityPageSeed[] = [
     path: "/service-areas/monroe",
     seoTitle: "Glass & Door Services in Monroe, NC | Glass & Door Pro",
     seoDescription:
-      "Monroe, NC's local glass and door company. Frameless showers, window installation, door installation, window repair, and commercial glass. Owner-operator with 15+ years of experience. Call (704) 771-6111.",
+      "Charlotte-based, owner-operated glass and door services for Monroe, NC. Frameless showers, windows, doors, repairs, and commercial glass. Call (704) 771-6111.",
     seoKeywords:
       "glass services Monroe NC, frameless shower doors Monroe NC, window installation Monroe NC, door installation Monroe NC, window repair Monroe NC",
     ogImageUrl: "/images/glass-door-pro/city-monroe-hero.webp",
@@ -3111,16 +3111,16 @@ const glassCityPages: GlassCityPageSeed[] = [
         imageUrl: "/images/glass-door-pro/city-monroe-hero.webp",
         imagePositionY: 45,
       },
-      introTitle: "Your Local Glass & Door Company in Monroe",
+      introTitle: "Charlotte-Based Glass & Door Service for Monroe",
       introContent:
-        "<p>Glass and Door Pro is based right here in Monroe. Doug Adams lives and works in Union County, and Monroe homeowners are some of our most valued clients — many have become repeat customers and personal friends.</p><p>Being local matters more than most people realize. When you call a Monroe-area company for a frameless shower install, you're not waiting for a Charlotte-based crew to fit you into a route. We answer the phone, get out for a quote quickly, and don't add a travel premium to Union County projects the way some competitors quietly do. We're also the only local glass and door specialist working Saturdays.</p><p>Whether you're remodeling a master bathroom in one of the newer subdivisions off Highway 74, repairing a foggy bedroom window in a 1990s home near Sun Valley, or replacing the entry door on a historic home near downtown Monroe, this is the kind of work I do every week.</p>",
+        "<p>Glass and Door Pro is based in Charlotte and serves Monroe and the surrounding Union County communities regularly. Monroe homeowners are some of our most valued clients, and many have become repeat customers and personal referrals.</p><p>Doug handles every quote, measurement, and installation personally. Monroe is part of our normal service area, so there are no added travel premiums for Union County projects. Same-week and Saturday appointments are often available.</p><p>Whether you're remodeling a master bathroom in one of the newer subdivisions off Highway 74, repairing a foggy bedroom window in a 1990s home near Sun Valley, or replacing the entry door on a historic home near downtown Monroe, this is the kind of work I do every week.</p>",
       benefitsTitle: "Why Monroe Homeowners Choose Glass and Door Pro",
       benefits: [
         {
           icon: "MapPin",
-          title: "Truly Local",
+          title: "Charlotte-Based, Serving Monroe",
           description:
-            "Based in Monroe, not Charlotte. Faster response, no travel surcharges, and a genuine personal stake in our reputation around town.",
+            "Monroe is a regular part of our Union County service area, with no travel surcharges and direct, owner-operated service from Doug.",
         },
         {
           icon: "User",
@@ -3224,7 +3224,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaHeading: "Ready to Get Started in Monroe?",
       ctaBody:
         "Call, text, or fill out the form for a free in-home quote. Doug will come out personally — and Saturday appointments are available.",
-      ctaFooter: "Mon–Sat: 7am – 7pm | Based in Monroe, NC",
+      ctaFooter: "Mon–Sat: 7am – 7pm | Charlotte-based, serving Monroe and Union County",
     }),
   },
   {
@@ -3233,7 +3233,7 @@ const glassCityPages: GlassCityPageSeed[] = [
     path: "/service-areas/charlotte",
     seoTitle: "Glass & Door Services in Charlotte, NC | Glass & Door Pro",
     seoDescription:
-      "Personal, owner-operated glass and door services for Charlotte, NC homeowners. Frameless showers, window installation, door installation, window repair, and commercial glass. 15+ years of experience. Call (704) 771-6111.",
+      "Charlotte-based, owner-operated glass and door company serving Charlotte, NC. Frameless showers, windows, doors, repairs, and commercial glass. Call (704) 771-6111.",
     seoKeywords:
       "glass services Charlotte NC, frameless shower doors Charlotte NC, window installation Charlotte NC, door installation Charlotte NC, window repair Charlotte NC",
     ogImageUrl: "/images/glass-door-pro/city-charlotte-hero.webp",
@@ -3241,13 +3241,13 @@ const glassCityPages: GlassCityPageSeed[] = [
       hero: {
         heading: "Glass & Door Services in Charlotte, NC",
         subheading:
-          "Personal, owner-operated frameless shower doors, window and door installation, window repair, and commercial glass — for homeowners and businesses throughout Charlotte, NC. 15+ years of experience. Saturday appointments available.",
+          "Charlotte-based, owner-operated frameless shower doors, window and door installation, window repair, and commercial glass. 15+ years of experience. Saturday appointments available.",
         imageUrl: "/images/glass-door-pro/city-charlotte-hero.webp",
         imagePositionY: 45,
       },
-      introTitle: "Personal Service for Charlotte Homeowners",
+      introTitle: "Your Charlotte-Based Glass & Door Company",
       introContent:
-        "<p>Charlotte has no shortage of glass and door companies — but most of them have something in common: when you call, you talk to a salesperson. When the crew shows up, they're subcontractors. When something needs follow-up, you're calling a 1-800 number.</p><p>Glass and Door Pro is different. I'm Doug — owner, operator, and the person who'll actually come measure your project, plan it with you, and install it myself. I've been doing this work in the greater Charlotte area for 15+ years, and the reason I keep getting referrals is simple: the person who quotes the job is the person who does the job.</p><p>We're based in South Charlotte, and the greater Charlotte metro is our primary service area. Whether you're remodeling a master bathroom in SouthPark, replacing a foggy bedroom window in NoDa, or putting a new entry door on a craftsman bungalow in Dilworth, this is the work I do every week.</p>",
+        "<p>Glass and Door Pro is based in South Charlotte, with a business address at 6135 Park South Drive, Suite 542, Charlotte, NC 28210. Charlotte and the surrounding metro are our primary service area.</p><p>I'm Doug — owner, operator, and the person who'll actually come measure your project, plan it with you, and install it myself. I've been doing this work in the greater Charlotte area for 15+ years, and the reason I keep getting referrals is simple: the person who quotes the job is the person who does the job.</p><p>Whether you're remodeling a master bathroom in SouthPark, replacing a foggy bedroom window in NoDa, or putting a new entry door on a craftsman bungalow in Dilworth, this is the work I do every week. Saturday appointments are available.</p>",
       benefitsTitle: "Why Charlotte Homeowners Choose Glass and Door Pro",
       benefits: [
         {
@@ -3323,9 +3323,9 @@ const glassCityPages: GlassCityPageSeed[] = [
       faqTitle: "Frequently Asked Questions — Charlotte, NC",
       faqs: [
         {
-          question: "Do you actually come into Charlotte, or do you stay in Union County?",
+          question: "Where is Glass and Door Pro based?",
           answer:
-            "<p>We work throughout Charlotte regularly. Glass and Door Pro is based in Charlotte, and the greater Charlotte metro is our primary service area. We have clients across South Charlotte, Ballantyne, SouthPark, Myers Park, Dilworth, Cotswold, and most other Charlotte neighborhoods.</p>",
+            "<p>Glass and Door Pro is based in South Charlotte at 6135 Park South Drive, Suite 542, Charlotte, NC 28210. Charlotte and the greater Charlotte metro are our primary service area, including South Charlotte, Ballantyne, SouthPark, Myers Park, Dilworth, Cotswold, and surrounding neighborhoods.</p>",
         },
         {
           question: "Is there a travel fee for working in Charlotte?",
@@ -3362,7 +3362,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       ctaHeading: "Ready to Get Started in Charlotte?",
       ctaBody:
         "Call, text, or fill out the form for a free in-home quote. Doug will come out personally — and Saturday appointments are available.",
-      ctaFooter: "Mon–Sat: 7am – 7pm | Serving the greater Charlotte metro",
+      ctaFooter: "Mon–Sat: 7am – 7pm | Based in South Charlotte",
     }),
   },
   {

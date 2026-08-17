@@ -299,22 +299,108 @@ const businessAddressReplacements = [
   ],
 ] as const;
 
-function updateStoredBusinessDetails(value: unknown): unknown {
+type TextReplacement = readonly [string, string];
+
+const cityPositioningUpdates: Record<
+  string,
+  {
+    seoDescription: string;
+    legacySeoDescriptions: readonly string[];
+    replacements: readonly TextReplacement[];
+  }
+> = {
+  "areas-served-monroe-nc": {
+    seoDescription:
+      "Charlotte-based, owner-operated glass and door services for Monroe, NC. Frameless showers, windows, doors, repairs, and commercial glass. Call (704) 771-6111.",
+    legacySeoDescriptions: [
+      "Owner-operated glass and door services in Monroe, NC. Frameless showers, window installation, door installation and window repair by Doug.",
+      "Monroe, NC's local glass and door company. Frameless showers, window installation, door installation, window repair, and commercial glass. Owner-operator with 15+ years of experience. Call (704) 771-6111.",
+    ],
+    replacements: [
+      ["your Monroe-based owner-operator", "your Charlotte-based owner-operator"],
+      [
+        "Your Local Glass & Door Company in Monroe",
+        "Charlotte-Based Glass & Door Service for Monroe",
+      ],
+      [
+        "<p>Glass and Door Pro is based right here in Monroe. Doug Adams lives and works in Union County, and Monroe homeowners are some of our most valued clients — many have become repeat customers and personal friends.</p><p>Being local matters more than most people realize. When you call a Monroe-area company for a frameless shower install, you're not waiting for a Charlotte-based crew to fit you into a route. We answer the phone, get out for a quote quickly, and don't add a travel premium to Union County projects the way some competitors quietly do. We're also the only local glass and door specialist working Saturdays.</p><p>Whether you're remodeling a master bathroom in one of the newer subdivisions off Highway 74, repairing a foggy bedroom window in a 1990s home near Sun Valley, or replacing the entry door on a historic home near downtown Monroe, this is the kind of work I do every week.</p>",
+        "<p>Glass and Door Pro is based in Charlotte and serves Monroe and the surrounding Union County communities regularly. Monroe homeowners are some of our most valued clients, and many have become repeat customers and personal referrals.</p><p>Doug handles every quote, measurement, and installation personally. Monroe is part of our normal service area, so there are no added travel premiums for Union County projects. Same-week and Saturday appointments are often available.</p><p>Whether you're remodeling a master bathroom in one of the newer subdivisions off Highway 74, repairing a foggy bedroom window in a 1990s home near Sun Valley, or replacing the entry door on a historic home near downtown Monroe, this is the kind of work I do every week.</p>",
+      ],
+      ["Truly Local", "Charlotte-Based, Serving Monroe"],
+      [
+        "Based in Monroe, not Charlotte. Faster response, no travel surcharges, and a genuine personal stake in our reputation around town.",
+        "Monroe is a regular part of our Union County service area, with no travel surcharges and direct, owner-operated service from Doug.",
+      ],
+      [
+        "Based in Monroe. Serving Union County, Charlotte, and surrounding areas.",
+        "Based in Charlotte. Serving Monroe, Union County, and the greater Charlotte area.",
+      ],
+      ["Are you actually based in Monroe, NC?", "Do you still serve Monroe, NC?"],
+      [
+        "<p>Yes. Glass and Door Pro is based right here in Monroe. Doug lives and works in Union County, which means shorter response times for Monroe homeowners and a real local presence — not a Charlotte-based company driving an hour into Union County for a quote.</p>",
+        "<p>Yes. Monroe remains a regular part of our service area. Doug works throughout Union County, including Monroe, and handles every quote and installation personally.</p>",
+      ],
+      [
+        "Mon–Sat: 7am – 7pm | Based in Monroe, NC",
+        "Mon–Sat: 7am – 7pm | Charlotte-based, serving Monroe and Union County",
+      ],
+    ],
+  },
+  "areas-served-charlotte-nc": {
+    seoDescription:
+      "Charlotte-based, owner-operated glass and door company serving Charlotte, NC. Frameless showers, windows, doors, repairs, and commercial glass. Call (704) 771-6111.",
+    legacySeoDescriptions: [
+      "Owner-operated glass and door services in Charlotte, NC. Frameless showers, window installation, door installation and window repair by Doug.",
+      "Personal, owner-operated glass and door services for Charlotte, NC homeowners. Frameless showers, window installation, door installation, window repair, and commercial glass. 15+ years of experience. Call (704) 771-6111.",
+    ],
+    replacements: [
+      [
+        "Personal, owner-operated frameless shower doors, window and door installation, window repair, and commercial glass — for homeowners and businesses throughout Charlotte, NC.",
+        "Charlotte-based, owner-operated frameless shower doors, window and door installation, window repair, and commercial glass.",
+      ],
+      ["Owner-Operated Glass & Door Service in Charlotte", "Your Charlotte-Based Glass & Door Company"],
+      ["Personal Service for Charlotte Homeowners", "Your Charlotte-Based Glass & Door Company"],
+      [
+        "<p>Charlotte has no shortage of glass and door companies — but most of them have something in common: when you call, you talk to a salesperson. When the crew shows up, they're subcontractors. When something needs follow-up, you're calling a 1-800 number.</p><p>Glass and Door Pro is different. I'm Doug — owner, operator, and the person who'll actually come measure your project, plan it with you, and install it myself. I've been doing this work in the greater Charlotte area for 15+ years, and the reason I keep getting referrals is simple: the person who quotes the job is the person who does the job.</p><p>We're based in Monroe, just 30-40 minutes from most Charlotte addresses, and the greater Charlotte metro is our primary service area. Whether you're remodeling a master bathroom in SouthPark, replacing a foggy bedroom window in NoDa, or putting a new entry door on a craftsman bungalow in Dilworth, this is the work I do every week.</p>",
+        "<p>Glass and Door Pro is based in South Charlotte, with a business address at 6135 Park South Drive, Suite 542, Charlotte, NC 28210. Charlotte and the surrounding metro are our primary service area.</p><p>I'm Doug — owner, operator, and the person who'll actually come measure your project, plan it with you, and install it myself. I've been doing this work in the greater Charlotte area for 15+ years, and the reason I keep getting referrals is simple: the person who quotes the job is the person who does the job.</p><p>Whether you're remodeling a master bathroom in SouthPark, replacing a foggy bedroom window in NoDa, or putting a new entry door on a craftsman bungalow in Dilworth, this is the work I do every week. Saturday appointments are available.</p>",
+      ],
+      [
+        "Based in Monroe. Serving Charlotte and surrounding areas.",
+        "Based in Charlotte. Serving the greater Charlotte metro and surrounding areas.",
+      ],
+      ["Do you actually come into Charlotte, or do you stay in Union County?", "Where is Glass and Door Pro based?"],
+      [
+        "<p>We work throughout Charlotte regularly. Glass and Door Pro is based in Monroe, but the greater Charlotte metro is our primary service area. We have clients across South Charlotte, Ballantyne, SouthPark, Myers Park, Dilworth, Cotswold, and most other Charlotte neighborhoods. We're typically less than 40 minutes from any Charlotte address.</p>",
+        "<p>Glass and Door Pro is based in South Charlotte at 6135 Park South Drive, Suite 542, Charlotte, NC 28210. Charlotte and the greater Charlotte metro are our primary service area, including South Charlotte, Ballantyne, SouthPark, Myers Park, Dilworth, Cotswold, and surrounding neighborhoods.</p>",
+      ],
+      [
+        "Why would I choose a Monroe-based company over a Charlotte-based one?",
+        "Why choose Glass and Door Pro over a larger Charlotte glass company?",
+      ],
+      [
+        "<p>Three reasons most clients tell us. First, Doug personally handles every project — no sales reps, no subcontracted crews. Second, our pricing tends to be more competitive than the larger Charlotte shops because our overhead is lower. Third, Saturday availability — we work Monday through Saturday. The Monroe location is only a disadvantage if you assume we don't actually work in Charlotte, which we do, every week.</p>",
+        "<p>Three reasons most clients tell us. First, Doug personally handles every project — no sales reps, no subcontracted crews. Second, our pricing tends to be more competitive than larger shops because our overhead is lower. Third, Saturday availability — we work Monday through Saturday.</p>",
+      ],
+      [
+        "Mon–Sat: 7am – 7pm | Serving the greater Charlotte metro",
+        "Mon–Sat: 7am – 7pm | Based in South Charlotte",
+      ],
+    ],
+  },
+};
+
+function replaceStoredStrings(value: unknown, replacements: readonly TextReplacement[]): unknown {
   if (typeof value === "string") {
-    const currentHours = businessHoursReplacements.reduce(
-      (text, [currentHours, newHours]) => text.replaceAll(currentHours, newHours),
+    return replacements.reduce(
+      (text, [currentValue, newValue]) => text.replaceAll(currentValue, newValue),
       value,
-    );
-    return businessAddressReplacements.reduce(
-      (text, [currentAddress, newAddress]) => text.replaceAll(currentAddress, newAddress),
-      currentHours,
     );
   }
 
   if (Array.isArray(value)) {
     let changed = false;
     const next = value.map((item) => {
-      const updated = updateStoredBusinessDetails(item);
+      const updated = replaceStoredStrings(item, replacements);
       if (updated !== item) changed = true;
       return updated;
     });
@@ -325,7 +411,7 @@ function updateStoredBusinessDetails(value: unknown): unknown {
     let changed = false;
     const next = Object.fromEntries(
       Object.entries(value).map(([key, item]) => {
-        const updated = updateStoredBusinessDetails(item);
+        const updated = replaceStoredStrings(item, replacements);
         if (updated !== item) changed = true;
         return [key, updated];
       }),
@@ -334,6 +420,13 @@ function updateStoredBusinessDetails(value: unknown): unknown {
   }
 
   return value;
+}
+
+function updateStoredBusinessDetails(value: unknown): unknown {
+  return replaceStoredStrings(value, [
+    ...businessHoursReplacements,
+    ...businessAddressReplacements,
+  ]);
 }
 
 function shouldEnsureRelatedCommercialServicesBlock(content: unknown) {
@@ -386,6 +479,25 @@ async function normalizeStoredCmsPages() {
       JSON.stringify(page.content).includes(GLASS_PRIVACY_POLICY_LEGACY_MARKER)
     ) {
       updates.content = buildPrivacyPolicyContent();
+    }
+
+    const cityPositioningUpdate = cityPositioningUpdates[page.slug];
+    if (cityPositioningUpdate) {
+      const currentSeoDescription = updates.seoDescription ?? page.seoDescription;
+      if (
+        currentSeoDescription &&
+        cityPositioningUpdate.legacySeoDescriptions.includes(currentSeoDescription)
+      ) {
+        updates.seoDescription = cityPositioningUpdate.seoDescription;
+      }
+
+      const positionedContent = replaceStoredStrings(
+        updates.content ?? page.content,
+        cityPositioningUpdate.replacements,
+      );
+      if (positionedContent !== (updates.content ?? page.content)) {
+        updates.content = positionedContent as InsertCmsPage["content"];
+      }
     }
 
     const contentWithCurrentBusinessDetails = updateStoredBusinessDetails(
