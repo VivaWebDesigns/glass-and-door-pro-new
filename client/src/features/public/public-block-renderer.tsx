@@ -1,5 +1,6 @@
 import { useState, useEffect, lazy, Suspense, type MouseEvent, type ReactElement } from "react";
 import { useLocation } from "wouter";
+import { formatGlassReviewAge } from "@shared/glass-review-dates";
 import { Button } from "@/components/ui/button";
 import { FormModalButton } from "@/components/forms/form-modal-button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -281,7 +282,12 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
       </div>
       {isSplit && bg && !isGlassService && (
         <div className="hidden md:block absolute right-0 top-0 bottom-0 w-1/3">
-          <img src={bg} alt="" className="w-full h-full object-cover" style={{ objectPosition: `${bgPosX}% ${bgPosY}%` }} />
+          <img
+            src={bg}
+            alt=""
+            className="w-full h-full object-cover"
+            style={{ objectPosition: `${bgPosX}% ${bgPosY}%` }}
+          />
         </div>
       )}
     </section>
@@ -714,6 +720,7 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
     source?: string;
     sourceIcon?: string;
     date?: string;
+    reviewDate?: string;
   }>(props.items);
   const shouldCarousel = items.length > 2;
 
@@ -743,16 +750,17 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
   function SourceBadge({
     item,
   }: {
-    item: { source?: string; sourceIcon?: string; date?: string };
+    item: { source?: string; sourceIcon?: string; date?: string; reviewDate?: string };
   }) {
     const source = item.source || "Google";
     const showGoogleIcon = (item.sourceIcon || source).toLowerCase() === "google";
+    const reviewAge = formatGlassReviewAge(item.reviewDate, item.date);
 
     return (
       <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
         {showGoogleIcon ? <GoogleSourceIcon /> : null}
         {!showGoogleIcon ? <span>{source}</span> : null}
-        {item.date ? <span className="font-medium text-[#1a8ead]">· {item.date}</span> : null}
+        {reviewAge ? <span className="font-medium text-[#1a8ead]">· {reviewAge}</span> : null}
       </div>
     );
   }
@@ -767,6 +775,7 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
       source?: string;
       sourceIcon?: string;
       date?: string;
+      reviewDate?: string;
     },
     i: number,
   ) => (
@@ -1737,10 +1746,7 @@ const RENDERERS: Record<string, React.ComponentType<{ props: Record<string, unkn
   "protocol-builder": ProtocolBuilderBlock,
 };
 
-const DYNAMIC_BLOCK_TYPES = new Set([
-  "contact-form",
-  "form-embed",
-]);
+const DYNAMIC_BLOCK_TYPES = new Set(["contact-form", "form-embed"]);
 
 export function PublicBlockRenderer({
   block,

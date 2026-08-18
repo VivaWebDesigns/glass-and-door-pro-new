@@ -172,9 +172,7 @@ describe("ensureSystemCmsPages", () => {
               id: "faq",
               type: "faq",
               props: {
-                items: [
-                  { question: "When are you open?", answer: "Mon–Sat, 7am–6pm." },
-                ],
+                items: [{ question: "When are you open?", answer: "Mon–Sat, 7am–6pm." }],
               },
             },
             {
@@ -196,9 +194,7 @@ describe("ensureSystemCmsPages", () => {
     const [, update] = mockUpdatePage.mock.calls[0];
     expect(update.content.blocks[0]).toBe(unchangedBlock);
     expect(update.content.blocks[1].props.items[0].answer).toBe("Mon–Sat, 7am–7pm.");
-    expect(update.content.blocks[2].props.footerLine).toBe(
-      "Mon-Sat: 7am - 7pm | Charlotte, NC",
-    );
+    expect(update.content.blocks[2].props.footerLine).toBe("Mon-Sat: 7am - 7pm | Charlotte, NC");
   });
 
   it("updates the former business address in stored CMS content", async () => {
@@ -295,7 +291,8 @@ describe("ensureSystemCmsPages", () => {
               props: {
                 items: [
                   {
-                    question: "Do you actually come into Charlotte, or do you stay in Union County?",
+                    question:
+                      "Do you actually come into Charlotte, or do you stay in Union County?",
                     answer:
                       "<p>We work throughout Charlotte regularly. Glass and Door Pro is based in Monroe, but the greater Charlotte metro is our primary service area. We have clients across South Charlotte, Ballantyne, SouthPark, Myers Park, Dilworth, Cotswold, and most other Charlotte neighborhoods. We're typically less than 40 minutes from any Charlotte address.</p>",
                   },
@@ -368,7 +365,8 @@ describe("ensureSystemCmsPages", () => {
               id: "indian-trail-faq",
               type: "faq",
               props: {
-                question: "Are you actually based near Indian Trail, or do you come from Charlotte?",
+                question:
+                  "Are you actually based near Indian Trail, or do you come from Charlotte?",
               },
             },
           ],
@@ -534,16 +532,78 @@ describe("ensureSystemCmsPages", () => {
     expect(update.updatedBy).toBe("admin-id");
     expect(update.content.blocks[0]).toEqual(heroBlock);
     expect(update.content.blocks[2]).toEqual(faqBlock);
-    expect(update.content.blocks[1].props.cards.map((card: { link: string }) => card.link)).toEqual([
-      "/services/frameless-showers",
-      "/services/window-installation",
-      "/services/door-installation",
-      "/services/window-repair",
-      "/services/commercial-storefront-glass-installation",
-      "/services/commercial-storefront-glass-replacement-repair",
-      "/services/commercial-door-installation",
-      "/services/commercial-door-replacement-repair",
-      "/services/commercial-window-replacement",
+    expect(update.content.blocks[1].props.cards.map((card: { link: string }) => card.link)).toEqual(
+      [
+        "/services/frameless-showers",
+        "/services/window-installation",
+        "/services/door-installation",
+        "/services/window-repair",
+        "/services/commercial-storefront-glass-installation",
+        "/services/commercial-storefront-glass-replacement-repair",
+        "/services/commercial-door-installation",
+        "/services/commercial-door-replacement-repair",
+        "/services/commercial-window-replacement",
+      ],
+    );
+  });
+
+  it("syncs written Google reviews, dates, and the two newest homepage reviews", async () => {
+    const testimonialBlock = (items: Array<Record<string, unknown>>) => ({
+      id: "reviews",
+      type: "testimonials",
+      props: { anchorId: "reviews", items },
+    });
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "reviews-id",
+        slug: "reviews",
+        seoDescription: "Reviews.",
+        content: {
+          blocks: [
+            testimonialBlock([
+              { name: "Frankie23 “Patricia”", quote: "Removed review" },
+              { name: "Noah Clark", quote: "Existing Noah review" },
+              { name: "Tapan Patel", quote: "Removed review" },
+            ]),
+          ],
+        },
+        updatedBy: "admin-id",
+      },
+      {
+        id: "home-id",
+        slug: "home",
+        seoDescription: "Home.",
+        content: {
+          blocks: [testimonialBlock([{ name: "Noah Clark", quote: "Existing Noah review" }])],
+        },
+        updatedBy: "admin-id",
+      },
     ]);
+    mockGetPageBySlug.mockResolvedValue(null);
+
+    const mod = await import("../services/system-cms-pages.service");
+    await mod.ensureSystemCmsPages();
+
+    const reviewsUpdate = mockUpdatePage.mock.calls.find(([id]) => id === "reviews-id")?.[1];
+    const reviewItems = reviewsUpdate.content.blocks[0].props.items;
+    expect(reviewItems.slice(0, 5).map((item: { name: string }) => item.name)).toEqual([
+      "Lisa M",
+      "Konstantin Kozhemyakov",
+      "van orcutt",
+      "Jeff Zwally",
+      "Chuck Preslar",
+    ]);
+    expect(reviewItems.map((item: { name: string }) => item.name)).not.toContain(
+      "Frankie23 “Patricia”",
+    );
+    expect(reviewItems.map((item: { name: string }) => item.name)).not.toContain("Tapan Patel");
+    expect(reviewItems.find((item: { name: string }) => item.name === "Noah Clark")).toMatchObject({
+      reviewDate: "2026-07-07",
+    });
+
+    const homeUpdate = mockUpdatePage.mock.calls.find(([id]) => id === "home-id")?.[1];
+    expect(
+      homeUpdate.content.blocks[0].props.items.map((item: { name: string }) => item.name),
+    ).toEqual(["Lisa M", "Konstantin Kozhemyakov", "Noah Clark"]);
   });
 });

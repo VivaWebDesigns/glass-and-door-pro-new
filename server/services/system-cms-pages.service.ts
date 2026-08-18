@@ -2,6 +2,12 @@ import { randomUUID } from "crypto";
 import { storage } from "../storage";
 import { normalizeSeoDescription } from "@shared/seo-description";
 import { GLASS_HOMEPAGE_SERVICE_CARDS } from "@shared/glass-homepage-services";
+import { glassGoogleReviewDate } from "@shared/glass-review-dates";
+import {
+  GLASS_NEW_GOOGLE_REVIEWS,
+  GLASS_NEW_HOMEPAGE_REVIEWS,
+  RETIRED_GLASS_GOOGLE_REVIEW_NAMES,
+} from "@shared/glass-new-reviews";
 import {
   GLASS_PRIVACY_POLICY_HTML,
   GLASS_PRIVACY_POLICY_LEGACY_MARKER,
@@ -277,6 +283,51 @@ function ensureHomepageServiceCards(content: unknown) {
   return { ...content, blocks };
 }
 
+function ensureGoogleReviewItems(content: unknown, homepage: boolean) {
+  if (!isRecord(content) || !Array.isArray(content.blocks)) return null;
+
+  const testimonialIndex = content.blocks.findIndex(
+    (block) =>
+      isRecord(block) &&
+      block.type === "testimonials" &&
+      isRecord(block.props) &&
+      block.props.anchorId === "reviews",
+  );
+  if (testimonialIndex < 0) return null;
+
+  const testimonialBlock = content.blocks[testimonialIndex];
+  if (!isRecord(testimonialBlock) || !isRecord(testimonialBlock.props)) return null;
+
+  const currentItems = Array.isArray(testimonialBlock.props.items)
+    ? testimonialBlock.props.items.filter(isRecord)
+    : [];
+  const featuredItems = homepage ? GLASS_NEW_HOMEPAGE_REVIEWS : GLASS_NEW_GOOGLE_REVIEWS;
+  const featuredNames = new Set(featuredItems.map((item) => item.name));
+  const retainedItems = currentItems
+    .filter((item) => {
+      const name = typeof item.name === "string" ? item.name : "";
+      return !featuredNames.has(name) && !RETIRED_GLASS_GOOGLE_REVIEW_NAMES.has(name);
+    })
+    .map((item) => {
+      const name = typeof item.name === "string" ? item.name : "";
+      const reviewDate = glassGoogleReviewDate(name);
+      return reviewDate && item.reviewDate !== reviewDate ? { ...item, reviewDate } : item;
+    });
+  const items = [...featuredItems, ...retainedItems];
+
+  if (JSON.stringify(items) === JSON.stringify(currentItems)) return null;
+
+  const blocks = [...content.blocks];
+  blocks[testimonialIndex] = {
+    ...testimonialBlock,
+    props: {
+      ...testimonialBlock.props,
+      items,
+    },
+  };
+  return { ...content, blocks };
+}
+
 const businessHoursReplacements = [
   ["7am - 6pm", "7am - 7pm"],
   ["7am – 6pm", "7am – 7pm"],
@@ -289,14 +340,8 @@ const businessAddressReplacements = [
     "2341 Waverly Dr<br>Monroe, NC 28112",
     "6135 Park South Drive<br>Suite 542<br>Charlotte, NC 28210",
   ],
-  [
-    "2341 Waverly Dr\nMonroe, NC 28112",
-    "6135 Park South Drive\nSuite 542\nCharlotte, NC 28210",
-  ],
-  [
-    "2341 Waverly Dr, Monroe, NC 28112",
-    "6135 Park South Drive Suite 542, Charlotte, NC 28210",
-  ],
+  ["2341 Waverly Dr\nMonroe, NC 28112", "6135 Park South Drive\nSuite 542\nCharlotte, NC 28210"],
+  ["2341 Waverly Dr, Monroe, NC 28112", "6135 Park South Drive Suite 542, Charlotte, NC 28210"],
 ] as const;
 
 type TextReplacement = readonly [string, string];
@@ -358,7 +403,10 @@ const cityPositioningUpdates: Record<
         "Personal, owner-operated frameless shower doors, window and door installation, window repair, and commercial glass — for homeowners and businesses throughout Charlotte, NC.",
         "Charlotte-based, owner-operated frameless shower doors, window and door installation, window repair, and commercial glass.",
       ],
-      ["Owner-Operated Glass & Door Service in Charlotte", "Your Charlotte-Based Glass & Door Company"],
+      [
+        "Owner-Operated Glass & Door Service in Charlotte",
+        "Your Charlotte-Based Glass & Door Company",
+      ],
       ["Personal Service for Charlotte Homeowners", "Your Charlotte-Based Glass & Door Company"],
       [
         "<p>Charlotte has no shortage of glass and door companies — but most of them have something in common: when you call, you talk to a salesperson. When the crew shows up, they're subcontractors. When something needs follow-up, you're calling a 1-800 number.</p><p>Glass and Door Pro is different. I'm Doug — owner, operator, and the person who'll actually come measure your project, plan it with you, and install it myself. I've been doing this work in the greater Charlotte area for 15+ years, and the reason I keep getting referrals is simple: the person who quotes the job is the person who does the job.</p><p>We're based in Monroe, just 30-40 minutes from most Charlotte addresses, and the greater Charlotte metro is our primary service area. Whether you're remodeling a master bathroom in SouthPark, replacing a foggy bedroom window in NoDa, or putting a new entry door on a craftsman bungalow in Dilworth, this is the work I do every week.</p>",
@@ -368,7 +416,10 @@ const cityPositioningUpdates: Record<
         "Based in Monroe. Serving Charlotte and surrounding areas.",
         "Based in Charlotte. Serving the greater Charlotte metro and surrounding areas.",
       ],
-      ["Do you actually come into Charlotte, or do you stay in Union County?", "Where is Glass and Door Pro based?"],
+      [
+        "Do you actually come into Charlotte, or do you stay in Union County?",
+        "Where is Glass and Door Pro based?",
+      ],
       [
         "<p>We work throughout Charlotte regularly. Glass and Door Pro is based in Monroe, but the greater Charlotte metro is our primary service area. We have clients across South Charlotte, Ballantyne, SouthPark, Myers Park, Dilworth, Cotswold, and most other Charlotte neighborhoods. We're typically less than 40 minutes from any Charlotte address.</p>",
         "<p>Glass and Door Pro is based in South Charlotte at 6135 Park South Drive, Suite 542, Charlotte, NC 28210. Charlotte and the greater Charlotte metro are our primary service area, including South Charlotte, Ballantyne, SouthPark, Myers Park, Dilworth, Cotswold, and surrounding neighborhoods.</p>",
@@ -538,6 +589,14 @@ async function normalizeStoredCmsPages() {
 
     if (page.slug === "home") {
       const content = ensureHomepageServiceCards(page.content);
+      if (content) updates.content = content as InsertCmsPage["content"];
+
+      const contentWithReviews = ensureGoogleReviewItems(updates.content ?? page.content, true);
+      if (contentWithReviews) updates.content = contentWithReviews as InsertCmsPage["content"];
+    }
+
+    if (page.slug === "reviews") {
+      const content = ensureGoogleReviewItems(page.content, false);
       if (content) updates.content = content as InsertCmsPage["content"];
     }
 

@@ -2,12 +2,15 @@ import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
 import { PublicPageRenderer } from "@/features/public/public-block-renderer";
 import type { BlockInstance } from "@/features/admin/cms/builder/block-registry";
+import { glassGoogleReviewDate } from "@shared/glass-review-dates";
+import { GLASS_NEW_GOOGLE_REVIEWS } from "@shared/glass-new-reviews";
 
 function googleReview(name: string, date: string, quote: string) {
   return {
     quote,
     name,
     date,
+    reviewDate: glassGoogleReviewDate(name),
     role: "Customer",
     location: "Google review",
     rating: 5,
@@ -17,12 +20,12 @@ function googleReview(name: string, date: string, quote: string) {
 }
 
 const reviewItems = [
+  ...GLASS_NEW_GOOGLE_REVIEWS,
   googleReview(
-    "Frankie23 “Patricia”",
-    "a week ago",
-    "I've been finding it very difficult to find good, reliable people for certain renovations. Doug, however, exceeded my expectations by miles. His talent for attention to meticulous details is very impressive. His love and pride for what he does shows through his work, which is immaculate. Not to mention he is just a very nice guy who actually listens and caters to you even if you aren't sure of what you need/want, per se. Extremely communicative and patient. 10/10. Good job and Thank You!",
+    "Mike Capuano",
+    "2 weeks ago",
+    "Fast response, Great communication. Quality work. Would call again.",
   ),
-  googleReview("Mike Capuano", "2 weeks ago", "Fast response, Great communication. Quality work. Would call again."),
   googleReview(
     "Jvarr",
     "2 weeks ago",
@@ -43,7 +46,11 @@ const reviewItems = [
     "a month ago",
     "Doug with Glass and Door Pro is excellent! I broke a piece in my window and I couldn't get my window to open or close. I called Doug on Monday morning and he came out right away. He had all the supplies he needed and sent me texts to let me know the next steps.",
   ),
-  googleReview("Holly Widders", "a month ago", "He did a fantastic job! Our sliding glass door works better than ever now!"),
+  googleReview(
+    "Holly Widders",
+    "a month ago",
+    "He did a fantastic job! Our sliding glass door works better than ever now!",
+  ),
   googleReview(
     "Derick Pope",
     "a month ago",
@@ -99,25 +106,36 @@ const reviewItems = [
     "7 months ago",
     "Doug helped us to replace a window and install a storm door. He provided exceptional service throughout the entire process, and I highly recommend Glass and Door Pro.",
   ),
-  googleReview("Andrey Bayrashev", "9 months ago", "Great work installing our broken window, with great quality and at affordable price!"),
+  googleReview(
+    "Andrey Bayrashev",
+    "9 months ago",
+    "Great work installing our broken window, with great quality and at affordable price!",
+  ),
   googleReview(
     "Ryan Billingsley",
     "10 months ago",
     "Doug installed a new front door and storm door on our house. Due to the extreme temperatures, the door had swollen and was not functioning properly. Called Doug and he came out quickly to get it sorted.",
   ),
-  googleReview("Tapan Patel", "10 months ago", "Pro."),
   googleReview(
     "Arlie Gunn",
     "a year ago",
     "These guys were friendly and professional and also showed up to help last minute!!! I was in a tough spot and they showed up with smiles on their faces and helped me out no problem. Also the pricing is fair and very affordable.",
   ),
-  googleReview("Hardcor Coleman", "a year ago", "Great experience job was done quick and efficient. Plus a good guy will definitely recommend."),
+  googleReview(
+    "Hardcor Coleman",
+    "a year ago",
+    "Great experience job was done quick and efficient. Plus a good guy will definitely recommend.",
+  ),
   googleReview(
     "Samantha Walsh",
     "a year ago",
     "Doug was amazing with our major window issues. He was prompt and professional and very communicative. He helped alleviate a lot of stress and has been our go to ever since. I have to say not only is the quality top notch but his pricing was the most reasonable in town! Would recommend him 10x over!!",
   ),
-  googleReview("Dennis “AusareOne” Stevens", "a year ago", "Excellent work I highly recommend him. 100%."),
+  googleReview(
+    "Dennis “AusareOne” Stevens",
+    "a year ago",
+    "Excellent work I highly recommend him. 100%.",
+  ),
   googleReview(
     "Thomas Foy",
     "a year ago",
@@ -148,7 +166,11 @@ const reviewItems = [
     "a year ago",
     "Doug is a great, honest and hard working gentleman. Based on his hard work I suggested him to keep working with great manufacturers to match his valuable work.",
   ),
-  googleReview("Sheila Ellsaesser", "a year ago", "This was a great experience. Very detailed, professional."),
+  googleReview(
+    "Sheila Ellsaesser",
+    "a year ago",
+    "This was a great experience. Very detailed, professional.",
+  ),
   googleReview(
     "cookiemclaughlin",
     "a year ago",
@@ -169,7 +191,11 @@ const reviewItems = [
     "2 years ago",
     "Replaced a back door and frame that was rotting out. Did an excellent job with a quality door and frame. Punctual, professional, economical!",
   ),
-  googleReview("G. Scott Denton", "2 years ago", "Doug was simply fantastic. Very thorough and the shower glass turned out amazing! Highly recommend!"),
+  googleReview(
+    "G. Scott Denton",
+    "2 years ago",
+    "Doug was simply fantastic. Very thorough and the shower glass turned out amazing! Highly recommend!",
+  ),
   googleReview(
     "T Woods",
     "2 years ago",
@@ -185,7 +211,11 @@ const reviewItems = [
     "2 years ago",
     "Very knowledgeable, knew exactly what to do and was both personable and professional. Plus he cleaned up after he completed the job and everything looked great! Thanks Doug for fixing our shower door!",
   ),
-  googleReview("Mindy Bass", "2 years ago", "Doug came the next day and took precise measurements. Very courteous, professional with very reasonable prices."),
+  googleReview(
+    "Mindy Bass",
+    "2 years ago",
+    "Doug came the next day and took precise measurements. Very courteous, professional with very reasonable prices.",
+  ),
   googleReview(
     "Donna Kelly",
     "2 years ago",
@@ -197,7 +227,11 @@ const reviewItems = [
     "3 years ago",
     "A stone broke our sliding glass door glass. Doug came, measured, and gave us the quote. Within a week he came and installed the glass. Extremely nice, knowledgeable, honest and reasonable. I highly recommend him.",
   ),
-  googleReview("Matthew Berti", "3 years ago", "Door came out great and finished off our new shower."),
+  googleReview(
+    "Matthew Berti",
+    "3 years ago",
+    "Door came out great and finished off our new shower.",
+  ),
   googleReview(
     "Will Friedrich",
     "3 years ago",
@@ -208,8 +242,16 @@ const reviewItems = [
     "3 years ago",
     "Doug was quick to respond, very professional, and affordable!! We were extremely pleased with the service and will def call him if we need any other window repairs!",
   ),
-  googleReview("Travis Dixon", "3 years ago", "Had a glass shower door installed, did fantastic work and very easy to work with, and communicated every step of the way."),
-  googleReview("William Owens", "3 years ago", "First very kind respectful. His work was quick but professional experience."),
+  googleReview(
+    "Travis Dixon",
+    "3 years ago",
+    "Had a glass shower door installed, did fantastic work and very easy to work with, and communicated every step of the way.",
+  ),
+  googleReview(
+    "William Owens",
+    "3 years ago",
+    "First very kind respectful. His work was quick but professional experience.",
+  ),
   googleReview(
     "JOSEPH PETRILLI",
     "3 years ago",
@@ -230,7 +272,11 @@ const reviewItems = [
     "4 years ago",
     "He responded quickly to my call and was very flexible with times. He is extremely professional and was so personable and kind. The workmanship is very precise and the damaged area looks like new. I would highly recommend him to anyone.",
   ),
-  googleReview("Kristy Compton", "4 years ago", "Doug did an AMAZING job!! Very meticulous and made sure it was done right. Will definitely use again and highly recommend."),
+  googleReview(
+    "Kristy Compton",
+    "4 years ago",
+    "Doug did an AMAZING job!! Very meticulous and made sure it was done right. Will definitely use again and highly recommend.",
+  ),
   googleReview(
     "Jyotirmoy Banerjee",
     "4 years ago",
@@ -256,8 +302,16 @@ const reviewItems = [
     "4 years ago",
     "Doug was great from beginning to end! He kept and maintained communication from beginning to end. Instead of replacing a door, he was able to repair it and fix a leak problem with the door. Great work.",
   ),
-  googleReview("Jennifer Barber", "4 years ago", "He did a very professional job. When he finished the door repair it was not like it was ever broken."),
-  googleReview("Custodio Benitez", "4 years ago", "Did a great job. I recommend him to anybody that needs a window fix and glass job."),
+  googleReview(
+    "Jennifer Barber",
+    "4 years ago",
+    "He did a very professional job. When he finished the door repair it was not like it was ever broken.",
+  ),
+  googleReview(
+    "Custodio Benitez",
+    "4 years ago",
+    "Did a great job. I recommend him to anybody that needs a window fix and glass job.",
+  ),
   googleReview(
     "Mary Beth Roth",
     "4 years ago",
@@ -295,7 +349,8 @@ const blocks: BlockInstance[] = [
       ctaSecondaryAction: "form-modal",
       ctaSecondaryFormSlug: "contact-form",
       ctaSecondaryModalTitle: "Request a Free Estimate",
-      ctaSecondaryModalDescription: "Share a few project details and Doug will follow up with next steps.",
+      ctaSecondaryModalDescription:
+        "Share a few project details and Doug will follow up with next steps.",
       backgroundImageUrl: "/images/glass-door-pro/reviews-hero-1920w.webp",
       overlayColor: "#0f172a",
       overlayOpacity: 18,

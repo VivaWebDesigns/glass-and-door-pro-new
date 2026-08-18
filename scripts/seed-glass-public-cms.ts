@@ -10,6 +10,8 @@ import type {
 } from "../shared/schema";
 import { GLASS_HOMEPAGE_SERVICE_CARDS } from "../shared/glass-homepage-services";
 import { GLASS_PRIVACY_POLICY_HTML } from "../shared/glass-privacy-policy";
+import { glassGoogleReviewDate } from "../shared/glass-review-dates";
+import { GLASS_NEW_GOOGLE_REVIEWS } from "../shared/glass-new-reviews";
 
 function uid() {
   return randomUUID();
@@ -43,6 +45,7 @@ function googleReview(name: string, quote: string) {
   return {
     quote,
     name,
+    reviewDate: glassGoogleReviewDate(name),
     role: "Customer",
     location: "Google review",
     rating: 5,
@@ -51,33 +54,8 @@ function googleReview(name: string, quote: string) {
   };
 }
 
-const glassReviewItems = [
-  googleReview(
-    "Noah Clark",
-    "Great experience, made sure the job was done correctly and explained different options allowing us to make an informed decision.",
-  ),
-  googleReview(
-    "RTrish",
-    "Overpriced. Called to request a sliding glass door repair. Doug responded quickly. He was very courteous, prompt and had the issue fixed in a timely manner. Thankfully, the screen was just off track. All went well, but it did seem a little pricey.",
-  ),
-  googleReview(
-    "Mike O'Sullivan",
-    "Reasonable price. My custom double-pane glass window needed to be replaced. Everything was done exactly on time, and the glass was carefully installed. Good as new!",
-  ),
-  googleReview("K. Z.", "Very helpful to replace sliding door wheels!"),
-  googleReview("Chris Jones", "Great price."),
-  googleReview(
-    "Jacob Ellison",
-    "Great price. Came on time. Was professional and did an amazing install. Great price and great work.",
-  ),
-  googleReview(
-    "Eikon",
-    "They came and quickly installed two high quality storm doors the very next day after I called them. Both doors were exactly what I was looking for. Prompt and professional workmanship at a very reasonable price, highly recommended!",
-  ),
-  googleReview(
-    "Frankie23 “Patricia”",
-    "I've been finding it very difficult to find good, reliable people for certain renovations. Doug, however, exceeded my expectations by miles. His talent for attention to meticulous details is very impressive. His love and pride for what he does shows through his work, which is immaculate. Not to mention he is just a very nice guy who actually listens and caters to you even if you aren't sure of what you need/want, per se. Extremely communicative and patient. 10/10. Good job and Thank You!",
-  ),
+export const glassReviewItems = [
+  ...GLASS_NEW_GOOGLE_REVIEWS,
   googleReview(
     "Mike Capuano",
     "Fast response, Great communication. Quality work. Would call again.",
@@ -154,7 +132,6 @@ const glassReviewItems = [
     "Ryan Billingsley",
     "Doug installed a new front door and storm door on our house. Due to the extreme temperatures, the door had swollen and was not functioning properly. Called Doug and he came out quickly to get it sorted.",
   ),
-  googleReview("Tapan Patel", "Pro."),
   googleReview(
     "Arlie Gunn",
     "These guys were friendly and professional and also showed up to help last minute!!! I was in a tough spot and they showed up with smiles on their faces and helped me out no problem. Also the pricing is fair and very affordable.",
@@ -449,7 +426,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
         sectionBackgroundColor: "#ffffff",
         sectionPaddingTop: "lg",
         sectionPaddingBottom: "lg",
-        items: glassReviewItems.slice(0, 6),
+        items: [...glassReviewItems.slice(0, 2), ...glassReviewItems.slice(11, 17)],
       },
     },
     {
