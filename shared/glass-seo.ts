@@ -6,6 +6,11 @@ export type JsonLdObject = Record<string, unknown>;
 export const GLASS_SITE_URL = "https://glassanddoorpro.com";
 export const GLASS_BUSINESS_ID = `${GLASS_SITE_URL}/#business`;
 export const GLASS_DEFAULT_OG_IMAGE = "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png";
+export const GLASS_LEGAL_NOINDEX_SLUGS = ["privacy-policy", "terms-of-service"] as const;
+
+export function isGlassLegalNoindexSlug(slug: string) {
+  return (GLASS_LEGAL_NOINDEX_SLUGS as readonly string[]).includes(slug);
+}
 
 const cityServiceOffers = [
   ["Frameless Shower Door Installation", "/services/frameless-showers"],

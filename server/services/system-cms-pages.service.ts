@@ -3,6 +3,7 @@ import { storage } from "../storage";
 import { normalizeSeoDescription } from "@shared/seo-description";
 import { GLASS_HOMEPAGE_SERVICE_CARDS } from "@shared/glass-homepage-services";
 import { glassGoogleReviewDate } from "@shared/glass-review-dates";
+import { isGlassLegalNoindexSlug } from "@shared/glass-seo";
 import {
   GLASS_NEW_GOOGLE_REVIEWS,
   GLASS_NEW_HOMEPAGE_REVIEWS,
@@ -574,11 +575,16 @@ async function normalizeStoredCmsPages() {
     const updates: {
       seoDescription?: string | null;
       content?: InsertCmsPage["content"];
+      noindex?: boolean;
       updatedBy?: string | null;
     } = {};
     const normalized = normalizeSeoDescription(page.seoDescription);
     if (normalized !== page.seoDescription) {
       updates.seoDescription = normalized;
+    }
+
+    if (isGlassLegalNoindexSlug(page.slug) && page.noindex !== true) {
+      updates.noindex = true;
     }
 
     const currentResidentialUrl = residentialServicePageUrlsBySlug[page.slug];
@@ -720,7 +726,7 @@ export async function ensureSystemCmsPages() {
         "Glass & Door Pro privacy policy, Charlotte glass company privacy, customer information",
       ogImageUrl: "",
       canonicalUrl: "",
-      noindex: false,
+      noindex: true,
       publishedAt: new Date(),
       scheduledAt: null,
       createdBy: null,
@@ -745,7 +751,7 @@ export async function ensureSystemCmsPages() {
         "Glass & Door Pro terms of service, Charlotte glass company terms, website terms",
       ogImageUrl: "",
       canonicalUrl: "",
-      noindex: false,
+      noindex: true,
       publishedAt: new Date(),
       scheduledAt: null,
       createdBy: null,

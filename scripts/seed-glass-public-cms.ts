@@ -12,6 +12,7 @@ import { GLASS_HOMEPAGE_SERVICE_CARDS } from "../shared/glass-homepage-services"
 import { GLASS_PRIVACY_POLICY_HTML } from "../shared/glass-privacy-policy";
 import { glassGoogleReviewDate } from "../shared/glass-review-dates";
 import { GLASS_NEW_GOOGLE_REVIEWS } from "../shared/glass-new-reviews";
+import { isGlassLegalNoindexSlug } from "../shared/glass-seo";
 
 function uid() {
   return randomUUID();
@@ -5193,7 +5194,7 @@ export async function seedGlassPublicCms() {
       "Glass & Door Pro privacy policy, Charlotte glass company privacy, customer information",
     ogImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
     canonicalUrl: "https://glassanddoorpro.com/privacy-policy",
-    noindex: false,
+    noindex: isGlassLegalNoindexSlug("privacy-policy"),
     publishedAt: new Date(),
   };
   const existingPrivacyPolicy = await storage.cmsPages.getPageBySlug("privacy-policy");
@@ -5222,7 +5223,7 @@ export async function seedGlassPublicCms() {
     seoKeywords: "Glass & Door Pro terms of service, Charlotte glass company terms, website terms",
     ogImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
     canonicalUrl: "https://glassanddoorpro.com/terms-of-service",
-    noindex: false,
+    noindex: isGlassLegalNoindexSlug("terms-of-service"),
     publishedAt: new Date(),
   };
   const existingTermsOfService = await storage.cmsPages.getPageBySlug("terms-of-service");

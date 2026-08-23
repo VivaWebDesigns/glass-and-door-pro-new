@@ -116,6 +116,48 @@ describe("ensureSystemCmsPages", () => {
     });
   });
 
+  it("noindexes existing privacy and terms pages", async () => {
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "privacy-id",
+        slug: "privacy-policy",
+        seoDescription: "Privacy description.",
+        noindex: false,
+        content: { blocks: [] },
+        updatedBy: "admin-id",
+      },
+      {
+        id: "terms-id",
+        slug: "terms-of-service",
+        seoDescription: "Terms description.",
+        noindex: false,
+        content: { blocks: [] },
+        updatedBy: "admin-id",
+      },
+    ]);
+    mockGetPageBySlug.mockImplementation(async (slug: string) => ({
+      id: `${slug}-id`,
+      slug,
+      status: "published",
+      noindex: slug === "privacy-policy" || slug === "terms-of-service",
+      content: { blocks: [] },
+      updatedBy: "admin-id",
+    }));
+
+    const mod = await import("../services/system-cms-pages.service");
+    await mod.ensureSystemCmsPages();
+
+    expect(mockUpdatePage).toHaveBeenCalledTimes(2);
+    expect(mockUpdatePage).toHaveBeenCalledWith("privacy-id", {
+      noindex: true,
+      updatedBy: "admin-id",
+    });
+    expect(mockUpdatePage).toHaveBeenCalledWith("terms-id", {
+      noindex: true,
+      updatedBy: "admin-id",
+    });
+  });
+
   it("replaces only the legacy Glass & Door Pro privacy policy", async () => {
     mockGetAllPages.mockResolvedValue([
       {

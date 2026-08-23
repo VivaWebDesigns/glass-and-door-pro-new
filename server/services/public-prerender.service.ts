@@ -11,6 +11,7 @@ import {
   getGlassServiceSocialMetadata,
   getCmsPublicPath,
   getCmsSlugForPublicPath,
+  isGlassLegalNoindexSlug,
   isGlassServicePageSlug,
 } from "@shared/glass-seo";
 import { storage } from "../storage";
@@ -78,12 +79,14 @@ const FALLBACK_STATIC_PAGES: Record<
     description:
       "Review how Glass & Door Pro handles contact form details, service inquiries, cookies, analytics, and customer records.",
     body: "Review how Glass & Door Pro handles contact form details, service inquiries, cookies, analytics, and customer records.",
+    noindex: true,
   },
   "/terms-of-service": {
     title: "Terms of Service",
     description:
       "Review the terms governing use of the Glass & Door Pro website, estimates, service information, third-party links, and site content.",
     body: "Review the terms governing use of the Glass & Door Pro website, estimates, service information, third-party links, and site content.",
+    noindex: true,
   },
   "/disclaimer": {
     title: "Disclaimer",
@@ -782,7 +785,11 @@ function buildCmsSnapshot(
     ogImageUrl:
       absoluteUrl(normalizedVisiblePage.ogImageUrl || seo?.defaultOgImageUrl, siteUrl) || null,
     twitterSite: socialOverride?.twitterSite || null,
-    robots: normalizedVisiblePage.noindex ? "noindex,nofollow" : null,
+    robots: normalizedVisiblePage.noindex
+      ? isGlassLegalNoindexSlug(normalizedVisiblePage.slug)
+        ? "noindex,follow"
+        : "noindex,nofollow"
+      : null,
     bodyHtml,
     cmsPage: normalizedVisiblePage,
     jsonLd: [
@@ -820,7 +827,7 @@ function buildFallbackSnapshot(
     description: fallback.description,
     canonicalUrl: pathname === "/" ? siteUrl : `${siteUrl}${pathname}`,
     ogImageUrl: absoluteUrl(seo?.defaultOgImageUrl, siteUrl) || null,
-    robots: fallback.noindex ? "noindex,nofollow" : null,
+    robots: fallback.noindex ? "noindex,follow" : null,
     bodyHtml: buildSimplePageBody(
       fallback.title,
       fallback.body,

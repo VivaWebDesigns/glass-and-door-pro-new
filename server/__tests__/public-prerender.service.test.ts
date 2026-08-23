@@ -111,6 +111,30 @@ describe("public-prerender.service", () => {
     expect(html).not.toContain("Meta Description:");
   });
 
+  it("emits noindex,follow for legal CMS pages and their fallbacks", async () => {
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      slug: "privacy-policy",
+      title: "Privacy Policy",
+      noindex: true,
+    });
+    const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } =
+      await import("../services/public-prerender.service");
+
+    const snapshot = await getPublicHtmlSnapshot("/privacy-policy");
+    const html = injectPublicHtmlSnapshot(
+      '<html><head><title>Default</title><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--><div id="root"></div></body></html>',
+      snapshot,
+    );
+
+    expect(snapshot?.robots).toBe("noindex,follow");
+    expect(html).toContain('<meta name="robots" content="noindex,follow" />');
+
+    mockGetPageBySlug.mockResolvedValue(undefined);
+    const fallbackSnapshot = await getPublicHtmlSnapshot("/terms-of-service");
+    expect(fallbackSnapshot?.robots).toBe("noindex,follow");
+  });
+
   it("emits CMS FAQPage schema and maps nested public routes to CMS slugs", async () => {
     mockGetSeo.mockResolvedValue({
       ...seoSettings,

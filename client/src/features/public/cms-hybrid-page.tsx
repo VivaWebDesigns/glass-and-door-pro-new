@@ -19,6 +19,7 @@ import {
   getGlassServiceSeoOverride,
   getGlassServiceSocialMetadata,
   getCmsPublicPath,
+  isGlassLegalNoindexSlug,
   isGlassServicePageSlug,
 } from "@shared/glass-seo";
 import { getPrerenderedCmsPage } from "@/lib/cms-prerender";
@@ -170,7 +171,7 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
     setLink("canonical", canonical);
 
     if (page.noindex) {
-      setMeta("robots", "noindex,nofollow");
+      setMeta("robots", isGlassLegalNoindexSlug(page.slug) ? "noindex,follow" : "noindex,nofollow");
     } else {
       removeMeta("robots");
     }

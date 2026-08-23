@@ -13,7 +13,7 @@ import setupRoutes from "./setup.routes";
 import formsRoutes from "./forms.routes";
 import { buildRobotsTxtPayload } from "../services/robots-txt.service";
 import { storage } from "../storage/index";
-import { getCmsPublicPath } from "@shared/glass-seo";
+import { getCmsPublicPath, isGlassLegalNoindexSlug } from "@shared/glass-seo";
 import { BRANDING_COLOR_DEFAULTS, resolveBrandingColor } from "@shared/branding-colors";
 import { resolveLocalUploadUrlOrFallback } from "../services/local-upload-storage";
 
@@ -193,7 +193,9 @@ export function registerApiRoutes(app: Express) {
       });
 
       for (const page of pages) {
-        if (page.status !== "published" || page.noindex) continue;
+        if (page.status !== "published" || page.noindex || isGlassLegalNoindexSlug(page.slug)) {
+          continue;
+        }
         if (
           [
             "home",
