@@ -1,6 +1,9 @@
 import sanitizeHtml from "sanitize-html";
 import type { CmsPage, SeoSettings } from "@shared/schema";
-import { GLASS_PRIMARY_SERVICE_AREAS } from "@shared/glass-service-areas";
+import {
+  GLASS_PRIMARY_SERVICE_AREAS,
+  GLASS_PRIMARY_SERVICE_AREA_NAMES,
+} from "@shared/glass-service-areas";
 import { normalizeSeoDescription } from "@shared/seo-description";
 import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
 import {
@@ -55,19 +58,18 @@ const FALLBACK_STATIC_PAGES: Record<
     title: "Gallery",
     description:
       "Browse recent frameless shower, glass, window, and door installation projects from Glass & Door Pro in the Charlotte area.",
-    body: "Browse recent Glass & Door Pro project photos, including frameless shower installations across Charlotte, Monroe, Indian Trail, and nearby communities.",
+    body: `Browse recent Glass & Door Pro project photos, including frameless shower installations across ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby communities.`,
   },
   "/reviews": {
     title: "Customer Reviews",
     description:
       "Read customer reviews for Glass & Door Pro glass, shower, window, door, and commercial glass work in the Charlotte area.",
-    body: "Read Glass & Door Pro customer reviews from homeowners and businesses across Charlotte, Monroe, Indian Trail, and nearby communities.",
+    body: `Read Glass & Door Pro customer reviews from homeowners and businesses across ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby communities.`,
   },
   "/services": {
     title: "Glass and Door Services",
-    description:
-      "Explore frameless showers, window installation, door installation, window repair, and commercial glass services from Glass & Door Pro in Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas.",
-    body: "Glass & Door Pro provides frameless shower doors, residential window installation, door installation, window repair, and commercial glass services across Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby communities.",
+    description: `Explore frameless showers, window installation, door installation, window repair, and commercial glass services from Glass & Door Pro in ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby areas.`,
+    body: `Glass & Door Pro provides frameless shower doors, residential window installation, door installation, window repair, and commercial glass services across ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby communities.`,
   },
   "/service-areas": {
     title: "Service Areas",

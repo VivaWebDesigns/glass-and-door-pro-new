@@ -3,6 +3,7 @@ import { BadgeCheck, Building2, DoorOpen, Grid3X3, Wrench, type LucideIcon } fro
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
+import { GLASS_PRIMARY_SERVICE_AREA_NAMES } from "@shared/glass-service-areas";
 
 type ServiceCard = {
   title: string;
@@ -14,13 +15,15 @@ type ServiceCard = {
 const residentialServices: ServiceCard[] = [
   {
     title: "Frameless Showers",
-    description: "Custom frameless shower doors and glass enclosures measured and installed personally.",
+    description:
+      "Custom frameless shower doors and glass enclosures measured and installed personally.",
     href: "/services/frameless-showers",
     icon: BadgeCheck,
   },
   {
     title: "Window Installation",
-    description: "Residential window installation and replacement for homes across the Charlotte area.",
+    description:
+      "Residential window installation and replacement for homes across the Charlotte area.",
     href: "/services/window-installation",
     icon: Grid3X3,
   },
@@ -32,7 +35,8 @@ const residentialServices: ServiceCard[] = [
   },
   {
     title: "Window Repair",
-    description: "Broken glass, foggy panes, seal failure, and glass-only replacement when possible.",
+    description:
+      "Broken glass, foggy panes, seal failure, and glass-only replacement when possible.",
     href: "/services/window-repair",
     icon: Wrench,
   },
@@ -55,13 +59,15 @@ const commercialServices: ServiceCard[] = [
   },
   {
     title: "Commercial Door Installation",
-    description: "Aluminum entry doors, glass storefront doors, and complete commercial entrance systems.",
+    description:
+      "Aluminum entry doors, glass storefront doors, and complete commercial entrance systems.",
     href: "/services/commercial-door-installation",
     icon: DoorOpen,
   },
   {
     title: "Commercial Door Replacement & Repair",
-    description: "Broken glass panels, hardware failure, misaligned frames, and worn closers repaired or replaced fast.",
+    description:
+      "Broken glass panels, hardware failure, misaligned frames, and worn closers repaired or replaced fast.",
     href: "/services/commercial-door-replacement-repair",
     icon: Wrench,
   },
@@ -90,14 +96,16 @@ export default function ServicesPage() {
                 Glass and Door Services
               </h1>
               <p className="mt-5 text-base leading-8 text-slate-600 sm:text-lg">
-                Frameless showers, residential windows, door installation, window repair, and commercial
-                glass and door services across Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and
+                Frameless showers, residential windows, door installation, window repair, and
+                commercial glass and door services across {GLASS_PRIMARY_SERVICE_AREA_NAMES}, and
                 nearby communities.
               </p>
             </div>
             {serviceGroups.map((serviceGroup) => (
               <section key={serviceGroup.title} className="mt-10">
-                <h2 className="font-heading text-2xl font-bold text-slate-900">{serviceGroup.title}</h2>
+                <h2 className="font-heading text-2xl font-bold text-slate-900">
+                  {serviceGroup.title}
+                </h2>
                 <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                   {serviceGroup.services.map((service) => {
                     const Icon = service.icon;
@@ -108,8 +116,12 @@ export default function ServicesPage() {
                         className="group rounded-lg bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
                       >
                         <Icon className="h-8 w-8 text-primary" aria-hidden="true" />
-                        <h3 className="mt-4 text-lg font-semibold text-slate-900">{service.title}</h3>
-                        <p className="mt-2 text-sm leading-6 text-slate-600">{service.description}</p>
+                        <h3 className="mt-4 text-lg font-semibold text-slate-900">
+                          {service.title}
+                        </h3>
+                        <p className="mt-2 text-sm leading-6 text-slate-600">
+                          {service.description}
+                        </p>
                         <span className="mt-5 inline-flex text-sm font-semibold text-primary group-hover:underline">
                           View service
                         </span>

@@ -4,7 +4,10 @@ import { normalizeSeoDescription } from "@shared/seo-description";
 import { GLASS_HOMEPAGE_SERVICE_CARDS } from "@shared/glass-homepage-services";
 import { glassGoogleReviewDate } from "@shared/glass-review-dates";
 import { isGlassLegalNoindexSlug } from "@shared/glass-seo";
-import { GLASS_PRIMARY_SERVICE_AREA_LINKS_HTML } from "@shared/glass-service-areas";
+import {
+  GLASS_PRIMARY_SERVICE_AREA_LINKS_HTML,
+  GLASS_PRIMARY_SERVICE_AREA_NAMES,
+} from "@shared/glass-service-areas";
 import {
   GLASS_NEW_GOOGLE_REVIEWS,
   GLASS_NEW_HOMEPAGE_REVIEWS,
@@ -588,6 +591,14 @@ const legacyServiceAreaListReplacements: TextReplacement[] = [
   GLASS_PRIMARY_SERVICE_AREA_LINKS_HTML,
 ]);
 
+const legacyPlainServiceAreaListReplacements: TextReplacement[] = [
+  "Charlotte, Monroe, Indian Trail, Stallings, Wesley Chapel, Waxhaw, Matthews, Weddington, Indian Land, Fort Mill, Pineville",
+  "Charlotte, Monroe, Indian Trail, Stallings, Wesley Chapel, Waxhaw, Matthews, Weddington, Pineville, Fort Mill, Indian Land",
+  "Charlotte, Monroe, Indian Trail, Matthews, Waxhaw",
+  "Monroe, Charlotte, Indian Trail, Matthews, Waxhaw",
+  "Charlotte, Monroe, Indian Trail",
+].map((list) => [list, GLASS_PRIMARY_SERVICE_AREA_NAMES]);
+
 function shouldEnsureRelatedCommercialServicesBlock(content: unknown) {
   if (!isRecord(content)) return false;
   const systemMeta = content._system ?? content.system;
@@ -702,6 +713,14 @@ async function normalizeStoredCmsPages() {
     );
     if (contentWithServiceAreaOrder !== (updates.content ?? page.content)) {
       updates.content = contentWithServiceAreaOrder as InsertCmsPage["content"];
+    }
+
+    const contentWithPlainServiceAreaOrder = replaceStoredStrings(
+      updates.content ?? page.content,
+      legacyPlainServiceAreaListReplacements,
+    );
+    if (contentWithPlainServiceAreaOrder !== (updates.content ?? page.content)) {
+      updates.content = contentWithPlainServiceAreaOrder as InsertCmsPage["content"];
     }
 
     if (Object.keys(updates).length > 0) {

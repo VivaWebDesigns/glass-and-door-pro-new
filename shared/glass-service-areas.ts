@@ -10,6 +10,10 @@ export const GLASS_PRIMARY_SERVICE_AREAS = [
   { label: "Indian Land", href: "/service-areas/indian-land" },
 ] as const;
 
+export const GLASS_PRIMARY_SERVICE_AREA_NAMES = GLASS_PRIMARY_SERVICE_AREAS.map(
+  ({ label }) => label,
+).join(", ");
+
 export const GLASS_PRIMARY_SERVICE_AREA_LINKS_HTML = GLASS_PRIMARY_SERVICE_AREAS.map(
   ({ label, href }) => `<a href="${href}">${label}</a>`,
 ).join(", ");

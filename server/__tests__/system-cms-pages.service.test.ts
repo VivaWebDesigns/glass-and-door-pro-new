@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { GLASS_PRIMARY_SERVICE_AREA_LINKS_HTML } from "@shared/glass-service-areas";
+import {
+  GLASS_PRIMARY_SERVICE_AREA_LINKS_HTML,
+  GLASS_PRIMARY_SERVICE_AREA_NAMES,
+} from "@shared/glass-service-areas";
 
 const mockGetPageBySlug = vi.fn();
 const mockGetAllPages = vi.fn();
@@ -31,6 +34,100 @@ describe("ensureSystemCmsPages", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetAllPages.mockResolvedValue([]);
+  });
+
+  it("updates homepage contact areas and services hero/CTA plain-text lists without altering other copy", async () => {
+    const pages = [
+      {
+        id: "home-id",
+        slug: "home",
+        seoDescription: null,
+        updatedBy: "editor",
+        content: {
+          blocks: [
+            {
+              id: "contact",
+              type: "contact-form",
+              props: {
+                heading: "Ready to start your project?",
+                contactItems: [
+                  {
+                    label: "Service Area",
+                    value:
+                      "Charlotte, Monroe, Indian Trail, Stallings, Wesley Chapel, Waxhaw, Matthews, Weddington, Indian Land, Fort Mill, Pineville",
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+      {
+        id: "services-id",
+        slug: "services",
+        seoDescription: null,
+        updatedBy: "editor",
+        content: {
+          blocks: [
+            {
+              id: "hero",
+              type: "hero",
+              props: {
+                heading: "Glass and Door Services",
+                subheading:
+                  "<p>Services across Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby communities.</p>",
+              },
+            },
+            {
+              id: "cta",
+              type: "cta",
+              props: {
+                subheading:
+                  "<p><strong>Mon-Sat: 7am - 7pm | Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas</strong></p>",
+              },
+            },
+            {
+              id: "custom",
+              type: "rich-text",
+              props: { content: "A project in Monroe. Another in Waxhaw." },
+            },
+          ],
+        },
+      },
+    ];
+    mockGetAllPages.mockResolvedValue(pages);
+    mockGetPageBySlug.mockResolvedValue({ content: { blocks: [] } });
+    const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
+    await ensureSystemCmsPages();
+    expect(mockUpdatePage).toHaveBeenCalledTimes(2);
+    const home = mockUpdatePage.mock.calls.find(([id]) => id === "home-id")![1];
+    expect(home.content.blocks[0].props.contactItems[0].value).toBe(
+      GLASS_PRIMARY_SERVICE_AREA_NAMES,
+    );
+    const services = mockUpdatePage.mock.calls.find(([id]) => id === "services-id")![1];
+    expect(services.content.blocks).toEqual([
+      {
+        ...pages[1].content.blocks[0],
+        props: {
+          heading: "Glass and Door Services",
+          subheading: `<p>Services across ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby communities.</p>`,
+        },
+      },
+      {
+        ...pages[1].content.blocks[1],
+        props: {
+          subheading: `<p><strong>Mon-Sat: 7am - 7pm | Serving ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby areas</strong></p>`,
+        },
+      },
+      pages[1].content.blocks[2],
+    ]);
+    mockUpdatePage.mockClear();
+    mockGetAllPages.mockResolvedValue([
+      { ...pages[0], ...home },
+      { ...pages[1], ...services },
+    ]);
+    await ensureSystemCmsPages();
+    expect(mockUpdatePage).not.toHaveBeenCalled();
   });
 
   it.each([

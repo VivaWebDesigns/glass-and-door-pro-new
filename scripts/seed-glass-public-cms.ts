@@ -17,6 +17,7 @@ import {
   GLASS_COMMERCIAL_LINKED_SERVICE_AREA_CONTENT,
   GLASS_LINKED_SERVICE_AREA_CONTENT,
   GLASS_PRIMARY_SERVICE_AREAS,
+  GLASS_PRIMARY_SERVICE_AREA_NAMES,
 } from "../shared/glass-service-areas";
 
 function uid() {
@@ -466,7 +467,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
           {
             icon: "MapPin",
             label: "Service Area",
-            value: "Charlotte, Monroe, Indian Trail, and the surrounding North Carolina area",
+            value: GLASS_PRIMARY_SERVICE_AREA_NAMES,
           },
           {
             icon: "Clock",
@@ -1517,7 +1518,7 @@ const glassServicesContent: InsertCmsPage["content"] = {
     serviceHero({
       heading: "Glass and Door Services",
       subheading:
-        "Frameless showers, residential windows, door installation, window repair, and commercial glass and door services across Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby communities.",
+        `Frameless showers, residential windows, door installation, window repair, and commercial glass and door services across ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby communities.`,
       imageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
       imageAlt: "Frameless glass shower and home glass services in the Charlotte area",
       imagePositionY: 42,
@@ -1623,7 +1624,7 @@ const glassServicesContent: InsertCmsPage["content"] = {
     quoteCtaBlock(
       "Ready to Get Started?",
       "Call, text, or fill out the form for a free quote. Doug will review the project personally and give you clear next steps.",
-      "Mon-Sat: 7am - 7pm | Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas",
+      `Mon-Sat: 7am - 7pm | Serving ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby areas`,
     ),
   ],
 };
