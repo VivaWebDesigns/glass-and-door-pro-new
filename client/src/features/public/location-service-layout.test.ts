@@ -26,4 +26,33 @@ describe("prepareLocationServiceBlocks", () => {
     });
     expect(blocks[0].props.anchorId).toBeUndefined();
   });
+
+  it("supports location headings without rewriting them", () => {
+    const blocks = [
+      {
+        id: "charlotte-intro",
+        type: "rich-text",
+        props: {
+          title: "Your Charlotte-Based Glass & Door Company",
+          content: "<p>Existing Charlotte copy.</p>",
+        },
+      },
+      {
+        id: "fort-mill-services",
+        type: "cards-grid",
+        props: {
+          title: "Our Services in Fort Mill, SC",
+          subtitle: "Existing Fort Mill copy.",
+        },
+      },
+    ] as BlockInstance[];
+
+    const prepared = prepareLocationServiceBlocks(blocks);
+
+    expect(prepared.map((block) => block.props.title)).toEqual([
+      "Your Charlotte-Based Glass & Door Company",
+      "Our Services in Fort Mill, SC",
+    ]);
+    expect(prepared[0].props.content).toBe("<p>Existing Charlotte copy.</p>");
+  });
 });

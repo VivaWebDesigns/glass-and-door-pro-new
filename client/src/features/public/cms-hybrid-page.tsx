@@ -238,7 +238,7 @@ export function CmsPageView({ page, globalSeo, previewLabel }: CmsPageViewProps)
   const heroBlocks = showSidebar && blocks[0] && /hero/i.test(blocks[0].type) ? [blocks[0]] : [];
   const contentBlocks = heroBlocks.length > 0 ? blocks.slice(1) : blocks;
   const isServiceDetailPage = isGlassServicePageSlug(page.slug);
-  const isIndianTrailLocationPage = page.slug === "service-areas-indian-trail";
+  const isLocationDetailPage = isServiceAreaPageSlug(page.slug);
 
   return (
     <div className="public-page-shell min-h-screen flex flex-col" data-testid="cms-public-page">
@@ -265,7 +265,7 @@ export function CmsPageView({ page, globalSeo, previewLabel }: CmsPageViewProps)
                 </div>
               </div>
             </>
-          ) : isIndianTrailLocationPage ? (
+          ) : isLocationDetailPage ? (
             <LocationServiceLayout blocks={blocks} galleryBlock={hiddenServiceAreaGallery} />
           ) : isServiceDetailPage ? (
             <ServiceEditorialLayout blocks={blocks} />

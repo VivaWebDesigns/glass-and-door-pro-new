@@ -115,9 +115,7 @@ export function LocationServiceLayout({
   const serviceBlock = pageBlocks.find(
     (block) => block.type === "cards-grid" && /^Our Services in /i.test(text(block.props.title)),
   );
-  const localIntroBlock = pageBlocks.find(
-    (block) => block.type === "rich-text" && /^Your Local /i.test(text(block.props.title)),
-  );
+  const localIntroBlock = pageBlocks.find((block) => block.type === "rich-text");
   const whyBlock = pageBlocks.find(
     (block) =>
       block.type === "cards-grid" &&
