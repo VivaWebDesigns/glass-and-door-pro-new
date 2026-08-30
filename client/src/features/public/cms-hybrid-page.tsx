@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import type { BlockInstance, BuilderContent } from "@/features/admin/cms/builder/block-registry";
 import type { CmsPage, SeoSettings } from "@shared/schema";
 import { normalizeSeoDescription } from "@shared/seo-description";
+import { correctGlassSearchTitle } from "@shared/glass-search-snippets";
 import { JsonLd } from "@/components/shared/json-ld";
 import { buildBreadcrumbLd, buildFaqPageLd, extractFaqItems } from "@/lib/structured-data";
 import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
@@ -120,7 +121,10 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
     const prevTitle = document.title;
     const seoOverride = getGlassServiceSeoOverride(page.slug);
     const socialOverride = getGlassServiceSocialMetadata(page.slug);
-    const effectiveTitle = seoOverride?.title || page.seoTitle || page.title;
+    const effectiveTitle = correctGlassSearchTitle(
+      page.slug,
+      seoOverride?.title || page.seoTitle || page.title,
+    );
     const titleSuffix = globalSeo?.titleSuffix ?? " | Glass & Door Pro";
     const titleFormatter =
       page.slug === "home" || isGlassServicePageSlug(page.slug)

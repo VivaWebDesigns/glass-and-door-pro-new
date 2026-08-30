@@ -238,7 +238,7 @@ const servicePageNames: Record<
     serviceType: "Door Installation",
     name: "Door Installation",
     seoTitle:
-      "Door Installation in Charlotte & Monroe, NC | Entry, Patio & Storm Doors | Glass and Door Pro",
+      "Door Installation in Charlotte, NC | Entry, Patio & Storm Doors | Glass and Door Pro",
     seoDescription:
       "Residential door installation for entry doors, patio doors, storm doors, and exterior doors across Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Call (704) 771-6111.",
     description:
@@ -258,7 +258,7 @@ const servicePageNames: Record<
     serviceType: "Window Repair",
     name: "Window Repair",
     seoTitle:
-      "Window Repair in Charlotte & Monroe, NC | Foggy Glass, Broken Seals & More | Glass and Door Pro",
+      "Window Repair in Charlotte, NC | Foggy Glass, Broken Seals & More | Glass and Door Pro",
     seoDescription:
       "Window repair for broken seals, foggy panes, failed IGUs, broken hardware, and cracked glass. Serving Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Call (704) 771-6111.",
     description:

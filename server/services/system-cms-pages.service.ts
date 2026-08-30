@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { storage } from "../storage";
 import { normalizeSeoDescription } from "@shared/seo-description";
+import { correctGlassSearchTitle } from "@shared/glass-search-snippets";
 import { GLASS_HOMEPAGE_SERVICE_CARDS } from "@shared/glass-homepage-services";
 import { glassGoogleReviewDate } from "@shared/glass-review-dates";
 import { isGlassLegalNoindexSlug } from "@shared/glass-seo";
@@ -624,11 +625,16 @@ async function normalizeStoredCmsPages() {
 
   for (const page of pages) {
     const updates: {
+      seoTitle?: string;
       seoDescription?: string | null;
       content?: InsertCmsPage["content"];
       noindex?: boolean;
       updatedBy?: string | null;
     } = {};
+    const correctedTitle = correctGlassSearchTitle(page.slug, page.seoTitle);
+    if (correctedTitle && correctedTitle !== page.seoTitle) {
+      updates.seoTitle = correctedTitle;
+    }
     const normalized = normalizeSeoDescription(page.seoDescription);
     if (normalized !== page.seoDescription) {
       updates.seoDescription = normalized;

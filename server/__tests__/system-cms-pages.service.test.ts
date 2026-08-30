@@ -31,6 +31,47 @@ vi.mock("../utils/logger", () => ({
 }));
 
 describe("ensureSystemCmsPages", () => {
+  it("migrates only requested search titles and preserves descriptions", async () => {
+    const slugs = [
+      "services",
+      "services-window-repair",
+      "services-door-installation",
+      "services-frameless-showers",
+    ];
+    const pages = slugs.map((slug) => ({
+      id: slug,
+      slug,
+      seoTitle: "Service in Charlotte & Monroe, NC",
+      seoDescription: "Original Charlotte and Monroe description.",
+      content: { blocks: [] },
+      updatedBy: "editor",
+    }));
+    mockGetAllPages.mockResolvedValue(pages);
+    mockGetPageBySlug.mockResolvedValue({ content: { blocks: [] } });
+    const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
+    await ensureSystemCmsPages();
+    expect(
+      mockUpdatePage.mock.calls.map(([id, update]) => [
+        id,
+        {
+          seoTitle: update.seoTitle,
+          updatedBy: update.updatedBy,
+        },
+      ]),
+    ).toEqual(
+      slugs.slice(0, 3).map((slug) => [
+        slug,
+        {
+          seoTitle: "Service in Charlotte, NC",
+          updatedBy: "editor",
+        },
+      ]),
+    );
+    mockUpdatePage.mock.calls.forEach(([, update]) => {
+      expect(update).not.toHaveProperty("seoDescription");
+    });
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetAllPages.mockResolvedValue([]);

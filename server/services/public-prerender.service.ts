@@ -5,6 +5,7 @@ import {
   GLASS_PRIMARY_SERVICE_AREA_NAMES,
 } from "@shared/glass-service-areas";
 import { normalizeSeoDescription } from "@shared/seo-description";
+import { correctGlassSearchTitle } from "@shared/glass-search-snippets";
 import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
 import {
   buildGlassBreadcrumbItems,
@@ -734,8 +735,10 @@ function buildCmsSnapshot(
   };
   const seoOverride = getGlassServiceSeoOverride(visiblePage.slug);
   const socialOverride = getGlassServiceSocialMetadata(visiblePage.slug);
-  const title =
-    seoOverride?.title || normalizedVisiblePage.seoTitle || normalizedVisiblePage.title || "Page";
+  const title = correctGlassSearchTitle(
+    visiblePage.slug,
+    seoOverride?.title || normalizedVisiblePage.seoTitle || normalizedVisiblePage.title,
+  ) || "Page";
   const description =
     seoOverride?.description ||
     normalizedVisiblePage.seoDescription ||

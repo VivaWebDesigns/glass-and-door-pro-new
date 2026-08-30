@@ -69,6 +69,22 @@ const cmsPage: CmsPage = {
 };
 
 describe("public-prerender.service", () => {
+  it("corrects the hub title without rewriting its description", async () => {
+    mockGetSeo.mockResolvedValue(seoSettings);
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      slug: "services",
+      seoTitle: "Glass and Door Services in Charlotte & Monroe, NC",
+      seoDescription: "Original description with Charlotte, Monroe and one phone: (704) 771-6111.",
+    });
+    const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
+    const snapshot = await getPublicHtmlSnapshot("/services");
+    expect(snapshot?.title).toBe("Glass & Door Pro | Glass and Door Services in Charlotte, NC");
+    expect(snapshot?.description).toBe(
+      "Original description with Charlotte, Monroe and one phone: (704) 771-6111.",
+    );
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetSeo.mockResolvedValue(seoSettings);

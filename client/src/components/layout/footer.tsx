@@ -1,5 +1,6 @@
 import { useMemo, type ReactNode } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { excludeServiceUtilitySnippets } from "@shared/glass-search-snippets";
 import { useQuery } from "@tanstack/react-query";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { useBranding } from "@/components/shared/branding-provider";
@@ -206,6 +207,7 @@ function ContactInfoItem({
 }
 
 export function Footer() {
+  const [location] = useLocation();
   const { frontendLogoUrl, companyAddress, companyName, companyPhoneNumbers } = useBranding();
   const { data: publicMenus } = useQuery<Partial<Record<PublicMenuLocation, CmsMenu>>>({
     queryKey: ["/api/cms/menus"],
@@ -267,7 +269,10 @@ export function Footer() {
 
   return (
     <footer className="border-t border-slate-800 bg-slate-900 text-slate-200" data-testid="footer">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12">
+      <div
+        data-nosnippet={excludeServiceUtilitySnippets(location) ? "" : undefined}
+        className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12"
+      >
         <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr_0.85fr_1.05fr] lg:gap-12">
           <div>
             <div className="mb-5 inline-flex bg-white p-1.5">

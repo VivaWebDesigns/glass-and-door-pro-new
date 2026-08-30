@@ -1,5 +1,6 @@
 import { useState, useEffect, lazy, Suspense, type MouseEvent, type ReactElement } from "react";
 import { useLocation } from "wouter";
+import { excludeServiceUtilitySnippets } from "@shared/glass-search-snippets";
 import { formatGlassReviewAge } from "@shared/glass-review-dates";
 import { Button } from "@/components/ui/button";
 import { FormModalButton } from "@/components/forms/form-modal-button";
@@ -138,6 +139,7 @@ function DynamicFallback() {
 }
 
 function HeroBlock({ props }: { props: Record<string, unknown> }) {
+  const [location] = useLocation();
   const bg = resolveCmsAssetUrl(str(props.backgroundImageUrl));
   const bgAlt = str(props.backgroundImageAlt) || str(props.imageAlt);
   const bgWidth = num(props.backgroundImageWidth as number, 0);
@@ -247,6 +249,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
           />
         )}
         <div
+          data-nosnippet={excludeServiceUtilitySnippets(location) ? "" : undefined}
           className={`flex flex-col gap-3 sm:flex-row sm:flex-wrap ${isSplit ? "sm:justify-start" : "sm:justify-center"}`}
         >
           {str(props.ctaText) && (
@@ -546,6 +549,7 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
 }
 
 function CtaBlock({ props }: { props: Record<string, unknown> }) {
+  const [location] = useLocation();
   const variant = str(props.variant) || "dark";
   const isGlassService =
     variant === "glass-service" ||
@@ -571,7 +575,10 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
           dangerouslySetInnerHTML={{ __html: str(props.subheading) }}
         />
       )}
-      <div className="flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">
+      <div
+        data-nosnippet={excludeServiceUtilitySnippets(location) ? "" : undefined}
+        className="flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap"
+      >
         {str(props.primaryText) && (
           <FormModalButton
             label={str(props.primaryText)}

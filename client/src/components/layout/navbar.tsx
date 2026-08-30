@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useBranding } from "@/components/shared/branding-provider";
 import type { CmsMenu, MenuItem, PublicMenuLocation } from "@shared/schema";
+import { excludeServiceUtilitySnippets } from "@shared/glass-search-snippets";
 
 const defaultNavLinks = [
   { label: "About", href: "/#about" },
@@ -203,7 +204,10 @@ export function Navbar() {
       className="sticky top-0 z-[999] border-b border-border/70 bg-white/95 shadow-sm backdrop-blur-xl"
       data-testid="navbar"
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2 sm:gap-6 sm:px-6">
+      <div
+        data-nosnippet={excludeServiceUtilitySnippets(location) ? "" : undefined}
+        className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2 sm:gap-6 sm:px-6"
+      >
         <Link href="/" data-testid="link-brand">
           <img src={brandLogo} alt={brandName} className="h-14 w-auto sm:h-16" />
         </Link>
