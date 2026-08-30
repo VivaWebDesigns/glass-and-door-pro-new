@@ -13,6 +13,11 @@ import { GLASS_PRIVACY_POLICY_HTML } from "../shared/glass-privacy-policy";
 import { glassGoogleReviewDate } from "../shared/glass-review-dates";
 import { GLASS_NEW_GOOGLE_REVIEWS } from "../shared/glass-new-reviews";
 import { isGlassLegalNoindexSlug } from "../shared/glass-seo";
+import {
+  GLASS_COMMERCIAL_LINKED_SERVICE_AREA_CONTENT,
+  GLASS_LINKED_SERVICE_AREA_CONTENT,
+  GLASS_PRIMARY_SERVICE_AREAS,
+} from "../shared/glass-service-areas";
 
 function uid() {
   return randomUUID();
@@ -852,11 +857,9 @@ type GlassServicePageSeed = {
   content: InsertCmsPage["content"];
 };
 
-const linkedServiceAreaContent =
-  '<p>We serve homeowners and businesses throughout the greater Charlotte metro area, including: <a href="/service-areas/charlotte">Charlotte</a>, <a href="/service-areas/monroe">Monroe</a>, <a href="/service-areas/indian-trail">Indian Trail</a>, <a href="/service-areas/stallings">Stallings</a>, <a href="/service-areas/wesley-chapel">Wesley Chapel</a>, <a href="/service-areas/waxhaw">Waxhaw</a>, <a href="/service-areas/matthews">Matthews</a>, <a href="/service-areas/weddington">Weddington</a>, <a href="/service-areas/pineville">Pineville</a>, <a href="/service-areas/fort-mill">Fort Mill</a>, <a href="/service-areas/indian-land">Indian Land</a>, and surrounding areas.</p>';
+const linkedServiceAreaContent = GLASS_LINKED_SERVICE_AREA_CONTENT;
 
-const commercialLinkedServiceAreaContent =
-  '<p>We serve businesses, property managers, general contractors, and commercial facilities throughout the greater Charlotte metro area, including <a href="/service-areas/charlotte">Charlotte</a>, <a href="/service-areas/matthews">Matthews</a>, <a href="/service-areas/indian-trail">Indian Trail</a>, <a href="/service-areas/monroe">Monroe</a>, <a href="/service-areas/waxhaw">Waxhaw</a>, <a href="/service-areas/fort-mill">Fort Mill</a>, <a href="/service-areas/indian-land">Indian Land</a>, <a href="/service-areas/pineville">Pineville</a>, <a href="/service-areas/weddington">Weddington</a>, <a href="/service-areas/wesley-chapel">Wesley Chapel</a>, <a href="/service-areas/stallings">Stallings</a>, and surrounding areas.</p>';
+const commercialLinkedServiceAreaContent = GLASS_COMMERCIAL_LINKED_SERVICE_AREA_CONTENT;
 
 function block(type: string, props: Record<string, unknown>) {
   return {
@@ -1292,8 +1295,7 @@ const month1FramelessContent: InsertCmsPage["content"] = {
     block("rich-text", {
       title: "Serving the Greater Charlotte Area",
       alignment: "center",
-      content:
-        '<p>We serve homeowners and businesses throughout the greater Charlotte metro area, including: <a href="/service-areas/charlotte">Charlotte</a>, <a href="/service-areas/monroe">Monroe</a>, <a href="/service-areas/indian-trail">Indian Trail</a>, <a href="/service-areas/stallings">Stallings</a>, <a href="/service-areas/wesley-chapel">Wesley Chapel</a>, <a href="/service-areas/waxhaw">Waxhaw</a>, <a href="/service-areas/matthews">Matthews</a>, <a href="/service-areas/weddington">Weddington</a>, <a href="/service-areas/pineville">Pineville</a>, <a href="/service-areas/fort-mill">Fort Mill</a>, <a href="/service-areas/indian-land">Indian Land</a>, and surrounding areas.</p>',
+      content: linkedServiceAreaContent,
       sectionBackgroundColor: "#ffffff",
       sectionPaddingTop: "md",
       sectionPaddingBottom: "md",
@@ -4570,19 +4572,11 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
           item("Commercial Window Replacement", "/services/commercial-window-replacement"),
         ]),
       ]),
-      item("Service Areas", "/service-areas/charlotte", [
-        item("Charlotte", "/service-areas/charlotte"),
-        item("Monroe", "/service-areas/monroe"),
-        item("Indian Trail", "/service-areas/indian-trail"),
-        item("Stallings", "/service-areas/stallings"),
-        item("Wesley Chapel", "/service-areas/wesley-chapel"),
-        item("Waxhaw", "/service-areas/waxhaw"),
-        item("Matthews", "/service-areas/matthews"),
-        item("Weddington", "/service-areas/weddington"),
-        item("Indian Land", "/service-areas/indian-land"),
-        item("Fort Mill", "/service-areas/fort-mill"),
-        item("Pineville", "/service-areas/pineville"),
-      ]),
+      item(
+        "Service Areas",
+        "/service-areas/charlotte",
+        GLASS_PRIMARY_SERVICE_AREAS.map(({ label, href }) => item(label, href)),
+      ),
       item("Gallery", "/gallery"),
       item("Reviews", "/reviews"),
       item("Contact", "/#contact"),
@@ -4620,17 +4614,7 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
     name: "Resources",
     location: "footer_resources",
     items: [
-      item("Charlotte", "/service-areas/charlotte"),
-      item("Monroe", "/service-areas/monroe"),
-      item("Indian Trail", "/service-areas/indian-trail"),
-      item("Stallings", "/service-areas/stallings"),
-      item("Wesley Chapel", "/service-areas/wesley-chapel"),
-      item("Waxhaw", "/service-areas/waxhaw"),
-      item("Matthews", "/service-areas/matthews"),
-      item("Weddington", "/service-areas/weddington"),
-      item("Indian Land", "/service-areas/indian-land"),
-      item("Fort Mill", "/service-areas/fort-mill"),
-      item("Pineville", "/service-areas/pineville"),
+      ...GLASS_PRIMARY_SERVICE_AREAS.map(({ label, href }) => item(label, href)),
       item("About Doug", "/#about"),
       item("Project Gallery", "/gallery"),
       item("Reviews", "/reviews"),
@@ -4683,19 +4667,11 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
           item("Commercial Window Replacement", "/services/commercial-window-replacement"),
         ]),
       ]),
-      item("Service Areas", "/service-areas/charlotte", [
-        item("Charlotte", "/service-areas/charlotte"),
-        item("Monroe", "/service-areas/monroe"),
-        item("Indian Trail", "/service-areas/indian-trail"),
-        item("Stallings", "/service-areas/stallings"),
-        item("Wesley Chapel", "/service-areas/wesley-chapel"),
-        item("Waxhaw", "/service-areas/waxhaw"),
-        item("Matthews", "/service-areas/matthews"),
-        item("Weddington", "/service-areas/weddington"),
-        item("Indian Land", "/service-areas/indian-land"),
-        item("Fort Mill", "/service-areas/fort-mill"),
-        item("Pineville", "/service-areas/pineville"),
-      ]),
+      item(
+        "Service Areas",
+        "/service-areas/charlotte",
+        GLASS_PRIMARY_SERVICE_AREAS.map(({ label, href }) => item(label, href)),
+      ),
       item("Gallery", "/gallery"),
       item("Reviews", "/reviews"),
       item("Contact", "/#contact"),

@@ -1,5 +1,6 @@
 import sanitizeHtml from "sanitize-html";
 import type { CmsPage, SeoSettings } from "@shared/schema";
+import { GLASS_PRIMARY_SERVICE_AREAS } from "@shared/glass-service-areas";
 import { normalizeSeoDescription } from "@shared/seo-description";
 import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
 import {
@@ -147,19 +148,7 @@ const COMMERCIAL_SERVICE_LINKS: PrerenderLink[] = [
   },
 ];
 
-const SERVICE_AREA_LINKS: PrerenderLink[] = [
-  { href: "/service-areas/charlotte", label: "Charlotte" },
-  { href: "/service-areas/monroe", label: "Monroe" },
-  { href: "/service-areas/indian-trail", label: "Indian Trail" },
-  { href: "/service-areas/stallings", label: "Stallings" },
-  { href: "/service-areas/wesley-chapel", label: "Wesley Chapel" },
-  { href: "/service-areas/waxhaw", label: "Waxhaw" },
-  { href: "/service-areas/matthews", label: "Matthews" },
-  { href: "/service-areas/weddington", label: "Weddington" },
-  { href: "/service-areas/indian-land", label: "Indian Land" },
-  { href: "/service-areas/fort-mill", label: "Fort Mill" },
-  { href: "/service-areas/pineville", label: "Pineville" },
-];
+const SERVICE_AREA_LINKS: PrerenderLink[] = [...GLASS_PRIMARY_SERVICE_AREAS];
 
 const LEGAL_LINKS: PrerenderLink[] = [
   { href: "/privacy-policy", label: "Privacy Policy" },

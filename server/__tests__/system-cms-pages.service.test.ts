@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { GLASS_PRIMARY_SERVICE_AREA_LINKS_HTML } from "@shared/glass-service-areas";
 
 const mockGetPageBySlug = vi.fn();
 const mockGetAllPages = vi.fn();
@@ -31,6 +32,84 @@ describe("ensureSystemCmsPages", () => {
     vi.clearAllMocks();
     mockGetAllPages.mockResolvedValue([]);
   });
+
+  it.each([
+    [
+      "Charlotte",
+      "Monroe",
+      "Indian Trail",
+      "Stallings",
+      "Wesley Chapel",
+      "Waxhaw",
+      "Matthews",
+      "Weddington",
+      "Pineville",
+      "Fort Mill",
+      "Indian Land",
+    ],
+    [
+      "Charlotte",
+      "Matthews",
+      "Indian Trail",
+      "Monroe",
+      "Waxhaw",
+      "Fort Mill",
+      "Indian Land",
+      "Pineville",
+      "Weddington",
+      "Wesley Chapel",
+      "Stallings",
+    ],
+  ])(
+    "migrates a published complete service-area list without changing other copy (%s)",
+    async (...labels) => {
+      const oldLinks = labels
+        .map(
+          (label) =>
+            `<a href="/service-areas/${label.toLowerCase().replaceAll(" ", "-")}">${label}</a>`,
+        )
+        .join(", ");
+      const page = {
+        id: "service-page-id",
+        slug: "services-frameless-showers",
+        seoDescription: null,
+        updatedBy: "admin-id",
+        content: {
+          blocks: [
+            {
+              id: "area-list",
+              type: "rich-text",
+              props: {
+                title: "Serving the Greater Charlotte Area",
+                content: `<p>Original introduction: ${oldLinks}, and surrounding areas.</p>`,
+                customCopy: "Monroe and Waxhaw projects remain welcome.",
+              },
+            },
+          ],
+        },
+      };
+      mockGetAllPages.mockResolvedValue([page]);
+      mockGetPageBySlug.mockResolvedValue({ content: { blocks: [] } });
+      const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
+      await ensureSystemCmsPages();
+
+      expect(mockUpdatePage).toHaveBeenCalledTimes(1);
+      const update = mockUpdatePage.mock.calls[0][1];
+      expect(update.content.blocks[0]).toEqual({
+        ...page.content.blocks[0],
+        props: {
+          ...page.content.blocks[0].props,
+          content: `<p>Original introduction: ${GLASS_PRIMARY_SERVICE_AREA_LINKS_HTML}, and surrounding areas.</p>`,
+        },
+      });
+      expect(update.updatedBy).toBe("admin-id");
+
+      mockUpdatePage.mockClear();
+      mockGetAllPages.mockResolvedValue([{ ...page, ...update }]);
+      await ensureSystemCmsPages();
+      expect(mockUpdatePage).not.toHaveBeenCalled();
+    },
+  );
 
   it("does not draft or noindex existing public pages on every startup unless marked system-retired", async () => {
     mockGetPageBySlug.mockImplementation(async (slug: string) => ({

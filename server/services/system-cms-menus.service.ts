@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { storage } from "../storage";
 import type { InsertCmsMenu, MenuItem, StandardMenuLocation } from "@shared/schema";
+import { GLASS_PRIMARY_SERVICE_AREAS } from "@shared/glass-service-areas";
 
 export const SYSTEM_MANAGED_MENU_NAME_PREFIX = "System - ";
 
@@ -57,6 +58,42 @@ function patchRetiredPublicUrls(items: MenuItem[]): { items: MenuItem[]; changed
   });
 
   return { items: nextItems, changed };
+}
+
+const legacyServiceAreaUrls = new Set<string>([
+  ...GLASS_PRIMARY_SERVICE_AREAS.map(({ href }) => href),
+  "/service-areas/monroe",
+  "/service-areas/waxhaw",
+]);
+
+// This is a targeted migration of the former complete eleven-location list.
+// Do not overwrite smaller/custom menus or future CMS ordering choices.
+export function migrateServiceAreaMenuOrder(items: MenuItem[]): MenuItem[] {
+  let changed = false;
+  const next = items.map((entry) => {
+    const children = entry.children?.length
+      ? migrateServiceAreaMenuOrder(entry.children)
+      : entry.children;
+    if (children === entry.children) return entry;
+    changed = true;
+    return { ...entry, children };
+  });
+  const areaItems = next.filter((entry) => legacyServiceAreaUrls.has(entry.url));
+  const byUrl = new Map(areaItems.map((entry) => [entry.url, entry]));
+  if (
+    areaItems.length === legacyServiceAreaUrls.size &&
+    byUrl.size === legacyServiceAreaUrls.size
+  ) {
+    const ordered = GLASS_PRIMARY_SERVICE_AREAS.map(({ href }) => byUrl.get(href)!);
+    let inserted = false;
+    return next.flatMap((entry) => {
+      if (!legacyServiceAreaUrls.has(entry.url)) return [entry];
+      if (inserted) return [];
+      inserted = true;
+      return ordered;
+    });
+  }
+  return changed ? next : items;
 }
 
 function patchLegalItemUrls(items: MenuItem[]): { items: MenuItem[]; changed: boolean } {
@@ -204,12 +241,15 @@ export async function ensureSystemCmsMenus() {
   }
 
   for (const menu of menus) {
-    if (!isSystemManagedCmsMenu(menu)) continue;
     if (!menu.items) continue;
-    const patched = patchRetiredPublicUrls((menu.items as MenuItem[]) || []);
-    if (patched.changed) {
+    const existingItems = menu.items as MenuItem[];
+    const patched = isSystemManagedCmsMenu(menu)
+      ? patchRetiredPublicUrls(existingItems)
+      : { items: existingItems, changed: false };
+    const reorderedItems = migrateServiceAreaMenuOrder(patched.items);
+    if (patched.changed || reorderedItems !== patched.items) {
       await storage.cmsMenus.update(menu.id, {
-        items: patched.items,
+        items: reorderedItems,
       });
     }
   }

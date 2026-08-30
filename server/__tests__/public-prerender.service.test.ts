@@ -349,7 +349,8 @@ describe("public-prerender.service", () => {
     expect(snapshot?.bodyHtml).toContain(
       '<a href="/services/window-installation">Window Installation</a>',
     );
-    expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/monroe">Monroe</a>');
+    expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/pineville">Pineville</a>');
+    expect(snapshot?.bodyHtml).not.toContain('href="/service-areas/monroe"');
     expect(snapshot?.jsonLd?.some((schema) => schema["@type"] === "BreadcrumbList")).toBe(false);
     expect(snapshot?.jsonLd?.some((schema) => schema["@type"] === "ItemList")).toBe(false);
   });
@@ -391,18 +392,28 @@ describe("public-prerender.service", () => {
         item: "https://glassanddoorpro.com/service-areas",
       },
     ]);
-    expect(itemListSchema?.itemListElement).toHaveLength(11);
+    expect(itemListSchema?.itemListElement?.map(({ name }) => name)).toEqual([
+      "Charlotte",
+      "Pineville",
+      "Matthews",
+      "Weddington",
+      "Indian Trail",
+      "Wesley Chapel",
+      "Stallings",
+      "Fort Mill",
+      "Indian Land",
+    ]);
     expect(itemListSchema?.itemListElement?.[0]).toEqual({
       "@type": "ListItem",
       position: 1,
       name: "Charlotte",
       url: "https://glassanddoorpro.com/service-areas/charlotte",
     });
-    expect(itemListSchema?.itemListElement?.[10]).toEqual({
+    expect(itemListSchema?.itemListElement?.[8]).toEqual({
       "@type": "ListItem",
-      position: 11,
-      name: "Pineville",
-      url: "https://glassanddoorpro.com/service-areas/pineville",
+      position: 9,
+      name: "Indian Land",
+      url: "https://glassanddoorpro.com/service-areas/indian-land",
     });
   });
 

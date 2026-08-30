@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { useBranding } from "@/components/shared/branding-provider";
 import type { CmsMenu, MenuItem, PublicMenuLocation } from "@shared/schema";
+import { GLASS_PRIMARY_SERVICE_AREAS } from "@shared/glass-service-areas";
 
 const defaultPlatformLinks = [
   { href: "/services", label: "All Services", testId: "link-footer-services" },
@@ -22,17 +23,11 @@ const defaultPlatformLinks = [
 
 const defaultServiceAreaLinks = [
   { href: "/service-areas", label: "All Service Areas", testId: "link-footer-service-areas" },
-  { href: "/service-areas/charlotte", label: "Charlotte", testId: "link-footer-service-area-charlotte" },
-  { href: "/service-areas/monroe", label: "Monroe", testId: "link-footer-service-area-monroe" },
-  { href: "/service-areas/indian-trail", label: "Indian Trail", testId: "link-footer-service-area-indian-trail" },
-  { href: "/service-areas/stallings", label: "Stallings", testId: "link-footer-service-area-stallings" },
-  { href: "/service-areas/wesley-chapel", label: "Wesley Chapel", testId: "link-footer-service-area-wesley-chapel" },
-  { href: "/service-areas/waxhaw", label: "Waxhaw", testId: "link-footer-service-area-waxhaw" },
-  { href: "/service-areas/matthews", label: "Matthews", testId: "link-footer-service-area-matthews" },
-  { href: "/service-areas/weddington", label: "Weddington", testId: "link-footer-service-area-weddington" },
-  { href: "/service-areas/indian-land", label: "Indian Land", testId: "link-footer-service-area-indian-land" },
-  { href: "/service-areas/fort-mill", label: "Fort Mill", testId: "link-footer-service-area-fort-mill" },
-  { href: "/service-areas/pineville", label: "Pineville", testId: "link-footer-service-area-pineville" },
+  ...GLASS_PRIMARY_SERVICE_AREAS.map(({ href, label }) => ({
+    href,
+    label,
+    testId: `link-footer-service-area-${href.split("/").at(-1)}`,
+  })),
 ];
 
 const defaultCompanyLinks = [

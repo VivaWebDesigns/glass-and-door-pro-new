@@ -19,6 +19,27 @@ vi.mock("@/components/shared/branding-provider", () => ({
 }));
 
 describe("Footer", () => {
+  it("uses the requested nine-location order in fallback navigation", () => {
+    globalThis.React = React;
+    const html = renderToStaticMarkup(<Footer />);
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    expect(
+      Array.from(doc.querySelectorAll('a[href^="/service-areas/"]')).map(
+        (link) => link.textContent,
+      ),
+    ).toEqual([
+      "Charlotte",
+      "Pineville",
+      "Matthews",
+      "Weddington",
+      "Indian Trail",
+      "Wesley Chapel",
+      "Stallings",
+      "Fort Mill",
+      "Indian Land",
+    ]);
+  });
+
   it("renders a crawlable Viva Web Designs attribution link", () => {
     globalThis.React = React;
     const html = renderToStaticMarkup(<Footer />);

@@ -3,64 +3,23 @@ import { ArrowRight, MapPin } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
+import { GLASS_PRIMARY_SERVICE_AREAS } from "@shared/glass-service-areas";
 
-const serviceAreas = [
-  [
-    "Charlotte",
-    "/service-areas/charlotte",
-    "Glass, window, door, shower, and commercial services across Charlotte.",
-  ],
-  [
-    "Monroe",
-    "/service-areas/monroe",
-    "Owner-operated glass and door services from Glass & Door Pro's home base.",
-  ],
-  [
-    "Indian Trail",
-    "/service-areas/indian-trail",
-    "Frameless showers, windows, doors, repairs, and commercial glass.",
-  ],
-  [
-    "Stallings",
-    "/service-areas/stallings",
-    "Local glass and door installation and repair for Stallings homes and businesses.",
-  ],
-  [
-    "Wesley Chapel",
-    "/service-areas/wesley-chapel",
-    "Custom shower glass, replacement windows, door installation, and repair.",
-  ],
-  [
-    "Waxhaw",
-    "/service-areas/waxhaw",
-    "Glass and door services for Waxhaw remodels, repairs, and replacements.",
-  ],
-  [
-    "Matthews",
-    "/service-areas/matthews",
-    "Residential and commercial glass, window, and door services in Matthews.",
-  ],
-  [
-    "Weddington",
-    "/service-areas/weddington",
-    "Custom glass, frameless showers, windows, and doors in Weddington.",
-  ],
-  [
-    "Indian Land",
-    "/service-areas/indian-land",
-    "Glass and door service for Indian Land, SC homeowners and businesses.",
-  ],
-  [
-    "Fort Mill",
-    "/service-areas/fort-mill",
-    "Frameless showers, windows, doors, and commercial glass in Fort Mill.",
-  ],
-  [
-    "Pineville",
-    "/service-areas/pineville",
-    "Glass, window, door, and repair services for Pineville properties.",
-  ],
-] as const;
+const serviceAreaDescriptions = {
+  Charlotte: "Glass, window, door, shower, and commercial services across Charlotte.",
+  Pineville: "Glass, window, door, and repair services for Pineville properties.",
+  Matthews: "Residential and commercial glass, window, and door services in Matthews.",
+  Weddington: "Custom glass, frameless showers, windows, and doors in Weddington.",
+  "Indian Trail": "Frameless showers, windows, doors, repairs, and commercial glass.",
+  "Wesley Chapel": "Custom shower glass, replacement windows, door installation, and repair.",
+  Stallings: "Local glass and door installation and repair for Stallings homes and businesses.",
+  "Fort Mill": "Frameless showers, windows, doors, and commercial glass in Fort Mill.",
+  "Indian Land": "Glass and door service for Indian Land, SC homeowners and businesses.",
+};
+
+const serviceAreas = GLASS_PRIMARY_SERVICE_AREAS.map(
+  ({ label, href }) => [label, href, serviceAreaDescriptions[label]] as const,
+);
 
 export default function ServiceAreasPage() {
   return (
@@ -87,9 +46,9 @@ export default function ServiceAreasPage() {
               Glass and Door Services Across Greater Charlotte
             </h1>
             <div className="mb-9 max-w-2xl text-base leading-8 text-white/85 sm:text-lg [&_a]:text-white [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-white/80 [&_p]:m-0">
-              Glass & Door Pro serves Charlotte, Union County, and nearby South Carolina
-              communities with frameless showers, window installation, door installation, window
-              repair, and commercial glass services.
+              Glass & Door Pro serves Charlotte, Union County, and nearby South Carolina communities
+              with frameless showers, window installation, door installation, window repair, and
+              commercial glass services.
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-start">
               <Button
