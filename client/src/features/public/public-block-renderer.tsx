@@ -627,7 +627,7 @@ function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
     openInNewTab?: boolean;
   }>(props.cards);
   return (
-    <div className="py-4">
+    <div className="py-4" data-testid="block-cards-grid">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
       <div className={`grid grid-cols-1 ${colsClass} gap-4 sm:gap-6`}>
         {cards.length === 0 ? (
@@ -640,7 +640,7 @@ function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
               key={i}
               className={`public-section-card-hover h-full overflow-hidden rounded-lg border-border/70 text-center shadow-sm ${variant === "service-links" ? "border-none bg-white" : ""}`}
             >
-              <CardContent className="flex h-full flex-col px-4 pb-5 pt-6 sm:px-6 sm:pb-6 sm:pt-8">
+              <CardContent className="public-service-card-content flex h-full flex-col px-4 pb-5 pt-6 sm:px-6 sm:pb-6 sm:pt-8">
                 <div
                   className={`mx-auto mb-4 flex items-center justify-center rounded-full bg-accent/10 ring-1 ring-accent/20 ${variant === "service-links" ? "h-16 w-16" : "h-12 w-12"}`}
                 >
