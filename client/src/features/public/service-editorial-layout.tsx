@@ -17,7 +17,7 @@ function sectionId(title: string, index: number) {
   return normalized || `section-${index + 1}`;
 }
 
-export function prepareFramelessServiceBlocks(blocks: BlockInstance[]) {
+export function prepareServiceEditorialBlocks(blocks: BlockInstance[]) {
   return blocks.map((block, index) => {
     const title = text(block.props.title);
     const existingAnchor = text(block.props.anchorId);
@@ -62,10 +62,7 @@ function PageSectionLinks({ blocks }: { blocks: BlockInstance[] }) {
 
 function DesktopPageGuide({ blocks, hero }: { blocks: BlockInstance[]; hero: BlockInstance }) {
   return (
-    <aside
-      className="frameless-service-guide hidden lg:block"
-      aria-label="Frameless shower page guide"
-    >
+    <aside className="service-editorial-guide hidden lg:block" aria-label="Service page guide">
       <div className="sticky top-28 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 className="font-heading text-xl font-bold text-slate-900">On this page</h2>
         <div className="mt-4 border-b border-slate-200 pb-5">
@@ -81,7 +78,7 @@ function DesktopPageGuide({ blocks, hero }: { blocks: BlockInstance[]; hero: Blo
             modalTitle={hero.props.ctaModalTitle}
             modalDescription={hero.props.ctaModalDescription}
             className="min-h-11 w-full bg-[#1a8ead] text-white hover:bg-[#167f9b]"
-            testId="frameless-guide-quote"
+            testId="service-editorial-guide-quote"
           />
           <a
             href={text(hero.props.ctaSecondaryLink)}
@@ -98,7 +95,7 @@ function DesktopPageGuide({ blocks, hero }: { blocks: BlockInstance[]; hero: Blo
 
 function MobilePageGuide({ blocks }: { blocks: BlockInstance[] }) {
   return (
-    <details className="frameless-service-mobile-guide rounded-lg border border-slate-200 bg-white lg:hidden">
+    <details className="service-editorial-mobile-guide rounded-lg border border-slate-200 bg-white lg:hidden">
       <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-4 px-4 py-3 font-heading text-base font-bold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#1a8ead]">
         On this page
         <ChevronDown className="h-5 w-5 shrink-0 text-[#1a8ead]" aria-hidden="true" />
@@ -110,32 +107,32 @@ function MobilePageGuide({ blocks }: { blocks: BlockInstance[] }) {
   );
 }
 
-export function FramelessServiceLayout({ blocks }: { blocks: BlockInstance[] }) {
+export function ServiceEditorialLayout({ blocks }: { blocks: BlockInstance[] }) {
   const hero = blocks[0];
   if (!hero || hero.type !== "hero") {
     return <PublicPageRenderer blocks={blocks} />;
   }
 
-  const contentBlocks = prepareFramelessServiceBlocks(blocks.slice(1));
+  const contentBlocks = prepareServiceEditorialBlocks(blocks.slice(1));
   const closingCta = contentBlocks.at(-1)?.type === "cta" ? contentBlocks.at(-1) : undefined;
   const editorialBlocks = closingCta ? contentBlocks.slice(0, -1) : contentBlocks;
 
   return (
-    <div className="frameless-service-page">
-      <div className="frameless-service-hero">
+    <div className="service-editorial-page">
+      <div className="service-editorial-hero">
         <PublicPageRenderer blocks={[hero]} />
       </div>
-      <div className="frameless-service-editorial-shell">
+      <div className="service-editorial-shell">
         <MobilePageGuide blocks={editorialBlocks} />
-        <div className="frameless-service-editorial-grid">
-          <div className="frameless-service-content">
+        <div className="service-editorial-grid">
+          <div className="service-editorial-content">
             <PublicPageRenderer blocks={editorialBlocks} />
           </div>
           <DesktopPageGuide blocks={editorialBlocks} hero={hero} />
         </div>
       </div>
       {closingCta ? (
-        <div className="frameless-service-closing-cta">
+        <div className="service-editorial-closing-cta">
           <PublicPageRenderer blocks={[closingCta]} />
         </div>
       ) : null}

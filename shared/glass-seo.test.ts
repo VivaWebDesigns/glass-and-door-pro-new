@@ -4,9 +4,27 @@ import {
   buildGlassServiceLdForCmsPage,
   getGlassCityPageArea,
   getGlassServiceSeoOverride,
+  isGlassServicePageSlug,
 } from "./glass-seo";
 
 describe("glass SEO helpers", () => {
+  it("identifies service-detail pages without treating the services hub as a detail page", () => {
+    const serviceDetailSlugs = [
+      "services-frameless-showers",
+      "services-window-installation",
+      "services-door-installation",
+      "services-window-repair",
+      "services-commercial-storefront-glass-installation",
+      "services-commercial-storefront-glass-replacement-repair",
+      "services-commercial-door-installation",
+      "services-commercial-door-replacement-repair",
+      "services-commercial-window-replacement",
+    ];
+
+    expect(serviceDetailSlugs.every(isGlassServicePageSlug)).toBe(true);
+    expect(isGlassServicePageSlug("services")).toBe(false);
+  });
+
   it("adds service-level areaServed to non-frameless service pages", () => {
     const schema = buildGlassServiceLdForCmsPage({
       slug: "services-window-installation",

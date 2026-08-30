@@ -23,7 +23,7 @@ import {
   isGlassServicePageSlug,
 } from "@shared/glass-seo";
 import { getPrerenderedCmsPage } from "@/lib/cms-prerender";
-import { FramelessServiceLayout } from "@/features/public/frameless-service-layout";
+import { ServiceEditorialLayout } from "@/features/public/service-editorial-layout";
 
 interface CmsHybridPageProps {
   slug: string;
@@ -232,7 +232,7 @@ export function CmsPageView({ page, globalSeo, previewLabel }: CmsPageViewProps)
   const useDefaultSidebar = !page.sidebarId && page.slug === "insights";
   const heroBlocks = showSidebar && blocks[0] && /hero/i.test(blocks[0].type) ? [blocks[0]] : [];
   const contentBlocks = heroBlocks.length > 0 ? blocks.slice(1) : blocks;
-  const isFramelessServicePage = page.slug === "services-frameless-showers";
+  const isServiceDetailPage = isGlassServicePageSlug(page.slug);
 
   return (
     <div className="public-page-shell min-h-screen flex flex-col" data-testid="cms-public-page">
@@ -259,8 +259,8 @@ export function CmsPageView({ page, globalSeo, previewLabel }: CmsPageViewProps)
                 </div>
               </div>
             </>
-          ) : isFramelessServicePage ? (
-            <FramelessServiceLayout blocks={blocks} />
+          ) : isServiceDetailPage ? (
+            <ServiceEditorialLayout blocks={blocks} />
           ) : (
             <PublicPageRenderer blocks={blocks} />
           )
