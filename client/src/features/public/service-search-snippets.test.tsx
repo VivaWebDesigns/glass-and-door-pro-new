@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { PublicBlockRenderer } from "./public-block-renderer";
+import { ServiceEditorialLayout } from "./service-editorial-layout";
 
 const route = vi.hoisted(() => ({ path: "/services" }));
 vi.mock("wouter", async (importOriginal) => ({
@@ -61,13 +62,30 @@ describe("search snippet utility exclusions", () => {
             },
           }}
         />
+        <ServiceEditorialLayout
+          blocks={[
+            {
+              id: "editorial-hero",
+              type: "hero",
+              props: {
+                heading: "Existing heading",
+                ctaText: "Get a Free Quote",
+                ctaAction: "custom-link",
+                ctaLink: "/#contact",
+                ctaSecondaryText: "Call (704) 771-6111",
+                ctaSecondaryAction: "custom-link",
+                ctaSecondaryLink: "tel:+17047716111",
+              },
+            },
+          ]}
+        />
         <Footer />
       </>,
     );
     const doc = new DOMParser().parseFromString(html, "text/html");
     const excluded = path !== "/services/frameless-showers";
     const phoneLinks = [...doc.querySelectorAll('a[href="tel:+17047716111"]')];
-    expect(phoneLinks.length).toBeGreaterThanOrEqual(4);
+    expect(phoneLinks.length).toBeGreaterThanOrEqual(6);
     phoneLinks.forEach((link) => {
       expect(Boolean(link.closest("[data-nosnippet]"))).toBe(excluded);
       expect(link.textContent).toContain("(704) 771-6111");

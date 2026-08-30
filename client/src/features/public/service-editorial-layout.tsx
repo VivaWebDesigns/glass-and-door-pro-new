@@ -1,4 +1,6 @@
 import { ChevronDown, Phone } from "lucide-react";
+import { useLocation } from "wouter";
+import { excludeServiceUtilitySnippets } from "@shared/glass-search-snippets";
 import { FormModalButton } from "@/components/forms/form-modal-button";
 import { PublicPageRenderer } from "@/features/public/public-block-renderer";
 import type { BlockInstance } from "@/features/admin/cms/builder/block-registry";
@@ -61,6 +63,7 @@ function PageSectionLinks({ blocks }: { blocks: BlockInstance[] }) {
 }
 
 function DesktopPageGuide({ blocks, hero }: { blocks: BlockInstance[]; hero: BlockInstance }) {
+  const [location] = useLocation();
   return (
     <aside className="service-editorial-guide hidden lg:block" aria-label="Service page guide">
       <div className="sticky top-28 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -68,7 +71,10 @@ function DesktopPageGuide({ blocks, hero }: { blocks: BlockInstance[]; hero: Blo
         <div className="mt-4 border-b border-slate-200 pb-5">
           <PageSectionLinks blocks={blocks} />
         </div>
-        <div className="mt-5 space-y-3">
+        <div
+          data-nosnippet={excludeServiceUtilitySnippets(location) ? "" : undefined}
+          className="mt-5 space-y-3"
+        >
           <FormModalButton
             label={text(hero.props.ctaText)}
             action={hero.props.ctaAction}
