@@ -29,7 +29,7 @@ describe("ensureSystemForms", () => {
     vi.clearAllMocks();
   });
 
-  it("preserves edited fields on existing system forms", async () => {
+  it("preserves edited fields while upgrading existing system forms", async () => {
     mockGetBySlug.mockImplementation(async (slug: string) => {
       if (slug === "contact-form") {
         return {
@@ -41,6 +41,21 @@ describe("ensureSystemForms", () => {
           isSystem: true,
           isActive: true,
           fields: [
+            {
+              id: "contact-preference",
+              key: "contactPreference",
+              label: "How should we contact you?",
+              type: "radio",
+              placeholder: "",
+              helpText: "",
+              required: true,
+              width: "full",
+              options: [
+                { label: "Call me", value: "phone", imageUrl: "" },
+                { label: "Email me", value: "email", imageUrl: "" },
+              ],
+              config: {},
+            },
             {
               id: "message",
               key: "message",
@@ -81,6 +96,7 @@ describe("ensureSystemForms", () => {
     expect(contactUpdate[1].fields).toHaveLength(1);
     expect(contactUpdate[1].fields[0].label).toBe("How can we help?");
     expect(contactUpdate[1].settings.successMessage).toBe("Custom contact success");
+    expect(contactUpdate[1].settings.schemaVersion).toBe(3);
   });
 
   it("upgrades legacy contact form fields", async () => {
@@ -114,13 +130,12 @@ describe("ensureSystemForms", () => {
       "name",
       "phone",
       "email",
-      "contactPreference",
       "subject",
       "message",
     ]);
     expect(contactUpdate[1].fields.find((formField: { key: string }) => formField.key === "phone").required).toBe(true);
     expect(contactUpdate[1].fields.find((formField: { key: string }) => formField.key === "email").required).toBe(false);
-    expect(contactUpdate[1].settings.schemaVersion).toBe(2);
+    expect(contactUpdate[1].settings.schemaVersion).toBe(3);
   });
 
   it("creates missing system forms on a clean install", async () => {

@@ -172,10 +172,6 @@ function validatePageFields(fields: CmsFormField[], values: FormValues) {
     }
   }
 
-  if (text(values.contactPreference) === "email" && !text(values.email)) {
-    return "Email is required when you select email as your preferred contact method";
-  }
-
   return null;
 }
 

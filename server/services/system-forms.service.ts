@@ -60,23 +60,15 @@ const SYSTEM_FORMS: ManagedSystemForm[] = [
       }),
       field("email", "email", "Email", "email", {
         placeholder: "you@example.com",
-        helpText: "Optional unless you prefer an email response",
+        helpText: "Optional",
         required: false,
         width: "half",
-      }),
-      field("contact-preference", "contactPreference", "How should we contact you?", "radio", {
-        required: true,
-        options: [
-          { label: "Call me", value: "phone", imageUrl: "" },
-          { label: "Email me", value: "email", imageUrl: "" },
-        ],
-        config: { choiceLayout: "inline", defaultValue: "phone" },
       }),
       field("subject", "subject", "Subject", "text", { placeholder: "What is this about?", required: true }),
       field("message", "message", "Message", "textarea", { placeholder: "Tell us more...", required: true }),
     ],
     settings: settings({
-      schemaVersion: 2,
+      schemaVersion: 3,
       submitButtonText: "Send Message",
       successMessage: "Thanks for reaching out. We'll get back to you soon.",
       mailchimpEnabled: false,
@@ -102,6 +94,11 @@ export async function ensureSystemForms() {
       const systemSchemaVersion =
         typeof systemForm.settings.schemaVersion === "number" ? systemForm.settings.schemaVersion : 0;
       const shouldUpgradeFields = existingSchemaVersion < systemSchemaVersion;
+      const existingFields = Array.isArray(existing.fields) ? existing.fields : [];
+      const upgradedFields =
+        existingSchemaVersion >= 2
+          ? existingFields.filter((existingField) => existingField.key !== "contactPreference")
+          : systemForm.fields;
 
       await storage.forms.update(existing.id, {
         name: existing.name || systemForm.name,
@@ -110,9 +107,11 @@ export async function ensureSystemForms() {
         isSystem: true,
         isActive: existing.isActive ?? true,
         fields:
-          !shouldUpgradeFields && Array.isArray(existing.fields) && existing.fields.length > 0
-            ? existing.fields
-            : systemForm.fields,
+          shouldUpgradeFields
+            ? upgradedFields
+            : existingFields.length > 0
+              ? existingFields
+              : systemForm.fields,
         settings:
           {
             ...systemForm.settings,

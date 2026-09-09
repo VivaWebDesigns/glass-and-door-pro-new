@@ -15,6 +15,13 @@ function removeLegacyAdminCta(htmlBody: string) {
   );
 }
 
+function removeContactPreferenceRow(htmlBody: string) {
+  return htmlBody.replace(
+    /\s*<p[^>]*><strong>Preferred contact:<\/strong>\s*{{contactPreference}}<\/p>/i,
+    "",
+  );
+}
+
 export const SYSTEM_EMAIL_TEMPLATE_DEFAULTS: InsertEmailTemplate[] = [
   {
     slug: "password-reset",
@@ -69,7 +76,6 @@ export const SYSTEM_EMAIL_TEMPLATE_DEFAULTS: InsertEmailTemplate[] = [
       "senderName",
       "senderEmail",
       "senderPhone",
-      "contactPreference",
       "subject",
       "messageBody",
       "replyToEmail",
@@ -83,7 +89,6 @@ export const SYSTEM_EMAIL_TEMPLATE_DEFAULTS: InsertEmailTemplate[] = [
       <p style="margin:0 0 8px;color:#374151;font-size:14px;"><strong>From:</strong> {{senderName}}</p>
       <p style="margin:0 0 8px;color:#374151;font-size:14px;"><strong>Phone:</strong> {{senderPhone}}</p>
       <p style="margin:0 0 8px;color:#374151;font-size:14px;"><strong>Email:</strong> {{#replyToEmail}}<a href="mailto:{{replyToEmail}}" style="color:#1d4ed8;">{{senderEmail}}</a>{{/replyToEmail}}{{#emailNotProvided}}Not provided{{/emailNotProvided}}</p>
-      <p style="margin:0 0 8px;color:#374151;font-size:14px;"><strong>Preferred contact:</strong> {{contactPreference}}</p>
       <p style="margin:0 0 8px;color:#374151;font-size:14px;"><strong>Subject:</strong> {{subject}}</p>
       <p style="margin:8px 0 0;color:#374151;font-size:14px;"><strong>Message:</strong></p>
       <p style="margin:4px 0 0;color:#374151;font-size:14px;">{{messageBody}}</p>
@@ -133,7 +138,7 @@ export async function ensureSystemEmailTemplates(refreshExisting = false) {
             !existing.variables.includes("replyToEmail"));
         const nextHtmlBody = contactTemplateNeedsUpgrade
           ? template.htmlBody
-          : removeLegacyAdminCta(existing.htmlBody);
+          : removeContactPreferenceRow(removeLegacyAdminCta(existing.htmlBody));
         const nextVariables = template.variables;
         const variablesChanged =
           JSON.stringify(existing.variables) !== JSON.stringify(nextVariables);

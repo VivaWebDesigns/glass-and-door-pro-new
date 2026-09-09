@@ -387,7 +387,6 @@ export async function sendContactFormEmail(
     senderName: string;
     senderEmail: string;
     senderPhone: string;
-    contactPreference: string;
     subject: string;
     messageBody: string;
   },
@@ -399,12 +398,10 @@ export async function sendContactFormEmail(
   const escapedPhone = escapeHtml(submission.senderPhone);
   const escapedSubject = escapeHtml(submission.subject);
   const escapedMessage = escapeHtml(submission.messageBody).replace(/\r?\n/g, "<br>");
-  const contactPreference = submission.contactPreference === "email" ? "Email" : "Phone";
   const vars = {
     senderName: escapedName,
     senderEmail: escapedEmail,
     senderPhone: escapedPhone,
-    contactPreference,
     subject: escapedSubject,
     messageBody: escapedMessage,
     replyToEmail: escapedEmail || null,
@@ -415,7 +412,6 @@ export async function sendContactFormEmail(
     senderName: sanitizeEmailSubject(submission.senderName),
     senderEmail: replyTo ?? "",
     senderPhone: sanitizeEmailSubject(submission.senderPhone),
-    contactPreference,
     subject: sanitizeEmailSubject(submission.subject),
     messageBody: sanitizeEmailSubject(submission.messageBody),
     replyToEmail: replyTo ?? null,
@@ -431,7 +427,6 @@ export async function sendContactFormEmail(
     <strong>Email:</strong> ${
       replyTo ? `<a href="mailto:${escapedEmail}">${escapedEmail}</a>` : "Not provided"
     }<br>
-    <strong>Preferred contact:</strong> ${contactPreference}<br>
     <strong>Subject:</strong> ${escapedSubject}</p>
     <p><strong>Message:</strong><br>${escapedMessage}</p>
     ${

@@ -242,10 +242,6 @@ function validateSubmissionData(form: CmsForm, data: unknown) {
     validated[field.key] = result.value ?? "";
   }
 
-  if (stringValue(validated.contactPreference) === "email" && !stringValue(validated.email)) {
-    throw new AppError("Email is required when email is your preferred contact method", 400);
-  }
-
   return validated;
 }
 
@@ -319,16 +315,14 @@ async function handleContactFormEffects(form: CmsForm, data: Record<string, unkn
   const name = stringValue(data.name);
   const email = stringValue(data.email);
   const phone = stringValue(data.phone);
-  const contactPreference = stringValue(data.contactPreference);
   const subject = stringValue(data.subject);
   const message = stringValue(data.message);
 
-  if (!name || !phone || !contactPreference || !subject || !message) {
+  if (!name || !phone || !subject || !message) {
     return;
   }
 
   const contactMessage = [
-    `Preferred contact: ${contactPreference === "email" ? "Email" : "Phone"}`,
     `Phone: ${phone}`,
     `Email: ${email || "Not provided"}`,
     "",
@@ -357,7 +351,6 @@ async function handleContactFormEffects(form: CmsForm, data: Record<string, unkn
       senderName: name,
       senderEmail: email,
       senderPhone: phone,
-      contactPreference,
       subject,
       messageBody: message,
     },
