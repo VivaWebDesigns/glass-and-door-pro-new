@@ -23,11 +23,7 @@ describe("ensureSystemCmsMenus", () => {
   });
 
   it("migrates complete location lists in header and footer menus, preserving IDs and unrelated links", async () => {
-    const areaItems = [
-      ...GLASS_PRIMARY_SERVICE_AREAS,
-      { label: "Monroe", href: "/service-areas/monroe" },
-      { label: "Waxhaw", href: "/service-areas/waxhaw" },
-    ]
+    const areaItems = [...GLASS_PRIMARY_SERVICE_AREAS]
       .reverse()
       .map(({ label, href }) => ({
         id: href,
@@ -75,6 +71,41 @@ describe("ensureSystemCmsMenus", () => {
     expect(migrateServiceAreaMenuOrder(headerItems)).toBe(headerItems);
     const customItems = [about, areaItems[0]];
     expect(migrateServiceAreaMenuOrder(customItems)).toBe(customItems);
+  });
+
+  it("adds Monroe and Waxhaw to the former complete nine-location menu", async () => {
+    const previousAreaItems = GLASS_PRIMARY_SERVICE_AREAS.filter(
+      ({ href }) => href !== "/service-areas/monroe" && href !== "/service-areas/waxhaw",
+    ).map(({ label, href }) => ({
+      id: href,
+      label,
+      url: href,
+      children: [],
+      openInNewTab: false,
+    }));
+    const about = {
+      id: "about",
+      label: "About",
+      url: "/#about",
+      children: [],
+      openInNewTab: false,
+    };
+    const { migrateServiceAreaMenuOrder } =
+      await import("../services/system-cms-menus.service");
+
+    const migrated = migrateServiceAreaMenuOrder([...previousAreaItems, about]);
+
+    expect(migrated.map((entry) => entry.url)).toEqual([
+      ...GLASS_PRIMARY_SERVICE_AREAS.map(({ href }) => href),
+      "/#about",
+    ]);
+    expect(migrated.find((entry) => entry.url === "/service-areas/waxhaw")?.label).toBe(
+      "Waxhaw",
+    );
+    expect(migrated.find((entry) => entry.url === "/service-areas/monroe")?.label).toBe(
+      "Monroe",
+    );
+    expect(migrateServiceAreaMenuOrder(migrated)).toBe(migrated);
   });
 
   it("does not remove or repoint admin-created menu links on startup unless marked system-managed", async () => {

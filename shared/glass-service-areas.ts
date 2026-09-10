@@ -6,6 +6,8 @@ export const GLASS_PRIMARY_SERVICE_AREAS = [
   { label: "Indian Trail", href: "/service-areas/indian-trail" },
   { label: "Wesley Chapel", href: "/service-areas/wesley-chapel" },
   { label: "Stallings", href: "/service-areas/stallings" },
+  { label: "Waxhaw", href: "/service-areas/waxhaw" },
+  { label: "Monroe", href: "/service-areas/monroe" },
   { label: "Fort Mill", href: "/service-areas/fort-mill" },
   { label: "Indian Land", href: "/service-areas/indian-land" },
 ] as const;

@@ -19,7 +19,7 @@ vi.mock("@/components/shared/branding-provider", () => ({
 }));
 
 describe("Footer", () => {
-  it("uses the requested nine-location order in fallback navigation", () => {
+  it("uses the requested eleven-location order in fallback navigation", () => {
     globalThis.React = React;
     const html = renderToStaticMarkup(<Footer />);
     const doc = new DOMParser().parseFromString(html, "text/html");
@@ -35,6 +35,8 @@ describe("Footer", () => {
       "Indian Trail",
       "Wesley Chapel",
       "Stallings",
+      "Waxhaw",
+      "Monroe",
       "Fort Mill",
       "Indian Land",
     ]);

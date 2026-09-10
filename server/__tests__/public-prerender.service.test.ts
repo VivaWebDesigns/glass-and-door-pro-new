@@ -376,7 +376,8 @@ describe("public-prerender.service", () => {
       '<a href="/services/window-installation">Window Installation</a>',
     );
     expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/pineville">Pineville</a>');
-    expect(snapshot?.bodyHtml).not.toContain('href="/service-areas/monroe"');
+    expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/waxhaw">Waxhaw</a>');
+    expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/monroe">Monroe</a>');
     expect(snapshot?.jsonLd?.some((schema) => schema["@type"] === "BreadcrumbList")).toBe(false);
     expect(snapshot?.jsonLd?.some((schema) => schema["@type"] === "ItemList")).toBe(false);
   });
@@ -388,7 +389,7 @@ describe("public-prerender.service", () => {
 
     expect(snapshot?.title).toContain("Service Areas");
     expect(snapshot?.description).toBe(
-      "Glass and Door Pro serves Charlotte, Union County, and nearby South Carolina communities with frameless showers, window installation, door installation, window repair, and commercial glass services.",
+      "Explore Glass and Door Pro service areas across Charlotte, Union County, and nearby South Carolina for showers, windows, doors, repairs, and commercial glass.",
     );
     expect(snapshot?.canonicalUrl).toBe("https://glassanddoorpro.com/service-areas");
     expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/charlotte">Charlotte</a>');
@@ -426,6 +427,8 @@ describe("public-prerender.service", () => {
       "Indian Trail",
       "Wesley Chapel",
       "Stallings",
+      "Waxhaw",
+      "Monroe",
       "Fort Mill",
       "Indian Land",
     ]);
@@ -435,9 +438,9 @@ describe("public-prerender.service", () => {
       name: "Charlotte",
       url: "https://glassanddoorpro.com/service-areas/charlotte",
     });
-    expect(itemListSchema?.itemListElement?.[8]).toEqual({
+    expect(itemListSchema?.itemListElement?.[10]).toEqual({
       "@type": "ListItem",
-      position: 9,
+      position: 11,
       name: "Indian Land",
       url: "https://glassanddoorpro.com/service-areas/indian-land",
     });

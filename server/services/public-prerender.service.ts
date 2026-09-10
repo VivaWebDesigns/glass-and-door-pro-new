@@ -75,7 +75,7 @@ const FALLBACK_STATIC_PAGES: Record<
   "/service-areas": {
     title: "Service Areas",
     description:
-      "Glass and Door Pro serves Charlotte, Union County, and nearby South Carolina communities with frameless showers, window installation, door installation, window repair, and commercial glass services.",
+      "Explore Glass and Door Pro service areas across Charlotte, Union County, and nearby South Carolina for showers, windows, doors, repairs, and commercial glass.",
     body: "Explore Glass and Door Pro service areas across the greater Charlotte metro, Union County, and nearby South Carolina communities.",
   },
   "/privacy-policy": {

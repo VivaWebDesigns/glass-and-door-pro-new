@@ -60,13 +60,24 @@ function patchRetiredPublicUrls(items: MenuItem[]): { items: MenuItem[]; changed
   return { items: nextItems, changed };
 }
 
-const legacyServiceAreaUrls = new Set<string>([
-  ...GLASS_PRIMARY_SERVICE_AREAS.map(({ href }) => href),
-  "/service-areas/monroe",
-  "/service-areas/waxhaw",
-]);
+const previousPrimaryServiceAreaUrls = [
+  "/service-areas/charlotte",
+  "/service-areas/pineville",
+  "/service-areas/matthews",
+  "/service-areas/weddington",
+  "/service-areas/indian-trail",
+  "/service-areas/wesley-chapel",
+  "/service-areas/stallings",
+  "/service-areas/fort-mill",
+  "/service-areas/indian-land",
+] as const;
 
-// This is a targeted migration of the former complete eleven-location list.
+const primaryServiceAreaUrls = new Set<string>(
+  GLASS_PRIMARY_SERVICE_AREAS.map(({ href }) => href),
+);
+const previousPrimaryServiceAreaUrlSet = new Set<string>(previousPrimaryServiceAreaUrls);
+
+// This targets only the former complete nine-location list or the current complete list.
 // Do not overwrite smaller/custom menus or future CMS ordering choices.
 export function migrateServiceAreaMenuOrder(items: MenuItem[]): MenuItem[] {
   let changed = false;
@@ -78,16 +89,28 @@ export function migrateServiceAreaMenuOrder(items: MenuItem[]): MenuItem[] {
     changed = true;
     return { ...entry, children };
   });
-  const areaItems = next.filter((entry) => legacyServiceAreaUrls.has(entry.url));
+  const areaItems = next.filter((entry) => primaryServiceAreaUrls.has(entry.url));
   const byUrl = new Map(areaItems.map((entry) => [entry.url, entry]));
-  if (
-    areaItems.length === legacyServiceAreaUrls.size &&
-    byUrl.size === legacyServiceAreaUrls.size
-  ) {
-    const ordered = GLASS_PRIMARY_SERVICE_AREAS.map(({ href }) => byUrl.get(href)!);
+  const isPreviousCompleteList =
+    areaItems.length === previousPrimaryServiceAreaUrlSet.size &&
+    byUrl.size === previousPrimaryServiceAreaUrlSet.size &&
+    previousPrimaryServiceAreaUrls.every((url) => byUrl.has(url));
+  const isCurrentCompleteList =
+    areaItems.length === primaryServiceAreaUrls.size &&
+    byUrl.size === primaryServiceAreaUrls.size;
+
+  if (isPreviousCompleteList || isCurrentCompleteList) {
+    const alreadyOrdered = areaItems.every(
+      (entry, index) => entry.url === GLASS_PRIMARY_SERVICE_AREAS[index]?.href,
+    );
+    if (isCurrentCompleteList && alreadyOrdered) return changed ? next : items;
+
+    const ordered = GLASS_PRIMARY_SERVICE_AREAS.map(
+      ({ label, href }) => byUrl.get(href) ?? item(label, href),
+    );
     let inserted = false;
     return next.flatMap((entry) => {
-      if (!legacyServiceAreaUrls.has(entry.url)) return [entry];
+      if (!primaryServiceAreaUrls.has(entry.url)) return [entry];
       if (inserted) return [];
       inserted = true;
       return ordered;

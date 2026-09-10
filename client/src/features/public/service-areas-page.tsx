@@ -13,6 +13,8 @@ const serviceAreaDescriptions = {
   "Indian Trail": "Frameless showers, windows, doors, repairs, and commercial glass.",
   "Wesley Chapel": "Custom shower glass, replacement windows, door installation, and repair.",
   Stallings: "Local glass and door installation and repair for Stallings homes and businesses.",
+  Waxhaw: "Custom showers, replacement windows, doors, and glass repair for Waxhaw properties.",
+  Monroe: "Owner-operated glass, window, door, and commercial services throughout Monroe.",
   "Fort Mill": "Frameless showers, windows, doors, and commercial glass in Fort Mill.",
   "Indian Land": "Glass and door service for Indian Land, SC homeowners and businesses.",
 };
