@@ -5,7 +5,7 @@ export type JsonLdObject = Record<string, unknown>;
 
 function compactObject(obj: Record<string, unknown>): Record<string, unknown> {
   return Object.fromEntries(
-    Object.entries(obj).filter(([, v]) => v !== null && v !== undefined && v !== "")
+    Object.entries(obj).filter(([, v]) => v !== null && v !== undefined && v !== ""),
   );
 }
 
@@ -20,15 +20,14 @@ export function buildOrganizationLd(globalSeo: SeoSettings): JsonLdObject | null
   if (!globalSeo.organizationName && !globalSeo.siteName) return null;
 
   const name = globalSeo.organizationName || globalSeo.siteName || "Glass & Door Pro";
-  const siteUrl = globalSeo.siteUrl || (typeof window !== "undefined" ? window.location.origin : "");
+  const siteUrl =
+    globalSeo.siteUrl || (typeof window !== "undefined" ? window.location.origin : "");
 
   const sameAs: string[] = [
     globalSeo.facebookUrl,
     globalSeo.linkedinUrl,
     globalSeo.instagramUrl,
-    globalSeo.twitterHandle
-      ? `https://x.com/${globalSeo.twitterHandle.replace(/^@/, "")}`
-      : null,
+    globalSeo.twitterHandle ? `https://x.com/${globalSeo.twitterHandle.replace(/^@/, "")}` : null,
   ].filter((url): url is string => !!url);
 
   return compactObject({
@@ -47,20 +46,20 @@ export function buildOrganizationLd(globalSeo: SeoSettings): JsonLdObject | null
 }
 
 export function buildWebSiteLd(globalSeo: SeoSettings): JsonLdObject | null {
-  const siteUrl = globalSeo.siteUrl || (typeof window !== "undefined" ? window.location.origin : "");
+  const siteUrl =
+    globalSeo.siteUrl || (typeof window !== "undefined" ? window.location.origin : "");
   if (!siteUrl) return null;
 
   return compactObject({
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: globalSeo.siteName || "Glass & Door Pro",
-    url: siteUrl,
+    alternateName: ["Glass and Door Pro", "glassanddoorpro.com"],
+    url: `${siteUrl.replace(/\/$/, "")}/`,
   });
 }
 
-export function buildBreadcrumbLd(
-  items: Array<{ name: string; url: string }>
-): JsonLdObject {
+export function buildBreadcrumbLd(items: Array<{ name: string; url: string }>): JsonLdObject {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",

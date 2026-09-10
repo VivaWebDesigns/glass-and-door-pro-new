@@ -321,11 +321,21 @@ describe("public-prerender.service", () => {
     const snapshot = await getPublicHtmlSnapshot("/");
 
     expect(snapshot?.title).toBe(
-      "Glass & Door Services in Charlotte & Monroe, NC | Glass & Door Pro",
+      "Glass & Door Pro | Glass & Door Services in Charlotte & Monroe, NC",
     );
     expect(snapshot?.bodyHtml).toContain(
-      "<h1>Glass &amp; Door Services in Charlotte &amp; Monroe, NC</h1>",
+      "<h1>Glass &amp; Door Pro: Charlotte Glass, Door &amp; Window Services</h1>",
     );
+    expect(snapshot?.jsonLd?.map((schema) => schema["@type"])).toEqual([
+      "Organization",
+      "WebSite",
+      "LocalBusiness",
+    ]);
+    expect(snapshot?.jsonLd?.find((schema) => schema["@type"] === "WebSite")).toMatchObject({
+      name: "Glass & Door Pro",
+      alternateName: ["Glass and Door Pro", "glassanddoorpro.com"],
+      url: "https://glassanddoorpro.com/",
+    });
     expect(snapshot?.bodyHtml).toContain("We&#39;ve got your glass &amp; door needs covered.");
     expect(snapshot?.bodyHtml).not.toContain("cc1dbbbe");
     expect(snapshot?.bodyHtml).not.toContain("hero</p>");

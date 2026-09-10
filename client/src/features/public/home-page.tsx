@@ -31,10 +31,11 @@ export default function HomePage() {
               Glass & Door Pro
             </p>
             <h1 className="max-w-3xl text-4xl font-bold tracking-normal sm:text-5xl">
-              Glass, door, and window service for the Charlotte area.
+              Glass & Door Pro: Charlotte Glass, Door & Window Services
             </h1>
             <p className="mt-5 max-w-2xl text-lg text-slate-200">
-              Owner-operated service for frameless showers, window installation, door repair, and commercial glass projects.
+              Owner-operated service for frameless showers, window installation, door repair, and
+              commercial glass projects.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg">

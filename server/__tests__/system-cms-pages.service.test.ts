@@ -333,6 +333,48 @@ describe("ensureSystemCmsPages", () => {
     });
   });
 
+  it("updates only known legacy homepage brand signals", async () => {
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "home-id",
+        slug: "home",
+        seoTitle: "Glass & Door Services in Charlotte NC",
+        seoDescription: "Already clean.",
+        content: {
+          blocks: [
+            {
+              id: "hero",
+              type: "hero",
+              props: { heading: "Glass & Door Services Around Charlotte" },
+            },
+          ],
+        },
+        updatedBy: "admin-id",
+      },
+    ]);
+    mockGetPageBySlug.mockResolvedValue(null);
+
+    const mod = await import("../services/system-cms-pages.service");
+    await mod.ensureSystemCmsPages();
+
+    expect(mockUpdatePage).toHaveBeenCalledTimes(1);
+    expect(mockUpdatePage).toHaveBeenCalledWith("home-id", {
+      seoTitle: "Glass & Door Pro | Charlotte Glass, Door & Window Services",
+      content: {
+        blocks: [
+          {
+            id: "hero",
+            type: "hero",
+            props: {
+              heading: "Glass & Door Pro: Charlotte Glass, Door & Window Services",
+            },
+          },
+        ],
+      },
+      updatedBy: "admin-id",
+    });
+  });
+
   it("noindexes existing privacy and terms pages", async () => {
     mockGetAllPages.mockResolvedValue([
       {

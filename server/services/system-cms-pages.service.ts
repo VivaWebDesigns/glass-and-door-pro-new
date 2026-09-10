@@ -341,6 +341,23 @@ const businessHoursReplacements = [
   ["7 AM to 6 PM", "7 AM to 7 PM"],
 ] as const;
 
+const homepageBrandHeadingReplacements = [
+  [
+    "Glass & Door Services Around Charlotte",
+    "Glass & Door Pro: Charlotte Glass, Door & Window Services",
+  ],
+  [
+    "We've got your glass & door needs covered.",
+    "Glass & Door Pro: Charlotte Glass, Door & Window Services",
+  ],
+] as const;
+
+const legacyHomepageSeoTitles = new Set([
+  "Glass & Door Services in Charlotte NC",
+  "Glass & Door Services in Charlotte, NC",
+  "Glass & Door Services in Charlotte & Monroe, NC",
+]);
+
 const businessAddressReplacements = [
   [
     "2341 Waverly Dr<br>Monroe, NC 28112",
@@ -651,11 +668,23 @@ async function normalizeStoredCmsPages() {
     }
 
     if (page.slug === "home") {
+      if (page.seoTitle && legacyHomepageSeoTitles.has(page.seoTitle)) {
+        updates.seoTitle = "Glass & Door Pro | Charlotte Glass, Door & Window Services";
+      }
+
       const content = ensureHomepageServiceCards(page.content);
       if (content) updates.content = content as InsertCmsPage["content"];
 
       const contentWithReviews = ensureGoogleReviewItems(updates.content ?? page.content, true);
       if (contentWithReviews) updates.content = contentWithReviews as InsertCmsPage["content"];
+
+      const contentWithBrandHeading = replaceStoredStrings(
+        updates.content ?? page.content,
+        homepageBrandHeadingReplacements,
+      );
+      if (contentWithBrandHeading !== (updates.content ?? page.content)) {
+        updates.content = contentWithBrandHeading as InsertCmsPage["content"];
+      }
     }
 
     if (page.slug === "reviews") {

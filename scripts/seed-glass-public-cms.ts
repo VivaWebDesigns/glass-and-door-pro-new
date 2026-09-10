@@ -309,7 +309,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
       props: {
         anchorId: "hero",
         variant: "glass-home",
-        heading: "We've got your glass & door needs covered.",
+        heading: "Glass & Door Pro: Charlotte Glass, Door & Window Services",
         subheading:
           "<p>Specializing in frameless glass showers, windows, and doors for homeowners in Charlotte, NC.</p>",
         ctaText: "Get a Free Quote",
@@ -5004,7 +5004,7 @@ export async function seedGlassPublicCms() {
         status: "published",
         template: "full-width",
         content: glassHomeContent,
-        seoTitle: "Glass & Door Services in Charlotte & Monroe, NC",
+        seoTitle: "Glass & Door Pro | Charlotte Glass, Door & Window Services",
         seoDescription:
           "Glass & Door Pro serves Charlotte and Monroe, NC with frameless shower doors, window installation, door replacement, window repair, and commercial glass. Owner-operated with 15+ years of experience.",
         seoKeywords:
@@ -5022,7 +5022,7 @@ export async function seedGlassPublicCms() {
       status: "published",
       template: "full-width",
       content: glassHomeContent,
-      seoTitle: "Glass & Door Services in Charlotte & Monroe, NC",
+      seoTitle: "Glass & Door Pro | Charlotte Glass, Door & Window Services",
       seoDescription:
         "Glass & Door Pro serves Charlotte and Monroe, NC with frameless shower doors, window installation, door replacement, window repair, and commercial glass. Owner-operated with 15+ years of experience.",
       seoKeywords:

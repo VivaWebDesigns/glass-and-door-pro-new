@@ -56,6 +56,7 @@ describe("cookie consent utilities", () => {
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.unstubAllGlobals();
     if (originalWindow) vi.stubGlobal("window", originalWindow);
     if (originalDocument) vi.stubGlobal("document", originalDocument);
@@ -68,11 +69,14 @@ describe("cookie consent utilities", () => {
   });
 
   it("writes consent, persists 60-day cookie state, and notifies subscribers", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-06-22T12:00:00.000Z"));
+
     const record = buildCookieConsentRecord({
       analytics: true,
       marketing: false,
       preferences: true,
-    }, new Date("2026-06-22T12:00:00.000Z"));
+    });
 
     const listener = vi.fn();
     const unsubscribe = subscribeToCookieConsent(listener);

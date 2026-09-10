@@ -524,7 +524,7 @@ export function buildGlassLocalBusinessLd(
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "@id": GLASS_BUSINESS_ID,
-    name: "Glass and Door Pro",
+    name: "Glass & Door Pro",
     url: `${GLASS_SITE_URL}/`,
     telephone: "+1-704-771-6111",
     email: "Doug@GlassandDoorPro.com",

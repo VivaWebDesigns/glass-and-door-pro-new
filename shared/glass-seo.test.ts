@@ -25,6 +25,14 @@ describe("glass SEO helpers", () => {
     expect(isGlassServicePageSlug("services")).toBe(false);
   });
 
+  it("uses the exact public brand name in LocalBusiness schema", () => {
+    expect(buildGlassLocalBusinessLd()).toMatchObject({
+      "@type": "LocalBusiness",
+      name: "Glass & Door Pro",
+      url: "https://glassanddoorpro.com/",
+    });
+  });
+
   it("adds service-level areaServed to non-frameless service pages", () => {
     const schema = buildGlassServiceLdForCmsPage({
       slug: "services-window-installation",

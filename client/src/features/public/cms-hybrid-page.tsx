@@ -10,7 +10,13 @@ import type { CmsPage, SeoSettings } from "@shared/schema";
 import { normalizeSeoDescription } from "@shared/seo-description";
 import { correctGlassSearchTitle } from "@shared/glass-search-snippets";
 import { JsonLd } from "@/components/shared/json-ld";
-import { buildBreadcrumbLd, buildFaqPageLd, extractFaqItems } from "@/lib/structured-data";
+import {
+  buildBreadcrumbLd,
+  buildFaqPageLd,
+  buildOrganizationLd,
+  buildWebSiteLd,
+  extractFaqItems,
+} from "@/lib/structured-data";
 import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
 import {
   buildGlassBreadcrumbItems,
@@ -112,10 +118,6 @@ function absoluteUrl(path: string, origin: string) {
   return `${origin.replace(/\/$/, "")}${path.startsWith("/") ? "" : "/"}${path}`;
 }
 
-function hasBrandSuffix(title: string) {
-  return /\s[|–—-]\sGlass (?:&|and) Door Pro$/i.test(title.trim());
-}
-
 function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSettings }) {
   useEffect(() => {
     const prevTitle = document.title;
@@ -126,14 +128,14 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
       seoOverride?.title || page.seoTitle || page.title,
     );
     const titleSuffix = globalSeo?.titleSuffix ?? " | Glass & Door Pro";
-    const titleFormatter =
-      page.slug === "home" || isGlassServicePageSlug(page.slug)
-        ? formatBrandLastTitle
-        : formatBrandFirstTitle;
-    const headTitle =
-      effectiveTitle && hasBrandSuffix(effectiveTitle)
-        ? effectiveTitle
-        : titleFormatter(effectiveTitle, titleSuffix, globalSeo?.siteName ?? "Glass & Door Pro");
+    const titleFormatter = isGlassServicePageSlug(page.slug)
+      ? formatBrandLastTitle
+      : formatBrandFirstTitle;
+    const headTitle = titleFormatter(
+      effectiveTitle,
+      titleSuffix,
+      globalSeo?.siteName ?? "Glass & Door Pro",
+    );
     const effectiveDescription =
       seoOverride?.description ||
       normalizeSeoDescription(page.seoDescription) ||
@@ -207,6 +209,8 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
   return (
     <JsonLd
       schemas={[
+        isHome && globalSeo ? buildOrganizationLd(globalSeo) : null,
+        isHome && globalSeo ? buildWebSiteLd(globalSeo) : null,
         buildGlassLocalBusinessLd(origin, cityArea),
         buildGlassServiceLdForCmsPage(page, origin),
         breadcrumbs,

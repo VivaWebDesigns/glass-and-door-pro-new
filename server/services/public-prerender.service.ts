@@ -50,7 +50,7 @@ const FALLBACK_STATIC_PAGES: Record<
   { title: string; description: string; body: string; noindex?: boolean }
 > = {
   "/": {
-    title: "Home",
+    title: "Charlotte Glass, Door & Window Services",
     description:
       "Explore frameless showers, window installation, door installation, window repair, and commercial glass from Glass & Door Pro.",
     body: "Glass & Door Pro serves greater Charlotte with frameless showers, windows, doors, window repair, and commercial glass.",
@@ -526,10 +526,6 @@ function buildHeadTitle(
   seo?: SeoSettings | null,
   options?: { brandLast?: boolean },
 ) {
-  if (/\s[|–—-]\sGlass (?:&|and) Door Pro$/i.test(rawTitle.trim())) {
-    return rawTitle.trim();
-  }
-
   const titleSuffix = seo?.titleSuffix ?? " | Glass & Door Pro";
   const siteName = seo?.siteName ?? "Glass & Door Pro";
   return options?.brandLast
@@ -575,7 +571,8 @@ function buildWebsiteSchema(seo: SeoSettings | null, siteUrl: string) {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: seo?.siteName || "Glass & Door Pro",
-    url: siteUrl,
+    alternateName: ["Glass and Door Pro", "glassanddoorpro.com"],
+    url: `${siteUrl.replace(/\/$/, "")}/`,
   };
 }
 
@@ -715,9 +712,9 @@ function getFallbackLinkSections(pathname: string) {
   return [];
 }
 
-function getPrerenderHeading(page: Pick<CmsPage, "slug" | "title">, effectiveTitle: string) {
+function getPrerenderHeading(page: Pick<CmsPage, "slug" | "title">) {
   if (page.slug === "home") {
-    return effectiveTitle || "Glass & Door Services in Charlotte & Monroe, NC";
+    return "Glass & Door Pro: Charlotte Glass, Door & Window Services";
   }
 
   return page.title;
@@ -750,7 +747,7 @@ function buildCmsSnapshot(
     (publicPath === "/" ? siteUrl : `${siteUrl}${publicPath}`);
   const faqItems = extractFaqItems(normalizedVisiblePage.content);
   const bodyHtml = buildSimplePageBody(
-    getPrerenderHeading(normalizedVisiblePage, title),
+    getPrerenderHeading(normalizedVisiblePage),
     description,
     uniqueFragments(collectTextFragments(normalizedVisiblePage.content)),
     collectAnchoredSections(normalizedVisiblePage.content),
@@ -769,8 +766,7 @@ function buildCmsSnapshot(
 
   return {
     title: buildHeadTitle(title, seo, {
-      brandLast:
-        normalizedVisiblePage.slug === "home" || isGlassServicePageSlug(normalizedVisiblePage.slug),
+      brandLast: isGlassServicePageSlug(normalizedVisiblePage.slug),
     }),
     description,
     canonicalUrl,
@@ -787,6 +783,8 @@ function buildCmsSnapshot(
     bodyHtml,
     cmsPage: normalizedVisiblePage,
     jsonLd: [
+      normalizedVisiblePage.slug === "home" ? buildOrganizationSchema(seo, siteUrl) : null,
+      normalizedVisiblePage.slug === "home" ? buildWebsiteSchema(seo, siteUrl) : null,
       buildGlassLocalBusinessLd(siteUrl, cityArea),
       buildGlassServiceLdForCmsPage(normalizedVisiblePage, siteUrl),
       breadcrumbs,
