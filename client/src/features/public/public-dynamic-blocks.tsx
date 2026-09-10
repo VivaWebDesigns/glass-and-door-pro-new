@@ -25,7 +25,7 @@ export function ContactFormBlock({ props = {} }: { props?: Record<string, unknow
   if (variant === "split-contact") {
     const items = arr<{ icon: string; label: string; value: string; href?: string }>(props.contactItems);
     return (
-      <section id={str(props.anchorId) || "contact"} className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20" data-testid="dynamic-contact-form">
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20" data-testid="dynamic-contact-form">
         <div className="mb-10 max-w-3xl">
           {str(props.eyebrow) && (
             <p className="mb-3 text-sm font-bold uppercase tracking-[0.16em] text-[#1a8ead]">{str(props.eyebrow)}</p>

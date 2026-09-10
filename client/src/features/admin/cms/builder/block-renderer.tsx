@@ -1738,7 +1738,6 @@ function ContactFormBlock({ props = {} }: { props?: Record<string, unknown> }) {
     );
     return (
       <section
-        id={str(props.anchorId) || "contact"}
         className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20"
         data-testid="dynamic-contact-form"
       >

@@ -347,6 +347,13 @@ describe("ensureSystemCmsPages", () => {
               type: "hero",
               props: { heading: "Glass & Door Services Around Charlotte" },
             },
+            {
+              id: "copy",
+              type: "rich-text",
+              props: {
+                body: "From entry doors to patio doors, we options to enhance your home's security and style.",
+              },
+            },
           ],
         },
         updatedBy: "admin-id",
@@ -367,6 +374,13 @@ describe("ensureSystemCmsPages", () => {
             type: "hero",
             props: {
               heading: "Glass and Door Pro: Charlotte Glass, Door & Window Services",
+            },
+          },
+          {
+            id: "copy",
+            type: "rich-text",
+            props: {
+              body: "From entry doors to patio doors, I install options to enhance your home's security and style.",
             },
           },
         ],

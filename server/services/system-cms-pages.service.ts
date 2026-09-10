@@ -341,7 +341,7 @@ const businessHoursReplacements = [
   ["7 AM to 6 PM", "7 AM to 7 PM"],
 ] as const;
 
-const homepageBrandHeadingReplacements = [
+const homepageContentReplacements = [
   [
     "Glass & Door Services Around Charlotte",
     "Glass and Door Pro: Charlotte Glass, Door & Window Services",
@@ -353,6 +353,10 @@ const homepageBrandHeadingReplacements = [
   [
     "Glass & Door Pro: Charlotte Glass, Door & Window Services",
     "Glass and Door Pro: Charlotte Glass, Door & Window Services",
+  ],
+  [
+    "From entry doors to patio doors, we options to enhance your home's security and style.",
+    "From entry doors to patio doors, I install options to enhance your home's security and style.",
   ],
 ] as const;
 
@@ -683,12 +687,12 @@ async function normalizeStoredCmsPages() {
       const contentWithReviews = ensureGoogleReviewItems(updates.content ?? page.content, true);
       if (contentWithReviews) updates.content = contentWithReviews as InsertCmsPage["content"];
 
-      const contentWithBrandHeading = replaceStoredStrings(
+      const contentWithHomepageCorrections = replaceStoredStrings(
         updates.content ?? page.content,
-        homepageBrandHeadingReplacements,
+        homepageContentReplacements,
       );
-      if (contentWithBrandHeading !== (updates.content ?? page.content)) {
-        updates.content = contentWithBrandHeading as InsertCmsPage["content"];
+      if (contentWithHomepageCorrections !== (updates.content ?? page.content)) {
+        updates.content = contentWithHomepageCorrections as InsertCmsPage["content"];
       }
     }
 
