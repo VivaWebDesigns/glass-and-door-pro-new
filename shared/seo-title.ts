@@ -26,7 +26,7 @@ function brandAliases(brand: string) {
 export function formatBrandFirstTitle(
   rawTitle: string | null | undefined,
   titleSuffix: string | null | undefined,
-  fallbackBrand = "Glass & Door Pro",
+  fallbackBrand = "Glass and Door Pro",
 ) {
   const title = (rawTitle || "").trim();
   const brand = cleanBrand(titleSuffix, fallbackBrand);
@@ -56,7 +56,7 @@ export function formatBrandFirstTitle(
 export function formatBrandLastTitle(
   rawTitle: string | null | undefined,
   titleSuffix: string | null | undefined,
-  fallbackBrand = "Glass & Door Pro",
+  fallbackBrand = "Glass and Door Pro",
 ) {
   let title = (rawTitle || "").trim();
   const brand = cleanBrand(titleSuffix, fallbackBrand);

@@ -127,14 +127,14 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
       page.slug,
       seoOverride?.title || page.seoTitle || page.title,
     );
-    const titleSuffix = globalSeo?.titleSuffix ?? " | Glass & Door Pro";
+    const titleSuffix = globalSeo?.titleSuffix ?? " | Glass and Door Pro";
     const titleFormatter = isGlassServicePageSlug(page.slug)
       ? formatBrandLastTitle
       : formatBrandFirstTitle;
     const headTitle = titleFormatter(
       effectiveTitle,
       titleSuffix,
-      globalSeo?.siteName ?? "Glass & Door Pro",
+      globalSeo?.siteName ?? "Glass and Door Pro",
     );
     const effectiveDescription =
       seoOverride?.description ||

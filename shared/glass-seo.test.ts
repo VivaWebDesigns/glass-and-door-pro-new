@@ -28,7 +28,7 @@ describe("glass SEO helpers", () => {
   it("uses the exact public brand name in LocalBusiness schema", () => {
     expect(buildGlassLocalBusinessLd()).toMatchObject({
       "@type": "LocalBusiness",
-      name: "Glass & Door Pro",
+      name: "Glass and Door Pro",
       url: "https://glassanddoorpro.com/",
     });
   });

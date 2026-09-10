@@ -44,7 +44,7 @@ import { CmsSitemapTab } from "./cms-sitemap-tab";
 
 const seoFormSchema = z.object({
   siteName: z.string().min(1, "Site name is required"),
-  titleSuffix: z.string().default(" | Glass & Door Pro"),
+  titleSuffix: z.string().default(" | Glass and Door Pro"),
   defaultMetaDescription: z.string().max(320, "Keep under 320 characters").optional().nullable(),
   siteUrl: z
     .string()
@@ -55,25 +55,10 @@ const seoFormSchema = z.object({
   defaultOgImageUrl: z.string().optional().nullable(),
   organizationName: z.string().optional().nullable(),
   organizationLogoUrl: z.string().optional().nullable(),
-  facebookUrl: z
-    .string()
-    .url("Must be a valid URL")
-    .optional()
-    .or(z.literal(""))
-    .nullable(),
+  facebookUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")).nullable(),
   twitterHandle: z.string().optional().nullable(),
-  linkedinUrl: z
-    .string()
-    .url("Must be a valid URL")
-    .optional()
-    .or(z.literal(""))
-    .nullable(),
-  instagramUrl: z
-    .string()
-    .url("Must be a valid URL")
-    .optional()
-    .or(z.literal(""))
-    .nullable(),
+  linkedinUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")).nullable(),
+  instagramUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")).nullable(),
   defaultRobotsNoindex: z.boolean().default(false),
 });
 
@@ -83,37 +68,43 @@ const ROADMAP_ITEMS = [
   {
     icon: Globe,
     title: "Per-Page SEO",
-    description: "CMS pages already support per-page seoTitle, seoDescription, seoKeywords, and ogImageUrl. Full edit UI exists in the page editor.",
+    description:
+      "CMS pages already support per-page seoTitle, seoDescription, seoKeywords, and ogImageUrl. Full edit UI exists in the page editor.",
     status: "available",
   },
   {
     icon: SearchIcon,
     title: "Per-Post SEO",
-    description: "Retired blog post SEO fields are no longer used by the public Glass & Door Pro site.",
+    description:
+      "Retired blog post SEO fields are no longer used by the public Glass & Door Pro site.",
     status: "available",
   },
   {
     icon: Code2,
     title: "Structured Data / JSON-LD",
-    description: "Organization, LocalBusiness, WebSite, BreadcrumbList, Service, OfferCatalog, and FAQPage JSON-LD are generated from current Glass & Door Pro content.",
+    description:
+      "Organization, LocalBusiness, WebSite, BreadcrumbList, Service, OfferCatalog, and FAQPage JSON-LD are generated from current Glass & Door Pro content.",
     status: "available",
   },
   {
     icon: Map,
     title: "Sitemap Generation",
-    description: "Auto-generated /sitemap.xml from published public pages. Draft, noindex, and retired legacy content is excluded. Preview available in the Sitemap tab.",
+    description:
+      "Auto-generated /sitemap.xml from published public pages. Draft, noindex, and retired legacy content is excluded. Preview available in the Sitemap tab.",
     status: "available",
   },
   {
     icon: ListChecks,
     title: "Redirects Manager",
-    description: "Manage 301/302 redirects for slug changes and retired pages. Redirects are applied server-side before the frontend loads. Toggle active/inactive without deleting.",
+    description:
+      "Manage 301/302 redirects for slug changes and retired pages. Redirects are applied server-side before the frontend loads. Toggle active/inactive without deleting.",
     status: "available",
   },
   {
     icon: BarChart2,
     title: "SEO Audit",
-    description: "Scans current CMS pages for missing SEO title, meta description, social image, noindex flags, and publication status. Includes direct edit links.",
+    description:
+      "Scans current CMS pages for missing SEO title, meta description, social image, noindex flags, and publication status. Includes direct edit links.",
     status: "available",
   },
 ];
@@ -121,13 +112,19 @@ const ROADMAP_ITEMS = [
 function StatusBadge({ status }: { status: string }) {
   if (status === "available") {
     return (
-      <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-xs">
+      <Badge
+        variant="secondary"
+        className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-xs"
+      >
         Available
       </Badge>
     );
   }
   return (
-    <Badge variant="secondary" className="bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400 text-xs">
+    <Badge
+      variant="secondary"
+      className="bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400 text-xs"
+    >
       Planned
     </Badge>
   );
@@ -144,12 +141,12 @@ export default function CmsSeoPage() {
   const form = useForm<SeoFormValues>({
     resolver: zodResolver(seoFormSchema),
     defaultValues: {
-      siteName: "Glass & Door Pro",
-      titleSuffix: " | Glass & Door Pro",
+      siteName: "Glass and Door Pro",
+      titleSuffix: " | Glass and Door Pro",
       defaultMetaDescription: "",
       siteUrl: "",
       defaultOgImageUrl: "",
-      organizationName: "Glass & Door Pro",
+      organizationName: "Glass and Door Pro",
       organizationLogoUrl: "",
       facebookUrl: "",
       twitterHandle: "",
@@ -162,12 +159,12 @@ export default function CmsSeoPage() {
   useEffect(() => {
     if (settings) {
       form.reset({
-        siteName: settings.siteName ?? "Glass & Door Pro",
-        titleSuffix: settings.titleSuffix ?? " | Glass & Door Pro",
+        siteName: settings.siteName ?? "Glass and Door Pro",
+        titleSuffix: settings.titleSuffix ?? " | Glass and Door Pro",
         defaultMetaDescription: settings.defaultMetaDescription ?? "",
         siteUrl: settings.siteUrl ?? "",
         defaultOgImageUrl: settings.defaultOgImageUrl ?? "",
-        organizationName: settings.organizationName ?? "Glass & Door Pro",
+        organizationName: settings.organizationName ?? "Glass and Door Pro",
         organizationLogoUrl: settings.organizationLogoUrl ?? "",
         facebookUrl: settings.facebookUrl ?? "",
         twitterHandle: settings.twitterHandle ?? "",
@@ -179,8 +176,7 @@ export default function CmsSeoPage() {
   }, [settings, form]);
 
   const saveMutation = useMutation({
-    mutationFn: (data: SeoFormValues) =>
-      apiRequest("PUT", "/api/admin/cms/seo", data),
+    mutationFn: (data: SeoFormValues) => apiRequest("PUT", "/api/admin/cms/seo", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/seo"] });
       queryClient.invalidateQueries({ queryKey: ["/api/seo/global"] });
@@ -197,7 +193,11 @@ export default function CmsSeoPage() {
 
   const descValue = form.watch("defaultMetaDescription") ?? "";
   const lastUpdated = settings?.updatedAt
-    ? new Date(settings.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+    ? new Date(settings.updatedAt).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
     : null;
 
   return (
@@ -222,11 +222,21 @@ export default function CmsSeoPage() {
 
         <Tabs defaultValue="settings">
           <TabsList className="flex-wrap h-auto gap-1">
-            <TabsTrigger value="settings" data-testid="tab-seo-settings">Global Settings</TabsTrigger>
-            <TabsTrigger value="audit" data-testid="tab-seo-audit">SEO Audit</TabsTrigger>
-            <TabsTrigger value="redirects" data-testid="tab-seo-redirects">Redirects</TabsTrigger>
-            <TabsTrigger value="sitemap" data-testid="tab-seo-sitemap">Sitemap</TabsTrigger>
-            <TabsTrigger value="roadmap" data-testid="tab-seo-roadmap">Architecture & Roadmap</TabsTrigger>
+            <TabsTrigger value="settings" data-testid="tab-seo-settings">
+              Global Settings
+            </TabsTrigger>
+            <TabsTrigger value="audit" data-testid="tab-seo-audit">
+              SEO Audit
+            </TabsTrigger>
+            <TabsTrigger value="redirects" data-testid="tab-seo-redirects">
+              Redirects
+            </TabsTrigger>
+            <TabsTrigger value="sitemap" data-testid="tab-seo-sitemap">
+              Sitemap
+            </TabsTrigger>
+            <TabsTrigger value="roadmap" data-testid="tab-seo-roadmap">
+              Architecture & Roadmap
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="settings" className="space-y-5 mt-5">
@@ -239,7 +249,6 @@ export default function CmsSeoPage() {
             ) : (
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-
                   <Card>
                     <CardHeader className="pb-3">
                       <div className="flex items-center gap-2">
@@ -260,7 +269,7 @@ export default function CmsSeoPage() {
                             <FormControl>
                               <Input
                                 {...field}
-                                placeholder="Glass & Door Pro"
+                                placeholder="Glass and Door Pro"
                                 data-testid="input-site-name"
                               />
                             </FormControl>
@@ -281,7 +290,7 @@ export default function CmsSeoPage() {
                               <Input
                                 {...field}
                                 value={field.value ?? ""}
-                                placeholder="Glass & Door Pro"
+                                placeholder="Glass and Door Pro"
                                 data-testid="input-org-name"
                               />
                             </FormControl>
@@ -337,12 +346,13 @@ export default function CmsSeoPage() {
                             <FormControl>
                               <Input
                                 {...field}
-                                placeholder=" | Glass & Door Pro"
+                                placeholder=" | Glass and Door Pro"
                                 data-testid="input-title-suffix"
                               />
                             </FormControl>
                             <FormDescription className="text-xs">
-                              Appended to page titles — e.g. "Window Repair Charlotte NC | Glass & Door Pro"
+                              Appended to page titles — e.g. "Window Repair Charlotte NC | Glass and
+                              Door Pro"
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -355,7 +365,9 @@ export default function CmsSeoPage() {
                           <FormItem>
                             <FormLabel>
                               Default Meta Description
-                              <span className={`ml-2 text-xs font-normal ${descValue.length > 160 ? "text-amber-500" : "text-muted-foreground"}`}>
+                              <span
+                                className={`ml-2 text-xs font-normal ${descValue.length > 160 ? "text-amber-500" : "text-muted-foreground"}`}
+                              >
                                 {descValue.length}/160 recommended
                               </span>
                             </FormLabel>
@@ -409,7 +421,8 @@ export default function CmsSeoPage() {
                         <CardTitle className="text-base">Default Open Graph Image</CardTitle>
                       </div>
                       <CardDescription className="text-xs">
-                        Fallback image for social sharing when a page has no custom OG image. Recommended: 1200×630 px.
+                        Fallback image for social sharing when a page has no custom OG image.
+                        Recommended: 1200×630 px.
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -440,7 +453,8 @@ export default function CmsSeoPage() {
                         <CardTitle className="text-base">Organization Logo</CardTitle>
                       </div>
                       <CardDescription className="text-xs">
-                        Used in Organization structured data and as a fallback brand image. Recommended: square PNG or SVG.
+                        Used in Organization structured data and as a fallback brand image.
+                        Recommended: square PNG or SVG.
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -579,7 +593,8 @@ export default function CmsSeoPage() {
               <CardHeader className="pb-3">
                 <CardTitle className="text-base">SEO Architecture</CardTitle>
                 <CardDescription className="text-xs">
-                  Current capabilities and the planned roadmap for per-page SEO, structured data, and technical SEO tooling
+                  Current capabilities and the planned roadmap for per-page SEO, structured data,
+                  and technical SEO tooling
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-1">
@@ -625,8 +640,10 @@ export default function CmsSeoPage() {
                   </a>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Returns the current global SEO settings. Used by the <code className="text-xs bg-muted px-1 py-0.5 rounded">useSeo</code> hook
-                  and public pages to apply site-wide defaults for title suffix, OG image, and robots preferences.
+                  Returns the current global SEO settings. Used by the{" "}
+                  <code className="text-xs bg-muted px-1 py-0.5 rounded">useSeo</code> hook and
+                  public pages to apply site-wide defaults for title suffix, OG image, and robots
+                  preferences.
                 </p>
               </CardContent>
             </Card>

@@ -359,14 +359,14 @@ describe("ensureSystemCmsPages", () => {
 
     expect(mockUpdatePage).toHaveBeenCalledTimes(1);
     expect(mockUpdatePage).toHaveBeenCalledWith("home-id", {
-      seoTitle: "Glass & Door Pro | Charlotte Glass, Door & Window Services",
+      seoTitle: "Glass and Door Pro | Charlotte Glass, Door & Window Services",
       content: {
         blocks: [
           {
             id: "hero",
             type: "hero",
             props: {
-              heading: "Glass & Door Pro: Charlotte Glass, Door & Window Services",
+              heading: "Glass and Door Pro: Charlotte Glass, Door & Window Services",
             },
           },
         ],

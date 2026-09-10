@@ -28,10 +28,10 @@ export default function HomePage() {
         <section className="bg-slate-950 text-white">
           <div className="mx-auto flex min-h-[520px] max-w-7xl flex-col justify-center px-4 py-20 sm:px-6 lg:px-8">
             <p className="mb-4 text-sm font-semibold uppercase tracking-wide text-sky-200">
-              Glass & Door Pro
+              Glass and Door Pro
             </p>
             <h1 className="max-w-3xl text-4xl font-bold tracking-normal sm:text-5xl">
-              Glass & Door Pro: Charlotte Glass, Door & Window Services
+              Glass and Door Pro: Charlotte Glass, Door & Window Services
             </h1>
             <p className="mt-5 max-w-2xl text-lg text-slate-200">
               Owner-operated service for frameless showers, window installation, door repair, and

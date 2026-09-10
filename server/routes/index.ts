@@ -51,7 +51,7 @@ export function registerApiRoutes(app: Express) {
           DEFAULT_FRONTEND_LOGO_URL,
         ),
         faviconUrl: resolveLocalUploadUrlOrFallback(branding.favicon_url, DEFAULT_FAVICON_URL),
-        companyName: branding.company_name || "Glass & Door Pro",
+        companyName: branding.company_name || "Glass and Door Pro",
         companyAddress:
           branding.company_address || "6135 Park South Drive\nSuite 542\nCharlotte, NC 28210",
         companyPhoneNumbers: branding.company_phone_numbers || "(704) 771-6111",
@@ -111,7 +111,7 @@ export function registerApiRoutes(app: Express) {
       res.json({
         frontendLogoUrl: DEFAULT_FRONTEND_LOGO_URL,
         faviconUrl: DEFAULT_FAVICON_URL,
-        companyName: "Glass & Door Pro",
+        companyName: "Glass and Door Pro",
         companyAddress: "6135 Park South Drive\nSuite 542\nCharlotte, NC 28210",
         companyPhoneNumbers: "(704) 771-6111",
         companyGoogleBusinessUrl: null,

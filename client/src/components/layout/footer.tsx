@@ -9,15 +9,47 @@ import { GLASS_PRIMARY_SERVICE_AREAS } from "@shared/glass-service-areas";
 
 const defaultPlatformLinks = [
   { href: "/services", label: "All Services", testId: "link-footer-services" },
-  { href: "/services/frameless-showers", label: "Frameless Showers", testId: "link-footer-frameless-showers" },
-  { href: "/services/window-installation", label: "Window Installation", testId: "link-footer-window-installation" },
-  { href: "/services/door-installation", label: "Door Installation", testId: "link-footer-door-installation" },
+  {
+    href: "/services/frameless-showers",
+    label: "Frameless Showers",
+    testId: "link-footer-frameless-showers",
+  },
+  {
+    href: "/services/window-installation",
+    label: "Window Installation",
+    testId: "link-footer-window-installation",
+  },
+  {
+    href: "/services/door-installation",
+    label: "Door Installation",
+    testId: "link-footer-door-installation",
+  },
   { href: "/services/window-repair", label: "Window Repair", testId: "link-footer-window-repair" },
-  { href: "/services/commercial-storefront-glass-installation", label: "Commercial Storefront Glass Installation", testId: "link-footer-commercial-storefront-glass-installation" },
-  { href: "/services/commercial-storefront-glass-replacement-repair", label: "Commercial Storefront Glass Replacement & Repair", testId: "link-footer-commercial-storefront-glass-replacement-repair" },
-  { href: "/services/commercial-door-installation", label: "Commercial Door Installation", testId: "link-footer-commercial-door-installation" },
-  { href: "/services/commercial-door-replacement-repair", label: "Commercial Door Replacement & Repair", testId: "link-footer-commercial-door-replacement-repair" },
-  { href: "/services/commercial-window-replacement", label: "Commercial Window Replacement", testId: "link-footer-commercial-window-replacement" },
+  {
+    href: "/services/commercial-storefront-glass-installation",
+    label: "Commercial Storefront Glass Installation",
+    testId: "link-footer-commercial-storefront-glass-installation",
+  },
+  {
+    href: "/services/commercial-storefront-glass-replacement-repair",
+    label: "Commercial Storefront Glass Replacement & Repair",
+    testId: "link-footer-commercial-storefront-glass-replacement-repair",
+  },
+  {
+    href: "/services/commercial-door-installation",
+    label: "Commercial Door Installation",
+    testId: "link-footer-commercial-door-installation",
+  },
+  {
+    href: "/services/commercial-door-replacement-repair",
+    label: "Commercial Door Replacement & Repair",
+    testId: "link-footer-commercial-door-replacement-repair",
+  },
+  {
+    href: "/services/commercial-window-replacement",
+    label: "Commercial Window Replacement",
+    testId: "link-footer-commercial-window-replacement",
+  },
   { href: "/gallery", label: "Gallery", testId: "link-footer-gallery" },
   { href: "/reviews", label: "Reviews", testId: "link-footer-reviews" },
 ];
@@ -34,7 +66,11 @@ const defaultServiceAreaLinks = [
 const defaultCompanyLinks = [
   { href: "/#contact", label: "Contact", testId: "link-footer-contact" },
   { href: "tel:+17047716111", label: "(704) 771-6111", testId: "link-footer-phone" },
-  { href: "mailto:Doug@GlassandDoorPro.com", label: "Doug@GlassandDoorPro.com", testId: "link-footer-email" },
+  {
+    href: "mailto:Doug@GlassandDoorPro.com",
+    label: "Doug@GlassandDoorPro.com",
+    testId: "link-footer-email",
+  },
 ];
 
 const defaultLegalLinks = [
@@ -191,13 +227,7 @@ function FooterTextLink({ link }: { link: FooterLegalLink }) {
   );
 }
 
-function ContactInfoItem({
-  icon: Icon,
-  children,
-}: {
-  icon: typeof MapPin;
-  children: ReactNode;
-}) {
+function ContactInfoItem({ icon: Icon, children }: { icon: typeof MapPin; children: ReactNode }) {
   return (
     <li className="flex items-start gap-3 text-sm leading-6 text-slate-400">
       <Icon className="mt-0.5 h-5 w-5 shrink-0 text-cyan-500" aria-hidden="true" />
@@ -227,45 +257,67 @@ export function Footer() {
   }, [publicMenus]);
 
   const servicesLinks = useMemo(() => {
-    const platformLinks = menuItemsToLinks(publicMenus?.footer_platform?.items as MenuItem[] | undefined, "link-footer-platform");
-    const professionalLinks = menuItemsToLinks(publicMenus?.footer_professionals?.items as MenuItem[] | undefined, "link-footer-professionals");
-    const galleryLinks = menuItemsToLinks(publicMenus?.footer_resources?.items as MenuItem[] | undefined, "link-footer-resources")
-      .filter((link) => /gallery/i.test(link.label));
-    const cmsLinks = uniqueFooterLinks([...platformLinks, ...professionalLinks, ...galleryLinks])
-      .filter((link) => !/quote/i.test(link.label));
+    const platformLinks = menuItemsToLinks(
+      publicMenus?.footer_platform?.items as MenuItem[] | undefined,
+      "link-footer-platform",
+    );
+    const professionalLinks = menuItemsToLinks(
+      publicMenus?.footer_professionals?.items as MenuItem[] | undefined,
+      "link-footer-professionals",
+    );
+    const galleryLinks = menuItemsToLinks(
+      publicMenus?.footer_resources?.items as MenuItem[] | undefined,
+      "link-footer-resources",
+    ).filter((link) => /gallery/i.test(link.label));
+    const cmsLinks = uniqueFooterLinks([
+      ...platformLinks,
+      ...professionalLinks,
+      ...galleryLinks,
+    ]).filter((link) => !/quote/i.test(link.label));
 
     return cmsLinks.length > 0 ? ensureServicesHubLink(cmsLinks) : defaultPlatformLinks;
   }, [publicMenus]) as FooterLegalLink[];
 
   const serviceAreaLinks = useMemo(() => {
-    const links = menuItemsToLinks(publicMenus?.footer_resources?.items as MenuItem[] | undefined, "link-footer-service-areas")
-      .filter((link) => link.href.startsWith("/service-areas/"));
+    const links = menuItemsToLinks(
+      publicMenus?.footer_resources?.items as MenuItem[] | undefined,
+      "link-footer-service-areas",
+    ).filter((link) => link.href.startsWith("/service-areas/"));
     return links.length > 0
       ? ensureServiceAreasHubLink(uniqueFooterLinks(links))
       : defaultServiceAreaLinks;
   }, [publicMenus]) as FooterLegalLink[];
 
   const companyLinks = useMemo(() => {
-    const links = menuItemsToLinks(publicMenus?.footer_company?.items as MenuItem[] | undefined, "link-footer-company");
+    const links = menuItemsToLinks(
+      publicMenus?.footer_company?.items as MenuItem[] | undefined,
+      "link-footer-company",
+    );
     return links.length > 0 ? links : defaultCompanyLinks;
   }, [publicMenus]) as FooterLegalLink[];
 
   const legalLinks = useMemo(() => {
-    const links = menuItemsToLinks(publicMenus?.footer_legal?.items as MenuItem[] | undefined, "link-footer-legal");
+    const links = menuItemsToLinks(
+      publicMenus?.footer_legal?.items as MenuItem[] | undefined,
+      "link-footer-legal",
+    );
     return links.length > 0 ? links : defaultLegalLinks;
   }, [publicMenus]) as FooterLegalLink[];
 
-  const brandLogo = frontendLogoUrl || "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
-  const brandName = companyName || "Glass & Door Pro";
-  const address = (companyAddress || "6135 Park South Drive Suite 542, Charlotte, NC 28210").replace(/\s*\n\s*/g, ", ");
+  const brandLogo =
+    frontendLogoUrl || "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
+  const brandName = companyName || "Glass and Door Pro";
+  const address = (
+    companyAddress || "6135 Park South Drive Suite 542, Charlotte, NC 28210"
+  ).replace(/\s*\n\s*/g, ", ");
   const phone = companyPhoneNumbers || "(704) 771-6111";
-  const phoneLink = companyLinks.find((link) => link.href.startsWith("tel:"))?.href || "tel:+17047716111";
-  const emailLink =
-    companyLinks.find((link) => link.href.startsWith("mailto:")) || {
-      href: "mailto:Doug@GlassandDoorPro.com",
-      label: "Doug@GlassandDoorPro.com",
-      testId: "link-footer-email",
-    };
+  const phoneLink =
+    companyLinks.find((link) => link.href.startsWith("tel:"))?.href || "tel:+17047716111";
+  const emailLink = companyLinks.find((link) => link.href.startsWith("mailto:")) || {
+    href: "mailto:Doug@GlassandDoorPro.com",
+    label: "Doug@GlassandDoorPro.com",
+    testId: "link-footer-email",
+  };
 
   return (
     <footer className="border-t border-slate-800 bg-slate-900 text-slate-200" data-testid="footer">

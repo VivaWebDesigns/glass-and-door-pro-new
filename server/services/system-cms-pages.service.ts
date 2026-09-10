@@ -344,11 +344,15 @@ const businessHoursReplacements = [
 const homepageBrandHeadingReplacements = [
   [
     "Glass & Door Services Around Charlotte",
-    "Glass & Door Pro: Charlotte Glass, Door & Window Services",
+    "Glass and Door Pro: Charlotte Glass, Door & Window Services",
   ],
   [
     "We've got your glass & door needs covered.",
+    "Glass and Door Pro: Charlotte Glass, Door & Window Services",
+  ],
+  [
     "Glass & Door Pro: Charlotte Glass, Door & Window Services",
+    "Glass and Door Pro: Charlotte Glass, Door & Window Services",
   ],
 ] as const;
 
@@ -356,6 +360,7 @@ const legacyHomepageSeoTitles = new Set([
   "Glass & Door Services in Charlotte NC",
   "Glass & Door Services in Charlotte, NC",
   "Glass & Door Services in Charlotte & Monroe, NC",
+  "Glass & Door Pro | Charlotte Glass, Door & Window Services",
 ]);
 
 const businessAddressReplacements = [
@@ -669,7 +674,7 @@ async function normalizeStoredCmsPages() {
 
     if (page.slug === "home") {
       if (page.seoTitle && legacyHomepageSeoTitles.has(page.seoTitle)) {
-        updates.seoTitle = "Glass & Door Pro | Charlotte Glass, Door & Window Services";
+        updates.seoTitle = "Glass and Door Pro | Charlotte Glass, Door & Window Services";
       }
 
       const content = ensureHomepageServiceCards(page.content);

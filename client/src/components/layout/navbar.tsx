@@ -1,10 +1,6 @@
 import { useState, useMemo } from "react";
 import { Link, useLocation } from "wouter";
-import {
-  Menu,
-  ChevronDown,
-  Phone,
-} from "lucide-react";
+import { Menu, ChevronDown, Phone } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -27,10 +23,19 @@ const defaultNavLinks = [
   { label: "Window Installation", href: "/services/window-installation" },
   { label: "Door Installation", href: "/services/door-installation" },
   { label: "Window Repair", href: "/services/window-repair" },
-  { label: "Commercial Storefront Glass Installation", href: "/services/commercial-storefront-glass-installation" },
-  { label: "Commercial Storefront Glass Replacement & Repair", href: "/services/commercial-storefront-glass-replacement-repair" },
+  {
+    label: "Commercial Storefront Glass Installation",
+    href: "/services/commercial-storefront-glass-installation",
+  },
+  {
+    label: "Commercial Storefront Glass Replacement & Repair",
+    href: "/services/commercial-storefront-glass-replacement-repair",
+  },
   { label: "Commercial Door Installation", href: "/services/commercial-door-installation" },
-  { label: "Commercial Door Replacement & Repair", href: "/services/commercial-door-replacement-repair" },
+  {
+    label: "Commercial Door Replacement & Repair",
+    href: "/services/commercial-door-replacement-repair",
+  },
   { label: "Commercial Window Replacement", href: "/services/commercial-window-replacement" },
   { label: "Reviews", href: "/reviews" },
 ];
@@ -196,8 +201,9 @@ export function Navbar() {
 
   const resourceLinks = allResourceLinks;
 
-  const brandLogo = frontendLogoUrl || "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
-  const brandName = companyName || "Glass & Door Pro";
+  const brandLogo =
+    frontendLogoUrl || "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
+  const brandName = companyName || "Glass and Door Pro";
 
   return (
     <nav
@@ -238,9 +244,7 @@ export function Navbar() {
                   data-testid={`link-nav-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
                   aria-current={location === item.url ? "page" : undefined}
                 >
-                  <Link href={item.url}>
-                    {item.label}
-                  </Link>
+                  <Link href={item.url}>{item.label}</Link>
                 </Button>
               ),
             )
@@ -255,9 +259,7 @@ export function Navbar() {
                   data-testid={`link-nav-${link.label.toLowerCase()}`}
                   aria-current={location === link.href ? "page" : undefined}
                 >
-                  <Link href={link.href}>
-                    {link.label}
-                  </Link>
+                  <Link href={link.href}>{link.label}</Link>
                 </Button>
               ))}
               {resourceLinks.length > 0 && (
@@ -267,7 +269,9 @@ export function Navbar() {
                       variant="ghost"
                       className="public-nav-link"
                       data-testid="link-nav-resources"
-                      aria-current={resourceLinks.some((r) => location === r.href) ? "page" : undefined}
+                      aria-current={
+                        resourceLinks.some((r) => location === r.href) ? "page" : undefined
+                      }
                     >
                       Resources
                       <ChevronDown className="ml-1 h-3.5 w-3.5" />
@@ -294,9 +298,7 @@ export function Navbar() {
                 data-testid="link-nav-contact"
                 aria-current={location === "/#contact" ? "page" : undefined}
               >
-                <Link href="/#contact">
-                  Contact
-                </Link>
+                <Link href="/#contact">Contact</Link>
               </Button>
             </>
           )}
@@ -348,32 +350,30 @@ export function Navbar() {
                   flattenItems(dynamicItems).map(({ item, depth }) => {
                     const overviewLink = getServicesOverviewLink(item);
                     return item.children && item.children.length > 0 ? (
-                        <div key={item.id}>
-                          <p
-                            className="px-4 pt-3 pb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider"
+                      <div key={item.id}>
+                        <p
+                          className="px-4 pt-3 pb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider"
+                          style={depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined}
+                          data-testid={`text-mobile-group-${item.id}`}
+                        >
+                          {item.label}
+                        </p>
+                        {overviewLink ? (
+                          <Button
+                            asChild
+                            variant="ghost"
+                            className={mobileNavButtonClassName}
                             style={depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined}
-                            data-testid={`text-mobile-group-${item.id}`}
+                            data-testid="link-mobile-services-overview"
+                            aria-current={location === overviewLink.href ? "page" : undefined}
                           >
-                            {item.label}
-                          </p>
-                          {overviewLink ? (
-                            <Button
-                              asChild
-                              variant="ghost"
-                              className={mobileNavButtonClassName}
-                              style={
-                                depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined
-                              }
-                              data-testid="link-mobile-services-overview"
-                              aria-current={location === overviewLink.href ? "page" : undefined}
-                            >
-                              <Link href={overviewLink.href} onClick={() => setMobileOpen(false)}>
-                                {overviewLink.label}
-                              </Link>
-                            </Button>
-                          ) : null}
-                        </div>
-                      ) : item.openInNewTab ? (
+                            <Link href={overviewLink.href} onClick={() => setMobileOpen(false)}>
+                              {overviewLink.label}
+                            </Link>
+                          </Button>
+                        ) : null}
+                      </div>
+                    ) : item.openInNewTab ? (
                       <Button
                         key={item.id}
                         asChild

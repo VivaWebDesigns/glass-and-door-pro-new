@@ -309,7 +309,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
       props: {
         anchorId: "hero",
         variant: "glass-home",
-        heading: "Glass & Door Pro: Charlotte Glass, Door & Window Services",
+        heading: "Glass and Door Pro: Charlotte Glass, Door & Window Services",
         subheading:
           "<p>Specializing in frameless glass showers, windows, and doors for homeowners in Charlotte, NC.</p>",
         ctaText: "Get a Free Quote",
@@ -1517,8 +1517,7 @@ const glassServicesContent: InsertCmsPage["content"] = {
   blocks: [
     serviceHero({
       heading: "Glass and Door Services",
-      subheading:
-        `Frameless showers, residential windows, door installation, window repair, and commercial glass and door services across ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby communities.`,
+      subheading: `Frameless showers, residential windows, door installation, window repair, and commercial glass and door services across ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby communities.`,
       imageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
       imageAlt: "Frameless glass shower and home glass services in the Charlotte area",
       imagePositionY: 42,
@@ -4683,7 +4682,7 @@ const glassMenus: Array<InsertCmsMenu & { location: MenuLocation }> = [
 const brandingSettings: Record<string, string> = {
   frontend_logo_url: "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp",
   favicon_url: "/favicon-32x32.png?v=large-2",
-  company_name: "Glass & Door Pro",
+  company_name: "Glass and Door Pro",
   company_address: "6135 Park South Drive\nSuite 542\nCharlotte, NC 28210",
   company_phone_numbers: "(704) 771-6111",
   frontend_body_font: "nunito-sans",
@@ -4703,13 +4702,13 @@ const brandingSettings: Record<string, string> = {
 };
 
 const glassSeoSettings: Partial<InsertSeoSettings> = {
-  siteName: "Glass & Door Pro",
-  titleSuffix: " | Glass & Door Pro",
+  siteName: "Glass and Door Pro",
+  titleSuffix: " | Glass and Door Pro",
   defaultMetaDescription:
-    "Glass & Door Pro serves Charlotte, NC with frameless shower doors, window installation, door replacement, window repair, and commercial glass.",
+    "Glass and Door Pro serves Charlotte, NC with frameless shower doors, window installation, door replacement, window repair, and commercial glass.",
   siteUrl: "https://glassanddoorpro.com",
   defaultOgImageUrl: "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png",
-  organizationName: "Glass & Door Pro",
+  organizationName: "Glass and Door Pro",
   organizationLogoUrl: "/images/glass-door-pro/brand/logo-full-white-bg.png",
 };
 
@@ -5004,7 +5003,7 @@ export async function seedGlassPublicCms() {
         status: "published",
         template: "full-width",
         content: glassHomeContent,
-        seoTitle: "Glass & Door Pro | Charlotte Glass, Door & Window Services",
+        seoTitle: "Glass and Door Pro | Charlotte Glass, Door & Window Services",
         seoDescription:
           "Glass & Door Pro serves Charlotte and Monroe, NC with frameless shower doors, window installation, door replacement, window repair, and commercial glass. Owner-operated with 15+ years of experience.",
         seoKeywords:
@@ -5022,7 +5021,7 @@ export async function seedGlassPublicCms() {
       status: "published",
       template: "full-width",
       content: glassHomeContent,
-      seoTitle: "Glass & Door Pro | Charlotte Glass, Door & Window Services",
+      seoTitle: "Glass and Door Pro | Charlotte Glass, Door & Window Services",
       seoDescription:
         "Glass & Door Pro serves Charlotte and Monroe, NC with frameless shower doors, window installation, door replacement, window repair, and commercial glass. Owner-operated with 15+ years of experience.",
       seoKeywords:
