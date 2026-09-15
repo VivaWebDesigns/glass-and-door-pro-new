@@ -47,3 +47,9 @@ These project operating notes are standing rules for working in this repository 
 
 11. Trust/process rule:
     There should be no mystery unpublished work sitting in the tree. Inspect, commit, push, and report clearly.
+
+## Post-push deployment boundary
+
+Once the requested changes have been pushed successfully, do not poll Railway, inspect Railway deployment status or logs, wait for a Railway deployment, fetch or curl the production website or API, or run `git pull` to determine whether Railway has deployed the changes.
+
+Only perform post-push deployment monitoring or live-production verification when I explicitly request it in the current task. Otherwise, treat the successful push as the completion boundary and report that the push succeeded and that the Railway deployment was not verified.
