@@ -174,6 +174,17 @@ describe("ensureSystemCmsPages", () => {
   it.each([
     [
       "Charlotte",
+      "Pineville",
+      "Matthews",
+      "Weddington",
+      "Indian Trail",
+      "Wesley Chapel",
+      "Stallings",
+      "Fort Mill",
+      "Indian Land",
+    ],
+    [
+      "Charlotte",
       "Monroe",
       "Indian Trail",
       "Stallings",

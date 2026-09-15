@@ -579,9 +579,20 @@ function updateStoredBusinessDetails(value: unknown): unknown {
   ]);
 }
 
-// Migrate only the two previously published complete link lists, preserving
+// Migrate only previously published complete link lists, preserving
 // surrounding copy and any independently edited/custom lists.
 const legacyServiceAreaListReplacements: TextReplacement[] = [
+  [
+    "Charlotte",
+    "Pineville",
+    "Matthews",
+    "Weddington",
+    "Indian Trail",
+    "Wesley Chapel",
+    "Stallings",
+    "Fort Mill",
+    "Indian Land",
+  ],
   [
     "Charlotte",
     "Monroe",
@@ -619,6 +630,7 @@ const legacyServiceAreaListReplacements: TextReplacement[] = [
 ]);
 
 const legacyPlainServiceAreaListReplacements: TextReplacement[] = [
+  "Charlotte, Pineville, Matthews, Weddington, Indian Trail, Wesley Chapel, Stallings, Fort Mill, Indian Land",
   "Charlotte, Monroe, Indian Trail, Stallings, Wesley Chapel, Waxhaw, Matthews, Weddington, Indian Land, Fort Mill, Pineville",
   "Charlotte, Monroe, Indian Trail, Stallings, Wesley Chapel, Waxhaw, Matthews, Weddington, Pineville, Fort Mill, Indian Land",
   "Charlotte, Monroe, Indian Trail, Matthews, Waxhaw",
