@@ -1,7 +1,7 @@
 import { useState, useEffect, lazy, Suspense, type MouseEvent, type ReactElement } from "react";
 import { useLocation } from "wouter";
 import { excludeServiceUtilitySnippets } from "@shared/glass-search-snippets";
-import { formatGlassReviewAge } from "@shared/glass-review-dates";
+import { formatGlassReviewDate } from "@shared/glass-review-dates";
 import { Button } from "@/components/ui/button";
 import { FormModalButton } from "@/components/forms/form-modal-button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -761,13 +761,13 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
   }) {
     const source = item.source || "Google";
     const showGoogleIcon = (item.sourceIcon || source).toLowerCase() === "google";
-    const reviewAge = formatGlassReviewAge(item.reviewDate, item.date);
+    const reviewDate = formatGlassReviewDate(item.reviewDate, item.date);
 
     return (
       <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
         {showGoogleIcon ? <GoogleSourceIcon /> : null}
         {!showGoogleIcon ? <span>{source}</span> : null}
-        {reviewAge ? <span className="font-medium text-[#1a8ead]">· {reviewAge}</span> : null}
+        {reviewDate ? <span className="font-medium text-[#1a8ead]">· {reviewDate}</span> : null}
       </div>
     );
   }

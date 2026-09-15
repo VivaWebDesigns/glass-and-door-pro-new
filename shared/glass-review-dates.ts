@@ -88,28 +88,15 @@ export function glassGoogleReviewDate(name: string) {
   return GLASS_GOOGLE_REVIEW_DATES[name as keyof typeof GLASS_GOOGLE_REVIEW_DATES];
 }
 
-export function formatGlassReviewAge(
-  reviewDate: string | undefined,
-  fallback = "",
-  now = new Date(),
-) {
+export function formatGlassReviewDate(reviewDate: string | undefined, fallback = "") {
   if (!reviewDate) return fallback;
 
-  const reviewed = new Date(`${reviewDate}T12:00:00`);
+  const reviewed = new Date(`${reviewDate}T12:00:00Z`);
   if (Number.isNaN(reviewed.getTime())) return fallback;
 
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12);
-  const reviewedDay = new Date(reviewed.getFullYear(), reviewed.getMonth(), reviewed.getDate(), 12);
-  const days = Math.max(0, Math.floor((today.getTime() - reviewedDay.getTime()) / 86_400_000));
-
-  if (days === 0) return "today";
-  if (days === 1) return "1 day ago";
-  if (days < 14) return `${days} days ago`;
-  if (days < 365) {
-    const weeks = Math.floor(days / 7);
-    return `${weeks} ${weeks === 1 ? "week" : "weeks"} ago`;
-  }
-
-  const years = Math.floor(days / 365);
-  return `${years} ${years === 1 ? "year" : "years"} ago`;
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(reviewed);
 }
