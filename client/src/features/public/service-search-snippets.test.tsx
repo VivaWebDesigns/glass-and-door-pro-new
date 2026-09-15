@@ -23,6 +23,8 @@ describe("search snippet utility exclusions", () => {
     "/services",
     "/services/window-repair",
     "/services/door-installation",
+    "/service-areas/wesley-chapel",
+    "/service-areas/waxhaw",
     "/services/frameless-showers",
   ])("keeps phone links functional and scopes exclusions on %s", (path) => {
     globalThis.React = React;

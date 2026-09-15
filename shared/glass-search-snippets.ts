@@ -13,7 +13,10 @@ export function correctGlassSearchTitle(slug: string, title: string | null | und
 }
 
 export function excludeServiceUtilitySnippets(pathname: string) {
-  return ["/services", "/services/window-repair", "/services/door-installation"].includes(
-    pathname.replace(/\/$/, ""),
+  const normalizedPath = pathname.split(/[?#]/, 1)[0]?.replace(/\/+$/, "") || "/";
+  return (
+    ["/services", "/services/window-repair", "/services/door-installation"].includes(
+      normalizedPath,
+    ) || /^\/service-areas\/[^/]+$/.test(normalizedPath)
   );
 }

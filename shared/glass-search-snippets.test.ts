@@ -31,11 +31,14 @@ describe("scoped search listing cleanup", () => {
       "/",
       "/services/frameless-showers",
       "/services/window-installation",
-      "/service-areas/monroe",
+      "/service-areas",
     ]) {
       expect(excludeServiceUtilitySnippets(path)).toBe(false);
     }
     expect(excludeServiceUtilitySnippets("/services/")).toBe(true);
+    expect(excludeServiceUtilitySnippets("/service-areas/monroe")).toBe(true);
+    expect(excludeServiceUtilitySnippets("/service-areas/wesley-chapel/")).toBe(true);
+    expect(excludeServiceUtilitySnippets("/service-areas/waxhaw?source=search")).toBe(true);
     expect(correctGlassSearchTitle("services-frameless-showers", "Charlotte & Monroe, NC")).toBe(
       "Charlotte & Monroe, NC",
     );
