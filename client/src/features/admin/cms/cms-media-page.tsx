@@ -319,6 +319,7 @@ export default function CmsMediaPage() {
             />
           </div>
           <select
+            aria-label="Filter media by usage"
             value={usageFilter}
             onChange={(e) => setUsageFilter(e.target.value as typeof usageFilter)}
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -330,6 +331,7 @@ export default function CmsMediaPage() {
             <option value="unused">Unused Everywhere</option>
           </select>
           <select
+            aria-label="Filter media by type"
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value as typeof typeFilter)}
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -340,6 +342,7 @@ export default function CmsMediaPage() {
             <option value="documents">Documents</option>
           </select>
           <select
+            aria-label="Sort media"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -525,6 +528,7 @@ export default function CmsMediaPage() {
                     {selectedAsset.url}
                   </span>
                   <Button
+                    aria-label="Copy media URL"
                     type="button"
                     variant="ghost"
                     size="icon"

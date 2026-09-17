@@ -118,11 +118,11 @@ function AuditRow({
       </div>
       <div className="flex items-center gap-1.5 flex-shrink-0">
         {previewPath && (
-          <a href={previewPath} target="_blank" rel="noopener noreferrer">
-            <Button size="sm" variant="ghost" className="h-7 px-2" data-testid={`audit-preview-${item.id}`}>
+          <Button asChild size="sm" variant="ghost" className="h-7 px-2" data-testid={`audit-preview-${item.id}`}>
+            <a href={previewPath} target="_blank" rel="noopener noreferrer" aria-label="Preview page (opens in a new tab)">
               <ExternalLink className="h-3.5 w-3.5" />
-            </Button>
-          </a>
+            </a>
+          </Button>
         )}
         <Link href={editPath}>
           <Button size="sm" variant="outline" className="h-7 px-3 text-xs" data-testid={`audit-edit-${item.id}`}>

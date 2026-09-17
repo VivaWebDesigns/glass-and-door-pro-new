@@ -370,13 +370,13 @@ function SidebarEditor({ sidebar, onClose }: { sidebar: CmsSidebar | null; onClo
                         <WidgetSettings widget={widget} onChange={(updates) => updateWidget(widget.id, updates)} />
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => moveWidget(widget.id, -1)} disabled={index === 0}>
+                        <Button aria-label="Move widget up" variant="ghost" size="icon" onClick={() => moveWidget(widget.id, -1)} disabled={index === 0}>
                           <ArrowUp className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => moveWidget(widget.id, 1)} disabled={index === widgets.length - 1}>
+                        <Button aria-label="Move widget down" variant="ghost" size="icon" onClick={() => moveWidget(widget.id, 1)} disabled={index === widgets.length - 1}>
                           <ArrowDown className="h-4 w-4" />
                         </Button>
-                        <Button
+                        <Button aria-label="Delete widget"
                           variant="ghost"
                           size="icon"
                           className="text-destructive hover:text-destructive"

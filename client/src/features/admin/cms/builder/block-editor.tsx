@@ -505,7 +505,7 @@ function ArrayItemsField({
             <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
               Item {idx + 1}
             </span>
-            <Button
+            <Button aria-label={`Remove item ${idx + 1}`}
               type="button"
               variant="ghost"
               size="icon"
@@ -795,7 +795,7 @@ function PropField({
     case "color":
       return (
         <div className="flex items-center gap-2">
-          <input
+          <input aria-label={propDef.label}
             type="color"
             value={normalizeColorValue(strVal, propDef.key)}
             onChange={(e) => onChange(e.target.value)}

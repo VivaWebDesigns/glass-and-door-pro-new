@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { CmsForm, CmsFormField, CmsFormListColumn } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
@@ -184,6 +184,7 @@ function ChoiceGroup({
   value: unknown;
   onChange: (next: unknown) => void;
 }) {
+  const groupName = useId();
   const choiceLayout = field.config?.choiceLayout === "grid"
     ? "grid gap-3 sm:grid-cols-2"
     : field.config?.choiceLayout === "inline"
@@ -194,7 +195,7 @@ function ChoiceGroup({
   const selectedValue = multiple ? "" : text(value);
 
   return (
-    <div className={choiceLayout}>
+    <div role="group" aria-label={field.label} className={choiceLayout}>
       {(field.options ?? []).map((option) => {
         const checked = multiple ? selectedValues.includes(option.value) : selectedValue === option.value;
         const toggle = (nextChecked: boolean) => {
@@ -210,11 +211,10 @@ function ChoiceGroup({
 
         if (field.type === "image-choice") {
           return (
-            <div
+            <label
               key={option.value}
-              onClick={() => toggle(!checked)}
               className={cn(
-                "cursor-pointer rounded-xl border p-3 text-left transition-colors",
+                "block cursor-pointer rounded-xl border p-3 text-left transition-colors focus-within:ring-2 focus-within:ring-primary",
                 checked ? "border-primary ring-2 ring-primary/10" : "hover:border-primary/50"
               )}
             >
@@ -222,10 +222,16 @@ function ChoiceGroup({
                 <img src={option.imageUrl} alt={option.label} className="mb-3 h-32 w-full rounded-lg object-cover" />
               ) : null}
               <div className="flex items-center gap-3">
-                <Checkbox checked={checked} className="pointer-events-none" />
+                <input
+                  type={multiple ? "checkbox" : "radio"}
+                  name={groupName}
+                  checked={checked}
+                  onChange={(event) => toggle(event.target.checked)}
+                  className="h-4 w-4 accent-primary"
+                />
                 <span className="text-sm font-medium">{option.label}</span>
               </div>
-            </div>
+            </label>
           );
         }
 
@@ -241,6 +247,7 @@ function ChoiceGroup({
         return (
           <label key={option.value} className="flex items-start gap-3 rounded-lg border px-3 py-2">
             <input
+              name={groupName}
               type="radio"
               checked={checked}
               onChange={() => onChange(option.value)}
@@ -320,7 +327,8 @@ function renderFieldInput(
   field: CmsFormField,
   value: unknown,
   setValue: (next: unknown) => void,
-  compact: boolean
+  compact: boolean,
+  fieldId: string
 ) {
   if (field.type === "html") {
     return (
@@ -346,6 +354,7 @@ function renderFieldInput(
   if (field.type === "textarea") {
     return (
       <Textarea
+        id={fieldId}
         value={text(value)}
         onChange={(event) => setValue(event.target.value)}
         placeholder={field.placeholder}
@@ -357,7 +366,7 @@ function renderFieldInput(
   if (field.type === "select") {
     return (
       <Select value={text(value)} onValueChange={setValue}>
-        <SelectTrigger>
+        <SelectTrigger id={fieldId}>
           <SelectValue placeholder={field.placeholder || `Select ${field.label.toLowerCase()}`} />
         </SelectTrigger>
         <SelectContent>
@@ -374,7 +383,7 @@ function renderFieldInput(
   if (field.type === "multiselect") {
     const current = arrayValue(value).map((item) => text(item));
     return (
-      <select
+      <select id={fieldId} aria-label={field.label}
         multiple
         value={current}
         onChange={(event) =>
@@ -419,11 +428,13 @@ function renderFieldInput(
           <Input
             value={text(record.firstName)}
             onChange={(event) => setValue({ ...record, firstName: event.target.value })}
+            aria-label={`${field.label}: First name`}
             placeholder="First name"
           />
           <Input
             value={text(record.lastName)}
             onChange={(event) => setValue({ ...record, lastName: event.target.value })}
+            aria-label={`${field.label}: Last name`}
             placeholder="Last name"
           />
         </div>
@@ -432,6 +443,7 @@ function renderFieldInput(
 
     return (
       <Input
+        id={fieldId}
         value={text(record.fullName)}
         onChange={(event) => setValue({ fullName: event.target.value })}
         placeholder={field.placeholder || "Full name"}
@@ -444,15 +456,15 @@ function renderFieldInput(
     const compactLayout = field.config?.addressLayout === "compact";
     return (
       <div className={cn("grid gap-4", compactLayout ? "md:grid-cols-2" : "grid-cols-1")}>
-        <Input value={text(record.street)} onChange={(event) => setValue({ ...record, street: event.target.value })} placeholder="Street address" />
+        <Input aria-label={`${field.label}: Street address`} value={text(record.street)} onChange={(event) => setValue({ ...record, street: event.target.value })} placeholder="Street address" />
         {field.config?.showStreet2 ? (
-          <Input value={text(record.street2)} onChange={(event) => setValue({ ...record, street2: event.target.value })} placeholder="Address line 2" />
+          <Input aria-label={`${field.label}: Address line 2`} value={text(record.street2)} onChange={(event) => setValue({ ...record, street2: event.target.value })} placeholder="Address line 2" />
         ) : null}
-        <Input value={text(record.city)} onChange={(event) => setValue({ ...record, city: event.target.value })} placeholder="City" />
-        <Input value={text(record.state)} onChange={(event) => setValue({ ...record, state: event.target.value })} placeholder="State / Province" />
-        <Input value={text(record.postalCode)} onChange={(event) => setValue({ ...record, postalCode: event.target.value })} placeholder="Postal code" />
+        <Input aria-label={`${field.label}: City`} value={text(record.city)} onChange={(event) => setValue({ ...record, city: event.target.value })} placeholder="City" />
+        <Input aria-label={`${field.label}: State / Province`} value={text(record.state)} onChange={(event) => setValue({ ...record, state: event.target.value })} placeholder="State / Province" />
+        <Input aria-label={`${field.label}: Postal code`} value={text(record.postalCode)} onChange={(event) => setValue({ ...record, postalCode: event.target.value })} placeholder="Postal code" />
         {field.config?.showCountry !== false ? (
-          <Input value={text(record.country)} onChange={(event) => setValue({ ...record, country: event.target.value })} placeholder="Country" />
+          <Input aria-label={`${field.label}: Country`} value={text(record.country)} onChange={(event) => setValue({ ...record, country: event.target.value })} placeholder="Country" />
         ) : null}
       </div>
     );
@@ -473,6 +485,7 @@ function renderFieldInput(
 
   return (
     <Input
+      id={fieldId}
       type={inputType}
       value={text(value)}
       onChange={(event) => setValue(event.target.value)}
@@ -493,6 +506,7 @@ export function PublicFormRenderer({
   onSubmitSuccess,
 }: PublicFormRendererProps) {
   const { toast } = useToast();
+  const formId = useId();
   const [values, setValues] = useState<FormValues>({});
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
@@ -647,13 +661,14 @@ export function PublicFormRenderer({
                 className={cn("space-y-1.5", fieldSpanClass(field, compact))}
               >
                 {!["html", "section"].includes(field.type) ? (
-                  <Label htmlFor={`${slug}-${field.key}`}>{field.label}</Label>
+                  <Label htmlFor={`${formId}-${field.key}`}>{field.label}</Label>
                 ) : null}
                 {renderFieldInput(
                   field,
                   values[field.key],
                   (next) => setValues((current) => ({ ...current, [field.key]: next })),
-                  compact
+                  compact,
+                  `${formId}-${field.key}`
                 )}
                 {!structural && field.helpText ? <p className="text-xs public-helper-text">{field.helpText}</p> : null}
               </div>

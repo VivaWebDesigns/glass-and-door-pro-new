@@ -412,7 +412,7 @@ export function AdminSidebar({ children }: AdminSidebarProps) {
                     <>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <button
+                          <button aria-label="Open your profile"
                             type="button"
                             className="mx-auto h-7 w-7 rounded-full border border-border bg-background flex items-center justify-center overflow-hidden hover:ring-2 hover:ring-ring hover:ring-offset-1 transition-shadow"
                             onClick={() => setProfileOpen(true)}
@@ -488,7 +488,7 @@ export function AdminSidebar({ children }: AdminSidebarProps) {
             )}
           </aside>
 
-          <button
+          <button aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} aria-expanded={!collapsed}
             onClick={() => setCollapsed(!collapsed)}
             className="absolute top-6 -right-3.5 z-20 h-7 w-7 rounded-full border bg-background shadow-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:shadow-md transition-all"
             data-testid="button-toggle-sidebar"

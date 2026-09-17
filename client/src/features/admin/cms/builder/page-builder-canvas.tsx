@@ -225,7 +225,7 @@ function CanvasBlockFrame({
         >
           {block.props.isActive === false ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
         </Button>
-        <Button
+        <Button aria-label="Edit block"
           type="button"
           variant="secondary"
           size="icon"
@@ -238,7 +238,7 @@ function CanvasBlockFrame({
         >
           <Pencil className="h-3.5 w-3.5" />
         </Button>
-        <Button
+        <Button aria-label="Move block up"
           type="button"
           variant="secondary"
           size="icon"
@@ -251,7 +251,7 @@ function CanvasBlockFrame({
         >
           <ArrowUp className="h-3.5 w-3.5" />
         </Button>
-        <Button
+        <Button aria-label="Move block down"
           type="button"
           variant="secondary"
           size="icon"
@@ -264,7 +264,7 @@ function CanvasBlockFrame({
         >
           <ArrowDown className="h-3.5 w-3.5" />
         </Button>
-        <Button
+        <Button aria-label="Add block below"
           type="button"
           variant="secondary"
           size="icon"
@@ -277,7 +277,7 @@ function CanvasBlockFrame({
         >
           <Plus className="h-3.5 w-3.5" />
         </Button>
-        <Button
+        <Button aria-label="Duplicate block"
           type="button"
           variant="secondary"
           size="icon"
@@ -290,7 +290,7 @@ function CanvasBlockFrame({
         >
           <Copy className="h-3.5 w-3.5" />
         </Button>
-        <Button
+        <Button aria-label="Delete block"
           type="button"
           variant="destructive"
           size="icon"

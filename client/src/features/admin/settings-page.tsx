@@ -554,7 +554,7 @@ function IntegrationCard({
                   />
                 </div>
                 {field.isSecret && (
-                  <Button
+                  <Button aria-label={`${showSecrets[field.key] ? "Hide" : "Show"} ${field.label}`}
                     variant="ghost"
                     size="icon"
                     onClick={() =>
@@ -1325,7 +1325,7 @@ export function BrandingTab({
                           <p className="mt-1 text-xs text-muted-foreground">{field.description}</p>
                         </div>
                         <div className="flex items-center gap-3">
-                          <input
+                          <input aria-label={field.label}
                             type="color"
                             value={normalizeHexColor(colorValues[field.key]) || "#000000"}
                             onChange={(event) =>
@@ -1946,7 +1946,7 @@ function TemplateEditor({
                         <Heading2 className="mr-1.5 h-3.5 w-3.5" />
                         Heading
                       </Button>
-                      <Button
+                      <Button aria-label="Bold"
                         type="button"
                         variant="ghost"
                         size="icon"
@@ -1955,7 +1955,7 @@ function TemplateEditor({
                       >
                         <Bold className="h-3.5 w-3.5" />
                       </Button>
-                      <Button
+                      <Button aria-label="Italic"
                         type="button"
                         variant="ghost"
                         size="icon"
@@ -1964,7 +1964,7 @@ function TemplateEditor({
                       >
                         <Italic className="h-3.5 w-3.5" />
                       </Button>
-                      <Button
+                      <Button aria-label="Underline"
                         type="button"
                         variant="ghost"
                         size="icon"
@@ -1973,7 +1973,7 @@ function TemplateEditor({
                       >
                         <UnderlineIcon className="h-3.5 w-3.5" />
                       </Button>
-                      <Button
+                      <Button aria-label="Bulleted list"
                         type="button"
                         variant="ghost"
                         size="icon"
@@ -1982,7 +1982,7 @@ function TemplateEditor({
                       >
                         <List className="h-3.5 w-3.5" />
                       </Button>
-                      <Button
+                      <Button aria-label="Numbered list"
                         type="button"
                         variant="ghost"
                         size="icon"

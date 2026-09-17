@@ -190,7 +190,7 @@ export default function CmsPagesPage() {
                       </td>
                       <td className="py-3 px-2">
                         <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                          <Button
+                          <Button aria-label={`Edit ${page.title}`}
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
@@ -225,7 +225,7 @@ export default function CmsPagesPage() {
                               <Eye className="h-4 w-4" />
                             </Button>
                           )}
-                          <Button
+                          <Button aria-label={`Delete ${page.title}`}
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 text-destructive"

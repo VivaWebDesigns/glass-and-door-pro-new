@@ -189,7 +189,7 @@ export function StructurePanel({
                     </button>
 
                     <div className="flex items-center gap-0.5 self-start">
-                      <Button
+                      <Button aria-label="Move block up"
                         type="button"
                         variant="ghost"
                         size="icon"
@@ -200,7 +200,7 @@ export function StructurePanel({
                       >
                         <ChevronDown className="h-3 w-3 rotate-180" />
                       </Button>
-                      <Button
+                      <Button aria-label="Move block down"
                         type="button"
                         variant="ghost"
                         size="icon"
@@ -211,7 +211,7 @@ export function StructurePanel({
                       >
                         <ChevronDown className="h-3 w-3" />
                       </Button>
-                      <Button
+                      <Button aria-label="Duplicate block"
                         type="button"
                         variant="ghost"
                         size="icon"
@@ -221,7 +221,7 @@ export function StructurePanel({
                       >
                         <Copy className="h-3 w-3" />
                       </Button>
-                      <Button
+                      <Button aria-label="Delete block"
                         type="button"
                         variant="ghost"
                         size="icon"

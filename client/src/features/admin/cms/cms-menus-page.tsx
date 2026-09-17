@@ -151,7 +151,7 @@ function MenuItemEditor({
         <GripVertical className="h-4 w-4 text-muted-foreground shrink-0 cursor-grab" />
 
         {hasChildren ? (
-          <button
+          <button aria-label={expanded ? "Collapse child menu items" : "Expand child menu items"} aria-expanded={expanded}
             onClick={() => setExpanded(!expanded)}
             className="shrink-0"
             data-testid={`toggle-children-${item.id}`}
@@ -196,7 +196,7 @@ function MenuItemEditor({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" data-testid={`menu-item-actions-${item.id}`}>
+            <Button aria-label="Menu item actions" variant="ghost" size="icon" className="h-7 w-7 shrink-0" data-testid={`menu-item-actions-${item.id}`}>
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>

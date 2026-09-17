@@ -1,4 +1,4 @@
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { AdminSidebar } from "@/features/admin/admin-sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -206,10 +206,9 @@ export default function CmsOverviewPage() {
                     <tr
                       key={page.id}
                       className="border-b last:border-0 hover:bg-muted/30 cursor-pointer"
-                      onClick={() => navigate(`/admin/cms/pages/${page.id}`)}
                       data-testid={`row-recent-page-${page.id}`}
                     >
-                      <td className="py-2 font-medium">{page.title}</td>
+                      <td className="py-2 font-medium"><Link href={`/admin/cms/pages/${page.id}`} className="hover:underline">{page.title}</Link></td>
                       <td className="py-2 text-muted-foreground font-mono text-xs">{page.slug}</td>
                       <td className="py-2">
                         <Badge

@@ -64,7 +64,7 @@ export function PageBuilder({ content, onChange }: PageBuilderProps) {
   const desktopInspectorShellRef = useRef<HTMLDivElement | null>(null);
   const [desktopInspectorOffset, setDesktopInspectorOffset] = useState(0);
 
-  const blocks = content.blocks ?? [];
+  const blocks = useMemo(() => content.blocks ?? [], [content.blocks]);
   const selectedBlock = blocks.find((block) => block.id === selectedId) ?? null;
   const selectedDef = selectedBlock ? getBlockDef(selectedBlock.type) : null;
   const selectedEditorDef = selectedBlock

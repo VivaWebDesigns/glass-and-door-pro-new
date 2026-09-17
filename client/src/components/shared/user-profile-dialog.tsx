@@ -78,18 +78,21 @@ export function UserProfileDialog({ open, onOpenChange }: UserProfileDialogProps
     },
   });
 
+  const resetProfile = profileForm.reset;
+  const resetPassword = passwordForm.reset;
+
   useEffect(() => {
     if (open && user) {
-      profileForm.reset({
+      resetProfile({
         firstName: user.firstName || "",
         lastName: user.lastName || "",
         email: user.email || "",
       });
-      passwordForm.reset();
+      resetPassword();
       setShowCurrentPassword(false);
       setShowNewPassword(false);
     }
-  }, [open, user]);
+  }, [open, user, resetProfile, resetPassword]);
 
   const profileMutation = useMutation({
     mutationFn: async (data: ProfileFormData) => {

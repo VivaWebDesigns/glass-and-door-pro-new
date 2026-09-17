@@ -509,7 +509,7 @@ export default function CmsPageEditorPage() {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button
+            <Button aria-label="Back to pages"
               variant="ghost"
               size="icon"
               onClick={() =>
@@ -669,7 +669,7 @@ export default function CmsPageEditorPage() {
                       <p className="text-xs text-muted-foreground">
                         Choose a future date and time for this page to go live automatically.
                       </p>
-                      <input
+                      <input aria-label="Publication date and time"
                         type="datetime-local"
                         value={scheduleDate}
                         onChange={(e) => setScheduleDate(e.target.value)}

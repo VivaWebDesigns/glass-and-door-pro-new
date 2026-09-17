@@ -15,10 +15,57 @@ npm run doctor -- --json --json-out /tmp/react-doctor.json --blocking none
 ```
 
 The default command fails on error-level findings. `--blocking none` produces an
-advisory report. The command disables telemetry/remote scoring and Socket.dev
-supply-chain checks, so no numerical health score is requested. Source diagnostics
-still run. To opt into dependency checks, append `--supply-chain`.
+advisory report. The command enables remote health scoring and telemetry, as requested. Socket.dev
+supply-chain checks remain disabled. To opt into dependency checks, append
+`--supply-chain`. To run locally without a score, append `--no-telemetry`.
 No CI workflow or Git hook was installed. Existing rules have not been suppressed.
+
+## Accessibility and React correctness follow-up
+
+The scored baseline was **35/100 (Critical)** with 3 errors and 330 warnings.
+After this pass, a complete uncached scan of 349 files reports **37/100 (Critical)**,
+3 errors and 245 warnings: **85 fewer warnings**. Both scans use CLI 0.9.14,
+full scope, all default categories, remote scoring enabled and supply-chain checks
+disabled. No rules were disabled. An intermediate cached scan omitted the known
+artifact placeholder finding; the uncached result is the authoritative final count.
+The same three error findings remain as explained below.
+
+Changes:
+
+- Named icon controls across public navigation, sliders, CMS editing, media,
+  menus, settings and user administration; named color/date/select controls and
+  video frames. Expand/collapse controls expose expanded state.
+- Public forms now associate labels with input IDs unique to each form instance;
+  composite name/address inputs have persistent accessible names. Image choices
+  use native labelled radio/checkbox inputs. Radio names are unique per group,
+  enabling arrow navigation without interfering with other form instances.
+- Avatar upload supports Enter/Space. CMS upload uses a native browse button
+  alongside the library picker and drop area. Notifications use links or buttons,
+  and recent CMS page titles use links. SEO preview uses one linked control
+  instead of nesting a button inside a link.
+- Hoisted testimonial source components in public and editor renderers so React
+  retains their DOM across parent updates. Stabilized the page-builder empty
+  blocks array and included stable form-reset functions in profile effect deps.
+- `npm run doctor` now requests the health score by default.
+
+Validation: `npm run check`, `npm run lint` (existing warnings remain),
+`npm test` (187 tests / 53 files), and `npm run build` passed. New regression tests
+cover form label association, independent radio groups, and testimonial DOM
+identity. `npm run format` still reports the same 213 preexisting files.
+
+A local Vite fixture using the real form and slider components passed Chromium
+keyboard checks: Space/ArrowRight radio selection, isolation of two copies of a
+form, and Enter activation of the next-slide control. The accessibility snapshot
+confirmed names and roles. Desktop (1280px) and mobile (390px) screenshots were
+inspected; no browser errors or horizontal overflow occurred. The temporary
+fixture was removed. Full authenticated admin flows, database-backed submissions,
+screen-reader software, and Railway deployment were not verified.
+
+Reviewed exceptions/backlog: rich-text container click handling delegates to native
+anchors (keyboard Enter already dispatches their clicks); the editor-lock loading
+reset is already in a `finally` block. These were left intact with rules enabled.
+Other dependency warnings, component complexity, index keys and potential HTML
+sinks still require focused review. The score is not a runtime-speed measurement.
 
 ## Initial audit and fixes
 

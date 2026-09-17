@@ -1099,7 +1099,7 @@ function FormsPageContent() {
                         Delete
                       </Button>
                     ) : null}
-                    <Button type="button" variant="outline" size="icon" onClick={() => setFormSettingsOpen((current) => !current)}>
+                    <Button aria-label={formSettingsOpen ? "Collapse form settings" : "Expand form settings"} aria-expanded={formSettingsOpen} type="button" variant="outline" size="icon" onClick={() => setFormSettingsOpen((current) => !current)}>
                       {formSettingsOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     </Button>
                   </div>
@@ -1371,7 +1371,7 @@ function FormsPageContent() {
                                       </p>
                                     </div>
                                   </div>
-                                  <Button
+                                  <Button aria-label={`Remove ${field.label || "field"}`}
                                     type="button"
                                     variant="ghost"
                                     size="icon"

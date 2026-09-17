@@ -292,7 +292,7 @@ function UsersContent() {
                   {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "—"}
                 </TableCell>
                 <TableCell>
-                  <Button
+                  <Button aria-label="Open user details"
                     variant="ghost"
                     size="icon"
                     onClick={() => setDetailUser(user)}
@@ -515,7 +515,7 @@ export function CreateUserSheet({
                   placeholder="At least 6 characters"
                   data-testid="input-create-password"
                 />
-                <Button
+                <Button aria-label={showPassword ? "Hide password" : "Show password"}
                   type="button"
                   variant="ghost"
                   size="icon"
@@ -829,7 +829,7 @@ function UserDetailSheet({
                         required
                         data-testid="input-detail-new-password"
                       />
-                      <Button
+                      <Button aria-label={showPassword ? "Hide password" : "Show password"}
                         type="button"
                         variant="ghost"
                         size="icon"

@@ -76,7 +76,7 @@ export function BlockInspectorPanel({
               <Bookmark className="mr-1.5 h-4 w-4" />
               Save Section
             </Button>
-            <Button
+            <Button aria-label="Close editor panel"
               type="button"
               variant="ghost"
               size="icon"

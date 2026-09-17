@@ -630,6 +630,7 @@ export default function CmsSeoPage() {
                   <span className="text-muted-foreground">GET</span>
                   <span className="flex-1">/api/seo/global</span>
                   <a
+                    aria-label="Open global SEO API"
                     href="/api/seo/global"
                     target="_blank"
                     rel="noopener noreferrer"

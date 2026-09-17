@@ -19,7 +19,7 @@
     "test:browser": "playwright test",
     "test:browser:headed": "playwright test --headed",
     "test:browser:ui": "playwright test --ui",
-    "doctor": "react-doctor --yes --no-telemetry --no-supply-chain"
+    "doctor": "react-doctor --yes --no-supply-chain"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1004.0",

@@ -151,7 +151,17 @@ export function AvatarUpload({
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          onClick={() => fileInputRef.current?.click()}
+          role="button"
+          tabIndex={0}
+          aria-label="Upload profile photo"
+          aria-disabled={uploadMutation.isPending}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              if (!uploadMutation.isPending) fileInputRef.current?.click();
+            }
+          }}
+          onClick={() => !uploadMutation.isPending && fileInputRef.current?.click()}
           data-testid="dropzone-avatar"
         >
           <Avatar className={sizeClasses[size]}>

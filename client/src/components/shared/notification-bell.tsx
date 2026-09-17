@@ -247,7 +247,6 @@ function NotifItem({
       className={`flex items-start gap-3 px-4 py-3 border-b last:border-0 hover:bg-muted/40 transition-colors cursor-pointer ${
         !notif.isRead ? "bg-accent/5" : ""
       }`}
-      onClick={() => onClick(notif)}
       data-testid={`notification-item-${notif.id}`}
     >
       <div className="mt-0.5 flex-shrink-0">
@@ -265,7 +264,7 @@ function NotifItem({
   );
 
   if (notif.linkUrl) {
-    return <Link href={notif.linkUrl}>{inner}</Link>;
+    return <Link href={notif.linkUrl} onClick={() => onClick(notif)} className="block">{inner}</Link>;
   }
-  return inner;
+  return <button type="button" className="block w-full text-left" onClick={() => onClick(notif)}>{inner}</button>;
 }

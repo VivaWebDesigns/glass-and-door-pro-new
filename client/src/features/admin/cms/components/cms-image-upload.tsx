@@ -279,7 +279,6 @@ export function CmsImageUpload({
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
-          onClick={() => !isUploading && fileInputRef.current?.click()}
           data-testid={testId ? `${testId}-dropzone` : "cms-image-dropzone"}
         >
           {isUploading ? (
@@ -299,9 +298,13 @@ export function CmsImageUpload({
               <div>
                 <p className="text-sm font-medium text-foreground/80">
                   Drop {acceptedMode === "all" ? "file" : "image"} here or{" "}
-                  <span className="text-violet-500 hover:text-violet-600 underline underline-offset-2">
+                  <button
+                    type="button"
+                    className="text-violet-500 hover:text-violet-600 underline underline-offset-2"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
                     browse
-                  </span>
+                  </button>
                 </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {acceptedMode === "all"
