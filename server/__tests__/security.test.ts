@@ -9,7 +9,10 @@ import { securityHeaders } from "../middleware/security";
 describe("securityHeaders", () => {
   it("allows every inline JavaScript bootstrap by its exact CSP hash", async () => {
     const html = await readFile(new URL("../../client/index.html", import.meta.url), "utf8");
-    const bootstrapScripts = Array.from(html.matchAll(/<script>([\s\S]*?)<\/script>/g), (match) => match[1]);
+    const bootstrapScripts = Array.from(
+      html.matchAll(/<script>([\s\S]*?)<\/script>/g),
+      (match) => match[1],
+    );
 
     expect(bootstrapScripts).toHaveLength(2);
 

@@ -44,7 +44,10 @@ function FormWidget({ widget }: { widget: SidebarWidget }) {
 }
 
 function CalloutWidget({ widget }: { widget: SidebarWidget }) {
-  const body = text(widget.settings.body, "Add a short message, promotion, or supporting note here.");
+  const body = text(
+    widget.settings.body,
+    "Add a short message, promotion, or supporting note here.",
+  );
   const buttonText = text(widget.settings.buttonText);
   const buttonUrl = text(widget.settings.buttonUrl, "#");
 

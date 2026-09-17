@@ -103,7 +103,7 @@ vi.mock("@/components/ui/tabs", () => {
       return React.createElement(
         TabsContext.Provider,
         { value: { value: currentValue, setValue } },
-        children
+        children,
       );
     },
     TabsList: ({ children }: { children: React.ReactNode }) =>
@@ -126,7 +126,7 @@ vi.mock("@/components/ui/tabs", () => {
           onClick: () => ctx.setValue(value),
           ...props,
         },
-        children
+        children,
       );
     },
     TabsContent: ({
@@ -165,8 +165,8 @@ vi.mock("@/features/admin/cms/builder/page-builder", () => ({
               ],
             }),
         },
-        "Change Builder"
-      )
+        "Change Builder",
+      ),
     ),
 }));
 
@@ -183,7 +183,8 @@ vi.mock("@/components/shared/seo-preview", () => ({
 }));
 
 vi.mock("@/components/shared/structured-data-status", () => ({
-  StructuredDataStatus: () => React.createElement("div", { "data-testid": "structured-data-status" }),
+  StructuredDataStatus: () =>
+    React.createElement("div", { "data-testid": "structured-data-status" }),
 }));
 
 vi.mock("@/features/admin/cms/components/cms-image-upload", () => ({
@@ -249,8 +250,12 @@ describe("CmsPageEditorPage", () => {
       mutationStates.push(state);
       return state;
     });
-    (globalThis as typeof globalThis & { React?: typeof React; IS_REACT_ACT_ENVIRONMENT?: boolean }).React = React;
-    (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+    (
+      globalThis as typeof globalThis & { React?: typeof React; IS_REACT_ACT_ENVIRONMENT?: boolean }
+    ).React = React;
+    (
+      globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
+    ).IS_REACT_ACT_ENVIRONMENT = true;
     container = document.createElement("div");
     document.body.appendChild(container);
   });
@@ -286,7 +291,9 @@ describe("CmsPageEditorPage", () => {
       guardArgs.onConflict();
     });
 
-    const saveButton = container.querySelector('[data-testid="button-save"]') as HTMLButtonElement | null;
+    const saveButton = container.querySelector(
+      '[data-testid="button-save"]',
+    ) as HTMLButtonElement | null;
     expect(saveButton).not.toBeNull();
     expect(saveButton?.disabled).toBe(true);
     expect(navigateMock).toHaveBeenCalledWith("/admin/cms/pages");
@@ -301,7 +308,7 @@ describe("CmsPageEditorPage", () => {
     });
 
     const builderChangeButton = container.querySelector(
-      '[data-testid="button-builder-change"]'
+      '[data-testid="button-builder-change"]',
     ) as HTMLButtonElement | null;
     expect(builderChangeButton).not.toBeNull();
 
@@ -309,14 +316,18 @@ describe("CmsPageEditorPage", () => {
       builderChangeButton?.click();
     });
 
-    const settingsTab = container.querySelector('[data-testid="tab-settings"]') as HTMLButtonElement | null;
+    const settingsTab = container.querySelector(
+      '[data-testid="tab-settings"]',
+    ) as HTMLButtonElement | null;
     expect(settingsTab).not.toBeNull();
 
     await act(async () => {
       settingsTab?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
-    const titleInput = container.querySelector('[data-testid="input-title"]') as HTMLInputElement | null;
+    const titleInput = container.querySelector(
+      '[data-testid="input-title"]',
+    ) as HTMLInputElement | null;
     expect(titleInput).not.toBeNull();
 
     await act(async () => {
@@ -326,7 +337,9 @@ describe("CmsPageEditorPage", () => {
       titleInput!.dispatchEvent(new Event("change", { bubbles: true }));
     });
 
-    const saveButton = container.querySelector('[data-testid="button-save"]') as HTMLButtonElement | null;
+    const saveButton = container.querySelector(
+      '[data-testid="button-save"]',
+    ) as HTMLButtonElement | null;
     expect(saveButton).not.toBeNull();
 
     await act(async () => {
@@ -346,7 +359,7 @@ describe("CmsPageEditorPage", () => {
             }),
           ],
         },
-      })
+      }),
     );
   });
 
@@ -365,7 +378,9 @@ describe("CmsPageEditorPage", () => {
       root!.render(React.createElement(CmsPageEditorPage));
     });
 
-    const saveButton = container.querySelector('[data-testid="button-save"]') as HTMLButtonElement | null;
+    const saveButton = container.querySelector(
+      '[data-testid="button-save"]',
+    ) as HTMLButtonElement | null;
     expect(saveButton).not.toBeNull();
 
     await act(async () => {
@@ -378,7 +393,7 @@ describe("CmsPageEditorPage", () => {
         slug: "services-frameless-showers",
         pageType: "service",
         seoDescription: mockPage.seoDescription,
-      })
+      }),
     );
 
     mockPage.pageType = originalPageType;
@@ -396,13 +411,15 @@ describe("CmsPageEditorPage", () => {
     });
 
     const builderChangeButton = container.querySelector(
-      '[data-testid="button-builder-change"]'
+      '[data-testid="button-builder-change"]',
     ) as HTMLButtonElement | null;
     await act(async () => {
       builderChangeButton?.click();
     });
 
-    const publishButton = container.querySelector('[data-testid="button-publish"]') as HTMLButtonElement | null;
+    const publishButton = container.querySelector(
+      '[data-testid="button-publish"]',
+    ) as HTMLButtonElement | null;
     expect(publishButton).not.toBeNull();
 
     await act(async () => {
@@ -410,7 +427,7 @@ describe("CmsPageEditorPage", () => {
     });
 
     expect(confirmSpy).toHaveBeenCalledWith(
-      "You have unsaved changes to this page. Publishing will use the last saved version, not your in-progress edits. Continue?"
+      "You have unsaved changes to this page. Publishing will use the last saved version, not your in-progress edits. Continue?",
     );
     expect(mutationStates[2]?.mutate).not.toHaveBeenCalled();
   });

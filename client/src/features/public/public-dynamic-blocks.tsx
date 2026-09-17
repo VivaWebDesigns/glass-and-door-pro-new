@@ -23,16 +23,27 @@ export function ContactFormBlock({ props = {} }: { props?: Record<string, unknow
   const variant = str(props.variant);
 
   if (variant === "split-contact") {
-    const items = arr<{ icon: string; label: string; value: string; href?: string }>(props.contactItems);
+    const items = arr<{ icon: string; label: string; value: string; href?: string }>(
+      props.contactItems,
+    );
     return (
-      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20" data-testid="dynamic-contact-form">
+      <section
+        className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20"
+        data-testid="dynamic-contact-form"
+      >
         <div className="mb-10 max-w-3xl">
           {str(props.eyebrow) && (
-            <p className="mb-3 text-sm font-bold uppercase tracking-[0.16em] text-[#1a8ead]">{str(props.eyebrow)}</p>
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.16em] text-[#1a8ead]">
+              {str(props.eyebrow)}
+            </p>
           )}
-          <h2 className="font-heading text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">{str(props.heading) || "Ready to start your project?"}</h2>
+          <h2 className="font-heading text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+            {str(props.heading) || "Ready to start your project?"}
+          </h2>
           {str(props.subheading) && (
-            <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">{str(props.subheading)}</p>
+            <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
+              {str(props.subheading)}
+            </p>
           )}
         </div>
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
@@ -57,7 +68,10 @@ export function ContactFormBlock({ props = {} }: { props?: Record<string, unknow
                 const Icon = CONTACT_ICON_MAP[item.icon] ?? MapPin;
                 const content = <span className="whitespace-pre-line">{item.value}</span>;
                 return (
-                  <Card key={`${item.label}-${index}`} className="border-none bg-white text-slate-900 shadow-sm">
+                  <Card
+                    key={`${item.label}-${index}`}
+                    className="border-none bg-white text-slate-900 shadow-sm"
+                  >
                     <CardContent className="flex gap-4 p-6">
                       <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#1a8ead] text-white">
                         <Icon className="h-7 w-7" />
@@ -65,7 +79,10 @@ export function ContactFormBlock({ props = {} }: { props?: Record<string, unknow
                       <div>
                         <p className="text-xl font-bold leading-6 text-slate-900">{item.label}</p>
                         {item.href ? (
-                          <a href={item.href} className="mt-1 block text-base leading-6 text-slate-500 hover:text-[#1a8ead]">
+                          <a
+                            href={item.href}
+                            className="mt-1 block text-base leading-6 text-slate-500 hover:text-[#1a8ead]"
+                          >
                             {content}
                           </a>
                         ) : (

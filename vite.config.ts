@@ -13,7 +13,7 @@ function preambleFixPlugin(): Plugin {
       if (id.includes("node_modules") || !code.includes("can't detect preamble")) return;
       return code.replace(
         /if\s*\(!window\.\$RefreshReg\$\)\s*\{[^}]*can't detect preamble[^}]*\}/s,
-        `if (!window.$RefreshReg$) { window.$RefreshReg$ = () => {}; window.$RefreshSig$ = () => (t) => t; }`
+        `if (!window.$RefreshReg$) { window.$RefreshReg$ = () => {}; window.$RefreshSig$ = () => (t) => t; }`,
       );
     },
   };
@@ -25,15 +25,9 @@ export default defineConfig({
     preambleFixPlugin(),
     ...(isReplit && process.env.NODE_ENV !== "production"
       ? [
-          await import("@replit/vite-plugin-runtime-error-modal").then((m) =>
-            m.default(),
-          ),
-          await import("@replit/vite-plugin-cartographer").then((m) =>
-            m.cartographer(),
-          ),
-          await import("@replit/vite-plugin-dev-banner").then((m) =>
-            m.devBanner(),
-          ),
+          await import("@replit/vite-plugin-runtime-error-modal").then((m) => m.default()),
+          await import("@replit/vite-plugin-cartographer").then((m) => m.cartographer()),
+          await import("@replit/vite-plugin-dev-banner").then((m) => m.devBanner()),
         ]
       : []),
   ],
@@ -52,6 +46,9 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (!id.includes("node_modules")) return undefined;
+
+          if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) return "react-runtime";
+          if (id.includes("/@radix-ui/") || id.includes("/@floating-ui/")) return "ui-primitives";
 
           if (id.includes("/@tiptap/")) {
             return "tiptap";

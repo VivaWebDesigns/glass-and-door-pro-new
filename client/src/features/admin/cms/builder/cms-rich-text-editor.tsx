@@ -59,7 +59,7 @@ function ToolbarButton({
       title={title}
       className={cn(
         "h-8 min-w-8 shrink-0 rounded-md px-2 text-xs",
-        active && "bg-primary/10 text-primary ring-1 ring-primary/20"
+        active && "bg-primary/10 text-primary ring-1 ring-primary/20",
       )}
     >
       {children}
@@ -123,14 +123,16 @@ export function CmsRichTextEditor({
         .insertContent({
           type: "text",
           text: linkText.trim(),
-          marks: [{
-            type: "link",
-            attrs: {
-              href: url,
-              target: linkOpenInNewTab ? "_blank" : null,
-              rel: linkOpenInNewTab ? "noopener noreferrer" : null,
+          marks: [
+            {
+              type: "link",
+              attrs: {
+                href: url,
+                target: linkOpenInNewTab ? "_blank" : null,
+                rel: linkOpenInNewTab ? "noopener noreferrer" : null,
+              },
             },
-          }],
+          ],
         })
         .run();
     } else {
@@ -155,17 +157,31 @@ export function CmsRichTextEditor({
   if (!editor) return null;
 
   return (
-    <Tabs value={activeTab} onValueChange={(tab) => setActiveTab(tab as "visual" | "html")} className="w-full">
+    <Tabs
+      value={activeTab}
+      onValueChange={(tab) => setActiveTab(tab as "visual" | "html")}
+      className="w-full"
+    >
       <div className="mb-2 flex items-center justify-between gap-3">
         <TabsList className="h-9 rounded-full">
-          <TabsTrigger value="visual" className="rounded-full px-3 text-xs" data-testid={`${testId}-visual-tab`}>
+          <TabsTrigger
+            value="visual"
+            className="rounded-full px-3 text-xs"
+            data-testid={`${testId}-visual-tab`}
+          >
             Visual
           </TabsTrigger>
-          <TabsTrigger value="html" className="rounded-full px-3 text-xs" data-testid={`${testId}-html-tab`}>
+          <TabsTrigger
+            value="html"
+            className="rounded-full px-3 text-xs"
+            data-testid={`${testId}-html-tab`}
+          >
             HTML
           </TabsTrigger>
         </TabsList>
-        <p className="text-[11px] text-muted-foreground">Use HTML only when you need advanced control.</p>
+        <p className="text-[11px] text-muted-foreground">
+          Use HTML only when you need advanced control.
+        </p>
       </div>
 
       <TabsContent value="visual" className="mt-0">
@@ -174,43 +190,91 @@ export function CmsRichTextEditor({
           data-testid={testId}
         >
           <div className="flex flex-wrap items-center gap-1 border-b bg-muted/40 px-2 py-2">
-            <ToolbarButton onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} title="Undo">
+            <ToolbarButton
+              onClick={() => editor.chain().focus().undo().run()}
+              disabled={!editor.can().undo()}
+              title="Undo"
+            >
               <Undo2 className="h-3.5 w-3.5" />
             </ToolbarButton>
-            <ToolbarButton onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} title="Redo">
+            <ToolbarButton
+              onClick={() => editor.chain().focus().redo().run()}
+              disabled={!editor.can().redo()}
+              title="Redo"
+            >
               <Redo2 className="h-3.5 w-3.5" />
             </ToolbarButton>
             <ToolbarSep />
-            <ToolbarButton active={editor.isActive("paragraph")} onClick={() => editor.chain().focus().setParagraph().run()} title="Paragraph">
+            <ToolbarButton
+              active={editor.isActive("paragraph")}
+              onClick={() => editor.chain().focus().setParagraph().run()}
+              title="Paragraph"
+            >
               <span className="font-semibold leading-none">P</span>
             </ToolbarButton>
-            <ToolbarButton active={editor.isActive("heading", { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} title="Heading">
+            <ToolbarButton
+              active={editor.isActive("heading", { level: 2 })}
+              onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+              title="Heading"
+            >
               <span className="font-semibold leading-none">H2</span>
             </ToolbarButton>
             <ToolbarSep />
-            <ToolbarButton active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()} title="Bold">
+            <ToolbarButton
+              active={editor.isActive("bold")}
+              onClick={() => editor.chain().focus().toggleBold().run()}
+              title="Bold"
+            >
               <Bold className="h-3.5 w-3.5" />
             </ToolbarButton>
-            <ToolbarButton active={editor.isActive("italic")} onClick={() => editor.chain().focus().toggleItalic().run()} title="Italic">
+            <ToolbarButton
+              active={editor.isActive("italic")}
+              onClick={() => editor.chain().focus().toggleItalic().run()}
+              title="Italic"
+            >
               <Italic className="h-3.5 w-3.5" />
             </ToolbarButton>
-            <ToolbarButton active={editor.isActive("underline")} onClick={() => editor.chain().focus().toggleUnderline().run()} title="Underline">
+            <ToolbarButton
+              active={editor.isActive("underline")}
+              onClick={() => editor.chain().focus().toggleUnderline().run()}
+              title="Underline"
+            >
               <UnderlineIcon className="h-3.5 w-3.5" />
             </ToolbarButton>
-            <ToolbarButton active={editor.isActive("strike")} onClick={() => editor.chain().focus().toggleStrike().run()} title="Strikethrough">
+            <ToolbarButton
+              active={editor.isActive("strike")}
+              onClick={() => editor.chain().focus().toggleStrike().run()}
+              title="Strikethrough"
+            >
               <Strikethrough className="h-3.5 w-3.5" />
             </ToolbarButton>
-            <ToolbarButton active={editor.isActive("code")} onClick={() => editor.chain().focus().toggleCode().run()} title="Inline code">
+            <ToolbarButton
+              active={editor.isActive("code")}
+              onClick={() => editor.chain().focus().toggleCode().run()}
+              title="Inline code"
+            >
               <Code className="h-3.5 w-3.5" />
             </ToolbarButton>
             <ToolbarSep />
-            <ToolbarButton active={editor.isActive("bulletList")} onClick={() => editor.chain().focus().toggleBulletList().run()} title="Bullet list">
+            <ToolbarButton
+              active={editor.isActive("bulletList")}
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+              title="Bullet list"
+            >
               <List className="h-3.5 w-3.5" />
             </ToolbarButton>
-            <ToolbarButton active={editor.isActive("orderedList")} onClick={() => editor.chain().focus().toggleOrderedList().run()} title="Numbered list">
+            <ToolbarButton
+              active={editor.isActive("orderedList")}
+              onClick={() => editor.chain().focus().toggleOrderedList().run()}
+              title="Numbered list"
+            >
               <ListOrdered className="h-3.5 w-3.5" />
             </ToolbarButton>
-            <ToolbarButton active={editor.isActive("blockquote")} onClick={() => editor.chain().focus().toggleBlockquote().run()} title="Quote">
+            <ToolbarButton
+              active={editor.isActive("blockquote")}
+              onClick={() => editor.chain().focus().toggleBlockquote().run()}
+              title="Quote"
+            >
               <Quote className="h-3.5 w-3.5" />
             </ToolbarButton>
             <ToolbarSep />
@@ -279,13 +343,22 @@ export function CmsRichTextEditor({
                       checked={linkOpenInNewTab}
                       onCheckedChange={(checked) => setLinkOpenInNewTab(checked === true)}
                     />
-                    <Label htmlFor={`${testId ?? "cms-richtext"}-link-new-tab`} className="text-xs font-normal">
+                    <Label
+                      htmlFor={`${testId ?? "cms-richtext"}-link-new-tab`}
+                      className="text-xs font-normal"
+                    >
                       Open in new tab
                     </Label>
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Button type="button" size="sm" className="h-8 text-xs" onClick={insertLink} disabled={!linkUrl.trim()}>
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="h-8 text-xs"
+                    onClick={insertLink}
+                    disabled={!linkUrl.trim()}
+                  >
                     {editor.isActive("link") ? "Update" : "Insert"}
                   </Button>
                   {editor.isActive("link") && (
@@ -322,7 +395,10 @@ export function CmsRichTextEditor({
             </div>
           )}
 
-          <EditorContent editor={editor} data-testid={testId ? `${testId}-content` : "cms-richtext-content"} />
+          <EditorContent
+            editor={editor}
+            data-testid={testId ? `${testId}-content` : "cms-richtext-content"}
+          />
         </div>
       </TabsContent>
 

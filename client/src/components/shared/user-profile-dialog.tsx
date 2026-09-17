@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -54,7 +54,11 @@ interface UserProfileDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function UserProfileDialog({ open, onOpenChange }: UserProfileDialogProps) {
+export function UserProfileDialog(props: UserProfileDialogProps) {
+  const { user } = useAuth();
+  return <ProfileSession key={`${user?.id ?? "anonymous"}:${props.open}`} {...props} />;
+}
+function ProfileSession({ open, onOpenChange }: UserProfileDialogProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -77,22 +81,6 @@ export function UserProfileDialog({ open, onOpenChange }: UserProfileDialogProps
       confirmPassword: "",
     },
   });
-
-  const resetProfile = profileForm.reset;
-  const resetPassword = passwordForm.reset;
-
-  useEffect(() => {
-    if (open && user) {
-      resetProfile({
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        email: user.email || "",
-      });
-      resetPassword();
-      setShowCurrentPassword(false);
-      setShowNewPassword(false);
-    }
-  }, [open, user, resetProfile, resetPassword]);
 
   const profileMutation = useMutation({
     mutationFn: async (data: ProfileFormData) => {
@@ -159,7 +147,11 @@ export function UserProfileDialog({ open, onOpenChange }: UserProfileDialogProps
               <p className="font-medium text-sm" data-testid="text-profile-name">
                 {user.firstName} {user.lastName}
               </p>
-              <Badge variant="outline" className="text-xs capitalize" data-testid="badge-profile-role">
+              <Badge
+                variant="outline"
+                className="text-xs capitalize"
+                data-testid="badge-profile-role"
+              >
                 {user.role}
               </Badge>
             </div>

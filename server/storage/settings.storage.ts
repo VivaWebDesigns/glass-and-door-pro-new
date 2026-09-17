@@ -5,10 +5,11 @@ import crypto from "crypto";
 import { logger } from "../utils/logger";
 
 const ALGORITHM = "aes-256-cbc";
-const SECRET = process.env.SESSION_SECRET || "dev-secret-change-me";
 
 function getKey(): Buffer {
-  return crypto.createHash("sha256").update(SECRET).digest();
+  const secret = process.env.SESSION_SECRET;
+  if (!secret) throw new Error("SESSION_SECRET is required for encrypted settings");
+  return crypto.createHash("sha256").update(secret).digest();
 }
 
 function encrypt(text: string): string {
@@ -22,14 +23,17 @@ function encrypt(text: string): string {
 function decrypt(text: string, settingKey?: string): string {
   const [ivHex, encrypted] = text.split(":");
   if (!ivHex || !encrypted) return text;
+  const key = getKey();
   try {
     const iv = Buffer.from(ivHex, "hex");
-    const decipher = crypto.createDecipheriv(ALGORITHM, getKey(), iv);
+    const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
     let decrypted = decipher.update(encrypted, "hex", "utf8");
     decrypted += decipher.final("utf8");
     return decrypted;
   } catch {
-    logger.db.warn("Decryption failed, returning raw value", { settingKey: settingKey ?? "unknown" });
+    logger.db.warn("Decryption failed, returning raw value", {
+      settingKey: settingKey ?? "unknown",
+    });
     return text;
   }
 }
@@ -85,10 +89,7 @@ export class SettingsStorage {
     const cached = this.settingCache.get(key);
     if (this.isFresh(cached)) return cached.data;
 
-    const [setting] = await db
-      .select()
-      .from(systemSettings)
-      .where(eq(systemSettings.key, key));
+    const [setting] = await db.select().from(systemSettings).where(eq(systemSettings.key, key));
     if (!setting) {
       this.settingCache.set(key, { data: null, expiresAt: Date.now() + this.ttlMs });
       return null;
@@ -100,10 +101,7 @@ export class SettingsStorage {
   }
 
   async getSettingsByCategory(category: string): Promise<SystemSetting[]> {
-    return db
-      .select()
-      .from(systemSettings)
-      .where(eq(systemSettings.category, category));
+    return db.select().from(systemSettings).where(eq(systemSettings.category, category));
   }
 
   async getAllSettings(): Promise<SystemSetting[]> {
@@ -114,13 +112,10 @@ export class SettingsStorage {
     key: string,
     value: string,
     category: string,
-    isSecret: boolean
+    isSecret: boolean,
   ): Promise<SystemSetting> {
     const storedValue = isSecret ? encrypt(value) : value;
-    const existing = await db
-      .select()
-      .from(systemSettings)
-      .where(eq(systemSettings.key, key));
+    const existing = await db.select().from(systemSettings).where(eq(systemSettings.key, key));
 
     this.settingCache.delete(key);
 
@@ -149,10 +144,7 @@ export class SettingsStorage {
   }
 
   async deleteSetting(key: string): Promise<void> {
-    const [existing] = await db
-      .select()
-      .from(systemSettings)
-      .where(eq(systemSettings.key, key));
+    const [existing] = await db.select().from(systemSettings).where(eq(systemSettings.key, key));
     this.settingCache.delete(key);
     await db.delete(systemSettings).where(eq(systemSettings.key, key));
     if (existing) {

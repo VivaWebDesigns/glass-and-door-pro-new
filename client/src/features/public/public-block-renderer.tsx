@@ -1,3 +1,5 @@
+import { useRowKeys } from "@/hooks/use-row-keys";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 import { useState, useEffect, lazy, Suspense, type MouseEvent, type ReactElement } from "react";
 import { useLocation } from "wouter";
 import { excludeServiceUtilitySnippets } from "@shared/glass-search-snippets";
@@ -245,7 +247,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
           <div
             className={`mb-9 text-base leading-8 text-white/85 sm:text-lg [&_a]:text-white [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-white/80 [&_p]:m-0 ${isSplit ? "max-w-2xl" : "max-w-2xl mx-auto"}`}
             style={subheadingTextStyle}
-            dangerouslySetInnerHTML={{ __html: str(props.subheading) }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(str(props.subheading)) }}
           />
         )}
         <div
@@ -325,7 +327,7 @@ function TwoColumnTextBlock({ props }: { props: Record<string, unknown> }) {
             {column.body && (
               <div
                 className="prose prose-sm max-w-none text-foreground"
-                dangerouslySetInnerHTML={{ __html: column.body }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(column.body) }}
               />
             )}
             {column.items.length > 0 && (
@@ -360,7 +362,9 @@ function CalloutBoxBlock({ props }: { props: Record<string, unknown> }) {
       <div className={`public-section-card rounded-lg p-5 sm:p-8 ${variantClass}`}>
         <div
           className="public-prose prose prose-sm max-w-none break-words"
-          dangerouslySetInnerHTML={{ __html: str(props.content) || "<p>Add callout content.</p>" }}
+          dangerouslySetInnerHTML={{
+            __html: sanitizeHtml(str(props.content) || "<p>Add callout content.</p>"),
+          }}
         />
         {str(props.ctaText) && (
           <div className="mt-6">
@@ -477,7 +481,9 @@ function RichTextBlock({ props }: { props: Record<string, unknown> }) {
       <div
         className={`public-prose prose prose-sm max-w-none ${textAlign}`}
         onClick={handleContentClick}
-        dangerouslySetInnerHTML={{ __html: str(props.content) || "<p>No content.</p>" }}
+        dangerouslySetInnerHTML={{
+          __html: sanitizeHtml(str(props.content) || "<p>No content.</p>"),
+        }}
       />
     </div>
   );
@@ -505,7 +511,7 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
         {str(props.body) && (
           <div
             className={`public-prose prose prose-sm max-w-none ${bodyAlign}`}
-            dangerouslySetInnerHTML={{ __html: str(props.body) }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(str(props.body)) }}
           />
         )}
       </div>
@@ -572,7 +578,7 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
       {str(props.subheading) && (
         <div
           className={`mb-8 mx-auto max-w-xl text-sm leading-relaxed sm:text-base [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:opacity-80 [&_p]:m-0 ${variant === "light" ? "text-muted-foreground [&_a]:text-primary" : "opacity-80 [&_a]:text-current"}`}
-          dangerouslySetInnerHTML={{ __html: str(props.subheading) }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(str(props.subheading)) }}
         />
       )}
       <div
@@ -686,6 +692,7 @@ function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
 
 function FaqBlock({ props }: { props: Record<string, unknown> }) {
   const items = arr<{ question: string; answer: string }>(props.items);
+  const itemKeys = useRowKeys(items);
   return (
     <div className="py-4">
       <SectionHeading props={props} defaultAlignment="left" className="mb-8" />
@@ -695,15 +702,15 @@ function FaqBlock({ props }: { props: Record<string, unknown> }) {
         ) : (
           items.map((item, i) => (
             <AccordionItem
-              key={i}
-              value={`faq-${i}`}
+              key={itemKeys[i]}
+              value={itemKeys[i]}
               className="public-section-card rounded-lg px-4"
             >
               <AccordionTrigger className="font-medium text-left">{item.question}</AccordionTrigger>
               <AccordionContent>
                 <div
                   className="text-muted-foreground [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-primary/80 [&_p]:m-0"
-                  dangerouslySetInnerHTML={{ __html: item.answer }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.answer) }}
                 />
               </AccordionContent>
             </AccordionItem>
@@ -900,6 +907,7 @@ function ButtonGroupBlock({ props }: { props: Record<string, unknown> }) {
     modalTitle?: string;
     modalDescription?: string;
   }>(props.buttons);
+  const buttonKeys = useRowKeys(buttons);
   return (
     <div className="py-4">
       <SectionHeading
@@ -913,7 +921,7 @@ function ButtonGroupBlock({ props }: { props: Record<string, unknown> }) {
         ) : (
           buttons.map((btn, i) => (
             <FormModalButton
-              key={i}
+              key={buttonKeys[i]}
               label={btn.text}
               action={btn.action}
               href={btn.link}
@@ -945,7 +953,7 @@ function RawHtmlBlock({ props }: { props: Record<string, unknown> }) {
       <SectionHeading props={props} defaultAlignment="center" className="mb-6" />
       <div
         className="prose prose-sm max-w-none text-foreground"
-        dangerouslySetInnerHTML={{ __html: str(props.html) || "" }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(str(props.html) || "") }}
       />
     </div>
   );
@@ -1036,6 +1044,7 @@ function VideoEmbedBlock({ props }: { props: Record<string, unknown> }) {
           {ytId && (
             <iframe
               title={str(props.title) || "YouTube video"}
+              sandbox="allow-scripts allow-same-origin allow-presentation"
               src={`https://www.youtube.com/embed/${ytId}`}
               className="absolute inset-0 w-full h-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -1045,6 +1054,7 @@ function VideoEmbedBlock({ props }: { props: Record<string, unknown> }) {
           {vimeoId && (
             <iframe
               title={str(props.title) || "Vimeo video"}
+              sandbox="allow-scripts allow-same-origin allow-presentation"
               src={`https://player.vimeo.com/video/${vimeoId}`}
               className="absolute inset-0 w-full h-full"
               allowFullScreen
@@ -1517,7 +1527,7 @@ function ScienceExplainerBlock({ props }: { props: Record<string, unknown> }) {
       {str(props.body) && (
         <div
           className="prose prose-sm max-w-none text-foreground mb-6"
-          dangerouslySetInnerHTML={{ __html: str(props.body) }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(str(props.body)) }}
         />
       )}
       {citations.length > 0 && (

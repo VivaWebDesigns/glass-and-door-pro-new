@@ -80,7 +80,7 @@ declare global {
 }
 
 export function requestIdMiddleware(req: Request, res: Response, next: NextFunction) {
-  const id = req.headers["x-request-id"] as string || randomUUID();
+  const id = (req.headers["x-request-id"] as string) || randomUUID();
   req.requestId = id;
   res.setHeader("X-Request-Id", id);
   requestContext.run({ requestId: id }, () => {

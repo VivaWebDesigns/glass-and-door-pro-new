@@ -1,3 +1,4 @@
+import { errorMessage, hasErrorCode } from "@shared/errors";
 import { Router } from "express";
 import { z } from "zod";
 import { storage } from "../storage/index";
@@ -14,8 +15,10 @@ async function hasAdminUser(): Promise<boolean> {
   try {
     const admins = await storage.users.getUsersByRole("admin");
     return admins.length > 0;
-  } catch (err: any) {
-    logger.app.warn("Setup status check failed (table may not exist yet)", { error: err.message });
+  } catch (err: unknown) {
+    logger.app.warn("Setup status check failed (table may not exist yet)", {
+      error: errorMessage(err),
+    });
     return false;
   }
 }
@@ -48,7 +51,7 @@ router.get(
   asyncHandler(async (_req, res) => {
     const adminExists = await hasAdminUser();
     res.json({ needsSetup: !adminExists });
-  })
+  }),
 );
 
 const setupAdminSchema = z.object({
@@ -89,14 +92,22 @@ router.post(
       if (result.rows.length === 0) {
         const adminExists = await hasAdminUser();
         if (adminExists) {
-          res.status(403).json({ message: "Admin account already exists. Setup is no longer available." });
+          res
+            .status(403)
+            .json({ message: "Admin account already exists. Setup is no longer available." });
         } else {
           res.status(409).json({ message: "An account with this email already exists" });
         }
         return;
       }
 
-      const created = result.rows[0] as any;
+      const created = result.rows[0] as {
+        id: string;
+        email: string;
+        first_name: string;
+        last_name: string;
+        role: string;
+      };
       logger.app.info("Initial admin account created", { userId: created.id, email });
 
       res.status(201).json({
@@ -106,14 +117,14 @@ router.post(
         lastName: created.last_name,
         role: created.role,
       });
-    } catch (err: any) {
-      if (err.code === "23505") {
+    } catch (err: unknown) {
+      if (hasErrorCode(err, "23505")) {
         res.status(409).json({ message: "An account with this email already exists" });
         return;
       }
       throw err;
     }
-  })
+  }),
 );
 
 export default router;

@@ -38,7 +38,8 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     blocks: () => [
       block("hero", {
         heading: "Glass & Door Services in the Charlotte Area",
-        subheading: "Residential and commercial glass, window, door, shower, and storefront services from Glass & Door Pro.",
+        subheading:
+          "Residential and commercial glass, window, door, shower, and storefront services from Glass & Door Pro.",
         ctaText: "Get a Free Quote",
         ctaLink: "/#contact",
         ctaSecondaryText: "Call (704) 771-6111",
@@ -56,9 +57,21 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
         title: "What We Help With",
         columns: "3",
         cards: [
-          { icon: "Droplets", title: "Frameless Showers", description: "Custom shower glass measured and installed for the opening." },
-          { icon: "Grid3X3", title: "Windows & Doors", description: "Residential installation and repair with clean finish details." },
-          { icon: "Building2", title: "Commercial Glass", description: "Storefront glass, commercial doors, and facility glass replacement." },
+          {
+            icon: "Droplets",
+            title: "Frameless Showers",
+            description: "Custom shower glass measured and installed for the opening.",
+          },
+          {
+            icon: "Grid3X3",
+            title: "Windows & Doors",
+            description: "Residential installation and repair with clean finish details.",
+          },
+          {
+            icon: "Building2",
+            title: "Commercial Glass",
+            description: "Storefront glass, commercial doors, and facility glass replacement.",
+          },
         ],
       }),
       block("rich-text", {
@@ -70,11 +83,13 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
         items: [
           {
             question: "What areas do you serve?",
-            answer: "Glass & Door Pro serves Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby communities.",
+            answer:
+              "Glass & Door Pro serves Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby communities.",
           },
           {
             question: "Can I request a quote online?",
-            answer: "Yes. Use the contact form or call (704) 771-6111 to describe your project and request an estimate.",
+            answer:
+              "Yes. Use the contact form or call (704) 771-6111 to describe your project and request an estimate.",
           },
         ],
       }),
@@ -96,9 +111,21 @@ export interface LandingPageGoal {
 }
 
 export const LANDING_PAGE_GOALS: LandingPageGoal[] = [
-  { id: "quote-request", label: "Get quote requests", description: "Encourage visitors to contact Glass & Door Pro" },
-  { id: "service-detail", label: "Explain a service", description: "Describe a specific residential or commercial service" },
-  { id: "general", label: "General landing page", description: "Flexible page for a service, offer, or campaign" },
+  {
+    id: "quote-request",
+    label: "Get quote requests",
+    description: "Encourage visitors to contact Glass & Door Pro",
+  },
+  {
+    id: "service-detail",
+    label: "Explain a service",
+    description: "Describe a specific residential or commercial service",
+  },
+  {
+    id: "general",
+    label: "General landing page",
+    description: "Flexible page for a service, offer, or campaign",
+  },
 ];
 
 export interface AudienceOption {
@@ -123,12 +150,48 @@ export interface WizardBlockOption {
 
 export function getRecommendedBlocks(goalId: string): WizardBlockOption[] {
   const all: WizardBlockOption[] = [
-    { id: "hero", type: "hero", label: "Hero Section", description: "Full-width hero with heading and CTA buttons", recommended: true },
-    { id: "trust-bar", type: "trust-bar", label: "Trust Bar", description: "Row of trust signals", recommended: false },
-    { id: "features", type: "cards-grid", label: "Service Cards", description: "Icon + text cards", recommended: false },
-    { id: "details", type: "rich-text", label: "Service Details", description: "Long-form supporting copy", recommended: false },
-    { id: "faq", type: "faq", label: "FAQ", description: "Frequently asked questions", recommended: false },
-    { id: "cta", type: "cta", label: "Call to Action", description: "Quote request CTA section", recommended: true },
+    {
+      id: "hero",
+      type: "hero",
+      label: "Hero Section",
+      description: "Full-width hero with heading and CTA buttons",
+      recommended: true,
+    },
+    {
+      id: "trust-bar",
+      type: "trust-bar",
+      label: "Trust Bar",
+      description: "Row of trust signals",
+      recommended: false,
+    },
+    {
+      id: "features",
+      type: "cards-grid",
+      label: "Service Cards",
+      description: "Icon + text cards",
+      recommended: false,
+    },
+    {
+      id: "details",
+      type: "rich-text",
+      label: "Service Details",
+      description: "Long-form supporting copy",
+      recommended: false,
+    },
+    {
+      id: "faq",
+      type: "faq",
+      label: "FAQ",
+      description: "Frequently asked questions",
+      recommended: false,
+    },
+    {
+      id: "cta",
+      type: "cta",
+      label: "Call to Action",
+      description: "Quote request CTA section",
+      recommended: true,
+    },
   ];
 
   const goalRecommendations: Record<string, string[]> = {
@@ -165,32 +228,42 @@ export function generateLandingPageBlocks(
   ctaText: string,
   ctaLink: string,
 ): BlockInstance[] {
-  const blockOptions = getRecommendedBlocks(goalId);
+  const blockOptions = new Map(getRecommendedBlocks(goalId).map((item) => [item.id, item]));
   const blocks: BlockInstance[] = [];
   const audienceDescription = buildAudienceSubheading(audiences, "");
 
   for (const id of selectedBlockIds) {
-    const option = blockOptions.find((item) => item.id === id);
+    const option = blockOptions.get(id);
     if (!option) continue;
 
     if (option.type === "hero") {
-      blocks.push(block("hero", {
-        heading: headline || "Glass & Door Services in the Charlotte Area",
-        subheading: subheadline || audienceDescription || "Tell Glass & Door Pro about your glass, window, door, shower, or commercial project.",
-        ctaText: ctaText || "Get a Free Quote",
-        ctaLink: ctaLink || "/#contact",
-        ctaSecondaryText: "",
-        ctaSecondaryLink: "",
-        minHeight: "520",
-      }));
+      blocks.push(
+        block("hero", {
+          heading: headline || "Glass & Door Services in the Charlotte Area",
+          subheading:
+            subheadline ||
+            audienceDescription ||
+            "Tell Glass & Door Pro about your glass, window, door, shower, or commercial project.",
+          ctaText: ctaText || "Get a Free Quote",
+          ctaLink: ctaLink || "/#contact",
+          ctaSecondaryText: "",
+          ctaSecondaryLink: "",
+          minHeight: "520",
+        }),
+      );
     } else if (option.type === "cta") {
-      blocks.push(block("cta", {
-        heading: "Ready to Get Started?",
-        subheading: subheadline || audienceDescription || "Send the project details and Glass & Door Pro will follow up with next steps.",
-        primaryText: ctaText || "Get a Free Quote",
-        primaryLink: ctaLink || "/#contact",
-        variant: "dark",
-      }));
+      blocks.push(
+        block("cta", {
+          heading: "Ready to Get Started?",
+          subheading:
+            subheadline ||
+            audienceDescription ||
+            "Send the project details and Glass & Door Pro will follow up with next steps.",
+          primaryText: ctaText || "Get a Free Quote",
+          primaryLink: ctaLink || "/#contact",
+          variant: "dark",
+        }),
+      );
     } else {
       blocks.push(block(option.type));
     }

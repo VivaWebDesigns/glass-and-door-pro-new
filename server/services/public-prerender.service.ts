@@ -1,25 +1,25 @@
-import sanitizeHtml from "sanitize-html";
-import type { CmsPage, SeoSettings } from "@shared/schema";
-import {
-  GLASS_PRIMARY_SERVICE_AREAS,
-  GLASS_PRIMARY_SERVICE_AREA_NAMES,
-} from "@shared/glass-service-areas";
-import { normalizeSeoDescription } from "@shared/seo-description";
-import { correctGlassSearchTitle } from "@shared/glass-search-snippets";
 import { getGlassLocationSearchCopy } from "@shared/glass-location-search";
-import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
+import { correctGlassSearchTitle } from "@shared/glass-search-snippets";
 import {
   buildGlassBreadcrumbItems,
   buildGlassLocalBusinessLd,
   buildGlassServiceLdForCmsPage,
+  getCmsPublicPath,
+  getCmsSlugForPublicPath,
   getGlassCityPageArea,
   getGlassServiceSeoOverride,
   getGlassServiceSocialMetadata,
-  getCmsPublicPath,
-  getCmsSlugForPublicPath,
   isGlassLegalNoindexSlug,
   isGlassServicePageSlug,
 } from "@shared/glass-seo";
+import {
+  GLASS_PRIMARY_SERVICE_AREAS,
+  GLASS_PRIMARY_SERVICE_AREA_NAMES,
+} from "@shared/glass-service-areas";
+import type { CmsPage, SeoSettings } from "@shared/schema";
+import { normalizeSeoDescription } from "@shared/seo-description";
+import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
+import sanitizeHtml from "sanitize-html";
 import { storage } from "../storage";
 
 interface PublicHtmlSnapshot {
@@ -42,7 +42,6 @@ type PrerenderLink = {
   description?: string;
 };
 
-const DEFAULT_TITLE = "Glass and Door Pro | Charlotte Glass, Windows & Doors";
 const DEFAULT_DESCRIPTION =
   "Glass and Door Pro serves the Charlotte area with frameless showers, residential windows, door installation, window repair, and commercial glass.";
 
@@ -854,7 +853,7 @@ function buildFallbackSnapshot(
 
 export async function getPublicHtmlSnapshot(
   pathname: string,
-  search = "",
+  _search = "",
 ): Promise<PublicHtmlSnapshot | null> {
   if (
     pathname.startsWith("/api") ||

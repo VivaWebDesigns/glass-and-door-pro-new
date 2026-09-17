@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminSidebar } from "@/features/admin/admin-sidebar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -91,10 +91,14 @@ export default function CmsMediaPage() {
   >("newest");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedAsset, setSelectedAsset] = useState<CmsMediaLibraryAsset | null>(null);
-  const [metadataForm, setMetadataForm] = useState<MediaMetadataForm>(buildMetadataForm(null));
+  const [metadataForm, setMetadataForm] = useState<MediaMetadataForm>(() =>
+    buildMetadataForm(null),
+  );
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [cropFileName, setCropFileName] = useState("image.webp");
   const [isPreparingCrop, setIsPreparingCrop] = useState(false);
+  const cropRequest = useRef<AbortController | null>(null);
+  useEffect(() => () => cropRequest.current?.abort(), []);
 
   const { data: assets = [], isLoading } = useQuery<CmsMediaLibraryAsset[]>({
     queryKey: ["/api/admin/cms/media"],
@@ -251,21 +255,27 @@ export default function CmsMediaPage() {
 
   const prepareCropper = async () => {
     if (!selectedAsset) return;
+    cropRequest.current?.abort();
+    const controller = new AbortController();
+    cropRequest.current = controller;
     setIsPreparingCrop(true);
     try {
       const response = await fetch(`/api/admin/cms/media/${selectedAsset.id}/source`, {
         credentials: "include",
+        signal: controller.signal,
       });
       if (!response.ok) {
         throw new Error("Could not load image for cropping");
       }
       const blob = await response.blob();
+      if (controller.signal.aborted) return;
       if (cropSrc?.startsWith("blob:")) {
         URL.revokeObjectURL(cropSrc);
       }
       setCropFileName(selectedAsset.originalName || "image.webp");
       setCropSrc(URL.createObjectURL(blob));
     } catch (error) {
+      if (controller.signal.aborted) return;
       toast({
         title: "Unable to open crop tool",
         description: error instanceof Error ? error.message : "Please try again.",
@@ -399,7 +409,7 @@ export default function CmsMediaPage() {
             {filteredAssets.map((asset) => (
               <button
                 key={asset.id}
-                className="group relative aspect-square rounded-xl border bg-muted/20 overflow-hidden transition-all hover:border-violet-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-violet-400"
+                className="group relative aspect-square rounded-xl border bg-muted/20 overflow-hidden transition-[color,background-color,border-color,box-shadow] hover:border-violet-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-violet-400"
                 onClick={() => setSelectedAsset(asset)}
                 data-testid={`media-asset-${asset.id}`}
               >

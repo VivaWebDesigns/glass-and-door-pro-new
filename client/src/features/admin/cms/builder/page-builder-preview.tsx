@@ -17,7 +17,7 @@ import type { BlockInstance } from "./block-registry";
 const LazyPublicPageRenderer = lazy(() =>
   import("@/features/public/public-block-renderer").then((module) => ({
     default: module.PublicPageRenderer,
-  }))
+  })),
 );
 
 export type PreviewDevice = "desktop" | "tablet" | "mobile";
@@ -163,7 +163,8 @@ export function FrontendPreviewDialog({
                 Frontend Preview
               </DialogTitle>
               <DialogDescription>
-                Review the current page content with the published renderer only, without builder chrome, before you publish.
+                Review the current page content with the published renderer only, without builder
+                chrome, before you publish.
               </DialogDescription>
             </div>
             <div className="flex flex-wrap items-center gap-2">

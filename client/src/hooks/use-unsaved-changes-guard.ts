@@ -38,13 +38,13 @@ export function useUnsavedChangesGuard({
       onProceed?.();
       return true;
     },
-    [message, shouldWarn]
+    [message, shouldWarn],
   );
 
   const confirmDiscardChanges = useCallback(
     (onDiscard?: () => void, overrideMessage?: string) =>
       confirmIfDirty(onDiscard, overrideMessage),
-    [confirmIfDirty]
+    [confirmIfDirty],
   );
 
   return {

@@ -88,15 +88,17 @@ export function glassGoogleReviewDate(name: string) {
   return GLASS_GOOGLE_REVIEW_DATES[name as keyof typeof GLASS_GOOGLE_REVIEW_DATES];
 }
 
+const reviewDateFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
 export function formatGlassReviewDate(reviewDate: string | undefined, fallback = "") {
   if (!reviewDate) return fallback;
 
   const reviewed = new Date(`${reviewDate}T12:00:00Z`);
   if (Number.isNaN(reviewed.getTime())) return fallback;
 
-  return new Intl.DateTimeFormat("en-US", {
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(reviewed);
+  return reviewDateFormatter.format(reviewed);
 }

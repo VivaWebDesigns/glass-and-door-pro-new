@@ -19,7 +19,7 @@ export function formatPhoneNumber(raw: string): string {
     return `+1 (${area}) ${pfx}-${line}`;
   }
 
-  const cleaned = raw.replace(/[^\d\s\-\(\)]/g, "").trim();
+  const cleaned = raw.replace(/[^\d\s\-()]/g, "").trim();
   return cleaned ? "+" + cleaned : "+";
 }
 
@@ -29,12 +29,9 @@ export function isValidPhone(value: string | undefined | null): boolean {
   return value.startsWith("+") && digits.length >= 7 && digits.length <= 15;
 }
 
-export const phoneSchema = z
-  .string()
-  .optional()
-  .refine(isValidPhone, {
-    message: "Enter a valid phone number with country code, e.g. +1 (555) 123-4567",
-  });
+export const phoneSchema = z.string().optional().refine(isValidPhone, {
+  message: "Enter a valid phone number with country code, e.g. +1 (555) 123-4567",
+});
 
 export const requiredPhoneSchema = z
   .string()

@@ -121,7 +121,15 @@ export function CmsSitemapTab() {
   ];
 
   const corePageSlugs = ["home"];
-  const retiredPageSlugs = ["about", "contact", "directory", "events", "insights", "join", "recordings"];
+  const retiredPageSlugs = [
+    "about",
+    "contact",
+    "directory",
+    "events",
+    "insights",
+    "join",
+    "recordings",
+  ];
 
   const cmsEntries: SitemapEntry[] = (pages ?? [])
     .filter((p) => !corePageSlugs.includes(p.slug) && !retiredPageSlugs.includes(p.slug))
@@ -303,7 +311,6 @@ export function CmsSitemapTab() {
               ))}
             </CardContent>
           </Card>
-
         </>
       )}
 

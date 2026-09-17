@@ -1,3 +1,5 @@
+import { useRowKeys } from "@/hooks/use-row-keys";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 import { lazy, Suspense, useState, useEffect, type ReactElement } from "react";
 import { Button } from "@/components/ui/button";
 import { FormModalButton } from "@/components/forms/form-modal-button";
@@ -289,7 +291,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
           <div
             className={`text-lg text-white/80 mb-8 [&_a]:text-white [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-white/80 [&_p]:m-0 ${isSplit ? "" : "max-w-xl mx-auto"}`}
             style={subheadingTextStyle}
-            dangerouslySetInnerHTML={{ __html: str(props.subheading) }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(str(props.subheading)) }}
           />
         )}
         <div className={`flex flex-wrap gap-3 ${isSplit ? "justify-start" : "justify-center"}`}>
@@ -375,7 +377,7 @@ function TwoColumnTextBlock({ props }: { props: Record<string, unknown> }) {
             {column.body && (
               <div
                 className="prose prose-sm max-w-none text-foreground"
-                dangerouslySetInnerHTML={{ __html: column.body }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(column.body) }}
               />
             )}
             {column.items.length > 0 && (
@@ -410,7 +412,9 @@ function CalloutBoxBlock({ props }: { props: Record<string, unknown> }) {
       <div className={`rounded-2xl p-5 sm:p-8 ${variantClass}`}>
         <div
           className="prose prose-sm max-w-none break-words text-foreground"
-          dangerouslySetInnerHTML={{ __html: str(props.content) || "<p>Add callout content.</p>" }}
+          dangerouslySetInnerHTML={{
+            __html: sanitizeHtml(str(props.content) || "<p>Add callout content.</p>"),
+          }}
         />
         {str(props.ctaText) && (
           <div className="mt-6">
@@ -495,7 +499,9 @@ function RichTextBlock({ props }: { props: Record<string, unknown> }) {
       />
       <div
         className={`prose prose-sm max-w-none ${textAlign} text-foreground`}
-        dangerouslySetInnerHTML={{ __html: str(props.content) || "<p>No content.</p>" }}
+        dangerouslySetInnerHTML={{
+          __html: sanitizeHtml(str(props.content) || "<p>No content.</p>"),
+        }}
       />
     </div>
   );
@@ -523,7 +529,7 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
         {str(props.body) && (
           <div
             className={`prose prose-sm max-w-none text-foreground ${bodyAlign}`}
-            dangerouslySetInnerHTML={{ __html: str(props.body) }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(str(props.body)) }}
           />
         )}
       </div>
@@ -590,7 +596,7 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
       {str(props.subheading) && (
         <div
           className={`mb-8 mx-auto max-w-xl text-sm leading-relaxed sm:text-base [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:opacity-80 [&_p]:m-0 ${variant === "light" ? "text-muted-foreground [&_a]:text-primary" : "opacity-80 [&_a]:text-current"}`}
-          dangerouslySetInnerHTML={{ __html: str(props.subheading) }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(str(props.subheading)) }}
         />
       )}
       <div className="flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">
@@ -701,6 +707,7 @@ function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
 
 function FaqBlock({ props }: { props: Record<string, unknown> }) {
   const items = arr<{ question: string; answer: string }>(props.items);
+  const itemKeys = useRowKeys(items);
   return (
     <div className="py-4">
       <SectionHeading props={props} defaultAlignment="left" className="mb-8" />
@@ -709,12 +716,12 @@ function FaqBlock({ props }: { props: Record<string, unknown> }) {
           <p className="text-muted-foreground">Add FAQ items to display here.</p>
         ) : (
           items.map((item, i) => (
-            <AccordionItem key={i} value={`faq-${i}`} className="border rounded-lg px-4">
+            <AccordionItem key={itemKeys[i]} value={itemKeys[i]} className="border rounded-lg px-4">
               <AccordionTrigger className="font-medium text-left">{item.question}</AccordionTrigger>
               <AccordionContent>
                 <div
                   className="text-muted-foreground [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-primary/80 [&_p]:m-0"
-                  dangerouslySetInnerHTML={{ __html: item.answer }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.answer) }}
                 />
               </AccordionContent>
             </AccordionItem>
@@ -901,6 +908,7 @@ function ButtonGroupBlock({ props }: { props: Record<string, unknown> }) {
     modalTitle?: string;
     modalDescription?: string;
   }>(props.buttons);
+  const buttonKeys = useRowKeys(buttons);
   return (
     <div className="py-4">
       <SectionHeading
@@ -914,7 +922,7 @@ function ButtonGroupBlock({ props }: { props: Record<string, unknown> }) {
         ) : (
           buttons.map((btn, i) => (
             <FormModalButton
-              key={i}
+              key={buttonKeys[i]}
               label={btn.text}
               action={btn.action}
               href={btn.link}
@@ -946,7 +954,7 @@ function RawHtmlBlock({ props }: { props: Record<string, unknown> }) {
       <SectionHeading props={props} defaultAlignment="center" className="mb-6" />
       <div
         className="prose prose-sm max-w-none text-foreground"
-        dangerouslySetInnerHTML={{ __html: str(props.html) || "" }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(str(props.html) || "") }}
       />
     </div>
   );
@@ -1037,7 +1045,9 @@ function VideoEmbedBlock({ props }: { props: Record<string, unknown> }) {
       ) : (
         <div className="relative rounded-xl overflow-hidden" style={{ paddingBottom }}>
           {ytId && (
-            <iframe title={str(props.title) || "YouTube video"}
+            <iframe
+              title={str(props.title) || "YouTube video"}
+              sandbox="allow-scripts allow-same-origin allow-presentation"
               src={`https://www.youtube.com/embed/${ytId}`}
               className="absolute inset-0 w-full h-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -1045,7 +1055,9 @@ function VideoEmbedBlock({ props }: { props: Record<string, unknown> }) {
             />
           )}
           {vimeoId && (
-            <iframe title={str(props.title) || "Vimeo video"}
+            <iframe
+              title={str(props.title) || "Vimeo video"}
+              sandbox="allow-scripts allow-same-origin allow-presentation"
               src={`https://player.vimeo.com/video/${vimeoId}`}
               className="absolute inset-0 w-full h-full"
               allowFullScreen
@@ -1381,7 +1393,8 @@ function SliderBlock({ props }: { props: Record<string, unknown> }) {
       </div>
       {slides.length > 1 && (
         <div className="flex items-center justify-center gap-4 mt-4">
-          <Button aria-label="Previous slide"
+          <Button
+            aria-label="Previous slide"
             variant="outline"
             size="icon"
             className="rounded-full h-8 w-8"
@@ -1392,7 +1405,9 @@ function SliderBlock({ props }: { props: Record<string, unknown> }) {
           </Button>
           <div className="flex gap-1.5">
             {slides.map((_, i) => (
-              <button aria-label={`Go to slide ${i + 1}`} aria-current={i === current ? "true" : undefined}
+              <button
+                aria-label={`Go to slide ${i + 1}`}
+                aria-current={i === current ? "true" : undefined}
                 key={i}
                 className={`w-2 h-2 rounded-full transition-colors ${i === current ? "bg-accent" : "bg-muted-foreground/30"}`}
                 onClick={() => setCurrent(i)}
@@ -1400,7 +1415,8 @@ function SliderBlock({ props }: { props: Record<string, unknown> }) {
               />
             ))}
           </div>
-          <Button aria-label="Next slide"
+          <Button
+            aria-label="Next slide"
             variant="outline"
             size="icon"
             className="rounded-full h-8 w-8"
@@ -1517,7 +1533,7 @@ function ScienceExplainerBlock({ props }: { props: Record<string, unknown> }) {
       {str(props.body) && (
         <div
           className="prose prose-sm max-w-none text-foreground mb-6"
-          dangerouslySetInnerHTML={{ __html: str(props.body) }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(str(props.body)) }}
         />
       )}
       {citations.length > 0 && (
@@ -1947,14 +1963,7 @@ export function BlockRenderer({
 
 /** Block types that render edge-to-edge without a max-width container.
  *  Update this set when adding new full-width block types. */
-const FULL_WIDTH_BLOCKS = new Set([
-  "hero",
-  "cta",
-  "trust-bar",
-  "divider",
-  "slider",
-  "stats-bar",
-]);
+const FULL_WIDTH_BLOCKS = new Set(["hero", "cta", "trust-bar", "divider", "slider", "stats-bar"]);
 
 export function PageRenderer({ blocks }: { blocks: BlockInstance[] }) {
   return (

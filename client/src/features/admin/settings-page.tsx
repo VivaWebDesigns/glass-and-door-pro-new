@@ -320,7 +320,7 @@ const INTEGRATIONS: IntegrationConfig[] = [
         key: "ga4_reporting_private_key",
         label: "Reporting Private Key",
         isSecret: true,
-        placeholder: "-----BEGIN PRIVATE KEY-----",
+        placeholder: "Paste the complete reporting private key",
       },
     ],
   },
@@ -554,7 +554,8 @@ function IntegrationCard({
                   />
                 </div>
                 {field.isSecret && (
-                  <Button aria-label={`${showSecrets[field.key] ? "Hide" : "Show"} ${field.label}`}
+                  <Button
+                    aria-label={`${showSecrets[field.key] ? "Hide" : "Show"} ${field.label}`}
                     variant="ghost"
                     size="icon"
                     onClick={() =>
@@ -1325,7 +1326,8 @@ export function BrandingTab({
                           <p className="mt-1 text-xs text-muted-foreground">{field.description}</p>
                         </div>
                         <div className="flex items-center gap-3">
-                          <input aria-label={field.label}
+                          <input
+                            aria-label={field.label}
                             type="color"
                             value={normalizeHexColor(colorValues[field.key]) || "#000000"}
                             onChange={(event) =>
@@ -1473,6 +1475,7 @@ export function BrandingTab({
                   </p>
                   <div className="flex flex-wrap items-center gap-4 text-sm">
                     <a
+                      id="branding-preview-link"
                       href="#branding-preview-link"
                       className="underline underline-offset-4"
                       style={previewLinkStyle}
@@ -1705,15 +1708,6 @@ function TemplateEditor({
     enabled: open,
   });
 
-  useEffect(() => {
-    setSubject(template.subject);
-    setHtmlBody(template.htmlBody);
-    setPreviewHtml(null);
-    setEditorTab("visual");
-    setLinkUrl("");
-    setShowLinkPanel(false);
-  }, [template]);
-
   useLockConflictGuard({
     active: open,
     resourceId: open ? template.slug : null,
@@ -1787,14 +1781,15 @@ function TemplateEditor({
     },
   });
 
+  const requestPreview = previewMutation.mutate;
   useEffect(() => {
     if (!open) return;
     const timeout = window.setTimeout(() => {
-      previewMutation.mutate();
+      requestPreview();
     }, 250);
 
     return () => window.clearTimeout(timeout);
-  }, [open, subject, htmlBody]);
+  }, [open, subject, htmlBody, requestPreview]);
 
   const syncVisualHtml = () => {
     const editor = visualEditorRef.current;
@@ -1946,7 +1941,8 @@ function TemplateEditor({
                         <Heading2 className="mr-1.5 h-3.5 w-3.5" />
                         Heading
                       </Button>
-                      <Button aria-label="Bold"
+                      <Button
+                        aria-label="Bold"
                         type="button"
                         variant="ghost"
                         size="icon"
@@ -1955,7 +1951,8 @@ function TemplateEditor({
                       >
                         <Bold className="h-3.5 w-3.5" />
                       </Button>
-                      <Button aria-label="Italic"
+                      <Button
+                        aria-label="Italic"
                         type="button"
                         variant="ghost"
                         size="icon"
@@ -1964,7 +1961,8 @@ function TemplateEditor({
                       >
                         <Italic className="h-3.5 w-3.5" />
                       </Button>
-                      <Button aria-label="Underline"
+                      <Button
+                        aria-label="Underline"
                         type="button"
                         variant="ghost"
                         size="icon"
@@ -1973,7 +1971,8 @@ function TemplateEditor({
                       >
                         <UnderlineIcon className="h-3.5 w-3.5" />
                       </Button>
-                      <Button aria-label="Bulleted list"
+                      <Button
+                        aria-label="Bulleted list"
                         type="button"
                         variant="ghost"
                         size="icon"
@@ -1982,7 +1981,8 @@ function TemplateEditor({
                       >
                         <List className="h-3.5 w-3.5" />
                       </Button>
-                      <Button aria-label="Numbered list"
+                      <Button
+                        aria-label="Numbered list"
                         type="button"
                         variant="ghost"
                         size="icon"
@@ -2094,6 +2094,7 @@ function TemplateEditor({
               </div>
               {previewHtml ? (
                 <iframe
+                  sandbox=""
                   srcDoc={previewHtml}
                   className="w-full h-[420px] bg-white"
                   title="Email preview"
@@ -2296,6 +2297,7 @@ function EmailTemplatesTab() {
 
       {editingTemplate && (
         <TemplateEditor
+          key={editingTemplate.id}
           template={editingTemplate}
           open={!!editingTemplate}
           onClose={() => setEditingTemplate(null)}
@@ -2356,7 +2358,6 @@ export default function AdminSettingsPage() {
               <HeadTagAdditionsTab settings={settings || {}} />
             )}
           </TabsContent>
-
         </Tabs>
       </div>
     </AdminSidebar>

@@ -20,7 +20,7 @@ router.get(
     res.json({
       unreadMessages,
     });
-  })
+  }),
 );
 
 router.get(
@@ -31,60 +31,53 @@ router.get(
       return res.json(cached);
     }
 
-    const [
-      usersByRole,
-      registrationTrend,
-      recentActivity,
-      contactsTrend,
-      totalUsers,
-    ] = await Promise.all([
-      db
-        .select({
-          role: users.role,
-          count: sql<number>`count(*)`,
-        })
-        .from(users)
-        .groupBy(users.role),
+    const [usersByRole, registrationTrend, recentActivity, contactsTrend, totalUsers] =
+      await Promise.all([
+        db
+          .select({
+            role: users.role,
+            count: sql<number>`count(*)`,
+          })
+          .from(users)
+          .groupBy(users.role),
 
-      db
-        .select({
-          month: sql<string>`to_char(${users.createdAt}, 'YYYY-MM')`,
-          count: sql<number>`count(*)`,
-        })
-        .from(users)
-        .where(sql`${users.createdAt} >= now() - interval '6 months'`)
-        .groupBy(sql`to_char(${users.createdAt}, 'YYYY-MM')`)
-        .orderBy(sql`to_char(${users.createdAt}, 'YYYY-MM')`),
+        db
+          .select({
+            month: sql<string>`to_char(${users.createdAt}, 'YYYY-MM')`,
+            count: sql<number>`count(*)`,
+          })
+          .from(users)
+          .where(sql`${users.createdAt} >= now() - interval '6 months'`)
+          .groupBy(sql`to_char(${users.createdAt}, 'YYYY-MM')`)
+          .orderBy(sql`to_char(${users.createdAt}, 'YYYY-MM')`),
 
-      db
-        .select({
-          id: activityLogs.id,
-          userId: activityLogs.userId,
-          action: activityLogs.action,
-          details: activityLogs.details,
-          createdAt: activityLogs.createdAt,
-          firstName: users.firstName,
-          lastName: users.lastName,
-        })
-        .from(activityLogs)
-        .leftJoin(users, sql`${activityLogs.userId} = ${users.id}`)
-        .orderBy(sql`${activityLogs.createdAt} desc`)
-        .limit(15),
+        db
+          .select({
+            id: activityLogs.id,
+            userId: activityLogs.userId,
+            action: activityLogs.action,
+            details: activityLogs.details,
+            createdAt: activityLogs.createdAt,
+            firstName: users.firstName,
+            lastName: users.lastName,
+          })
+          .from(activityLogs)
+          .leftJoin(users, sql`${activityLogs.userId} = ${users.id}`)
+          .orderBy(sql`${activityLogs.createdAt} desc`)
+          .limit(15),
 
-      db
-        .select({
-          month: sql<string>`to_char(${contactMessages.createdAt}, 'YYYY-MM')`,
-          count: sql<number>`count(*)`,
-        })
-        .from(contactMessages)
-        .where(sql`${contactMessages.createdAt} >= now() - interval '6 months'`)
-        .groupBy(sql`to_char(${contactMessages.createdAt}, 'YYYY-MM')`)
-        .orderBy(sql`to_char(${contactMessages.createdAt}, 'YYYY-MM')`),
+        db
+          .select({
+            month: sql<string>`to_char(${contactMessages.createdAt}, 'YYYY-MM')`,
+            count: sql<number>`count(*)`,
+          })
+          .from(contactMessages)
+          .where(sql`${contactMessages.createdAt} >= now() - interval '6 months'`)
+          .groupBy(sql`to_char(${contactMessages.createdAt}, 'YYYY-MM')`)
+          .orderBy(sql`to_char(${contactMessages.createdAt}, 'YYYY-MM')`),
 
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(users),
-    ]);
+        db.select({ count: sql<number>`count(*)` }).from(users),
+      ]);
 
     const result = {
       usersByRole: usersByRole.map((r) => ({ role: r.role, count: Number(r.count) })),
@@ -103,7 +96,7 @@ router.get(
 
     analyticsCache.set(ANALYTICS_CACHE_KEY, result);
     res.json(result);
-  })
+  }),
 );
 
 export default router;

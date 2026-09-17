@@ -25,9 +25,7 @@ export const mixedBuilderFixture: BuilderContent = {
       type: "faq",
       props: {
         heading: "Common Questions",
-        items: [
-          { question: "How do I apply?", answer: "<p>Use the application form.</p>" },
-        ],
+        items: [{ question: "How do I apply?", answer: "<p>Use the application form.</p>" }],
       },
     },
     {

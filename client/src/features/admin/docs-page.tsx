@@ -7,7 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import {
   Sheet,
@@ -82,7 +88,7 @@ function sortCategories(categories: string[]) {
 export default function DocsPage() {
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedDoc, setSelectedDoc] = useState<Doc | null>(null);
+  const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [editingDoc, setEditingDoc] = useState<Partial<Doc> | null>(null);
   const [savedDocSnapshot, setSavedDocSnapshot] = useState("");
@@ -121,10 +127,15 @@ export default function DocsPage() {
       const res = await apiRequest("POST", "/api/admin/docs/sync");
       return res.json();
     },
-    onSuccess: async (payload: { total: number; created: number; updated: number; docs: Doc[] }) => {
+    onSuccess: async (payload: {
+      total: number;
+      created: number;
+      updated: number;
+      docs: Doc[];
+    }) => {
       await queryClient.invalidateQueries({ queryKey: ["/api/admin/docs"] });
       const firstDoc = payload.docs?.[0] ?? null;
-      setSelectedDoc(firstDoc);
+      setSelectedDocId(firstDoc?.id ?? null);
       toast({
         title: "System documentation synced",
         description: `${payload.total} documents available, ${payload.created} created, ${payload.updated} refreshed.`,
@@ -147,7 +158,11 @@ export default function DocsPage() {
     },
     onError: (error: Error) => {
       saveFeedbackRef.current.markError();
-      toast({ title: "Failed to create document", description: error.message, variant: "destructive" });
+      toast({
+        title: "Failed to create document",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -163,13 +178,17 @@ export default function DocsPage() {
       setEditingDoc(null);
       setSavedDocSnapshot("");
       if (selectedDoc?.id === updated.id) {
-        setSelectedDoc(updated);
+        setSelectedDocId(updated.id);
       }
       toast({ title: "Document updated" });
     },
     onError: (error: Error) => {
       saveFeedbackRef.current.markError();
-      toast({ title: "Failed to update document", description: error.message, variant: "destructive" });
+      toast({
+        title: "Failed to update document",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -179,7 +198,7 @@ export default function DocsPage() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["/api/admin/docs"] });
-      setSelectedDoc(null);
+      setSelectedDocId(null);
       toast({ title: "Document deleted" });
     },
   });
@@ -208,21 +227,11 @@ export default function DocsPage() {
     [categories],
   );
 
-  useEffect(() => {
-    if (!selectedDoc && filteredDocs.length > 0) {
-      setSelectedDoc(filteredDocs[0]);
-      return;
-    }
-
-    if (selectedDoc && !allDocs.some((doc) => doc.id === selectedDoc.id)) {
-      setSelectedDoc(filteredDocs[0] ?? null);
-      return;
-    }
-
-    if (selectedDoc && filteredDocs.length > 0 && !filteredDocs.some((doc) => doc.id === selectedDoc.id)) {
-      setSelectedDoc(filteredDocs[0] ?? null);
-    }
-  }, [allDocs, filteredDocs, selectedDoc]);
+  const selectedDoc =
+    filteredDocs.find((doc) => doc.id === selectedDocId) ??
+    filteredDocs[0] ??
+    allDocs.find((doc) => doc.id === selectedDocId) ??
+    null;
 
   useEffect(() => {
     if (selectedCategory && !categories.includes(selectedCategory)) {
@@ -310,7 +319,8 @@ export default function DocsPage() {
               Documentation Library
             </h1>
             <p className="max-w-3xl text-sm text-muted-foreground">
-              Internal operating documentation for the CMS, content workflows, infrastructure, deployment, and system architecture.
+              Internal operating documentation for the CMS, content workflows, infrastructure,
+              deployment, and system architecture.
             </p>
           </div>
 
@@ -321,11 +331,7 @@ export default function DocsPage() {
               disabled={syncMutation.isPending}
               data-testid="button-sync-system-docs"
             >
-              {syncMutation.isPending ? (
-                <LoadingSpinner />
-              ) : (
-                <RefreshCw className="mr-2 h-4 w-4" />
-              )}
+              {syncMutation.isPending ? <LoadingSpinner /> : <RefreshCw className="mr-2 h-4 w-4" />}
               Sync System Docs
             </Button>
             <Button onClick={openCreate} data-testid="button-create-doc">
@@ -339,7 +345,9 @@ export default function DocsPage() {
           <Card>
             <CardContent className="py-4">
               <div className="text-sm text-muted-foreground">Published library</div>
-              <div className="mt-1 text-2xl font-semibold" data-testid="text-doc-count">{allDocs.length}</div>
+              <div className="mt-1 text-2xl font-semibold" data-testid="text-doc-count">
+                {allDocs.length}
+              </div>
             </CardContent>
           </Card>
           <Card>
@@ -411,7 +419,10 @@ export default function DocsPage() {
                     <div className="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
                       <BookOpenText className="mx-auto mb-3 h-10 w-10 opacity-50" />
                       <p>No documentation found yet.</p>
-                      <p className="mt-1">Use “Sync System Docs” to import the repo documentation into the admin library.</p>
+                      <p className="mt-1">
+                        Use “Sync System Docs” to import the repo documentation into the admin
+                        library.
+                      </p>
                     </div>
                   ) : (
                     filteredDocs.map((doc) => (
@@ -419,7 +430,7 @@ export default function DocsPage() {
                         key={doc.id}
                         type="button"
                         className={`w-full rounded-xl border p-4 text-left transition-colors ${selectedDoc?.id === doc.id ? "border-primary bg-primary/5" : "hover:border-primary/40 hover:bg-muted/50"}`}
-                        onClick={() => setSelectedDoc(doc)}
+                        onClick={() => setSelectedDocId(doc.id)}
                         data-testid={`card-doc-${doc.id}`}
                       >
                         <div className="flex items-start justify-between gap-3">
@@ -476,7 +487,12 @@ export default function DocsPage() {
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <Button variant="outline" size="sm" onClick={() => openEdit(selectedDoc)} data-testid="button-edit-doc">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openEdit(selectedDoc)}
+                        data-testid="button-edit-doc"
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button
@@ -492,7 +508,10 @@ export default function DocsPage() {
                 </CardHeader>
                 <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden pb-4 pt-6">
                   <ScrollArea className="min-h-0 flex-1 pr-4">
-                    <MarkdownDocument content={selectedDoc.content} data-testid="text-doc-content" />
+                    <MarkdownDocument
+                      content={selectedDoc.content}
+                      data-testid="text-doc-content"
+                    />
                   </ScrollArea>
                 </CardContent>
               </>
@@ -530,7 +549,14 @@ export default function DocsPage() {
             ) : null}
 
             {editingDoc && (
-              <div className={cn("space-y-4", editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
+              <div
+                className={cn(
+                  "space-y-4",
+                  editorLock.hasLocking &&
+                    editorLock.isReadOnly &&
+                    "pointer-events-none select-none opacity-70",
+                )}
+              >
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label>Title</Label>
@@ -572,7 +598,9 @@ export default function DocsPage() {
                     <div className="flex items-center gap-2">
                       <Switch
                         checked={editingDoc.isPublished ?? true}
-                        onCheckedChange={(value) => setEditingDoc({ ...editingDoc, isPublished: value })}
+                        onCheckedChange={(value) =>
+                          setEditingDoc({ ...editingDoc, isPublished: value })
+                        }
                         data-testid="switch-doc-published"
                       />
                       <Label>{editingDoc.isPublished ? "Published" : "Draft"}</Label>
@@ -634,7 +662,9 @@ export default function DocsPage() {
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
-                  onClick={() => unsavedChangesGuard.confirmDiscardChanges(() => setSheetOpen(false))}
+                  onClick={() =>
+                    unsavedChangesGuard.confirmDiscardChanges(() => setSheetOpen(false))
+                  }
                 >
                   Cancel
                 </Button>

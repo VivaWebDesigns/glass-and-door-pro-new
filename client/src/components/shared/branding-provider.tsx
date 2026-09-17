@@ -61,10 +61,7 @@ export function BrandingProvider({ children }: { children: React.ReactNode }) {
     staleTime: 60_000,
   });
 
-  const branding = useMemo(
-    () => data ?? DEFAULT_BRANDING_SETTINGS,
-    [data]
-  );
+  const branding = useMemo(() => data ?? DEFAULT_BRANDING_SETTINGS, [data]);
   const pathname = location.split(/[?#]/)[0] || "/";
   const isAdminRoute = pathname.startsWith("/admin");
 

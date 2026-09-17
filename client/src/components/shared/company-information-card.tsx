@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { MapPin, Phone } from "lucide-react";
 import { useBranding } from "./branding-provider";
 
 function normalizePhoneHref(value: string) {
@@ -37,14 +37,21 @@ export function CompanyInformationCard({
             <div>
               {hasCompanyInfo ? (
                 <div className={cn("space-y-1 text-sm text-muted-foreground", bodyClassName)}>
-                  {companyName ? <p className="font-medium text-foreground">{companyName}</p> : null}
+                  {companyName ? (
+                    <p className={cn("font-medium text-foreground", titleClassName)}>
+                      {companyName}
+                    </p>
+                  ) : null}
                   {companyAddress ? (
                     companyGoogleBusinessUrl ? (
                       <a
                         href={companyGoogleBusinessUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className={cn("block whitespace-pre-line underline-offset-4 hover:underline", linkClassName)}
+                        className={cn(
+                          "block whitespace-pre-line underline-offset-4 hover:underline",
+                          linkClassName,
+                        )}
                       >
                         {companyAddress}
                       </a>
@@ -54,7 +61,9 @@ export function CompanyInformationCard({
                   ) : null}
                 </div>
               ) : (
-                <p className={cn("text-sm text-muted-foreground", bodyClassName)}>Glass & Door Pro — serving the greater Charlotte metro area</p>
+                <p className={cn("text-sm text-muted-foreground", bodyClassName)}>
+                  Glass & Door Pro — serving the greater Charlotte metro area
+                </p>
               )}
             </div>
 
@@ -63,10 +72,19 @@ export function CompanyInformationCard({
                 {phoneNumbers.map((phone) => {
                   const href = normalizePhoneHref(phone);
                   return (
-                    <div key={phone} className={cn("flex items-start gap-2 text-sm text-muted-foreground", bodyClassName)}>
+                    <div
+                      key={phone}
+                      className={cn(
+                        "flex items-start gap-2 text-sm text-muted-foreground",
+                        bodyClassName,
+                      )}
+                    >
                       <Phone className="mt-0.5 h-3.5 w-3.5" />
                       {href ? (
-                        <a href={href} className={cn("underline-offset-4 hover:underline", linkClassName)}>
+                        <a
+                          href={href}
+                          className={cn("underline-offset-4 hover:underline", linkClassName)}
+                        >
                           {phone}
                         </a>
                       ) : (

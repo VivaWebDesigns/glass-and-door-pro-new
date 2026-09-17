@@ -14,17 +14,16 @@ import { logger } from "../../utils/logger";
 import * as r2Service from "../../services/r2.service";
 
 const router = Router();
-const permissionSchema = z.enum([
-  AdminPermission.CONTENT,
-  AdminPermission.DESIGN,
-]);
+const permissionSchema = z.enum([AdminPermission.CONTENT, AdminPermission.DESIGN]);
 
 function isSystemUserRole(role: string) {
   return role === "admin" || role === "editor";
 }
 
 function normalizePermissions(value: unknown) {
-  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
 }
 
 async function normalizeActiveFormNotificationIds(formIds: string[]) {
@@ -35,11 +34,13 @@ async function normalizeActiveFormNotificationIds(formIds: string[]) {
   return formIds.filter((formId) => activeIds.has(formId));
 }
 
-function normalizeSystemUserPayload<T extends {
-  role: "admin" | "editor";
-  adminPermissions?: string[];
-  formNotificationFormIds?: string[];
-}>(payload: T) {
+function normalizeSystemUserPayload<
+  T extends {
+    role: "admin" | "editor";
+    adminPermissions?: string[];
+    formNotificationFormIds?: string[];
+  },
+>(payload: T) {
   if (payload.role === "admin") {
     return {
       ...payload,
@@ -88,9 +89,7 @@ async function ensureAdminGuardrails({
 
   const adminCount = await storage.users.countUsersByRole("admin");
   const wouldRemoveAdmin =
-    deleting ||
-    suspend === true ||
-    (nextRole !== undefined && nextRole !== "admin");
+    deleting || suspend === true || (nextRole !== undefined && nextRole !== "admin");
 
   if (wouldRemoveAdmin && adminCount <= 1) {
     throw new Error("At least one system admin must remain active.");
@@ -99,12 +98,14 @@ async function ensureAdminGuardrails({
   return user;
 }
 
-async function toSafeUser<T extends {
-  password?: string;
-  profileImageUrl?: string | null;
-  adminPermissions?: unknown;
-  formNotificationFormIds?: unknown;
-}>(user: T) {
+async function toSafeUser<
+  T extends {
+    password?: string;
+    profileImageUrl?: string | null;
+    adminPermissions?: unknown;
+    formNotificationFormIds?: unknown;
+  },
+>(user: T) {
   const { password: _password, ...safeUser } = user;
   return {
     ...safeUser,
@@ -136,7 +137,7 @@ router.get(
       .where(inArray(users.role, ["admin", "editor"]));
 
     res.json(await Promise.all(rows.map((row) => toSafeUser(row))));
-  })
+  }),
 );
 
 const createUserSchema = z.object({
@@ -162,8 +163,10 @@ router.post(
       return;
     }
 
-    const validFormIds = await normalizeActiveFormNotificationIds(data.formNotificationFormIds);
-    const hashedPassword = await hashPassword(data.password);
+    const [validFormIds, hashedPassword] = await Promise.all([
+      normalizeActiveFormNotificationIds(data.formNotificationFormIds),
+      hashPassword(data.password),
+    ]);
     const user = await storage.users.createUser({
       email: data.email,
       password: hashedPassword,
@@ -176,13 +179,13 @@ router.post(
 
     if (data.sendWelcomeEmail) {
       const baseUrl = getBaseUrl(req);
-      sendWelcomeEmail(user.email, user.firstName, `${baseUrl}/auth/login`, data.password).catch((err) =>
-        logger.email.warn("Failed to send welcome email", { error: err.message })
+      sendWelcomeEmail(user.email, user.firstName, `${baseUrl}/auth/login`, data.password).catch(
+        (err) => logger.email.warn("Failed to send welcome email", { error: err.message }),
       );
     }
 
     res.status(201).json(await toSafeUser(user));
-  })
+  }),
 );
 
 const updateUserSchema = z.object({
@@ -219,7 +222,8 @@ router.put(
     const merged = normalizeSystemUserPayload({
       role: parsed.role ?? (current.role as "admin" | "editor"),
       adminPermissions: parsed.adminPermissions ?? normalizePermissions(current.adminPermissions),
-      formNotificationFormIds: parsed.formNotificationFormIds ?? normalizePermissions(current.formNotificationFormIds),
+      formNotificationFormIds:
+        parsed.formNotificationFormIds ?? normalizePermissions(current.formNotificationFormIds),
     });
 
     await ensureAdminGuardrails({ targetUserId: current.id, nextRole: merged.role });
@@ -235,7 +239,7 @@ router.put(
     });
 
     res.json(await toSafeUser(updated!));
-  })
+  }),
 );
 
 router.delete(
@@ -260,7 +264,7 @@ router.delete(
     await ensureAdminGuardrails({ targetUserId: userId, deleting: true });
     await storage.users.deleteUser(userId);
     res.json({ message: "User deleted" });
-  })
+  }),
 );
 
 router.patch(
@@ -283,9 +287,9 @@ router.patch(
     }
 
     await ensureAdminGuardrails({ targetUserId: userId, suspend: !user.isSuspended });
-    const updated = await storage.users.updateUser(userId, { isSuspended: !user.isSuspended } as any);
+    const updated = await storage.users.updateUser(userId, { isSuspended: !user.isSuspended });
     res.json(await toSafeUser(updated!));
-  })
+  }),
 );
 
 router.post(
@@ -314,10 +318,10 @@ router.post(
     const baseUrl = getBaseUrl(req);
     const resetUrl = `${baseUrl}/auth/reset-password?token=${resetToken.token}`;
     sendPasswordResetEmail(user.email, user.firstName, resetUrl).catch((err) =>
-      logger.email.warn("Failed to send password reset email", { error: err.message })
+      logger.email.warn("Failed to send password reset email", { error: err.message }),
     );
     res.json({ message: "Password reset link sent" });
-  })
+  }),
 );
 
 export default router;

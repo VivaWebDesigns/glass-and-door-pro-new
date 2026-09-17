@@ -30,13 +30,18 @@ describe("PageBuilder", () => {
 
   beforeEach(() => {
     vi.spyOn(console, "error").mockImplementation(() => {});
-    (globalThis as typeof globalThis & { React?: typeof React; IS_REACT_ACT_ENVIRONMENT?: boolean }).React = React;
-    (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
-    (globalThis as typeof globalThis & { ResizeObserver?: typeof ResizeObserver }).ResizeObserver = class ResizeObserver {
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-    } as unknown as typeof ResizeObserver;
+    (
+      globalThis as typeof globalThis & { React?: typeof React; IS_REACT_ACT_ENVIRONMENT?: boolean }
+    ).React = React;
+    (
+      globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
+    ).IS_REACT_ACT_ENVIRONMENT = true;
+    (globalThis as typeof globalThis & { ResizeObserver?: typeof ResizeObserver }).ResizeObserver =
+      class ResizeObserver {
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      } as unknown as typeof ResizeObserver;
     container = document.createElement("div");
     document.body.appendChild(container);
   });
@@ -84,7 +89,9 @@ describe("PageBuilder", () => {
     expect(container.textContent).toContain("Call to Action");
     expect(container.textContent).toContain("FAQ");
     expect(container.textContent).toContain("Cards Grid");
-    expect(container.querySelector('[data-testid="mock-block-preview-cta-legacy-block"]')).not.toBeNull();
+    expect(
+      container.querySelector('[data-testid="mock-block-preview-cta-legacy-block"]'),
+    ).not.toBeNull();
   });
 
   it("isolates a single broken preview while leaving the rest of the builder interactive", async () => {
@@ -99,10 +106,14 @@ describe("PageBuilder", () => {
       );
     });
 
-    expect(container.textContent).toContain("This block preview could not be rendered in the builder.");
+    expect(container.textContent).toContain(
+      "This block preview could not be rendered in the builder.",
+    );
     expect(container.textContent).toContain("Block ID: broken-preview-block");
     expect(container.textContent).toContain("Type: unknown-preview");
     expect(container.querySelector('[data-testid="mock-block-preview-hero-block"]')).not.toBeNull();
-    expect(container.querySelector('[data-testid="select-canvas-block-broken-preview-block"]')).not.toBeNull();
+    expect(
+      container.querySelector('[data-testid="select-canvas-block-broken-preview-block"]'),
+    ).not.toBeNull();
   });
 });

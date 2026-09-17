@@ -1,3 +1,4 @@
+import type { Request, Response } from "express";
 import { describe, it, expect, vi } from "vitest";
 import { logger, requestIdMiddleware, requestContext } from "./logger";
 
@@ -27,9 +28,9 @@ describe("logger", () => {
 
 describe("requestIdMiddleware", () => {
   it("assigns a UUID requestId and sets X-Request-Id header", () => {
-    const req: any = { headers: {} };
+    const req = { headers: {} } as Request;
     const setHeader = vi.fn();
-    const res: any = { setHeader };
+    const res = { setHeader } as unknown as Response;
     const next = vi.fn();
 
     requestIdMiddleware(req, res, next);
@@ -42,9 +43,9 @@ describe("requestIdMiddleware", () => {
 
   it("accepts an incoming X-Request-Id header", () => {
     const incomingId = "custom-request-id-123";
-    const req: any = { headers: { "x-request-id": incomingId } };
+    const req = { headers: { "x-request-id": incomingId } } as Request;
     const setHeader = vi.fn();
-    const res: any = { setHeader };
+    const res = { setHeader } as unknown as Response;
     const next = vi.fn();
 
     requestIdMiddleware(req, res, next);
@@ -71,9 +72,9 @@ describe("requestContext (AsyncLocalStorage)", () => {
   });
 
   it("middleware sets up AsyncLocalStorage context for downstream code", () => {
-    const req: any = { headers: {} };
+    const req = { headers: {} } as Request;
     const setHeader = vi.fn();
-    const res: any = { setHeader };
+    const res = { setHeader } as unknown as Response;
     let contextId: string | undefined;
 
     requestIdMiddleware(req, res, () => {

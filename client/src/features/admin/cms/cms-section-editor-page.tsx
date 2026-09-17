@@ -1,17 +1,7 @@
-import { useState, useEffect, useRef } from "react";
-import { useParams, useLocation } from "wouter";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { AdminSidebar } from "@/features/admin/admin-sidebar";
-import { EditorSaveIndicator } from "@/components/shared/editor-save-indicator";
 import { EditorLockBanner } from "@/components/shared/editor-lock-banner";
+import { EditorSaveIndicator } from "@/components/shared/editor-save-indicator";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Form,
   FormControl,
@@ -20,6 +10,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -27,17 +18,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, Layers } from "lucide-react";
-import { apiRequest, queryClient as qc } from "@/lib/queryClient";
-import type { CmsSection } from "@shared/schema";
-import { PageBuilder } from "./builder/page-builder";
-import type { BuilderContent } from "./builder/block-registry";
-import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import { AdminSidebar } from "@/features/admin/admin-sidebar";
 import { useEditorLock } from "@/hooks/use-editor-lock";
-import { useLockConflictGuard } from "@/hooks/use-lock-conflict-guard";
 import { useEditorSaveState } from "@/hooks/use-editor-save-state";
+import { useLockConflictGuard } from "@/hooks/use-lock-conflict-guard";
+import { useToast } from "@/hooks/use-toast";
 import { useUnsavedChangesGuard } from "@/hooks/use-unsaved-changes-guard";
+import { apiRequest } from "@/lib/queryClient";
+import { cn } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { CmsSection } from "@shared/schema";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Layers, Save } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useLocation, useParams } from "wouter";
+import { z } from "zod";
+import type { BuilderContent } from "./builder/block-registry";
+import { PageBuilder } from "./builder/page-builder";
 
 const EMPTY_CONTENT: BuilderContent = { blocks: [] };
 
@@ -61,7 +61,7 @@ export default function CmsSectionEditorPage() {
   const [builderContent, setBuilderContent] = useState<BuilderContent>(EMPTY_CONTENT);
   const [initialized, setInitialized] = useState(false);
   const [savedBuilderSnapshot, setSavedBuilderSnapshot] = useState(() =>
-    JSON.stringify(EMPTY_CONTENT)
+    JSON.stringify(EMPTY_CONTENT),
   );
 
   const { data: section, isLoading: sectionLoading } = useQuery<CmsSection>({
@@ -93,7 +93,7 @@ export default function CmsSectionEditorPage() {
         category: section.category ?? "general",
       });
       const blocks = Array.isArray(section.blocks) ? section.blocks : [];
-      setBuilderContent({ blocks: blocks as any });
+      setBuilderContent({ blocks: blocks as BuilderContent["blocks"] });
       setSavedBuilderSnapshot(JSON.stringify({ blocks }));
       setInitialized(true);
     }
@@ -130,7 +130,7 @@ export default function CmsSectionEditorPage() {
           description: variables.description,
           category: variables.category,
         },
-        variables.content
+        variables.content,
       );
       saveState.markSaved();
       navigate(`/admin/cms/sections/${created.id}`);
@@ -158,7 +158,7 @@ export default function CmsSectionEditorPage() {
           description: variables.description,
           category: variables.category,
         },
-        variables.content
+        variables.content,
       );
       saveState.markSaved();
     },
@@ -183,8 +183,7 @@ export default function CmsSectionEditorPage() {
   };
 
   const isSaving = createMutation.isPending || updateMutation.isPending;
-  const builderDirty =
-    JSON.stringify(builderContent) !== savedBuilderSnapshot;
+  const builderDirty = JSON.stringify(builderContent) !== savedBuilderSnapshot;
   const isDirty = form.formState.isDirty || builderDirty;
   const saveState = useEditorSaveState({
     isDirty,
@@ -235,8 +234,11 @@ export default function CmsSectionEditorPage() {
             </Button>
             <div className="flex items-center gap-2">
               <Layers className="h-5 w-5 text-violet-500" />
-              <h1 className="text-xl font-heading font-semibold" data-testid="text-section-editor-title">
-                {isNew ? "New Section" : (form.watch("name") || "Edit Section")}
+              <h1
+                className="text-xl font-heading font-semibold"
+                data-testid="text-section-editor-title"
+              >
+                {isNew ? "New Section" : form.watch("name") || "Edit Section"}
               </h1>
             </div>
           </div>
@@ -253,9 +255,17 @@ export default function CmsSectionEditorPage() {
           </div>
         </div>
 
-        <Card className={cn(editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
+        <Card
+          className={cn(
+            editorLock.hasLocking &&
+              editorLock.isReadOnly &&
+              "pointer-events-none select-none opacity-70",
+          )}
+        >
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-muted-foreground">Section Details</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Section Details
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -308,7 +318,10 @@ export default function CmsSectionEditorPage() {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
+                      <FormLabel>
+                        Description{" "}
+                        <span className="text-muted-foreground font-normal">(optional)</span>
+                      </FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Brief description of when to use this section…"
@@ -328,12 +341,15 @@ export default function CmsSectionEditorPage() {
 
         <div className="space-y-2">
           <h2 className="text-sm font-medium text-muted-foreground">Blocks</h2>
-          <Card className={cn(editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
+          <Card
+            className={cn(
+              editorLock.hasLocking &&
+                editorLock.isReadOnly &&
+                "pointer-events-none select-none opacity-70",
+            )}
+          >
             <CardContent className="pt-4">
-              <PageBuilder
-                content={builderContent}
-                onChange={setBuilderContent}
-              />
+              <PageBuilder content={builderContent} onChange={setBuilderContent} />
             </CardContent>
           </Card>
         </div>

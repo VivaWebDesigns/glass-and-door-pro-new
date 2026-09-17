@@ -1,16 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const mockSend = vi.fn();
-const MockS3Client = vi.fn(() => ({ send: mockSend }));
+const MockS3Client = vi.fn(function () {
+  return { send: mockSend };
+});
 
 vi.mock("@aws-sdk/client-s3", () => ({
   S3Client: MockS3Client,
-  PutObjectCommand: vi.fn((params: unknown) => ({ type: "PutObject", ...(params as object) })),
-  DeleteObjectCommand: vi.fn((params: unknown) => ({
-    type: "DeleteObject",
-    ...(params as object),
-  })),
-  HeadBucketCommand: vi.fn((params: unknown) => ({ type: "HeadBucket", ...(params as object) })),
+  PutObjectCommand: vi.fn(function (params: unknown) {
+    return { type: "PutObject", ...(params as object) };
+  }),
+  DeleteObjectCommand: vi.fn(function (params: unknown) {
+    return { type: "DeleteObject", ...(params as object) };
+  }),
+  HeadBucketCommand: vi.fn(function (params: unknown) {
+    return { type: "HeadBucket", ...(params as object) };
+  }),
 }));
 
 vi.mock("../utils/logger", () => ({

@@ -45,6 +45,7 @@ export function JsonLd({ schemas }: JsonLdProps) {
   const serializedSchemas = JSON.stringify(valid);
 
   useEffect(() => {
+    const valid = JSON.parse(serializedSchemas) as JsonLdObject[];
     if (valid.length === 0) return;
 
     const schemaSet = new Set(valid.map(schemaIdentity).filter((key): key is string => !!key));

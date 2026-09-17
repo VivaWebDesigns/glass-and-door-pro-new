@@ -1,3 +1,4 @@
+import { sanitizeHtml } from "@/lib/sanitize-html";
 import type { ElementType, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -25,7 +26,7 @@ export function renderPublicDisplayText(value: string): ReactNode {
       </span>
     ) : (
       part
-    )
+    ),
   );
 }
 
@@ -50,13 +51,18 @@ export function SectionHeading({
   const title = str(props.title) || str(props.heading) || fallbackTitle || "";
   const subtitle = str(props.subtitle) || str(props.subheading);
   const level = headingLevel(props.sectionHeadingLevel ?? props.headingLevel);
-  const alignment = headingAlignment(props.sectionHeadingAlignment ?? props.alignment, defaultAlignment);
+  const alignment = headingAlignment(
+    props.sectionHeadingAlignment ?? props.alignment,
+    defaultAlignment,
+  );
 
   if (!eyebrow && !title && !subtitle) return null;
 
   const HeadingTag = level as ElementType;
-  const textAlign = alignment === "left" ? "text-left" : alignment === "right" ? "text-right" : "text-center";
-  const itemsAlign = alignment === "left" ? "items-start" : alignment === "right" ? "items-end" : "items-center";
+  const textAlign =
+    alignment === "left" ? "text-left" : alignment === "right" ? "text-right" : "text-center";
+  const itemsAlign =
+    alignment === "left" ? "items-start" : alignment === "right" ? "items-end" : "items-center";
   const defaultTitleClass =
     level === "h1"
       ? "text-3xl sm:text-4xl md:text-5xl font-heading font-bold leading-tight public-heading-1"
@@ -78,9 +84,9 @@ export function SectionHeading({
         <div
           className={cn(
             "public-heading-subtext max-w-2xl text-sm leading-relaxed sm:text-base [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-primary/80 [&_p]:m-0",
-            subtitleClassName
+            subtitleClassName,
           )}
-          dangerouslySetInnerHTML={{ __html: subtitle }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(subtitle) }}
         />
       )}
     </div>

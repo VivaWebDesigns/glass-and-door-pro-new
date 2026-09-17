@@ -9,6 +9,7 @@ async function throwIfResNotOk(res: Response) {
       if (json.message) message = json.message;
       else if (json.error) message = json.error;
     } catch {
+      // Non-JSON error responses use the original response text.
     }
     throw new Error(message);
   }
@@ -31,9 +32,7 @@ export async function apiRequest(
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
-export const getQueryFn: <T>(options: {
-  on401: UnauthorizedBehavior;
-}) => QueryFunction<T> =
+export const getQueryFn: <T>(options: { on401: UnauthorizedBehavior }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     const res = await fetch(queryKey.join("/") as string, {

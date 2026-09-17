@@ -58,11 +58,13 @@ export const menuItemSchema: z.ZodType<MenuItem> = z.lazy(() =>
     url: z.string().min(1),
     openInNewTab: z.preprocess((v) => v ?? false, z.boolean()),
     children: z.preprocess((v) => v ?? [], z.array(menuItemSchema)),
-  })
+  }),
 ) as z.ZodType<MenuItem>;
 
 export const cmsMenus = pgTable("cms_menus", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   location: text("location").notNull().default("unassigned"),
   items: jsonb("items").default([]),

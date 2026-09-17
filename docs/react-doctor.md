@@ -20,6 +20,28 @@ supply-chain checks remain disabled. To opt into dependency checks, append
 `--supply-chain`. To run locally without a score, append `--no-telemetry`.
 No CI workflow or Git hook was installed. Existing rules have not been suppressed.
 
+## Complete warning and formatting review
+
+The latest complete uncached scan is **57/100 (Critical), zero errors and 178
+warnings**, compared with 37/100, two errors and 241 warnings at the start of this
+pass. All baseline findings and every remaining diagnostic have an individual
+entry in [the complete review](./react-doctor-complete-review.md). Retained
+architectural suggestions and detector exceptions remain enabled and visible.
+
+Fixed security boundaries, editor-state/focus issues, shared context values,
+accessibility and bundle splitting. All 87 baseline ESLint warnings and all 213
+baseline formatting failures are resolved. Dependency migrations reduce npm audit
+from 36 vulnerabilities to zero; React Doctor remains pinned at 0.9.14.
+
+Validation: `npm run check`, `npm run lint`, `npm run format`, `npm test`
+(**202 tests / 59 files**), `npm run build`, and `npm audit` pass. The build retains
+one diagnosed upstream PostCSS source-metadata warning; the affected generated
+content declarations contain no asset URLs. A built-site Chromium smoke test
+with mocked APIs passed. Real database/admin workflows, external video playback,
+email delivery and Railway deployment were not verified. New HTML sanitization
+removes executable CMS markup, and encrypted settings require an explicit key;
+compatibility notes and evidence are in the complete review.
+
 ## Form and menu correctness follow-up
 
 The next complete uncached scan (CLI 0.9.14, full scope, default categories,

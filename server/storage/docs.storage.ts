@@ -1,6 +1,6 @@
-import { eq, asc, ilike, and } from "drizzle-orm";
-import { db } from "../db";
 import { docs, type Doc, type InsertDoc } from "@shared/schema";
+import { asc, eq } from "drizzle-orm";
+import { db } from "../db";
 
 export class DocsStorage {
   async getDoc(id: string): Promise<Doc | undefined> {

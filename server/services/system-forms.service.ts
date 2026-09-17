@@ -1,4 +1,9 @@
-import { cmsFormFieldSchema, type CmsFormField, type CmsFormSettings, type InsertCmsForm } from "@shared/schema";
+import {
+  cmsFormFieldSchema,
+  type CmsFormField,
+  type CmsFormSettings,
+  type InsertCmsForm,
+} from "@shared/schema";
 import { z } from "zod";
 import { storage } from "../storage";
 import { logger } from "../utils/logger";
@@ -10,7 +15,7 @@ function field(
   key: string,
   label: string,
   type: CmsFormField["type"],
-  options: Partial<CmsFormFieldInput> = {}
+  options: Partial<CmsFormFieldInput> = {},
 ): CmsFormField {
   return cmsFormFieldSchema.parse({
     id,
@@ -46,12 +51,17 @@ const SYSTEM_FORMS: ManagedSystemForm[] = [
   {
     name: "Contact Form",
     slug: "contact-form",
-    description: "Primary public quote and contact form used throughout the Glass & Door Pro website.",
+    description:
+      "Primary public quote and contact form used throughout the Glass & Door Pro website.",
     kind: "contact",
     isSystem: true,
     isActive: true,
     fields: [
-      field("name", "name", "Name", "text", { placeholder: "Your name", required: true, width: "half" }),
+      field("name", "name", "Name", "text", {
+        placeholder: "Your name",
+        required: true,
+        width: "half",
+      }),
       field("phone", "phone", "Phone", "tel", {
         placeholder: "(704) 555-0123",
         helpText: "Best number for a callback",
@@ -64,8 +74,14 @@ const SYSTEM_FORMS: ManagedSystemForm[] = [
         required: false,
         width: "half",
       }),
-      field("subject", "subject", "Subject", "text", { placeholder: "What is this about?", required: true }),
-      field("message", "message", "Message", "textarea", { placeholder: "Tell us more...", required: true }),
+      field("subject", "subject", "Subject", "text", {
+        placeholder: "What is this about?",
+        required: true,
+      }),
+      field("message", "message", "Message", "textarea", {
+        placeholder: "Tell us more...",
+        required: true,
+      }),
     ],
     settings: settings({
       schemaVersion: 3,
@@ -85,14 +101,15 @@ export async function ensureSystemForms() {
   for (const systemForm of SYSTEM_FORMS) {
     const existing = await storage.forms.getBySlug(systemForm.slug);
     if (existing) {
-      const existingSettings =
-        (typeof existing.settings === "object" && existing.settings
-          ? existing.settings
-          : {}) as Partial<CmsFormSettings>;
+      const existingSettings = (
+        typeof existing.settings === "object" && existing.settings ? existing.settings : {}
+      ) as Partial<CmsFormSettings>;
       const existingSchemaVersion =
         typeof existingSettings.schemaVersion === "number" ? existingSettings.schemaVersion : 0;
       const systemSchemaVersion =
-        typeof systemForm.settings.schemaVersion === "number" ? systemForm.settings.schemaVersion : 0;
+        typeof systemForm.settings.schemaVersion === "number"
+          ? systemForm.settings.schemaVersion
+          : 0;
       const shouldUpgradeFields = existingSchemaVersion < systemSchemaVersion;
       const existingFields = Array.isArray(existing.fields) ? existing.fields : [];
       const upgradedFields =
@@ -106,18 +123,16 @@ export async function ensureSystemForms() {
         kind: existing.kind || systemForm.kind,
         isSystem: true,
         isActive: existing.isActive ?? true,
-        fields:
-          shouldUpgradeFields
-            ? upgradedFields
-            : existingFields.length > 0
-              ? existingFields
-              : systemForm.fields,
-        settings:
-          {
-            ...systemForm.settings,
-            ...existingSettings,
-            schemaVersion: Math.max(existingSchemaVersion, systemSchemaVersion),
-          },
+        fields: shouldUpgradeFields
+          ? upgradedFields
+          : existingFields.length > 0
+            ? existingFields
+            : systemForm.fields,
+        settings: {
+          ...systemForm.settings,
+          ...existingSettings,
+          schemaVersion: Math.max(existingSchemaVersion, systemSchemaVersion),
+        },
       });
       continue;
     }

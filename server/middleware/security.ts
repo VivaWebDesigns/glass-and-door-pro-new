@@ -41,7 +41,12 @@ export function securityHeaders(): RequestHandler {
           "https://www.googletagmanager.com",
           "https://static.cloudflareinsights.com",
         ],
-        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://unpkg.com"],
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://fonts.googleapis.com",
+          "https://unpkg.com",
+        ],
         fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
         imgSrc: [
           "'self'",
@@ -68,12 +73,7 @@ export function securityHeaders(): RequestHandler {
         objectSrc: ["'none'"],
         baseUri: ["'self'"],
         formAction: ["'self'"],
-        mediaSrc: [
-          "'self'",
-          "blob:",
-          "https://*.r2.cloudflarestorage.com",
-          "https://*.r2.dev",
-        ],
+        mediaSrc: ["'self'", "blob:", "https://*.r2.cloudflarestorage.com", "https://*.r2.dev"],
         workerSrc: ["'self'", "blob:"],
       },
     },

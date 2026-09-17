@@ -39,9 +39,9 @@ describe("CardsGridBlock", () => {
 
     document.body.innerHTML = markup;
 
-    expect(
-      document.querySelector('a[href="/services/frameless-showers"]')?.textContent,
-    ).toContain("Learn More");
+    expect(document.querySelector('a[href="/services/frameless-showers"]')?.textContent).toContain(
+      "Learn More",
+    );
     expect(
       document.querySelector('a[href="https://example.com/commercial-windows"]'),
     ).toMatchObject({ target: "_blank", rel: "noopener noreferrer" });

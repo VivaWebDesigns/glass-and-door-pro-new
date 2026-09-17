@@ -87,9 +87,7 @@ describe("ensureSystemForms", () => {
     const mod = await import("../services/system-forms.service");
     await mod.ensureSystemForms();
 
-    const contactUpdate = mockUpdate.mock.calls.find(
-      ([id]: [string]) => id === "contact-form-id"
-    );
+    const contactUpdate = mockUpdate.mock.calls.find(([id]: [string]) => id === "contact-form-id");
 
     expect(contactUpdate).toBeTruthy();
     expect(contactUpdate[1].name).toBe("Custom Contact Form");
@@ -122,9 +120,7 @@ describe("ensureSystemForms", () => {
     const mod = await import("../services/system-forms.service");
     await mod.ensureSystemForms();
 
-    const contactUpdate = mockUpdate.mock.calls.find(
-      ([id]: [string]) => id === "contact-form-id"
-    );
+    const contactUpdate = mockUpdate.mock.calls.find(([id]: [string]) => id === "contact-form-id");
 
     expect(contactUpdate[1].fields.map((formField: { key: string }) => formField.key)).toEqual([
       "name",
@@ -133,8 +129,14 @@ describe("ensureSystemForms", () => {
       "subject",
       "message",
     ]);
-    expect(contactUpdate[1].fields.find((formField: { key: string }) => formField.key === "phone").required).toBe(true);
-    expect(contactUpdate[1].fields.find((formField: { key: string }) => formField.key === "email").required).toBe(false);
+    expect(
+      contactUpdate[1].fields.find((formField: { key: string }) => formField.key === "phone")
+        .required,
+    ).toBe(true);
+    expect(
+      contactUpdate[1].fields.find((formField: { key: string }) => formField.key === "email")
+        .required,
+    ).toBe(false);
     expect(contactUpdate[1].settings.schemaVersion).toBe(3);
   });
 
@@ -146,10 +148,6 @@ describe("ensureSystemForms", () => {
 
     expect(mockCreate).toHaveBeenCalledTimes(1);
     const createdSlugs = mockCreate.mock.calls.map(([form]) => form.slug);
-    expect(createdSlugs).toEqual(
-      expect.arrayContaining([
-        "contact-form",
-      ])
-    );
+    expect(createdSlugs).toEqual(expect.arrayContaining(["contact-form"]));
   });
 });

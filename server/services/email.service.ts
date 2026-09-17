@@ -1,3 +1,4 @@
+import { errorMessage } from "@shared/errors";
 import nodemailer from "nodemailer";
 import { logger } from "../utils/logger";
 import { resolveLocalUploadUrlOrFallback } from "./local-upload-storage";
@@ -12,7 +13,7 @@ const DEFAULT_EMAIL_LOGO_URL = "/images/glass-door-pro/brand/logo-header-900x260
 
 const isSmtpConfigured = !!(SMTP_HOST && SMTP_USER && SMTP_PASS);
 
-let transporter: nodemailer.Transporter | null = null;
+let transporter: ReturnType<typeof nodemailer.createTransport> | null = null;
 if (isSmtpConfigured) {
   transporter = nodemailer.createTransport({
     host: SMTP_HOST,
@@ -489,8 +490,8 @@ export async function testMailgunConnection(): Promise<{
     const mg = mailgun.client({ username: "api", key: config.apiKey });
     await mg.domains.get(config.domain);
     return { success: true, message: "Mailgun connection successful" };
-  } catch (err: any) {
-    return { success: false, message: err.message || "Connection failed" };
+  } catch (err: unknown) {
+    return { success: false, message: errorMessage(err, "Connection failed") };
   }
 }
 

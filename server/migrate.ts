@@ -92,7 +92,7 @@ async function ensureEventSlugs() {
 export async function runMigrations() {
   const migrationsFolder = path.resolve(
     process.env.NODE_ENV === "production" ? __dirname : process.cwd(),
-    "migrations"
+    "migrations",
   );
 
   const bootstrapState = await getMigrationBootstrapState();
@@ -102,7 +102,7 @@ export async function runMigrations() {
 
   if (!bootstrapState.hasJournal && bootstrapState.publicTableCount > 0) {
     logger.app.warn(
-      "Skipping startup migrations because the database already has tables but no Drizzle journal. Assuming schema was provisioned via drizzle push."
+      "Skipping startup migrations because the database already has tables but no Drizzle journal. Assuming schema was provisioned via drizzle push.",
     );
     return;
   }

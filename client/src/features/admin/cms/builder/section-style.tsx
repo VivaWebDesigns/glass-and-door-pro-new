@@ -2,7 +2,6 @@ import type { CSSProperties, ReactNode } from "react";
 
 export const DEFAULT_SECTION_LINEAR_GRADIENT = "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)";
 export const DEFAULT_SECTION_PADDING = "md";
-const CMS_MISSING_IMAGE_PLACEHOLDER_URL = "/images/cms-media-missing.svg";
 
 const SECTION_PADDING_CLASS_MAP: Record<string, string> = {
   none: "0",

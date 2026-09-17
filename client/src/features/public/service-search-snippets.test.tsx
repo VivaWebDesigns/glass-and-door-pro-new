@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
-import React from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+import React, { act } from "react";
+import { createRoot } from "react-dom/client";
 import { describe, expect, it, vi } from "vitest";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
@@ -29,7 +29,7 @@ describe("search snippet utility exclusions", () => {
   ])("keeps phone links functional and scopes exclusions on %s", (path) => {
     globalThis.React = React;
     route.path = path;
-    const html = renderToStaticMarkup(
+    const html = renderClientMarkup(
       <>
         <Navbar />
         <PublicBlockRenderer
@@ -98,3 +98,13 @@ describe("search snippet utility exclusions", () => {
     if (!excluded) expect(doc.querySelector("[data-nosnippet]")).toBeNull();
   });
 });
+
+function renderClientMarkup(element: React.ReactNode) {
+  const container = document.createElement("div");
+  const root = createRoot(container);
+  Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+  act(() => root.render(element));
+  const html = container.innerHTML;
+  act(() => root.unmount());
+  return html;
+}

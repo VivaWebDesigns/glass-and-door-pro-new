@@ -16,13 +16,13 @@ const DOCS_ROOT = path.resolve(process.cwd(), "docs");
 const CATEGORY_ORDER: Record<string, number> = {
   "Getting Started": 0,
   "Admin Guides": 1,
-  "Architecture": 2,
+  Architecture: 2,
   "Architecture Decisions": 3,
   "Operations & Recovery": 4,
   "Deployment & Release": 5,
   "API Reference": 6,
   "Engineering Quality": 7,
-  "Security": 8,
+  Security: 8,
   "Product & Planning": 9,
   Reference: 10,
 };

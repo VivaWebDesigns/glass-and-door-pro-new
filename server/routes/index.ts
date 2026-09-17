@@ -1,21 +1,21 @@
-import type { Express, Request, Response, NextFunction } from "express";
-import { logger } from "../utils/logger";
-import authRoutes from "./auth.routes";
-import adminRoutes from "./admin/index";
-import settingsRoutes from "./settings.routes";
-import contactRoutes from "./contact.routes";
-import docsRoutes from "./docs.routes";
-import uploadRoutes from "./upload.routes";
-import notificationsRoutes from "./notifications.routes";
-import cmsPublicRoutes from "./cms-public.routes";
-import r2PublicRoutes from "./r2-public.routes";
-import setupRoutes from "./setup.routes";
-import formsRoutes from "./forms.routes";
+import { BRANDING_COLOR_DEFAULTS, resolveBrandingColor } from "@shared/branding-colors";
+import { getCmsPublicPath, isGlassLegalNoindexSlug } from "@shared/glass-seo";
+import type { Express, NextFunction, Request, Response } from "express";
+import { resolveLocalUploadUrlOrFallback } from "../services/local-upload-storage";
 import { buildRobotsTxtPayload } from "../services/robots-txt.service";
 import { storage } from "../storage/index";
-import { getCmsPublicPath, isGlassLegalNoindexSlug } from "@shared/glass-seo";
-import { BRANDING_COLOR_DEFAULTS, resolveBrandingColor } from "@shared/branding-colors";
-import { resolveLocalUploadUrlOrFallback } from "../services/local-upload-storage";
+import { logger } from "../utils/logger";
+import adminRoutes from "./admin/index";
+import authRoutes from "./auth.routes";
+import cmsPublicRoutes from "./cms-public.routes";
+import contactRoutes from "./contact.routes";
+import docsRoutes from "./docs.routes";
+import formsRoutes from "./forms.routes";
+import notificationsRoutes from "./notifications.routes";
+import r2PublicRoutes from "./r2-public.routes";
+import settingsRoutes from "./settings.routes";
+import setupRoutes from "./setup.routes";
+import uploadRoutes from "./upload.routes";
 
 const DEFAULT_FRONTEND_LOGO_URL = "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
 const DEFAULT_FAVICON_URL = "/favicon-32x32.png?v=large-2";
@@ -244,7 +244,7 @@ export function registerApiRoutes(app: Express) {
       res.set("Content-Type", "application/xml; charset=utf-8");
       res.set("Cache-Control", "public, max-age=3600");
       res.send(xml);
-    } catch (err) {
+    } catch {
       res.status(500).send("Error generating sitemap");
     }
   });

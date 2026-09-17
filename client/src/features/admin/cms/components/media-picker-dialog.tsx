@@ -92,7 +92,7 @@ export function MediaPickerDialog({
               {filtered.map((asset) => (
                 <button
                   key={asset.id}
-                  className="relative group rounded-lg border-2 overflow-hidden aspect-square transition-all hover:border-violet-400 focus:outline-none focus:border-violet-500 border-transparent bg-muted/30"
+                  className="relative group rounded-lg border-2 overflow-hidden aspect-square transition-[color,background-color,border-color,box-shadow] hover:border-violet-400 focus:outline-none focus:border-violet-500 border-transparent bg-muted/30"
                   onClick={() => {
                     onSelect(asset.url, asset);
                     onOpenChange(false);

@@ -18,7 +18,7 @@ const ServiceAreasPage = lazy(() => import("@/features/public/service-areas-page
 const CmsHybridPage = lazy(() =>
   import("@/features/public/cms-hybrid-page").then((module) => ({
     default: module.CmsHybridPage,
-  }))
+  })),
 );
 const CmsPreviewPage = lazy(() => import("@/features/public/cms-preview-page"));
 
@@ -81,39 +81,188 @@ function Router() {
     <Suspense fallback={<PageLoader />}>
       <Switch>
         <Route path="/" component={() => <CmsHybridPage slug="home" fallback={<HomePage />} />} />
-        <Route path="/gallery" component={() => <CmsHybridPage slug="gallery" fallback={<GalleryPage />} />} />
-        <Route path="/reviews" component={() => <CmsHybridPage slug="reviews" fallback={<ReviewsPage />} />} />
-        <Route path="/services" component={() => <CmsHybridPage slug="services" fallback={<ServicesPage />} />} />
-        <Route path="/services/frameless-showers" component={() => <CmsHybridPage slug="services-frameless-showers" fallback={<NotFound />} />} />
-        <Route path="/services/window-installation" component={() => <CmsHybridPage slug="services-window-installation" fallback={<NotFound />} />} />
-        <Route path="/services/door-installation" component={() => <CmsHybridPage slug="services-door-installation" fallback={<NotFound />} />} />
-        <Route path="/services/window-repair" component={() => <CmsHybridPage slug="services-window-repair" fallback={<NotFound />} />} />
-        <Route path="/services/commercial-storefront-glass-installation" component={() => <CmsHybridPage slug="services-commercial-storefront-glass-installation" fallback={<NotFound />} />} />
-        <Route path="/services/commercial-storefront-glass-replacement-repair" component={() => <CmsHybridPage slug="services-commercial-storefront-glass-replacement-repair" fallback={<NotFound />} />} />
-        <Route path="/services/commercial-door-installation" component={() => <CmsHybridPage slug="services-commercial-door-installation" fallback={<NotFound />} />} />
-        <Route path="/services/commercial-door-replacement-repair" component={() => <CmsHybridPage slug="services-commercial-door-replacement-repair" fallback={<NotFound />} />} />
-        <Route path="/services/commercial-window-replacement" component={() => <CmsHybridPage slug="services-commercial-window-replacement" fallback={<NotFound />} />} />
+        <Route
+          path="/gallery"
+          component={() => <CmsHybridPage slug="gallery" fallback={<GalleryPage />} />}
+        />
+        <Route
+          path="/reviews"
+          component={() => <CmsHybridPage slug="reviews" fallback={<ReviewsPage />} />}
+        />
+        <Route
+          path="/services"
+          component={() => <CmsHybridPage slug="services" fallback={<ServicesPage />} />}
+        />
+        <Route
+          path="/services/frameless-showers"
+          component={() => (
+            <CmsHybridPage slug="services-frameless-showers" fallback={<NotFound />} />
+          )}
+        />
+        <Route
+          path="/services/window-installation"
+          component={() => (
+            <CmsHybridPage slug="services-window-installation" fallback={<NotFound />} />
+          )}
+        />
+        <Route
+          path="/services/door-installation"
+          component={() => (
+            <CmsHybridPage slug="services-door-installation" fallback={<NotFound />} />
+          )}
+        />
+        <Route
+          path="/services/window-repair"
+          component={() => <CmsHybridPage slug="services-window-repair" fallback={<NotFound />} />}
+        />
+        <Route
+          path="/services/commercial-storefront-glass-installation"
+          component={() => (
+            <CmsHybridPage
+              slug="services-commercial-storefront-glass-installation"
+              fallback={<NotFound />}
+            />
+          )}
+        />
+        <Route
+          path="/services/commercial-storefront-glass-replacement-repair"
+          component={() => (
+            <CmsHybridPage
+              slug="services-commercial-storefront-glass-replacement-repair"
+              fallback={<NotFound />}
+            />
+          )}
+        />
+        <Route
+          path="/services/commercial-door-installation"
+          component={() => (
+            <CmsHybridPage slug="services-commercial-door-installation" fallback={<NotFound />} />
+          )}
+        />
+        <Route
+          path="/services/commercial-door-replacement-repair"
+          component={() => (
+            <CmsHybridPage
+              slug="services-commercial-door-replacement-repair"
+              fallback={<NotFound />}
+            />
+          )}
+        />
+        <Route
+          path="/services/commercial-window-replacement"
+          component={() => (
+            <CmsHybridPage slug="services-commercial-window-replacement" fallback={<NotFound />} />
+          )}
+        />
         <Route path="/service-areas" component={ServiceAreasPage} />
-        <Route path="/service-areas/charlotte" component={() => <CmsHybridPage slug="areas-served-charlotte-nc" fallback={<NotFound />} />} />
-        <Route path="/service-areas/monroe" component={() => <CmsHybridPage slug="areas-served-monroe-nc" fallback={<NotFound />} />} />
-        <Route path="/service-areas/indian-trail" component={() => <CmsHybridPage slug="service-areas-indian-trail" fallback={<NotFound />} />} />
-        <Route path="/service-areas/stallings" component={() => <CmsHybridPage slug="service-areas-stallings" fallback={<NotFound />} />} />
-        <Route path="/service-areas/wesley-chapel" component={() => <CmsHybridPage slug="service-areas-wesley-chapel" fallback={<NotFound />} />} />
-        <Route path="/service-areas/waxhaw" component={() => <CmsHybridPage slug="service-areas-waxhaw" fallback={<NotFound />} />} />
-        <Route path="/service-areas/matthews" component={() => <CmsHybridPage slug="service-areas-matthews" fallback={<NotFound />} />} />
-        <Route path="/service-areas/weddington" component={() => <CmsHybridPage slug="service-areas-weddington" fallback={<NotFound />} />} />
-        <Route path="/service-areas/indian-land" component={() => <CmsHybridPage slug="service-areas-indian-land" fallback={<NotFound />} />} />
-        <Route path="/service-areas/fort-mill" component={() => <CmsHybridPage slug="service-areas-fort-mill" fallback={<NotFound />} />} />
-        <Route path="/service-areas/pineville" component={() => <CmsHybridPage slug="service-areas-pineville" fallback={<NotFound />} />} />
-        <Route path="/areas-served/monroe-nc"><Redirect to="/service-areas/monroe" replace /></Route>
-        <Route path="/areas-served/charlotte-nc"><Redirect to="/service-areas/charlotte" replace /></Route>
+        <Route
+          path="/service-areas/charlotte"
+          component={() => (
+            <CmsHybridPage slug="areas-served-charlotte-nc" fallback={<NotFound />} />
+          )}
+        />
+        <Route
+          path="/service-areas/monroe"
+          component={() => <CmsHybridPage slug="areas-served-monroe-nc" fallback={<NotFound />} />}
+        />
+        <Route
+          path="/service-areas/indian-trail"
+          component={() => (
+            <CmsHybridPage slug="service-areas-indian-trail" fallback={<NotFound />} />
+          )}
+        />
+        <Route
+          path="/service-areas/stallings"
+          component={() => <CmsHybridPage slug="service-areas-stallings" fallback={<NotFound />} />}
+        />
+        <Route
+          path="/service-areas/wesley-chapel"
+          component={() => (
+            <CmsHybridPage slug="service-areas-wesley-chapel" fallback={<NotFound />} />
+          )}
+        />
+        <Route
+          path="/service-areas/waxhaw"
+          component={() => <CmsHybridPage slug="service-areas-waxhaw" fallback={<NotFound />} />}
+        />
+        <Route
+          path="/service-areas/matthews"
+          component={() => <CmsHybridPage slug="service-areas-matthews" fallback={<NotFound />} />}
+        />
+        <Route
+          path="/service-areas/weddington"
+          component={() => (
+            <CmsHybridPage slug="service-areas-weddington" fallback={<NotFound />} />
+          )}
+        />
+        <Route
+          path="/service-areas/indian-land"
+          component={() => (
+            <CmsHybridPage slug="service-areas-indian-land" fallback={<NotFound />} />
+          )}
+        />
+        <Route
+          path="/service-areas/fort-mill"
+          component={() => <CmsHybridPage slug="service-areas-fort-mill" fallback={<NotFound />} />}
+        />
+        <Route
+          path="/service-areas/pineville"
+          component={() => <CmsHybridPage slug="service-areas-pineville" fallback={<NotFound />} />}
+        />
+        <Route path="/areas-served/monroe-nc">
+          <Redirect to="/service-areas/monroe" replace />
+        </Route>
+        <Route path="/areas-served/charlotte-nc">
+          <Redirect to="/service-areas/charlotte" replace />
+        </Route>
         <Route path="/preview/cms/:id" component={CmsPreviewPage} />
-        <Route path="/privacy-policy" component={() => <CmsHybridPage slug="privacy-policy" fallback={<LegalFallbackPage title="Privacy Policy" subtitle="Review how Glass & Door Pro handles contact form details, service inquiries, cookies, analytics, and customer records." />} />} />
-        <Route path="/terms-of-service" component={() => <CmsHybridPage slug="terms-of-service" fallback={<LegalFallbackPage title="Terms of Service" subtitle="Review the terms governing use of the Glass & Door Pro website, estimates, service information, third-party links, and site content." />} />} />
-        <Route path="/disclaimer" component={() => <CmsHybridPage slug="disclaimer" fallback={<LegalFallbackPage title="Disclaimer" subtitle="Review important context about website information, estimates, repair recommendations, warranty references, pricing, and commercial glass work." />} />} />
+        <Route
+          path="/privacy-policy"
+          component={() => (
+            <CmsHybridPage
+              slug="privacy-policy"
+              fallback={
+                <LegalFallbackPage
+                  title="Privacy Policy"
+                  subtitle="Review how Glass & Door Pro handles contact form details, service inquiries, cookies, analytics, and customer records."
+                />
+              }
+            />
+          )}
+        />
+        <Route
+          path="/terms-of-service"
+          component={() => (
+            <CmsHybridPage
+              slug="terms-of-service"
+              fallback={
+                <LegalFallbackPage
+                  title="Terms of Service"
+                  subtitle="Review the terms governing use of the Glass & Door Pro website, estimates, service information, third-party links, and site content."
+                />
+              }
+            />
+          )}
+        />
+        <Route
+          path="/disclaimer"
+          component={() => (
+            <CmsHybridPage
+              slug="disclaimer"
+              fallback={
+                <LegalFallbackPage
+                  title="Disclaimer"
+                  subtitle="Review important context about website information, estimates, repair recommendations, warranty references, pricing, and commercial glass work."
+                />
+              }
+            />
+          )}
+        />
         <Route path="/forms/:slug" component={StandaloneFormPage} />
         <Route path="/auth/login" component={LoginPage} />
-        <Route path="/auth/register"><Redirect to="/" replace /></Route>
+        <Route path="/auth/register">
+          <Redirect to="/" replace />
+        </Route>
         <Route path="/auth/forgot-password" component={ForgotPasswordPage} />
         <Route path="/auth/reset-password" component={ResetPasswordPage} />
         <Route path="/setup" component={AdminSetupPage} />
@@ -228,7 +377,11 @@ function SetupGuard({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();
   const pathname = location.split(/[?#]/)[0] || "/";
   const checksSetup = pathRequiresSetupStatus(pathname);
-  const { data: setupStatus, isLoading, isError } = useQuery<{ needsSetup: boolean }>({
+  const {
+    data: setupStatus,
+    isLoading,
+    isError,
+  } = useQuery<{ needsSetup: boolean }>({
     queryKey: ["/api/setup/status"],
     staleTime: 60_000,
     retry: 2,
@@ -245,7 +398,10 @@ function SetupGuard({ children }: { children: React.ReactNode }) {
 
   if (checksSetup && isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen" data-testid="setup-guard-loading">
+      <div
+        className="flex items-center justify-center min-h-screen"
+        data-testid="setup-guard-loading"
+      >
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );

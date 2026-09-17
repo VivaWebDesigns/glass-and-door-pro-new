@@ -34,7 +34,10 @@ export function EventLocationMap({ latitude, longitude, locationName }: EventLoc
   if (isNaN(lat) || isNaN(lng)) return null;
 
   return (
-    <div className="aspect-video max-h-[300px] rounded-xl overflow-hidden border" data-testid="map-event-location">
+    <div
+      className="aspect-video max-h-[300px] rounded-xl overflow-hidden border"
+      data-testid="map-event-location"
+    >
       <MapContainer
         center={[lat, lng]}
         zoom={14}

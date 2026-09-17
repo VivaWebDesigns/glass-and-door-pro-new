@@ -184,11 +184,10 @@ export function AdminSidebar({ children }: AdminSidebarProps) {
     setOpenGroup(open ? label : null);
   };
   const exactOnlyRoutes = ["/admin", "/admin/cms"];
-  const isRouteActive = (href?: string) => Boolean(
-    href &&
-      (location === href ||
-        (!exactOnlyRoutes.includes(href) && location.startsWith(href))),
-  );
+  const isRouteActive = (href?: string) =>
+    Boolean(
+      href && (location === href || (!exactOnlyRoutes.includes(href) && location.startsWith(href))),
+    );
   const isChildRouteActive = (child: NavItem) => {
     if (!child.href) return false;
     if (child.href === "/admin/cms/blog") {
@@ -202,9 +201,8 @@ export function AdminSidebar({ children }: AdminSidebarProps) {
   };
   const isNavItemActive = (item: NavItem) =>
     isRouteActive(item.href) || Boolean(item.children?.some(isChildRouteActive));
-  const activeGroupLabel = navGroups.find((group) =>
-    group.label && group.items.some(isNavItemActive)
-  )?.label ?? null;
+  const activeGroupLabel =
+    navGroups.find((group) => group.label && group.items.some(isNavItemActive))?.label ?? null;
 
   useEffect(() => {
     setOpenGroup(activeGroupLabel);
@@ -412,7 +410,8 @@ export function AdminSidebar({ children }: AdminSidebarProps) {
                     <>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <button aria-label="Open your profile"
+                          <button
+                            aria-label="Open your profile"
                             type="button"
                             className="mx-auto h-7 w-7 rounded-full border border-border bg-background flex items-center justify-center overflow-hidden hover:ring-2 hover:ring-ring hover:ring-offset-1 transition-shadow"
                             onClick={() => setProfileOpen(true)}
@@ -488,9 +487,11 @@ export function AdminSidebar({ children }: AdminSidebarProps) {
             )}
           </aside>
 
-          <button aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} aria-expanded={!collapsed}
+          <button
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-expanded={!collapsed}
             onClick={() => setCollapsed(!collapsed)}
-            className="absolute top-6 -right-3.5 z-20 h-7 w-7 rounded-full border bg-background shadow-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:shadow-md transition-all"
+            className="absolute top-6 -right-3.5 z-20 h-7 w-7 rounded-full border bg-background shadow-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:shadow-md transition-[color,box-shadow]"
             data-testid="button-toggle-sidebar"
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}

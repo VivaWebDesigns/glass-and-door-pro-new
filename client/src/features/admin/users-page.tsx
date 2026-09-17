@@ -1,27 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { ProtectedRoute } from "@/components/shared/protected-route";
-import { AdminSidebar } from "./admin-sidebar";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
-import { apiRequest, queryClient, STALE_TIMES } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-  SheetBody,
-  SheetFooter,
-} from "@/components/ui/sheet";
+import { ProtectedRoute } from "@/components/shared/protected-route";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,33 +10,53 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient, STALE_TIMES } from "@/lib/queryClient";
 import type { User } from "@shared/schema";
 import { AdminPermission } from "@shared/types";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-  Plus,
-  Search,
-  KeyRound,
-  Trash2,
-  Mail,
-  MoreHorizontal,
+  AlertTriangle,
   Eye,
   EyeOff,
+  FolderKanban,
+  KeyRound,
+  Mail,
+  MoreHorizontal,
+  Palette,
+  Plus,
+  Search,
+  Shield,
   ShieldAlert,
   ShieldCheck,
-  AlertTriangle,
-  Shield,
-  PanelsTopLeft,
-  Palette,
-  FolderKanban,
+  Trash2,
 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { AdminSidebar } from "./admin-sidebar";
 
 type SafeUser = Omit<User, "password"> & { country?: string | null };
 type ActiveForm = {
@@ -120,7 +118,11 @@ function summarizePermissions(user: SafeUser) {
   if (permissions.length === 0) return "No tool groups assigned";
 
   return permissions
-    .map((permission) => EDITOR_PERMISSION_OPTIONS.find((option) => option.value === permission)?.label ?? permission)
+    .map(
+      (permission) =>
+        EDITOR_PERMISSION_OPTIONS.find((option) => option.value === permission)?.label ??
+        permission,
+    )
     .join(", ");
 }
 
@@ -203,15 +205,14 @@ function UsersContent() {
     refetchOnWindowFocus: true,
   });
 
-  const activeForms = useMemo(
-    () => forms.filter((form) => form.isActive),
-    [forms]
-  );
+  const activeForms = useMemo(() => forms.filter((form) => form.isActive), [forms]);
 
   const filtered = users?.filter((user) => {
     const matchesSearch =
       !search ||
-      `${user.firstName ?? ""} ${user.lastName ?? ""}`.toLowerCase().includes(search.toLowerCase()) ||
+      `${user.firstName ?? ""} ${user.lastName ?? ""}`
+        .toLowerCase()
+        .includes(search.toLowerCase()) ||
       user.email.toLowerCase().includes(search.toLowerCase());
     return matchesSearch;
   });
@@ -232,7 +233,8 @@ function UsersContent() {
             System Users
           </h1>
           <p className="text-sm text-muted-foreground">
-            Manage admin and editor accounts used to operate the platform. Directory members are managed separately in the Directory app.
+            Manage admin and editor accounts used to operate the platform. Directory members are
+            managed separately in the Directory app.
           </p>
         </div>
         <Button onClick={() => setCreateOpen(true)} data-testid="button-create-user">
@@ -273,7 +275,10 @@ function UsersContent() {
                       {`${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || "—"}
                     </span>
                     {user.isSuspended && (
-                      <Badge variant="secondary" className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-xs">
+                      <Badge
+                        variant="secondary"
+                        className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-xs"
+                      >
                         Suspended
                       </Badge>
                     )}
@@ -281,7 +286,11 @@ function UsersContent() {
                 </TableCell>
                 <TableCell data-testid={`text-user-email-${user.id}`}>{user.email}</TableCell>
                 <TableCell>
-                  <Badge variant="secondary" className={ROLE_COLORS[user.role] || ""} data-testid={`badge-role-${user.id}`}>
+                  <Badge
+                    variant="secondary"
+                    className={ROLE_COLORS[user.role] || ""}
+                    data-testid={`badge-role-${user.id}`}
+                  >
                     {displayRole(user.role)}
                   </Badge>
                 </TableCell>
@@ -292,7 +301,8 @@ function UsersContent() {
                   {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "—"}
                 </TableCell>
                 <TableCell>
-                  <Button aria-label="Open user details"
+                  <Button
+                    aria-label="Open user details"
                     variant="ghost"
                     size="icon"
                     onClick={() => setDetailUser(user)}
@@ -316,6 +326,7 @@ function UsersContent() {
 
       <CreateUserSheet open={createOpen} onOpenChange={setCreateOpen} activeForms={activeForms} />
       <UserDetailSheet
+        key={detailUser?.id ?? "closed"}
         user={detailUser}
         onClose={() => setDetailUser(null)}
         onUserUpdated={setDetailUser}
@@ -377,6 +388,7 @@ function FormNotificationPanel({
   onToggle: (formId: string) => void;
   activeForms: ActiveForm[];
 }) {
+  const selectedFormIdSet = new Set(selectedFormIds);
   return (
     <div className="rounded-lg border p-4 space-y-4">
       <div>
@@ -390,16 +402,23 @@ function FormNotificationPanel({
       ) : (
         <div className="space-y-3">
           {activeForms.map((form) => (
-            <label key={form.id} className="flex items-start gap-3 rounded-md border p-3 cursor-pointer hover:bg-muted/30">
+            <label
+              key={form.id}
+              className="flex items-start gap-3 rounded-md border p-3 cursor-pointer hover:bg-muted/30"
+            >
               <Checkbox
-                checked={selectedFormIds.includes(form.id)}
+                checked={selectedFormIdSet.has(form.id)}
                 onCheckedChange={() => onToggle(form.id)}
                 data-testid={`checkbox-form-notification-${form.slug}`}
               />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">{form.name}</span>
-                  {form.isSystem && <Badge variant="outline" className="text-[10px]">System</Badge>}
+                  {form.isSystem && (
+                    <Badge variant="outline" className="text-[10px]">
+                      System
+                    </Badge>
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">Slug: {form.slug}</p>
               </div>
@@ -489,17 +508,36 @@ export function CreateUserSheet({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="create-first">First Name</Label>
-                <Input id="create-first" value={firstName} onChange={(event) => setFirstName(event.target.value)} required data-testid="input-create-first-name" />
+                <Input
+                  id="create-first"
+                  value={firstName}
+                  onChange={(event) => setFirstName(event.target.value)}
+                  required
+                  data-testid="input-create-first-name"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="create-last">Last Name</Label>
-                <Input id="create-last" value={lastName} onChange={(event) => setLastName(event.target.value)} required data-testid="input-create-last-name" />
+                <Input
+                  id="create-last"
+                  value={lastName}
+                  onChange={(event) => setLastName(event.target.value)}
+                  required
+                  data-testid="input-create-last-name"
+                />
               </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="create-email">Email</Label>
-              <Input id="create-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required data-testid="input-create-email" />
+              <Input
+                id="create-email"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+                data-testid="input-create-email"
+              />
             </div>
 
             <div className="space-y-2">
@@ -515,7 +553,8 @@ export function CreateUserSheet({
                   placeholder="At least 6 characters"
                   data-testid="input-create-password"
                 />
-                <Button aria-label={showPassword ? "Hide password" : "Show password"}
+                <Button
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                   type="button"
                   variant="ghost"
                   size="icon"
@@ -529,9 +568,12 @@ export function CreateUserSheet({
 
             <div className="rounded-lg border bg-muted/20 p-4 space-y-3">
               <div>
-                <Label htmlFor="create-role" className="text-sm font-medium">System Role</Label>
+                <Label htmlFor="create-role" className="text-sm font-medium">
+                  System Role
+                </Label>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Admins have full platform access. Editors are limited to the tool groups you choose below.
+                  Admins have full platform access. Editors are limited to the tool groups you
+                  choose below.
                 </p>
               </div>
               <SystemRoleSelector role={role} onChange={setRole} testIdPrefix="create-role" />
@@ -540,20 +582,26 @@ export function CreateUserSheet({
             {role === "editor" ? (
               <EditorPermissionsPanel
                 permissions={adminPermissions}
-                onToggle={(permission) => setAdminPermissions((current) => toggleValue(current, permission))}
+                onToggle={(permission) =>
+                  setAdminPermissions((current) => toggleValue(current, permission))
+                }
               />
             ) : (
               <div className="rounded-lg border bg-muted/20 p-4">
                 <div className="flex items-center gap-2">
                   <Shield className="h-4 w-4 text-primary" />
-                  <p className="text-sm font-medium">System Admins can access every admin tool group, including System settings.</p>
+                  <p className="text-sm font-medium">
+                    System Admins can access every admin tool group, including System settings.
+                  </p>
                 </div>
               </div>
             )}
 
             <FormNotificationPanel
               selectedFormIds={formNotificationFormIds}
-              onToggle={(formId) => setFormNotificationFormIds((current) => toggleValue(current, formId))}
+              onToggle={(formId) =>
+                setFormNotificationFormIds((current) => toggleValue(current, formId))
+              }
               activeForms={activeForms}
             />
 
@@ -578,10 +626,20 @@ export function CreateUserSheet({
           </form>
         </SheetBody>
         <SheetFooter>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)} data-testid="button-cancel-create">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            data-testid="button-cancel-create"
+          >
             Cancel
           </Button>
-          <Button type="submit" form="create-user-form" disabled={createMutation.isPending} data-testid="button-submit-create">
+          <Button
+            type="submit"
+            form="create-user-form"
+            disabled={createMutation.isPending}
+            data-testid="button-submit-create"
+          >
             {createMutation.isPending ? "Creating..." : "Create System User"}
           </Button>
         </SheetFooter>
@@ -604,27 +662,16 @@ function UserDetailSheet({
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("profile");
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"admin" | "editor">("editor");
-  const [adminPermissions, setAdminPermissions] = useState<string[]>([]);
-  const [formNotificationFormIds, setFormNotificationFormIds] = useState<string[]>([]);
+  const [firstName, setFirstName] = useState(user?.firstName ?? "");
+  const [lastName, setLastName] = useState(user?.lastName ?? "");
+  const [email, setEmail] = useState(user?.email ?? "");
+  const [role, setRole] = useState<"admin" | "editor">(user?.role === "admin" ? "admin" : "editor");
+  const [adminPermissions, setAdminPermissions] = useState<string[]>(user?.adminPermissions ?? []);
+  const [formNotificationFormIds, setFormNotificationFormIds] = useState<string[]>(
+    user?.formNotificationFormIds ?? [],
+  );
   const [newPassword, setNewPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  useEffect(() => {
-    if (!user) return;
-    setFirstName(user.firstName ?? "");
-    setLastName(user.lastName ?? "");
-    setEmail(user.email);
-    setRole((user.role === "admin" ? "admin" : "editor"));
-    setAdminPermissions(Array.isArray(user.adminPermissions) ? user.adminPermissions : []);
-    setFormNotificationFormIds(Array.isArray(user.formNotificationFormIds) ? user.formNotificationFormIds : []);
-    setNewPassword("");
-    setShowPassword(false);
-    setActiveTab("profile");
-  }, [user]);
 
   const updateMutation = useMutation({
     mutationFn: async () => {
@@ -667,7 +714,10 @@ function UserDetailSheet({
       await apiRequest("POST", `/api/admin/users/${user!.id}/reset-password`, {});
     },
     onSuccess: () => {
-      toast({ title: "Password reset email sent", description: `Reset link sent to ${user?.email}` });
+      toast({
+        title: "Password reset email sent",
+        description: `Reset link sent to ${user?.email}`,
+      });
     },
     onError: (err: Error) => {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -682,7 +732,10 @@ function UserDetailSheet({
     onSuccess: (updated: SafeUser) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       const action = updated.isSuspended ? "suspended" : "reactivated";
-      toast({ title: `Account ${action}`, description: `${user?.firstName} ${user?.lastName}'s account has been ${action}.` });
+      toast({
+        title: `Account ${action}`,
+        description: `${user?.firstName} ${user?.lastName}'s account has been ${action}.`,
+      });
       onUserUpdated({ ...updated });
     },
     onError: (err: Error) => {
@@ -706,7 +759,9 @@ function UserDetailSheet({
     },
   });
 
-  const fullName = user ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || user.email : "";
+  const fullName = user
+    ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || user.email
+    : "";
 
   return (
     <>
@@ -722,11 +777,18 @@ function UserDetailSheet({
               </div>
               {user && (
                 <div className="flex flex-col items-end gap-1 pt-1">
-                  <Badge variant="secondary" className={ROLE_COLORS[user.role] || ""} data-testid="badge-detail-role">
+                  <Badge
+                    variant="secondary"
+                    className={ROLE_COLORS[user.role] || ""}
+                    data-testid="badge-detail-role"
+                  >
                     {displayRole(user.role)}
                   </Badge>
                   {user.isSuspended && (
-                    <Badge variant="secondary" className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-xs">
+                    <Badge
+                      variant="secondary"
+                      className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-xs"
+                    >
                       Suspended
                     </Badge>
                   )}
@@ -759,45 +821,76 @@ function UserDetailSheet({
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="detail-first">First Name</Label>
-                        <Input id="detail-first" value={firstName} onChange={(event) => setFirstName(event.target.value)} data-testid="input-detail-first-name" />
+                        <Input
+                          id="detail-first"
+                          value={firstName}
+                          onChange={(event) => setFirstName(event.target.value)}
+                          data-testid="input-detail-first-name"
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="detail-last">Last Name</Label>
-                        <Input id="detail-last" value={lastName} onChange={(event) => setLastName(event.target.value)} data-testid="input-detail-last-name" />
+                        <Input
+                          id="detail-last"
+                          value={lastName}
+                          onChange={(event) => setLastName(event.target.value)}
+                          data-testid="input-detail-last-name"
+                        />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="detail-email">Email</Label>
-                      <Input id="detail-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required data-testid="input-detail-email" />
+                      <Input
+                        id="detail-email"
+                        type="email"
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        required
+                        data-testid="input-detail-email"
+                      />
                     </div>
 
                     <div className="rounded-lg border bg-muted/20 p-4 space-y-3">
                       <div>
-                        <Label htmlFor="detail-role" className="text-sm font-medium">System Role</Label>
+                        <Label htmlFor="detail-role" className="text-sm font-medium">
+                          System Role
+                        </Label>
                         <p className="text-xs text-muted-foreground mt-1">
-                          Editors can only access the tool groups you assign here. System remains admin-only.
+                          Editors can only access the tool groups you assign here. System remains
+                          admin-only.
                         </p>
                       </div>
-                      <SystemRoleSelector role={role} onChange={setRole} testIdPrefix="detail-role" />
+                      <SystemRoleSelector
+                        role={role}
+                        onChange={setRole}
+                        testIdPrefix="detail-role"
+                      />
                     </div>
 
                     {role === "editor" ? (
                       <EditorPermissionsPanel
                         permissions={adminPermissions}
-                        onToggle={(permission) => setAdminPermissions((current) => toggleValue(current, permission))}
+                        onToggle={(permission) =>
+                          setAdminPermissions((current) => toggleValue(current, permission))
+                        }
                       />
                     ) : (
                       <div className="rounded-lg border bg-muted/20 p-4">
                         <div className="flex items-center gap-2">
                           <Shield className="h-4 w-4 text-primary" />
-                          <p className="text-sm font-medium">System Admins always have full platform access, including the System tool group.</p>
+                          <p className="text-sm font-medium">
+                            System Admins always have full platform access, including the System
+                            tool group.
+                          </p>
                         </div>
                       </div>
                     )}
 
                     <FormNotificationPanel
                       selectedFormIds={formNotificationFormIds}
-                      onToggle={(formId) => setFormNotificationFormIds((current) => toggleValue(current, formId))}
+                      onToggle={(formId) =>
+                        setFormNotificationFormIds((current) => toggleValue(current, formId))
+                      }
                       activeForms={activeForms}
                     />
                   </form>
@@ -810,7 +903,9 @@ function UserDetailSheet({
                     <KeyRound className="h-4 w-4 text-muted-foreground" />
                     <h3 className="font-medium text-sm">Reset Password</h3>
                   </div>
-                  <p className="text-xs text-muted-foreground">Set a new password directly for this account.</p>
+                  <p className="text-xs text-muted-foreground">
+                    Set a new password directly for this account.
+                  </p>
                   <form
                     id="detail-reset-form"
                     onSubmit={(event) => {
@@ -829,17 +924,26 @@ function UserDetailSheet({
                         required
                         data-testid="input-detail-new-password"
                       />
-                      <Button aria-label={showPassword ? "Hide password" : "Show password"}
+                      <Button
+                        aria-label={showPassword ? "Hide password" : "Show password"}
                         type="button"
                         variant="ghost"
                         size="icon"
                         className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
                         onClick={() => setShowPassword(!showPassword)}
                       >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
                       </Button>
                     </div>
-                    <Button type="submit" disabled={resetPasswordMutation.isPending || !newPassword.trim()} data-testid="button-detail-reset-password">
+                    <Button
+                      type="submit"
+                      disabled={resetPasswordMutation.isPending || !newPassword.trim()}
+                      data-testid="button-detail-reset-password"
+                    >
                       {resetPasswordMutation.isPending ? "Saving..." : "Set"}
                     </Button>
                   </form>
@@ -851,7 +955,8 @@ function UserDetailSheet({
                     <h3 className="font-medium text-sm">Send Reset Email</h3>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Email a password reset link to <span className="font-medium">{user?.email}</span>.
+                    Email a password reset link to{" "}
+                    <span className="font-medium">{user?.email}</span>.
                   </p>
                   <Button
                     variant="outline"
@@ -896,7 +1001,12 @@ function UserDetailSheet({
                   <p className="text-xs text-muted-foreground">
                     Permanently delete this system account. This action cannot be undone.
                   </p>
-                  <Button variant="destructive" size="sm" onClick={() => setDeleteConfirmOpen(true)} data-testid="button-detail-delete">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => setDeleteConfirmOpen(true)}
+                    data-testid="button-detail-delete"
+                  >
                     <Trash2 className="mr-2 h-4 w-4" />
                     Delete Account
                   </Button>
@@ -907,10 +1017,20 @@ function UserDetailSheet({
 
           {activeTab === "profile" && (
             <SheetFooter>
-              <Button type="button" variant="outline" onClick={onClose} data-testid="button-detail-cancel">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                data-testid="button-detail-cancel"
+              >
                 Cancel
               </Button>
-              <Button type="submit" form="detail-profile-form" disabled={updateMutation.isPending} data-testid="button-detail-save">
+              <Button
+                type="submit"
+                form="detail-profile-form"
+                disabled={updateMutation.isPending}
+                data-testid="button-detail-save"
+              >
                 {updateMutation.isPending ? "Saving..." : "Save Changes"}
               </Button>
             </SheetFooter>
@@ -923,7 +1043,8 @@ function UserDetailSheet({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete System User</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to permanently delete <strong>{fullName}</strong> ({user?.email})? This action is irreversible.
+              Are you sure you want to permanently delete <strong>{fullName}</strong> ({user?.email}
+              )? This action is irreversible.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

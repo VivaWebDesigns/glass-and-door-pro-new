@@ -56,7 +56,9 @@ function renderJsonLd(schemas = [faqSchema]) {
 }
 
 function jsonLdScripts() {
-  return Array.from(document.querySelectorAll<HTMLScriptElement>('script[type="application/ld+json"]'));
+  return Array.from(
+    document.querySelectorAll<HTMLScriptElement>('script[type="application/ld+json"]'),
+  );
 }
 
 describe("JsonLd", () => {

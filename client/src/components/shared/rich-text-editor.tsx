@@ -1,3 +1,4 @@
+import { errorMessage } from "@shared/errors";
 import { useEditor, EditorContent } from "@tiptap/react";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useState, useRef, useCallback, useLayoutEffect, useImperativeHandle } from "react";
@@ -23,16 +24,48 @@ import { useToast } from "@/hooks/use-toast";
 import { createLinkExtension, createStarterKit } from "@/lib/tiptap";
 
 const EMOJI_LIST = [
-  "😀", "😂", "😊", "😍", "🤔", "😢", "😎", "🙏",
-  "👍", "👋", "❤️", "🎉", "✨", "🔥", "💪", "🤝",
-  "✅", "⭐", "💡", "📎", "📝", "🗓️", "⏰", "🌟",
+  "😀",
+  "😂",
+  "😊",
+  "😍",
+  "🤔",
+  "😢",
+  "😎",
+  "🙏",
+  "👍",
+  "👋",
+  "❤️",
+  "🎉",
+  "✨",
+  "🔥",
+  "💪",
+  "🤝",
+  "✅",
+  "⭐",
+  "💡",
+  "📎",
+  "📝",
+  "🗓️",
+  "⏰",
+  "🌟",
 ];
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_EXTENSIONS = [
-  ".png", ".jpg", ".jpeg", ".gif", ".webp",
-  ".pdf", ".doc", ".docx", ".xls", ".xlsx",
-  ".ppt", ".pptx", ".csv", ".txt",
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".gif",
+  ".webp",
+  ".pdf",
+  ".doc",
+  ".docx",
+  ".xls",
+  ".xlsx",
+  ".ppt",
+  ".pptx",
+  ".csv",
+  ".txt",
 ];
 
 interface Attachment {
@@ -47,11 +80,7 @@ export interface RichTextEditorHandle {
 }
 
 interface RichTextEditorProps {
-  onSend: (data: {
-    content: string;
-    contentHtml: string;
-    attachment?: Attachment;
-  }) => void;
+  onSend: (data: { content: string; contentHtml: string; attachment?: Attachment }) => void;
   disabled?: boolean;
   placeholder?: string;
   sendRef?: React.MutableRefObject<RichTextEditorHandle | null>;
@@ -171,10 +200,10 @@ export function RichTextEditor({ onSend, disabled, placeholder, sendRef }: RichT
         type: data.type,
         size: data.size,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({
         title: "Upload failed",
-        description: err.message,
+        description: errorMessage(err, "Upload failed"),
         variant: "destructive",
       });
     } finally {
@@ -195,14 +224,16 @@ export function RichTextEditor({ onSend, disabled, placeholder, sendRef }: RichT
         .insertContent({
           type: "text",
           text: url,
-          marks: [{
-            type: "link",
-            attrs: {
-              href: url,
-              target: linkOpenInNewTab ? "_blank" : null,
-              rel: linkOpenInNewTab ? "noopener noreferrer" : null,
+          marks: [
+            {
+              type: "link",
+              attrs: {
+                href: url,
+                target: linkOpenInNewTab ? "_blank" : null,
+                rel: linkOpenInNewTab ? "noopener noreferrer" : null,
+              },
             },
-          }],
+          ],
         })
         .run();
     } else {
@@ -319,7 +350,10 @@ export function RichTextEditor({ onSend, disabled, placeholder, sendRef }: RichT
               variant="ghost"
               size="sm"
               className={`h-7 w-7 p-0 ${showEmoji ? "bg-accent" : ""}`}
-              onClick={() => { setShowEmoji(!showEmoji); setShowLinkInput(false); }}
+              onClick={() => {
+                setShowEmoji(!showEmoji);
+                setShowLinkInput(false);
+              }}
               data-testid="button-format-emoji"
               title="Emoji"
             >
@@ -384,7 +418,12 @@ export function RichTextEditor({ onSend, disabled, placeholder, sendRef }: RichT
               placeholder="Enter URL..."
               autoPrependHttps
               className="h-7 text-xs flex-1 min-w-[180px]"
-              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); insertLink(); } }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  insertLink();
+                }
+              }}
               autoFocus
               data-testid="input-link-url"
             />
@@ -438,7 +477,9 @@ export function RichTextEditor({ onSend, disabled, placeholder, sendRef }: RichT
               getFileIcon(attachment.type)
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium truncate" data-testid="text-attachment-name">{attachment.name}</p>
+              <p className="text-xs font-medium truncate" data-testid="text-attachment-name">
+                {attachment.name}
+              </p>
               <p className="text-[10px] text-muted-foreground">{formatFileSize(attachment.size)}</p>
             </div>
             <Button

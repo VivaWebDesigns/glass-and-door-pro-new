@@ -1,3 +1,4 @@
+import { insertDocSchema } from "@shared/schema";
 import { Router } from "express";
 import { storage } from "../storage/index";
 import { authenticateToken, requireRole } from "../middleware/auth";
@@ -6,6 +7,7 @@ import { paramString } from "../utils/params";
 import { ensureSystemDocs } from "../services/system-docs.service";
 
 const router = Router();
+const editableDocSchema = insertDocSchema.omit({ createdBy: true });
 
 router.use(authenticateToken);
 router.use(requireRole("admin"));
@@ -15,7 +17,7 @@ router.get(
   asyncHandler(async (_req, res) => {
     const allDocs = await storage.docs.getAllDocs();
     res.json(allDocs);
-  })
+  }),
 );
 
 router.post(
@@ -27,7 +29,7 @@ router.post(
       ...result,
       docs: allDocs,
     });
-  })
+  }),
 );
 
 router.get(
@@ -39,30 +41,40 @@ router.get(
       return;
     }
     res.json(doc);
-  })
+  }),
 );
 
 router.post(
   "/",
   asyncHandler(async (req, res) => {
+    const parsed = editableDocSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ message: "Invalid document", issues: parsed.error.issues });
+      return;
+    }
     const doc = await storage.docs.createDoc({
-      ...req.body,
+      ...parsed.data,
       createdBy: req.user!.id,
     });
     res.status(201).json(doc);
-  })
+  }),
 );
 
 router.put(
   "/:id",
   asyncHandler(async (req, res) => {
-    const doc = await storage.docs.updateDoc(paramString(req.params.id), req.body);
+    const parsed = editableDocSchema.partial().safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ message: "Invalid document", issues: parsed.error.issues });
+      return;
+    }
+    const doc = await storage.docs.updateDoc(paramString(req.params.id), parsed.data);
     if (!doc) {
       res.status(404).json({ message: "Document not found" });
       return;
     }
     res.json(doc);
-  })
+  }),
 );
 
 router.delete(
@@ -70,7 +82,7 @@ router.delete(
   asyncHandler(async (req, res) => {
     await storage.docs.deleteDoc(paramString(req.params.id));
     res.json({ message: "Document deleted" });
-  })
+  }),
 );
 
 export default router;
