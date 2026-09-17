@@ -102,7 +102,7 @@ describe("glass SEO helpers", () => {
 
     expect(serviceSchema).toMatchObject({
       "@type": "Service",
-      name: "Glass and Door Services in Indian Land, SC",
+      name: "Glass Shower Door Installation in Indian Land, SC",
       hasOfferCatalog: {
         itemListElement: expect.arrayContaining([
           expect.objectContaining({

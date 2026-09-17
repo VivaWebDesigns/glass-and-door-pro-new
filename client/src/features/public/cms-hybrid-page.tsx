@@ -9,6 +9,7 @@ import type { BlockInstance, BuilderContent } from "@/features/admin/cms/builder
 import type { CmsPage, SeoSettings } from "@shared/schema";
 import { normalizeSeoDescription } from "@shared/seo-description";
 import { correctGlassSearchTitle } from "@shared/glass-search-snippets";
+import { getGlassLocationSearchCopy } from "@shared/glass-location-search";
 import { JsonLd } from "@/components/shared/json-ld";
 import {
   buildBreadcrumbLd,
@@ -131,11 +132,9 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
     const titleFormatter = isGlassServicePageSlug(page.slug)
       ? formatBrandLastTitle
       : formatBrandFirstTitle;
-    const headTitle = titleFormatter(
-      effectiveTitle,
-      titleSuffix,
-      globalSeo?.siteName ?? "Glass and Door Pro",
-    );
+    const headTitle = getGlassLocationSearchCopy(page.slug)
+      ? effectiveTitle || page.title
+      : titleFormatter(effectiveTitle, titleSuffix, globalSeo?.siteName ?? "Glass and Door Pro");
     const effectiveDescription =
       seoOverride?.description ||
       normalizeSeoDescription(page.seoDescription) ||

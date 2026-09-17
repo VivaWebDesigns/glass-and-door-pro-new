@@ -2,6 +2,10 @@ import { randomUUID } from "crypto";
 import { storage } from "../storage";
 import { normalizeSeoDescription } from "@shared/seo-description";
 import { correctGlassSearchTitle } from "@shared/glass-search-snippets";
+import {
+  getGlassLocationSearchCopy,
+  updateGlassLocationSearchContent,
+} from "@shared/glass-location-search";
 import { GLASS_HOMEPAGE_SERVICE_CARDS } from "@shared/glass-homepage-services";
 import { glassGoogleReviewDate } from "@shared/glass-review-dates";
 import { isGlassLegalNoindexSlug } from "@shared/glass-seo";
@@ -777,6 +781,24 @@ async function normalizeStoredCmsPages() {
     );
     if (contentWithPlainServiceAreaOrder !== (updates.content ?? page.content)) {
       updates.content = contentWithPlainServiceAreaOrder as InsertCmsPage["content"];
+    }
+
+    const locationCopy = getGlassLocationSearchCopy(page.slug);
+    const locationSystemMeta =
+      isRecord(page.content) && isRecord(page.content._system) ? page.content._system : {};
+    if (locationCopy && locationSystemMeta.showerSearchPositioning2026 !== true) {
+      updates.seoTitle = locationCopy.title;
+      updates.seoDescription = locationCopy.description;
+      const locationContent = updateGlassLocationSearchContent(
+        page.slug,
+        (updates.content ?? page.content) as InsertCmsPage["content"],
+      );
+      if (isRecord(locationContent)) {
+        updates.content = {
+          ...locationContent,
+          _system: { ...locationSystemMeta, showerSearchPositioning2026: true },
+        };
+      }
     }
 
     if (Object.keys(updates).length > 0) {

@@ -1,4 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { GLASS_PRIMARY_SERVICE_AREAS } from "@shared/glass-service-areas";
+import { getCmsSlugForPublicPath } from "@shared/glass-seo";
+import { getGlassLocationSearchCopy } from "@shared/glass-location-search";
 
 const mockGetPageBySlug = vi.fn();
 const mockCreatePage = vi.fn();
@@ -127,5 +130,20 @@ describe("seedGlassPublicCms", () => {
     ]);
     expect(JSON.stringify(mockUpdatePage.mock.calls)).not.toMatch(/7am(?:\s*[-–]\s*)6pm/i);
     expect(JSON.stringify(mockUpdatePage.mock.calls)).not.toContain("7 AM to 6 PM");
+
+    for (const area of GLASS_PRIMARY_SERVICE_AREAS) {
+      const slug = getCmsSlugForPublicPath(area.href);
+      const copy = getGlassLocationSearchCopy(slug);
+      const update = mockUpdatePage.mock.calls.find(([id]) => id === `${slug}-id`)?.[1];
+      expect(update).toMatchObject({
+        seoTitle: copy?.title,
+        seoDescription: copy?.description,
+      });
+      expect(update.content.blocks[0].props).toMatchObject({
+        heading: copy?.heading,
+        subheading: copy?.subheading,
+      });
+      expect(update.content.blocks[1].props.content).toContain(copy?.intro);
+    }
   });
 });

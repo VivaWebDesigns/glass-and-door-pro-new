@@ -69,6 +69,32 @@ const cmsPage: CmsPage = {
 };
 
 describe("public-prerender.service", () => {
+  it("renders a location title without the brand prefix and matches the shower heading", async () => {
+    mockGetSeo.mockResolvedValue(seoSettings);
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      slug: "service-areas-waxhaw",
+      title: "Waxhaw, NC",
+      content: {
+        blocks: [
+          {
+            id: "hero",
+            type: "hero",
+            props: { heading: "Glass Shower Door Installer in Waxhaw, NC" },
+          },
+        ],
+      },
+      seoTitle: "Glass Shower Door Installation in Waxhaw, NC",
+      seoDescription:
+        "Custom glass shower door installation in Waxhaw, NC. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.",
+    });
+    const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
+    const snapshot = await getPublicHtmlSnapshot("/service-areas/waxhaw");
+    expect(snapshot?.title).toBe("Glass Shower Door Installation in Waxhaw, NC");
+    expect(snapshot?.bodyHtml).toContain("<h1>Glass Shower Door Installer in Waxhaw, NC</h1>");
+    expect(snapshot?.description).toContain("Call (704) 771-6111");
+  });
+
   it("corrects the hub title without rewriting its description", async () => {
     mockGetSeo.mockResolvedValue(seoSettings);
     mockGetPageBySlug.mockResolvedValue({

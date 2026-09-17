@@ -6,6 +6,7 @@ import {
 } from "@shared/glass-service-areas";
 import { normalizeSeoDescription } from "@shared/seo-description";
 import { correctGlassSearchTitle } from "@shared/glass-search-snippets";
+import { getGlassLocationSearchCopy } from "@shared/glass-location-search";
 import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
 import {
   buildGlassBreadcrumbItems,
@@ -712,9 +713,21 @@ function getFallbackLinkSections(pathname: string) {
   return [];
 }
 
-function getPrerenderHeading(page: Pick<CmsPage, "slug" | "title">) {
+function getPrerenderHeading(page: Pick<CmsPage, "slug" | "title" | "content">) {
   if (page.slug === "home") {
     return "Glass and Door Pro: Charlotte Glass, Door & Window Services";
+  }
+
+  if (getGlassLocationSearchCopy(page.slug)) {
+    const content = page.content;
+    const blocks =
+      content && typeof content === "object" && !Array.isArray(content)
+        ? (content as Record<string, unknown>).blocks
+        : null;
+    if (Array.isArray(blocks)) {
+      const hero = blocks.find((block) => block?.type === "hero");
+      if (typeof hero?.props?.heading === "string") return hero.props.heading;
+    }
   }
 
   return page.title;
@@ -766,9 +779,11 @@ function buildCmsSnapshot(
   const cityArea = getGlassCityPageArea(normalizedVisiblePage.slug);
 
   return {
-    title: buildHeadTitle(title, seo, {
-      brandLast: isGlassServicePageSlug(normalizedVisiblePage.slug),
-    }),
+    title: getGlassLocationSearchCopy(normalizedVisiblePage.slug)
+      ? title
+      : buildHeadTitle(title, seo, {
+          brandLast: isGlassServicePageSlug(normalizedVisiblePage.slug),
+        }),
     description,
     canonicalUrl,
     ogTitle: socialOverride?.ogTitle || null,

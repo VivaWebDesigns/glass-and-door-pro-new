@@ -1,5 +1,6 @@
 import type { CmsPage } from "./schema";
 import { normalizeSeoDescription } from "./seo-description";
+import { getGlassLocationSearchCopy } from "./glass-location-search";
 
 export type JsonLdObject = Record<string, unknown>;
 
@@ -101,60 +102,6 @@ const serviceSocialMetadata: Record<
     ogTitle: "Apartment & Multi-Family Window Replacement Charlotte, NC | Glass and Door Pro",
     ogDescription:
       "Window replacement for apartment complexes and multi-family properties in Charlotte. Fast mobilization, project manager-friendly, owner-operated. When your timeline can't wait, call Glass and Door Pro.",
-    twitterCard: "summary_large_image",
-  },
-  "service-areas-indian-trail": {
-    ogTitle: "Glass & Door Services in Indian Trail, NC | Glass and Door Pro",
-    ogDescription:
-      "Local glass and door services in Indian Trail. Frameless shower doors, replacement windows, door installation, and more — measured and installed personally by Doug Adams.",
-    twitterCard: "summary_large_image",
-  },
-  "service-areas-stallings": {
-    ogTitle: "Glass & Door Services in Stallings, NC | Glass and Door Pro",
-    ogDescription:
-      "Local glass and door services in Stallings, NC. Frameless shower doors, replacement windows, and door installation measured and installed personally by Doug Adams.",
-    twitterCard: "summary_large_image",
-  },
-  "service-areas-wesley-chapel": {
-    ogTitle: "Glass & Door Services in Wesley Chapel, NC | Glass and Door Pro",
-    ogDescription:
-      "Glass and door services in Wesley Chapel, NC. Frameless showers, replacement windows, door installation — measured and installed personally by Doug Adams of Glass and Door Pro.",
-    twitterCard: "summary_large_image",
-  },
-  "service-areas-waxhaw": {
-    ogTitle: "Glass & Door Services in Waxhaw, NC | Glass and Door Pro",
-    ogDescription:
-      "Glass and door services for Waxhaw homeowners. Custom frameless showers, replacement windows, and door installation — personally measured and installed by Doug Adams.",
-    twitterCard: "summary_large_image",
-  },
-  "service-areas-matthews": {
-    ogTitle: "Glass & Door Services in Matthews, NC | Glass and Door Pro",
-    ogDescription:
-      "Glass and door services for Matthews homeowners. Frameless showers, replacement windows, door installation, and window repair — owner-operated and personally installed by Doug Adams.",
-    twitterCard: "summary_large_image",
-  },
-  "service-areas-weddington": {
-    ogTitle: "Glass & Door Services in Weddington, NC | Glass and Door Pro",
-    ogDescription:
-      "Custom glass and door work for Weddington homeowners. Frameless shower enclosures, replacement windows, and door installation — personally handled by Doug Adams of Glass and Door Pro.",
-    twitterCard: "summary_large_image",
-  },
-  "service-areas-indian-land": {
-    ogTitle: "Glass & Door Services in Indian Land, SC | Glass and Door Pro",
-    ogDescription:
-      "Glass and door services for Indian Land, SC homeowners. Frameless shower enclosures, replacement windows, and door installation — measured and installed personally by Doug Adams.",
-    twitterCard: "summary_large_image",
-  },
-  "service-areas-fort-mill": {
-    ogTitle: "Glass & Door Services in Fort Mill, SC | Glass and Door Pro",
-    ogDescription:
-      "Glass and door services for Fort Mill, SC homeowners. Frameless showers, replacement windows, and door installation — measured and installed personally by Doug Adams of Glass and Door Pro.",
-    twitterCard: "summary_large_image",
-  },
-  "service-areas-pineville": {
-    ogTitle: "Glass & Door Services in Pineville, NC | Glass and Door Pro",
-    ogDescription:
-      "Glass and door services for Pineville, NC homeowners. Frameless showers, replacement windows, door installation, and window repair — personally installed by Doug Adams.",
     twitterCard: "summary_large_image",
   },
 };
@@ -373,86 +320,50 @@ const servicePageNames: Record<
   },
 };
 
-const cityPageData: Record<
-  string,
-  { city: string; state: string; name: string; description: string }
-> = {
+const cityPageData: Record<string, { city: string; state: string }> = {
   "areas-served-monroe-nc": {
     city: "Monroe",
     state: "North Carolina",
-    name: "Glass and Door Services in Monroe, NC",
-    description:
-      "Frameless shower door installation, window installation, door installation, window repair, and commercial glass services for homes and businesses in Monroe, North Carolina.",
   },
   "areas-served-charlotte-nc": {
     city: "Charlotte",
     state: "North Carolina",
-    name: "Glass and Door Services in Charlotte, NC",
-    description:
-      "Frameless shower door installation, window installation, door installation, window repair, and commercial glass services for homes and businesses in Charlotte, North Carolina.",
   },
   "service-areas-indian-trail": {
     city: "Indian Trail",
     state: "North Carolina",
-    name: "Glass and Door Services in Indian Trail, NC",
-    description:
-      "Frameless showers, window installation, window repair, door installation, and commercial glass services in Indian Trail, North Carolina.",
   },
   "service-areas-stallings": {
     city: "Stallings",
     state: "North Carolina",
-    name: "Glass and Door Services in Stallings, NC",
-    description:
-      "Frameless showers, window installation, window repair, and door installation in Stallings, North Carolina.",
   },
   "service-areas-wesley-chapel": {
     city: "Wesley Chapel",
     state: "North Carolina",
-    name: "Glass and Door Services in Wesley Chapel, NC",
-    description:
-      "Frameless shower doors, window installation, window repair, and door installation in Wesley Chapel, North Carolina.",
   },
   "service-areas-waxhaw": {
     city: "Waxhaw",
     state: "North Carolina",
-    name: "Glass and Door Services in Waxhaw, NC",
-    description:
-      "Frameless shower doors, window installation, window repair, and door installation in Waxhaw, North Carolina.",
   },
   "service-areas-matthews": {
     city: "Matthews",
     state: "North Carolina",
-    name: "Glass and Door Services in Matthews, NC",
-    description:
-      "Frameless shower doors, window installation, window repair, and door installation in Matthews, North Carolina.",
   },
   "service-areas-weddington": {
     city: "Weddington",
     state: "North Carolina",
-    name: "Glass and Door Services in Weddington, NC",
-    description:
-      "Custom frameless shower doors, window installation, door installation, and window repair in Weddington, North Carolina.",
   },
   "service-areas-indian-land": {
     city: "Indian Land",
     state: "South Carolina",
-    name: "Glass and Door Services in Indian Land, SC",
-    description:
-      "Frameless shower doors, window installation, window repair, and door installation in Indian Land, South Carolina.",
   },
   "service-areas-fort-mill": {
     city: "Fort Mill",
     state: "South Carolina",
-    name: "Glass and Door Services in Fort Mill, SC",
-    description:
-      "Frameless shower doors, window installation, window repair, and door installation in Fort Mill, South Carolina.",
   },
   "service-areas-pineville": {
     city: "Pineville",
     state: "North Carolina",
-    name: "Glass and Door Services in Pineville, NC",
-    description:
-      "Frameless shower doors, window installation, window repair, and door installation in Pineville, North Carolina.",
   },
 };
 
@@ -557,11 +468,12 @@ export function buildGlassServiceLdForCmsPage(
   const seoDescription = normalizeSeoDescription(page.seoDescription);
   const cityData = cityPageData[page.slug];
   if (cityData) {
+    const locationCopy = getGlassLocationSearchCopy(page.slug);
     return {
       "@context": "https://schema.org",
       "@type": "Service",
-      name: cityData.name,
-      description: cityData.description,
+      name: locationCopy?.title,
+      description: locationCopy?.description,
       provider: { "@id": GLASS_BUSINESS_ID },
       areaServed: {
         "@type": "City",
