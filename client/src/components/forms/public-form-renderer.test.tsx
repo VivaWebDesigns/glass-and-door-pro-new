@@ -64,3 +64,62 @@ it("labels public inputs and keeps radio choices isolated between form instances
     container.remove();
   }
 });
+
+it("keeps answers during background schema refresh and resets when switching forms", async () => {
+  globalThis.React = React;
+  (
+    globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true;
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const form = {
+    id: "original",
+    name: "Service",
+    settings: {},
+    fields: [
+      {
+        id: "service",
+        key: "service",
+        label: "Service",
+        type: "radio",
+        options: [
+          { value: "glass", label: "Glass" },
+          { value: "door", label: "Door" },
+        ],
+      },
+    ],
+  };
+  client.setQueryData(["/api/forms", "original"], form);
+  client.setQueryData(["/api/forms", "other"], { ...form, id: "other" });
+  const container = document.createElement("div");
+  const root = createRoot(container);
+  const render = (slug: string) => (
+    <QueryClientProvider client={client}>
+      <PublicFormRenderer slug={slug} />
+    </QueryClientProvider>
+  );
+  try {
+    act(() => root.render(render("original")));
+    const selected = container.querySelectorAll<HTMLInputElement>('input[type="radio"]')[1];
+    act(() => selected.click());
+    expect(selected.checked).toBe(true);
+    await act(async () => {
+      client.setQueryData(["/api/forms", "original"], {
+        ...form,
+        fields: [{ ...form.fields[0], label: "Updated service" }],
+      });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    expect(container.querySelectorAll<HTMLInputElement>('input[type="radio"]')[1].checked).toBe(
+      true,
+    );
+    expect(container.textContent).not.toContain("Updated service");
+    act(() => root.render(render("other")));
+    expect(container.querySelectorAll("input:checked")).toHaveLength(0);
+    act(() => root.render(render("original")));
+    expect(container.textContent).toContain("Updated service");
+    expect(container.querySelectorAll("input:checked")).toHaveLength(0);
+  } finally {
+    act(() => root.unmount());
+    client.clear();
+  }
+});

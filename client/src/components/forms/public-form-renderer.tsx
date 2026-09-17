@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { CmsForm, CmsFormField, CmsFormListColumn } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
@@ -495,21 +495,8 @@ function renderFieldInput(
   );
 }
 
-export function PublicFormRenderer({
-  slug,
-  className,
-  showHeader = true,
-  descriptionOverride,
-  buttonTextOverride,
-  submitButtonClassName,
-  compact = false,
-  onSubmitSuccess,
-}: PublicFormRendererProps) {
-  const { toast } = useToast();
-  const formId = useId();
-  const [values, setValues] = useState<FormValues>({});
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
-
+export function PublicFormRenderer(props: PublicFormRendererProps) {
+  const { slug, className } = props;
   const { data: form, isLoading } = useQuery<CmsForm>({
     queryKey: ["/api/forms", slug],
     queryFn: async () => {
@@ -522,15 +509,48 @@ export function PublicFormRenderer({
     staleTime: 60_000,
   });
 
+  if (isLoading) {
+    return (
+      <div className={cn("flex items-center justify-center py-10", className)}>
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!form) {
+    return (
+      <div className={cn("rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground", className)}>
+        This form is unavailable right now.
+      </div>
+    );
+  }
+
+  return <LoadedPublicForm key={`${slug}:${form.id}`} initialForm={form} {...props} />;
+}
+
+function LoadedPublicForm({
+  initialForm,
+  slug,
+  className,
+  showHeader = true,
+  descriptionOverride,
+  buttonTextOverride,
+  submitButtonClassName,
+  compact = false,
+  onSubmitSuccess,
+}: PublicFormRendererProps & { initialForm: CmsForm }) {
+  const { toast } = useToast();
+  const formId = useId();
+  // Keep one schema snapshot for the lifetime of this form session. A background
+  // refresh must not replace fields or discard answers while someone is typing.
+  const [form] = useState(initialForm);
+  const [values, setValues] = useState<FormValues>(() => buildInitialValues(form.fields ?? []));
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+
   const fields = useMemo(() => (Array.isArray(form?.fields) ? form.fields : []), [form?.fields]);
   const pages = useMemo(() => splitPages(fields), [fields]);
   const activePage = pages[currentPageIndex] ?? pages[0] ?? { meta: null, fields: fields };
   const visibleFields = currentPageFields(activePage);
-
-  useEffect(() => {
-    setValues(buildInitialValues(fields));
-    setCurrentPageIndex(0);
-  }, [fields, slug]);
 
   const description =
     descriptionOverride ??
@@ -589,22 +609,6 @@ export function PublicFormRenderer({
       });
     },
   });
-
-  if (isLoading) {
-    return (
-      <div className={cn("flex items-center justify-center py-10", className)}>
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
-  if (!form) {
-    return (
-      <div className={cn("rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground", className)}>
-        This form is unavailable right now.
-      </div>
-    );
-  }
 
   const isLastPage = currentPageIndex >= pages.length - 1;
   const pageTitle = text(activePage.meta?.config?.pageTitle);

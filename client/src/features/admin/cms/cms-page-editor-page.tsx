@@ -129,15 +129,15 @@ export default function CmsPageEditorPage() {
   const [templatePickerOpen, setTemplatePickerOpen] = useState(isNew);
   const [wizardOpen, setWizardOpen] = useState(false);
 
-  const { data: page, isLoading: pageLoading } = useQuery<CmsPage>({
+  const { data: page, isLoading: pageLoading, error: pageError, refetch: refetchPage } = useQuery<CmsPage>({
     queryKey: ["/api/admin/cms/pages", id],
-    queryFn: () => fetch(`/api/admin/cms/pages/${id}`, { credentials: "include" }).then((r) => r.json()),
+    queryFn: () => apiRequest("GET", `/api/admin/cms/pages/${id}`).then((r) => r.json()),
     enabled: !isNew,
   });
 
   const { data: revisions = [] } = useQuery<CmsPageRevision[]>({
     queryKey: ["/api/admin/cms/pages", id, "revisions"],
-    queryFn: () => fetch(`/api/admin/cms/pages/${id}/revisions`, { credentials: "include" }).then((r) => r.json()),
+    queryFn: () => apiRequest("GET", `/api/admin/cms/pages/${id}/revisions`).then((r) => r.json()),
     enabled: !isNew,
   });
 
@@ -476,6 +476,19 @@ export default function CmsPageEditorPage() {
     const info = qualityIssues.filter((issue) => issue.severity === "info").length;
     return { errors, warnings, info };
   }, [qualityIssues]);
+
+  if (!isNew && pageError) {
+    return (
+      <AdminSidebar>
+        <div role="alert" className="p-6 max-w-6xl mx-auto space-y-4">
+          <h1 className="text-xl font-semibold">Unable to load this page</h1>
+          <p>{pageError.message}</p>
+          <Button onClick={() => refetchPage()}>Try again</Button>
+          <Button variant="outline" onClick={() => navigate("/admin/cms/pages")}>Back to pages</Button>
+        </div>
+      </AdminSidebar>
+    );
+  }
 
   if (!isNew && pageLoading) {
     return (

@@ -20,6 +20,41 @@ supply-chain checks remain disabled. To opt into dependency checks, append
 `--supply-chain`. To run locally without a score, append `--no-telemetry`.
 No CI workflow or Git hook was installed. Existing rules have not been suppressed.
 
+## Form and menu correctness follow-up
+
+The next complete uncached scan (CLI 0.9.14, full scope, default categories,
+remote scoring enabled, supply-chain disabled) covered 352 files with no skipped
+checks: **37/100 (Critical), 2 errors and 241 warnings**. Compared with the prior
+pass, one test-only error and four warnings were removed, with no new file/rule
+findings. The rounded score did not change.
+
+Confirmed fixes:
+
+- Menu indentation now replaces the preceding item immutably at both root and
+  nested levels. It previously wrote through a shallow array copy into the old
+  state, which could duplicate children when React replayed the updater. A shared
+  helper is tested against deeply frozen state and repeated invocations. New
+  menu IDs are generated in the event handler rather than a replayable updater.
+- Public forms keep one schema snapshot for the current form session. A background
+  refetch no longer resets answers or the current step. Switching form slug/ID
+  mounts a fresh session; a new visit uses the latest fetched schema. This
+  intentionally defers mid-session schema changes until a fresh session. Server
+  validation remains authoritative when a form changes while someone fills it in.
+- CMS page and revision requests now use the existing HTTP-status-checking request
+  helper. A page-load failure displays an alert and retry/back actions instead of
+  interpreting an error payload as editable page data. Integration tests exercise
+  403 and 404 responses and retry with the actual query/request path.
+- The unsaved-changes test harness exposes its hook API via `useImperativeHandle`
+  after commit instead of calling a prop callback during render. Its existing
+  behavioral tests remain intact. This resolves the remaining test-only error;
+  the artifact placeholder and development encryption fallback findings remain.
+
+Validation: `npm run check`, `npm run lint` (existing warnings), `npm test`
+(**192 tests in 55 files**), and `npm run build` passed. `npm run format` still
+reports the same 213 preexisting files. No rules were disabled. This pass used DOM
+and mocked HTTP regression tests; authenticated browser flows, real database
+requests, and Railway deployment were not verified.
+
 ## Accessibility and React correctness follow-up
 
 The scored baseline was **35/100 (Critical)** with 3 errors and 330 warnings.

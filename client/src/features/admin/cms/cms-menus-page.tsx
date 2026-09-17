@@ -52,6 +52,8 @@ import {
 import { useEditorLock } from "@/hooks/use-editor-lock";
 import { useLockConflictGuard } from "@/hooks/use-lock-conflict-guard";
 
+import { indentMenuItem } from "./menu-items";
+
 function generateId() {
   return Math.random().toString(36).substring(2, 10);
 }
@@ -246,13 +248,7 @@ function MenuItemEditor({
               onMoveUp={moveChildUp}
               onMoveDown={moveChildDown}
               onIndent={(childId) => {
-                if (cIdx === 0) return;
-                const arr = [...item.children];
-                const prevSibling = arr[cIdx - 1];
-                const child = arr[cIdx];
-                arr.splice(cIdx, 1);
-                prevSibling.children = [...prevSibling.children, child];
-                onUpdate(item.id, { children: arr });
+                onUpdate(item.id, { children: indentMenuItem(item.children, childId) });
               }}
               onOutdent={onOutdent}
             />
@@ -341,16 +337,7 @@ function MenuEditor({
   }, []);
 
   const indentItem = useCallback((id: string) => {
-    setItems((prev) => {
-      const idx = prev.findIndex((i) => i.id === id);
-      if (idx <= 0) return prev;
-      const arr = [...prev];
-      const item = arr[idx];
-      const prevSibling = arr[idx - 1];
-      arr.splice(idx, 1);
-      prevSibling.children = [...prevSibling.children, item];
-      return arr;
-    });
+    setItems((prev) => indentMenuItem(prev, id));
   }, []);
 
   const outdentItem = useCallback((id: string) => {
@@ -398,10 +385,11 @@ function MenuEditor({
   }
 
   const addItem = useCallback(() => {
+    const id = generateId();
     setItems((prev) => [
       ...prev,
       {
-        id: generateId(),
+        id,
         label: "",
         url: "/",
         openInNewTab: false,

@@ -9,12 +9,12 @@ type HarnessProps = {
   isDirty: boolean;
   enabled?: boolean;
   message?: string;
-  onReady: (api: ReturnType<typeof useUnsavedChangesGuard>) => void;
+  apiRef: React.Ref<ReturnType<typeof useUnsavedChangesGuard>>;
 };
 
-function UnsavedChangesHarness({ onReady, ...props }: HarnessProps) {
+function UnsavedChangesHarness({ apiRef, ...props }: HarnessProps) {
   const api = useUnsavedChangesGuard(props);
-  onReady(api);
+  React.useImperativeHandle(apiRef, () => api, [api]);
   return React.createElement("div", null, "guard");
 }
 
@@ -39,29 +39,27 @@ describe("useUnsavedChangesGuard", () => {
     document.body.innerHTML = "";
   });
 
-  async function renderHarness(props: Omit<HarnessProps, "onReady">) {
+  async function renderHarness(props: Omit<HarnessProps, "apiRef">) {
     if (!root) {
       root = createRoot(container);
     }
 
-    let latestApi: ReturnType<typeof useUnsavedChangesGuard> | null = null;
+    const apiRef = React.createRef<ReturnType<typeof useUnsavedChangesGuard>>();
 
     await act(async () => {
       root!.render(
         React.createElement(UnsavedChangesHarness, {
           ...props,
-          onReady: (api) => {
-            latestApi = api;
-          },
+          apiRef,
         })
       );
     });
 
-    if (!latestApi) {
+    if (!apiRef.current) {
       throw new Error("Guard API not ready");
     }
 
-    return latestApi;
+    return apiRef.current;
   }
 
   it("confirms before discarding when the editor is dirty", async () => {
