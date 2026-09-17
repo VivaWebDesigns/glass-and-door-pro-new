@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { AdminSidebar } from "./admin-sidebar";
@@ -253,7 +253,9 @@ export default function DocsPage() {
     isDirty,
     message: "You have unsaved changes to this document. Close without saving?",
   });
-  saveFeedbackRef.current = saveState;
+  useLayoutEffect(() => {
+    saveFeedbackRef.current = saveState;
+  }, [saveState]);
 
   const handleSheetOpenChange = (open: boolean) => {
     if (open) {

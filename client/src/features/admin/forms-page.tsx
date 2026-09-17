@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ElementType } from "react";
+import { useLayoutEffect, useEffect, useMemo, useRef, useState, type ElementType } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   type CmsForm,
@@ -685,7 +685,9 @@ function FormsPageContent() {
     isDirty: activeTab === "builder" && isDirty,
     message: "You have unsaved changes to this form. Leave without saving?",
   });
-  saveFeedbackRef.current = saveState;
+  useLayoutEffect(() => {
+    saveFeedbackRef.current = saveState;
+  }, [saveState]);
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -817,14 +819,15 @@ function FormsPageContent() {
   };
 
   const addField = (type: CmsFormFieldType, index?: number) => {
+    if (!draft) return;
+    const field = createField(type);
     updateDraft((current) => {
-      const field = createField(type);
       const insertAt = typeof index === "number" ? index : current.fields.length;
       const nextFields = [...current.fields];
       nextFields.splice(insertAt, 0, field);
-      setSelectedFieldId(field.id);
       return { ...current, fields: nextFields };
     });
+    setSelectedFieldId(field.id);
   };
 
   const removeField = (fieldId: string) => {

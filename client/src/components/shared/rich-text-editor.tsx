@@ -1,6 +1,6 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import Placeholder from "@tiptap/extension-placeholder";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useLayoutEffect, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -127,11 +127,11 @@ export function RichTextEditor({ onSend, disabled, placeholder, sendRef }: RichT
     setAttachment(null);
   }, [editor, attachment, onSend, disabled, uploading]);
 
-  sendFnRef.current = handleSend;
+  useLayoutEffect(() => {
+    sendFnRef.current = handleSend;
+  }, [handleSend]);
 
-  if (sendRef) {
-    sendRef.current = { triggerSend: handleSend };
-  }
+  useImperativeHandle(sendRef, () => ({ triggerSend: handleSend }), [handleSend]);
 
   const handleFileUpload = async (file: File) => {
     const ext = "." + file.name.split(".").pop()?.toLowerCase();

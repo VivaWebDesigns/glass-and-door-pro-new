@@ -18,7 +18,8 @@
     "test": "vitest run",
     "test:browser": "playwright test",
     "test:browser:headed": "playwright test --headed",
-    "test:browser:ui": "playwright test --ui"
+    "test:browser:ui": "playwright test --ui",
+    "doctor": "react-doctor --yes --no-telemetry --no-supply-chain"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1004.0",
@@ -150,6 +151,7 @@
     "jsdom": "^29.0.2",
     "postcss": "^8.4.47",
     "prettier": "^3.8.1",
+    "react-doctor": "0.9.14",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.20.5",
     "typescript": "5.6.3",
