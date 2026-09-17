@@ -50,6 +50,12 @@ export default defineConfig({
           if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) return "react-runtime";
           if (id.includes("/@radix-ui/") || id.includes("/@floating-ui/")) return "ui-primitives";
 
+          // Keep editor-only tools out of the vendor chunk used by public pages.
+          if (/node_modules\/(react-image-crop|browser-image-compression)\//.test(id)) {
+            return "image-editor";
+          }
+          if (id.includes("/react-resizable-panels/")) return "editor-panels";
+
           if (id.includes("/@tiptap/")) {
             return "tiptap";
           }

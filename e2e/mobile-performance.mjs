@@ -7,11 +7,20 @@ const baseURL = process.env.PERF_BASE_URL || "http://127.0.0.1:4176";
 if (!["127.0.0.1", "localhost"].includes(new globalThis.URL(baseURL).hostname)) {
   throw new Error("This measurement harness requires a local production preview.");
 }
+const pageName = process.env.PERF_PAGE || "door-installation";
+if (!["home", "door-installation"].includes(pageName)) {
+  throw new Error("PERF_PAGE must be home or door-installation.");
+}
+const isHome = pageName === "home";
+const routePath = isHome ? "/" : "/services/door-installation";
+const heading = isHome
+  ? "Glass and Door Pro: Charlotte Glass, Door & Window Services"
+  : "Door Installation";
 const output = process.env.PERF_OUTPUT || "/tmp/glass-mobile-performance.json";
 const pageFixture = {
   id: "local-performance-page",
-  slug: "services-door-installation",
-  title: "Door Installation",
+  slug: isHome ? "home" : "services-door-installation",
+  title: heading,
   status: "published",
   content: {
     version: 1,
@@ -20,9 +29,11 @@ const pageFixture = {
         id: "hero",
         type: "hero",
         props: {
-          heading: "Door Installation",
+          heading,
           subheading: "<p>Residential and commercial door service in the Charlotte area.</p>",
-          backgroundImageUrl: "/images/glass-door-pro/storefront-door-installation-hero.webp",
+          backgroundImageUrl: isHome
+            ? "/images/glass-door-pro/gallery-shower1-1280w.webp"
+            : "/images/glass-door-pro/storefront-door-installation-hero.webp",
           minHeight: "520",
           ctaText: "Request a quote",
           ctaLink: "/#contact",
@@ -92,8 +103,8 @@ try {
       uploadThroughput: 93750,
       connectionType: "cellular4g",
     });
-    await page.goto(`${baseURL}/services/door-installation`);
-    await page.getByRole("heading", { level: 1, name: "Door Installation" }).waitFor();
+    await page.goto(`${baseURL}${routePath}`);
+    await page.getByRole("heading", { level: 1, name: heading }).waitFor();
     await page.waitForLoadState("networkidle");
     await page.evaluate(() => globalThis.document.fonts.ready);
     const sample = await page.evaluate(() => ({
@@ -105,6 +116,7 @@ try {
         .map((item) => ({
           url: new globalThis.URL(item.name).pathname,
           bytes: item.encodedBodySize,
+          decodedBytes: item.decodedBodySize,
           duration: item.duration,
         })),
       overflow: globalThis.document.documentElement.scrollWidth > globalThis.innerWidth,
@@ -122,6 +134,7 @@ try {
 const median = (values) => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)];
 const report = {
   conditions: {
+    route: routePath,
     viewport: "Pixel 7 emulation",
     cpuSlowdown: 4,
     latencyMs: 150,
@@ -132,6 +145,20 @@ const report = {
     runs: 3,
   },
   summary: {
+    medianEncodedJsBytes: median(
+      runs.map((run) =>
+        run.resources
+          .filter((item) => item.url.endsWith(".js"))
+          .reduce((sum, item) => sum + item.bytes, 0),
+      ),
+    ),
+    medianDecodedJsBytes: median(
+      runs.map((run) =>
+        run.resources
+          .filter((item) => item.url.endsWith(".js"))
+          .reduce((sum, item) => sum + item.decodedBytes, 0),
+      ),
+    ),
     medianLcpMs: median(runs.map((run) => run.lcp)),
     medianFcpMs: median(runs.map((run) => run.fcp)),
     medianBlockingMs: median(

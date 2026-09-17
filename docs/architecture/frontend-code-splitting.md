@@ -7,15 +7,17 @@
 All page components in `client/src/App.tsx` use `React.lazy()` for dynamic imports:
 
 ```typescript
-const DirectoryPage = lazy(() => import("@/features/directory/directory-page"));
-const TherapistProfilePage = lazy(() => import("@/features/directory/therapist-profile-page"));
+const ServicesPage = lazy(() => import("@/features/public/services-page"));
+const AdminFormsPage = lazy(() => import("@/features/admin/forms-page"));
 ```
 
 A `<Suspense>` wrapper with a `<PageLoader>` spinner displays while chunks load.
 
-### Exceptions
+### Shared dependencies
 
-`CmsHybridPage` is eagerly imported because it's used on the home route and needs to be available immediately for CMS-rendered pages.
+`CmsHybridPage` also uses a lazy import, including on the home route. Route splitting alone does not prevent shared vendor chunks from loading admin-only dependencies. `vite.config.ts` isolates image cropping/compression into `image-editor` and resizable builder panels into `editor-panels`, alongside the existing rich-text editor chunks.
+
+See [the homepage bundle audit](../homepage-bundle-audit.md) for measured before/after payloads and local production-build regression checks.
 
 ### Component Organization
 
