@@ -1,8 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import { Bookmark, ListOrdered, Monitor, Plus, Settings2, Sparkles } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
+import { createFallbackBlockDef } from "./block-editor-fallback";
+import {
+  BLOCK_CATEGORY_LABELS,
+  duplicateBlockInstance,
+  getBlockSummary,
+  groupBlocksByCategory,
+} from "./block-helpers";
 import {
   ALL_BLOCKS,
   createBlock,
@@ -10,19 +17,12 @@ import {
   type BlockInstance,
   type BuilderContent,
 } from "./block-registry";
-import { createFallbackBlockDef } from "./block-editor";
-import { FrontendPreviewDialog, type PreviewDevice } from "./page-builder-preview";
 import type { VisualCanvasProps } from "./page-builder-canvas";
 import { BlockInspectorPanel } from "./page-builder-inspector";
 import { BuilderLeftRail, DesktopBuilderLayout, MobileBuilderLayout } from "./page-builder-layout";
 import { InserterPanel, StructurePanel } from "./page-builder-panels";
-import {
-  BLOCK_CATEGORY_LABELS,
-  duplicateBlockInstance,
-  getBlockSummary,
-  groupBlocksByCategory,
-  SaveSectionDialog,
-} from "./page-builder-support";
+import { FrontendPreviewDialog, type PreviewDevice } from "./page-builder-preview";
+import { SaveSectionDialog } from "./page-builder-support";
 
 interface PageBuilderProps {
   content: BuilderContent;

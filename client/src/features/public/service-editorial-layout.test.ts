@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { BlockInstance } from "@/features/admin/cms/builder/block-registry";
-import { prepareServiceEditorialBlocks } from "./service-editorial-layout";
+import { prepareServiceEditorialBlocks } from "./service-editorial-blocks";
 
 describe("prepareServiceEditorialBlocks", () => {
   it("adds navigation anchors without changing CMS copy", () => {

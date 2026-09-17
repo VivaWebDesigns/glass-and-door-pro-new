@@ -1,6 +1,7 @@
 import { sanitizeHtml } from "@/lib/sanitize-html";
-import type { ElementType, ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import type { ElementType } from "react";
+import { renderPublicDisplayText } from "./display-text";
 
 type HeadingLevel = "h1" | "h2";
 type HeadingAlignment = "left" | "center" | "right";
@@ -16,18 +17,6 @@ interface SectionHeadingProps {
 
 function str(v: unknown): string {
   return typeof v === "string" ? v : "";
-}
-
-export function renderPublicDisplayText(value: string): ReactNode {
-  return value.split(/(\s&\s)/g).map((part, index) =>
-    part === " & " ? (
-      <span key={`${part}-${index}`} className="font-sans">
-        {" & "}
-      </span>
-    ) : (
-      part
-    ),
-  );
 }
 
 function headingLevel(v: unknown): HeadingLevel {

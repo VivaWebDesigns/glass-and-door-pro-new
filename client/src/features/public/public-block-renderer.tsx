@@ -1,11 +1,11 @@
-import { useRowKeys } from "@/hooks/use-row-keys";
-import { sanitizeHtml } from "@/lib/sanitize-html";
-import { useState, useEffect, lazy, Suspense, type MouseEvent, type ReactElement } from "react";
-import { useLocation } from "wouter";
-import { excludeServiceUtilitySnippets } from "@shared/glass-search-snippets";
-import { formatGlassReviewDate } from "@shared/glass-review-dates";
-import { Button } from "@/components/ui/button";
 import { FormModalButton } from "@/components/forms/form-modal-button";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
@@ -14,20 +14,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import {
-  SectionStyleWrapper,
-  getSectionPaddingClasses,
-  getSectionStyleConfig,
-  hasSectionStyleConfig,
-  hexToRgba,
-  normalizeHexColor,
-} from "@/features/admin/cms/builder/section-style";
+import type { BlockInstance, BuilderContent } from "@/features/admin/cms/builder/block-registry";
 import {
   arr,
   colorStyle,
@@ -40,45 +27,56 @@ import {
   SPACING_MAP,
   str,
 } from "@/features/admin/cms/builder/block-renderer.shared";
+import { FULL_WIDTH_BLOCK_TYPES } from "@/features/admin/cms/builder/page-builder-constants";
+import { SectionHeading } from "@/features/admin/cms/builder/section-heading";
+import { SectionStyleWrapper } from "@/features/admin/cms/builder/section-style";
+import { useRowKeys } from "@/hooks/use-row-keys";
+import { sanitizeHtml } from "@/lib/sanitize-html";
+import { formatGlassReviewDate } from "@shared/glass-review-dates";
+import { excludeServiceUtilitySnippets } from "@shared/glass-search-snippets";
 import {
-  renderPublicDisplayText,
-  SectionHeading,
-} from "@/features/admin/cms/builder/section-heading";
-import {
-  Globe,
-  Heart,
-  Users,
-  MapPin,
-  Mail,
-  Phone,
-  Star,
-  CheckCircle,
-  Quote,
-  UserCheck,
-  CalendarDays,
+  ArrowRight,
+  BadgeCheck,
   BookOpen,
-  Image,
-  Play,
-  Minus,
+  Building2,
+  CalendarDays,
+  CheckCircle,
   ChevronLeft,
   ChevronRight,
-  ExternalLink,
-  XCircle,
-  BadgeCheck,
-  ArrowRight,
-  Search,
-  User,
-  ShieldCheck,
-  Lock,
-  Building2,
-  Loader2,
-  Droplets,
-  Grid3X3,
   DoorOpen,
+  Droplets,
+  ExternalLink,
+  Globe,
+  Grid3X3,
+  Heart,
+  Image,
+  Loader2,
+  Lock,
+  Mail,
+  MapPin,
+  Minus,
+  Phone,
+  Play,
+  Quote,
+  Search,
+  ShieldCheck,
+  Star,
+  User,
+  UserCheck,
+  Users,
   Wrench,
+  XCircle,
 } from "lucide-react";
-import type { BlockInstance, BuilderContent } from "@/features/admin/cms/builder/block-registry";
-import { FULL_WIDTH_BLOCK_TYPES } from "@/features/admin/cms/builder/page-builder-constants";
+import { lazy, Suspense, useEffect, useState, type MouseEvent, type ReactElement } from "react";
+import { useLocation } from "wouter";
+import { renderPublicDisplayText } from "../admin/cms/builder/display-text";
+import {
+  getSectionPaddingClasses,
+  getSectionStyleConfig,
+  hasSectionStyleConfig,
+  hexToRgba,
+  normalizeHexColor,
+} from "../admin/cms/builder/section-style-values";
 
 export type { BlockInstance, BuilderContent };
 

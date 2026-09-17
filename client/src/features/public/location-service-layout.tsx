@@ -1,38 +1,11 @@
-import { ChevronDown } from "lucide-react";
-import { PublicPageRenderer } from "@/features/public/public-block-renderer";
-import { resolveCmsAssetUrl } from "@/features/admin/cms/builder/block-renderer.shared";
 import type { BlockInstance } from "@/features/admin/cms/builder/block-registry";
+import { resolveCmsAssetUrl } from "@/features/admin/cms/builder/block-renderer.shared";
+import { PublicPageRenderer } from "@/features/public/public-block-renderer";
+import { ChevronDown } from "lucide-react";
+import { prepareLocationServiceBlocks } from "./location-service-blocks";
 
 function text(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
-}
-
-function sectionId(title: string, index: number) {
-  const normalized = title
-    .toLowerCase()
-    .replace(/&/g, "and")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-
-  return normalized || `section-${index + 1}`;
-}
-
-export function prepareLocationServiceBlocks(blocks: BlockInstance[]) {
-  return blocks.map((block, index) => {
-    const title = text(block.props.title);
-    const existingAnchor = text(block.props.anchorId);
-    const anchorId = existingAnchor || (title ? sectionId(title, index) : "");
-
-    return anchorId
-      ? {
-          ...block,
-          props: {
-            ...block.props,
-            anchorId,
-          },
-        }
-      : block;
-  });
 }
 
 function PageSectionLinks({ blocks }: { blocks: BlockInstance[] }) {

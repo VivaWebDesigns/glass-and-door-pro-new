@@ -708,8 +708,8 @@ function FormsPageContent() {
     clearFeedback: () => {},
   });
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
-  const [draggingFieldType, setDraggingFieldType] = useState<CmsFormFieldType | null>(null);
-  const [draggingFieldId, setDraggingFieldId] = useState<string | null>(null);
+  const draggingFieldType = useRef<CmsFormFieldType | null>(null);
+  const draggingFieldId = useRef<string | null>(null);
   const [dropIndex, setDropIndex] = useState<number | null>(null);
   const [formSettingsOpen, setFormSettingsOpen] = useState(true);
   const [openGroups, setOpenGroups] = useState<Record<"standard" | "advanced", boolean>>({
@@ -1082,21 +1082,23 @@ function FormsPageContent() {
   };
 
   const onDropFieldAtIndex = (index: number) => {
-    if (draggingFieldType) {
-      addField(draggingFieldType, index);
-    } else if (draggingFieldId && draft) {
-      const currentIndex = draft.fields.findIndex((field) => field.id === draggingFieldId);
+    const fieldType = draggingFieldType.current;
+    const fieldId = draggingFieldId.current;
+    if (fieldType) {
+      addField(fieldType, index);
+    } else if (fieldId && draft) {
+      const currentIndex = draft.fields.findIndex((field) => field.id === fieldId);
       if (currentIndex !== -1) {
         updateDraft((current) => ({
           ...current,
           fields: moveItem(current.fields, currentIndex, index),
         }));
-        setSelectedFieldId(draggingFieldId);
+        setSelectedFieldId(fieldId);
       }
     }
 
-    setDraggingFieldType(null);
-    setDraggingFieldId(null);
+    draggingFieldType.current = null;
+    draggingFieldId.current = null;
     setDropIndex(null);
   };
 
@@ -1589,10 +1591,10 @@ function FormsPageContent() {
                                     onDragStart={(event) => {
                                       event.dataTransfer.effectAllowed = "move";
                                       event.dataTransfer.setData("text/plain", field.id);
-                                      setDraggingFieldId(field.id);
+                                      draggingFieldId.current = field.id;
                                     }}
                                     onDragEnd={() => {
-                                      setDraggingFieldId(null);
+                                      draggingFieldId.current = null;
                                       setDropIndex(null);
                                     }}
                                     onDragOver={(event) => {
@@ -2317,9 +2319,11 @@ function FormsPageContent() {
                                   key={item.type}
                                   item={item}
                                   onAdd={addField}
-                                  onDragStart={setDraggingFieldType}
+                                  onDragStart={(type) => {
+                                    draggingFieldType.current = type;
+                                  }}
                                   onDragEnd={() => {
-                                    setDraggingFieldType(null);
+                                    draggingFieldType.current = null;
                                     setDropIndex(null);
                                   }}
                                 />

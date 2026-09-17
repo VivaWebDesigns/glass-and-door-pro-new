@@ -1,14 +1,15 @@
-import { Suspense, lazy, useEffect, useRef } from "react";
-import { Switch, Route, useLocation, Redirect } from "wouter";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider, useQuery } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrandingProvider } from "@/components/shared/branding-provider";
 import { ProtectedRoute } from "@/components/shared/protected-route";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/use-auth";
 import NotFound from "@/pages/not-found";
+import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
+import { Suspense, lazy, useEffect, useRef } from "react";
+import { Redirect, Route, Switch, useLocation } from "wouter";
+import { queryClient } from "./lib/queryClient";
+import { pathRequiresSetupStatus, shouldRedirectToSetup } from "./lib/setup-routing";
 
 const HomePage = lazy(() => import("@/features/public/home-page"));
 const GalleryPage = lazy(() => import("@/features/public/gallery-page"));
@@ -363,14 +364,6 @@ function Router() {
       </Switch>
     </Suspense>
   );
-}
-
-export function pathRequiresSetupStatus(pathname: string) {
-  return pathname === "/setup" || pathname.startsWith("/admin") || pathname.startsWith("/auth");
-}
-
-export function shouldRedirectToSetup(pathname: string, needsSetup: boolean) {
-  return pathRequiresSetupStatus(pathname) && needsSetup && pathname !== "/setup";
 }
 
 function SetupGuard({ children }: { children: React.ReactNode }) {

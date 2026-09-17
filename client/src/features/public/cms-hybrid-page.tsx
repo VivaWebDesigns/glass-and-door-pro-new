@@ -1,16 +1,12 @@
-import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { Navbar } from "@/components/layout/navbar";
+import { JsonLd } from "@/components/shared/json-ld";
+import type { BlockInstance, BuilderContent } from "@/features/admin/cms/builder/block-registry";
+import { LocationServiceLayout } from "@/features/public/location-service-layout";
 import { PublicBlockRenderer, PublicPageRenderer } from "@/features/public/public-block-renderer";
 import { PublicSidebar } from "@/features/public/public-sidebar";
-import { Loader2 } from "lucide-react";
-import type { BlockInstance, BuilderContent } from "@/features/admin/cms/builder/block-registry";
-import type { CmsPage, SeoSettings } from "@shared/schema";
-import { normalizeSeoDescription } from "@shared/seo-description";
-import { correctGlassSearchTitle } from "@shared/glass-search-snippets";
-import { getGlassLocationSearchCopy } from "@shared/glass-location-search";
-import { JsonLd } from "@/components/shared/json-ld";
+import { ServiceEditorialLayout } from "@/features/public/service-editorial-layout";
+import { getPrerenderedCmsPage } from "@/lib/cms-prerender";
 import {
   buildBreadcrumbLd,
   buildFaqPageLd,
@@ -18,21 +14,26 @@ import {
   buildWebSiteLd,
   extractFaqItems,
 } from "@/lib/structured-data";
-import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
+import { getGlassLocationSearchCopy } from "@shared/glass-location-search";
+import { correctGlassSearchTitle } from "@shared/glass-search-snippets";
 import {
   buildGlassBreadcrumbItems,
-  getGlassCityPageArea,
   buildGlassLocalBusinessLd,
   buildGlassServiceLdForCmsPage,
+  getCmsPublicPath,
+  getGlassCityPageArea,
   getGlassServiceSeoOverride,
   getGlassServiceSocialMetadata,
-  getCmsPublicPath,
   isGlassLegalNoindexSlug,
   isGlassServicePageSlug,
 } from "@shared/glass-seo";
-import { getPrerenderedCmsPage } from "@/lib/cms-prerender";
-import { ServiceEditorialLayout } from "@/features/public/service-editorial-layout";
-import { LocationServiceLayout } from "@/features/public/location-service-layout";
+import type { CmsPage, SeoSettings } from "@shared/schema";
+import { normalizeSeoDescription } from "@shared/seo-description";
+import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
+import { isValidCmsPage } from "./cms-page-validation";
 
 interface CmsHybridPageProps {
   slug: string;
@@ -50,17 +51,6 @@ class CmsNotFoundError extends Error {
     super(`CMS page not found: ${slug}`);
     this.name = "CmsNotFoundError";
   }
-}
-
-export function isValidCmsPage(data: unknown): data is CmsPage {
-  if (!data || typeof data !== "object") return false;
-  const obj = data as Record<string, unknown>;
-  return (
-    (typeof obj.id === "string" || typeof obj.id === "number") &&
-    typeof obj.slug === "string" &&
-    typeof obj.title === "string" &&
-    typeof obj.status === "string"
-  );
 }
 
 function parseCmsContent(content: unknown): BlockInstance[] {

@@ -1,40 +1,13 @@
+import { FormModalButton } from "@/components/forms/form-modal-button";
+import type { BlockInstance } from "@/features/admin/cms/builder/block-registry";
+import { PublicPageRenderer } from "@/features/public/public-block-renderer";
+import { excludeServiceUtilitySnippets } from "@shared/glass-search-snippets";
 import { ChevronDown, Phone } from "lucide-react";
 import { useLocation } from "wouter";
-import { excludeServiceUtilitySnippets } from "@shared/glass-search-snippets";
-import { FormModalButton } from "@/components/forms/form-modal-button";
-import { PublicPageRenderer } from "@/features/public/public-block-renderer";
-import type { BlockInstance } from "@/features/admin/cms/builder/block-registry";
+import { prepareServiceEditorialBlocks } from "./service-editorial-blocks";
 
 function text(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
-}
-
-function sectionId(title: string, index: number) {
-  const normalized = title
-    .toLowerCase()
-    .replace(/&/g, "and")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-
-  return normalized || `section-${index + 1}`;
-}
-
-export function prepareServiceEditorialBlocks(blocks: BlockInstance[]) {
-  return blocks.map((block, index) => {
-    const title = text(block.props.title);
-    const existingAnchor = text(block.props.anchorId);
-    const anchorId = existingAnchor || (title ? sectionId(title, index) : "");
-
-    return anchorId
-      ? {
-          ...block,
-          props: {
-            ...block.props,
-            anchorId,
-          },
-        }
-      : block;
-  });
 }
 
 function PageSectionLinks({ blocks }: { blocks: BlockInstance[] }) {

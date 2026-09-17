@@ -1,8 +1,13 @@
-import { useRowKeys } from "@/hooks/use-row-keys";
-import { sanitizeHtml } from "@/lib/sanitize-html";
-import { lazy, Suspense, useState, useEffect, type ReactElement } from "react";
-import { Button } from "@/components/ui/button";
 import { FormModalButton } from "@/components/forms/form-modal-button";
+import { PublicFormRenderer } from "@/components/forms/public-form-renderer";
+import { CompanyInformationCard } from "@/components/shared/company-information-card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Carousel,
@@ -11,85 +16,70 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useRowKeys } from "@/hooks/use-row-keys";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import {
-  Globe,
-  Heart,
-  Users,
-  MapPin,
-  Mail,
-  Phone,
-  Star,
-  CheckCircle,
-  Sparkles,
-  FileText,
-  LayoutTemplate,
-  Megaphone,
-  LayoutGrid,
-  HelpCircle,
-  Quote,
-  UserCheck,
-  CalendarDays,
-  BookOpen,
-  MousePointerClick,
-  Image,
-  Play,
-  Minus,
-  Heading,
-  Map,
-  Lock,
-  UserPlus,
-  Send,
-  Loader2,
-  ArrowRight,
-  Clock,
   AlertCircle,
-  ClipboardCheck,
-  BarChart3,
-  Search,
-  User,
-  ShieldCheck,
-  List,
-  Shield,
-  Newspaper,
-  TrendingUp,
-  Grid3X3,
-  Rss,
-  ListChecks,
-  FlaskConical,
+  ArrowRight,
   BadgeCheck,
-  Workflow,
-  ListOrdered,
+  BarChart3,
+  BookOpen,
+  Building2,
+  CalendarDays,
+  CheckCircle,
   ChevronLeft,
   ChevronRight,
-  GalleryHorizontal,
-  Grid2X2,
-  Building2,
-  ExternalLink,
-  XCircle,
-  Droplets,
+  ClipboardCheck,
+  Clock,
   DoorOpen,
+  Droplets,
+  ExternalLink,
+  FileText,
+  FlaskConical,
+  GalleryHorizontal,
+  Globe,
+  Grid2X2,
+  Grid3X3,
+  Heading,
+  Heart,
+  HelpCircle,
+  Image,
+  LayoutGrid,
+  LayoutTemplate,
+  List,
+  ListChecks,
+  ListOrdered,
+  Loader2,
+  Lock,
+  Mail,
+  Map,
+  MapPin,
+  Megaphone,
+  Minus,
+  MousePointerClick,
+  Newspaper,
+  Phone,
+  Play,
+  Quote,
+  Rss,
+  Search,
+  Send,
+  Shield,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  TrendingUp,
+  User,
+  UserCheck,
+  UserPlus,
+  Users,
+  Workflow,
   Wrench,
+  XCircle,
 } from "lucide-react";
+import { lazy, Suspense, useEffect, useState, type ReactElement } from "react";
 import type { BlockInstance } from "./block-registry";
-import { PublicFormRenderer } from "@/components/forms/public-form-renderer";
-import { CompanyInformationCard } from "@/components/shared/company-information-card";
-import { isDynamicBlock, getBlockDef } from "./block-registry";
-import {
-  SectionStyleWrapper,
-  DEFAULT_SECTION_LINEAR_GRADIENT,
-  getSectionPaddingClasses,
-  getSectionStyleConfig,
-  hasSectionStyleConfig,
-  hexToRgba,
-  normalizeHexColor,
-} from "./section-style";
-import { renderPublicDisplayText, SectionHeading } from "./section-heading";
+import { getBlockDef, isDynamicBlock } from "./block-registry";
 import {
   arr,
   colorStyle,
@@ -103,6 +93,17 @@ import {
   SPACING_MAP,
   str,
 } from "./block-renderer.shared";
+import { renderPublicDisplayText } from "./display-text";
+import { SectionHeading } from "./section-heading";
+import { SectionStyleWrapper } from "./section-style";
+import {
+  DEFAULT_SECTION_LINEAR_GRADIENT,
+  getSectionPaddingClasses,
+  getSectionStyleConfig,
+  hasSectionStyleConfig,
+  hexToRgba,
+  normalizeHexColor,
+} from "./section-style-values";
 
 const LUCIDE_MAP: Record<string, React.ElementType> = {
   Globe,

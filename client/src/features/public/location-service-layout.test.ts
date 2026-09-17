@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { BlockInstance } from "@/features/admin/cms/builder/block-registry";
-import { prepareLocationServiceBlocks } from "./location-service-layout";
+import { prepareLocationServiceBlocks } from "./location-service-blocks";
 
 describe("prepareLocationServiceBlocks", () => {
   it("adds navigation anchors without changing location-page copy", () => {

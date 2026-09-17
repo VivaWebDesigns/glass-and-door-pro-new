@@ -1,7 +1,8 @@
-import type { DragEvent } from "react";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 import {
   ArrowDown,
   ArrowUp,
@@ -15,19 +16,18 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
+import type { DragEvent } from "react";
+import { getBlockSummary } from "./block-helpers";
 import { getBlockDef, isDynamicBlock, type BlockInstance } from "./block-registry";
 import { BlockRenderer as AdminBlockRenderer } from "./block-renderer";
+import { reportBuilderRenderError } from "./builder-diagnostics";
+import { FULL_WIDTH_BLOCK_TYPES } from "./page-builder-constants";
+import { SectionStyleWrapper } from "./section-style";
 import {
   getSectionPaddingClasses,
   getSectionStyleConfig,
   hasSectionStyleConfig,
-  SectionStyleWrapper,
-} from "./section-style";
-import { cn } from "@/lib/utils";
-import { ErrorBoundary } from "@/components/shared/error-boundary";
-import { getBlockSummary } from "./page-builder-support";
-import { FULL_WIDTH_BLOCK_TYPES } from "./page-builder-constants";
-import { reportBuilderRenderError } from "./builder-diagnostics";
+} from "./section-style-values";
 
 interface CanvasBlockFrameProps {
   block: BlockInstance;

@@ -1,5 +1,7 @@
 # Complete warning and formatting review
 
+This is the audit snapshot for `eda627e`. See [the subsequent follow-up](./react-doctor-followup.md) for the current 58/100 score, 154 warnings and additional fixes.
+
 Baseline: commit `9a572e3`, React Doctor 0.9.14, full uncached scan, all default categories, remote scoring enabled and supply-chain disabled. Baseline: **37/100, 2 errors, 241 warnings**. No lint rules, score inputs or warning thresholds were disabled for this pass.
 
 This ledger distinguishes fixed failures, rejected detector assumptions, and retained observations. **Reviewed does not mean every diagnostic was eliminated.** Component size, duplication and legacy positional display keys remain visible. The score is not a performance benchmark.

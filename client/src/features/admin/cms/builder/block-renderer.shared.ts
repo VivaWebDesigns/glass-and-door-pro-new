@@ -1,5 +1,5 @@
 import type { CSSProperties, SyntheticEvent } from "react";
-import { normalizeHexColor } from "./section-style";
+import { normalizeHexColor } from "./section-style-values";
 
 export function str(v: unknown): string {
   return typeof v === "string" ? v : "";

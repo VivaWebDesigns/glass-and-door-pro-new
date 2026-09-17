@@ -6,9 +6,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { ChevronDown, Copy, GripVertical, ListOrdered, Plus, Search, Trash2 } from "lucide-react";
 import type { DragEvent } from "react";
+import { getBlockSummary } from "./block-helpers";
 import { getBlockDef, isDynamicBlock, type BlockDef, type BlockInstance } from "./block-registry";
 import { FULL_WIDTH_BLOCK_TYPES } from "./page-builder-constants";
-import { BlockIcon, getBlockSummary, SectionsLibrary } from "./page-builder-support";
+import { BlockIcon, SectionsLibrary } from "./page-builder-support";
 
 interface StructurePanelProps {
   blocks: BlockInstance[];

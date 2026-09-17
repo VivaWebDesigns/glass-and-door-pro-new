@@ -20,9 +20,20 @@ supply-chain checks remain disabled. To opt into dependency checks, append
 `--supply-chain`. To run locally without a score, append `--no-telemetry`.
 No CI workflow or Git hook was installed. Existing rules have not been suppressed.
 
+## Editor and browser-reliability follow-up
+
+Latest complete uncached audit: **58/100 (Critical), zero errors, 154 warnings**.
+This pass removes 21 mixed-export warnings and three event-only state findings
+without disabling rules. All 202 unit tests and eight new local desktop/mobile
+browser checks pass. The mobile lab comparison shows essentially unchanged
+loading times; no page-speed gain is claimed.
+
+See [the follow-up report](./react-doctor-followup.md) for exact scope, browser
+coverage, measurements, commands and verification limits.
+
 ## Complete warning and formatting review
 
-The latest complete uncached scan is **57/100 (Critical), zero errors and 178
+The preceding complete uncached scan was **57/100 (Critical), zero errors and 178
 warnings**, compared with 37/100, two errors and 241 warnings at the start of this
 pass. All baseline findings and every remaining diagnostic have an individual
 entry in [the complete review](./react-doctor-complete-review.md). Retained

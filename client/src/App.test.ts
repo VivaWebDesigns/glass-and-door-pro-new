@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { pathRequiresSetupStatus, shouldRedirectToSetup } from "./App";
+import { pathRequiresSetupStatus, shouldRedirectToSetup } from "./lib/setup-routing";
 
 describe("setup route guarding", () => {
   it("does not run setup gating for public service pages", () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getBlockDef, normalizeBlockType } from "@/features/admin/cms/builder/block-registry";
-import { createFallbackBlockDef } from "@/features/admin/cms/builder/block-editor";
+import { createFallbackBlockDef } from "./block-editor-fallback";
 
 describe("block registry compatibility helpers", () => {
   it("normalizes known legacy block aliases to current block types", () => {
