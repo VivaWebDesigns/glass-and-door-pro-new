@@ -893,6 +893,22 @@ export async function getPublicHtmlSnapshot(
   return buildFallbackSnapshot(pathname, seo, siteUrl);
 }
 
+// Match the first visible hero only. Static site assets have no legacy URL remapping;
+// uploaded/external assets are left to the renderer rather than risking a wasted preload.
+function getStaticHeroPreload(page: CmsPage | undefined) {
+  const content = page?.content;
+  if (!content || typeof content !== "object" || Array.isArray(content)) return "";
+  const blocks = (content as Record<string, unknown>).blocks;
+  if (!Array.isArray(blocks) || blocks[0]?.type !== "hero") return "";
+  const image = blocks[0]?.props?.backgroundImageUrl;
+  if (
+    typeof image !== "string" ||
+    !/^\/images\/glass-door-pro\/[a-zA-Z0-9/_-]+\.(webp|png|jpe?g|avif)$/.test(image)
+  )
+    return "";
+  return `<link rel="preload" as="image" href="${escapeHtml(image)}" fetchpriority="high" />`;
+}
+
 export function injectPublicHtmlSnapshot(
   template: string,
   snapshot: PublicHtmlSnapshot | null,
@@ -919,6 +935,7 @@ export function injectPublicHtmlSnapshot(
   }
 
   const headParts = [
+    getStaticHeroPreload(snapshot.cmsPage),
     `<meta name="description" content="${escapeHtml(snapshot.description)}" />`,
     `<meta property="og:title" content="${escapeHtml(snapshot.ogTitle || snapshot.title)}" />`,
     `<meta property="og:description" content="${escapeHtml(snapshot.ogDescription || snapshot.description)}" />`,

@@ -69,6 +69,61 @@ const cmsPage: CmsPage = {
 };
 
 describe("public-prerender.service", () => {
+  it("preloads only the leading static hero image in the document head", async () => {
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      content: {
+        blocks: [
+          {
+            type: "hero",
+            props: { backgroundImageUrl: "/images/glass-door-pro/city-waxhaw-hero.webp" },
+          },
+          {
+            type: "hero",
+            props: { backgroundImageUrl: "/images/glass-door-pro/reviews-hero-1920w.webp" },
+          },
+        ],
+      },
+    });
+    const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } =
+      await import("../services/public-prerender.service");
+    const snapshot = await getPublicHtmlSnapshot("/custom-landing");
+    const html = injectPublicHtmlSnapshot(
+      "<html><head><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--></body></html>",
+      snapshot,
+    );
+    const head = html.split("</head>")[0];
+    expect(head).toContain(
+      '<link rel="preload" as="image" href="/images/glass-door-pro/city-waxhaw-hero.webp" fetchpriority="high" />',
+    );
+    expect(head.match(/rel="preload"/g)).toHaveLength(1);
+    expect(head).not.toContain("reviews-hero-1920w.webp");
+  });
+
+  it.each([
+    [],
+    [
+      { type: "text", props: {} },
+      {
+        type: "hero",
+        props: { backgroundImageUrl: "/images/glass-door-pro/city-waxhaw-hero.webp" },
+      },
+    ],
+    [{ type: "hero", props: {} }],
+    [{ type: "hero", props: { backgroundImageUrl: '" onload="alert(1)' } }],
+    [{ type: "hero", props: { backgroundImageUrl: "https://example.com/hero.webp" } }],
+    [{ type: "hero", props: { backgroundImageUrl: "/uploads/cms/1781107243034-monroe.webp" } }],
+  ])("does not preload non-leading, absent or unsupported hero assets (%j)", async (...blocks) => {
+    mockGetPageBySlug.mockResolvedValue({ ...cmsPage, content: { blocks } });
+    const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } =
+      await import("../services/public-prerender.service");
+    const html = injectPublicHtmlSnapshot(
+      "<head><!--APP_DYNAMIC_HEAD--></head>",
+      await getPublicHtmlSnapshot("/custom-landing"),
+    );
+    expect(html).not.toContain('rel="preload"');
+  });
+
   it("renders a location title without the brand prefix and matches the shower heading", async () => {
     mockGetSeo.mockResolvedValue(seoSettings);
     mockGetPageBySlug.mockResolvedValue({
