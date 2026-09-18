@@ -8,6 +8,19 @@ import { chromium, expect } from "@playwright/test";
 const server = await preview({ preview: { host: "127.0.0.1", port: 4177, strictPort: true } });
 let browser;
 const origin = "http://127.0.0.1:4177";
+const cmsTemplate = await readFile("dist/public/.cms.html", "utf8");
+const cmsEntry = cmsTemplate.match(/<script type="module" crossorigin src="([^"]+)"/);
+assert.match(cmsEntry?.[1] ?? "", /^\/assets\/cms-[^/]+\.js$/);
+const servicePage = {
+  id: "local-service",
+  slug: "services-frameless-showers",
+  title: "Local frameless showers",
+  status: "published",
+  content: {
+    version: 1,
+    blocks: [{ id: "hero", type: "hero", props: { heading: "Local frameless showers" } }],
+  },
+};
 const asset = {
   id: "local-image",
   originalName: "test.webp",
@@ -48,6 +61,9 @@ try {
     if (url.pathname === "/api/setup/status") data = { needsSetup: false };
     if (url.pathname === "/api/branding") data = {};
     if (url.pathname.includes("/cms/pages/by-slug/")) {
+      if (url.pathname.endsWith("/services-frameless-showers")) {
+        return route.fulfill({ json: servicePage });
+      }
       return route.fulfill(
         cmsHome
           ? {
@@ -108,6 +124,23 @@ try {
     "CMS homepage eagerly requested editor chunks",
   );
 
+  await page.route(`${origin}/services/frameless-showers`, (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: cmsTemplate.replace(
+        "<!--APP_PRERENDER_CONTENT-->",
+        `<script id="__CMS_PRERENDER_PAGE__" type="application/json">${JSON.stringify(servicePage)}</script>`,
+      ),
+    }),
+  );
+  await page.goto(`${origin}/services/frameless-showers`);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Local frameless showers");
+  assert(
+    scripts.some((url) => url.includes(cmsEntry[1])),
+    "CMS entry did not load",
+  );
+  await page.unroute(`${origin}/services/frameless-showers`);
+
   await page.goto(`${origin}/admin/cms/media`);
   await page.getByTestId("media-asset-local-image").click();
   await page.getByTestId("button-crop-image").click();
@@ -136,7 +169,7 @@ try {
   await expect(handle).not.toHaveAttribute("aria-valuenow", priorSize);
   assert.deepEqual(errors, []);
   console.log(
-    "Production bundle checks passed: homepage excludes editor chunks; admin crop/compression and builder panels load.",
+    "Production bundle checks passed: CMS entry renders, public pages exclude editor chunks, and admin media/builder tools load.",
   );
 } finally {
   await browser?.close();

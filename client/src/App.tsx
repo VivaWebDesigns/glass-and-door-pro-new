@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import NotFound from "@/pages/not-found";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
-import { Suspense, lazy, useEffect, useRef } from "react";
+import { Suspense, lazy, useEffect, useRef, type ComponentType, type ReactNode } from "react";
 import { Redirect, Route, Switch, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { pathRequiresSetupStatus, shouldRedirectToSetup } from "./lib/setup-routing";
@@ -16,7 +16,7 @@ const GalleryPage = lazy(() => import("@/features/public/gallery-page"));
 const ReviewsPage = lazy(() => import("@/features/public/reviews-page"));
 const ServicesPage = lazy(() => import("@/features/public/services-page"));
 const ServiceAreasPage = lazy(() => import("@/features/public/service-areas-page"));
-const CmsHybridPage = lazy(() =>
+const LazyCmsHybridPage = lazy(() =>
   import("@/features/public/cms-hybrid-page").then((module) => ({
     default: module.CmsHybridPage,
   })),
@@ -77,7 +77,13 @@ function AdminIndexRoute() {
   return <NotFound />;
 }
 
-function Router() {
+type CmsPageComponent = ComponentType<{ slug: string; fallback: ReactNode }>;
+
+function Router({
+  cmsPageComponent: CmsHybridPage = LazyCmsHybridPage,
+}: {
+  cmsPageComponent?: CmsPageComponent;
+}) {
   return (
     <Suspense fallback={<PageLoader />}>
       <Switch>
@@ -529,7 +535,7 @@ function RouteAdminModeManager() {
   return null;
 }
 
-function App() {
+function App({ cmsPageComponent }: { cmsPageComponent?: CmsPageComponent } = {}) {
   return (
     <QueryClientProvider client={queryClient}>
       <BrandingProvider>
@@ -538,7 +544,7 @@ function App() {
           <SetupGuard>
             <RouteAdminModeManager />
             <RouteScrollManager />
-            <Router />
+            <Router cmsPageComponent={cmsPageComponent} />
           </SetupGuard>
         </TooltipProvider>
       </BrandingProvider>

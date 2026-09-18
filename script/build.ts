@@ -1,6 +1,6 @@
 import { build as esbuild } from "esbuild";
 import { build as viteBuild } from "vite";
-import { rm, cp, readFile } from "fs/promises";
+import { rm, cp, readFile, writeFile } from "fs/promises";
 
 async function buildAll() {
   await rm("dist", { recursive: true, force: true });
@@ -9,7 +9,24 @@ async function buildAll() {
   ) as { version?: string };
 
   console.log("building client...");
-  await viteBuild();
+  const clientBuild = await viteBuild();
+  const builds = Array.isArray(clientBuild) ? clientBuild : [clientBuild];
+  const cmsEntry = builds
+    .flatMap((build) => ("output" in build ? build.output : []))
+    .find(
+      (file) =>
+        file.type === "chunk" && file.isEntry && file.facadeModuleId?.endsWith("/cms-main.tsx"),
+    );
+  if (!cmsEntry) throw new Error("CMS client entry was not emitted");
+
+  const baseHtml = await readFile("dist/public/index.html", "utf8");
+  const entryScript = /<script type="module" crossorigin src="\/assets\/[^\"]+\.js"><\/script>/;
+  if (!entryScript.test(baseHtml)) throw new Error("Client entry script was not found in HTML");
+  const cmsHtml = baseHtml.replace(
+    entryScript,
+    `<script type="module" crossorigin src="/${cmsEntry.fileName}"></script>`,
+  );
+  await writeFile("dist/public/.cms.html", cmsHtml);
 
   console.log("building server...");
   await esbuild({
