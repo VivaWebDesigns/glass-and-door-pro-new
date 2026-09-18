@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { GLASS_SERVICE_AREAS_HERO_IMAGE } from "@shared/glass-service-areas";
 import type { CmsPage, SeoSettings } from "@shared/schema";
 
 const mockGetSeo = vi.fn();
@@ -69,6 +70,25 @@ const cmsPage: CmsPage = {
 };
 
 describe("public-prerender.service", () => {
+  it("preloads the standalone service-area hero using the renderer's shared asset", async () => {
+    mockGetSeo.mockResolvedValue(seoSettings);
+    mockGetPageBySlug.mockResolvedValue(null);
+    const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } =
+      await import("../services/public-prerender.service");
+    const snapshot = await getPublicHtmlSnapshot("/service-areas");
+    expect(snapshot?.heroImageUrl).toBe(GLASS_SERVICE_AREAS_HERO_IMAGE);
+    const html = injectPublicHtmlSnapshot("<head><!--APP_DYNAMIC_HEAD--></head>", snapshot);
+    expect(html).toContain(
+      `<link rel="preload" as="image" href="${GLASS_SERVICE_AREAS_HERO_IMAGE}" fetchpriority="high" />`,
+    );
+    expect(html.match(/rel="preload"/g)).toHaveLength(1);
+    const gallery = injectPublicHtmlSnapshot(
+      "<head><!--APP_DYNAMIC_HEAD--></head>",
+      await getPublicHtmlSnapshot("/gallery"),
+    );
+    expect(gallery).not.toContain('rel="preload"');
+  });
+
   it("preloads only the leading static hero image in the document head", async () => {
     mockGetPageBySlug.mockResolvedValue({
       ...cmsPage,

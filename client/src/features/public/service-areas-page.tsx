@@ -3,7 +3,10 @@ import { ArrowRight, MapPin } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
-import { GLASS_PRIMARY_SERVICE_AREAS } from "@shared/glass-service-areas";
+import {
+  GLASS_PRIMARY_SERVICE_AREAS,
+  GLASS_SERVICE_AREAS_HERO_IMAGE,
+} from "@shared/glass-service-areas";
 
 const serviceAreaDescriptions = {
   Charlotte: "Glass, window, door, shower, and commercial services across Charlotte.",
@@ -33,7 +36,7 @@ export default function ServiceAreasPage() {
           style={{ minHeight: "700px" }}
         >
           <img
-            src="/images/glass-door-pro/charming-suburban-home-hero-1920x1080.webp"
+            src={GLASS_SERVICE_AREAS_HERO_IMAGE}
             alt="Suburban home exterior with replacement windows installed"
             loading="eager"
             decoding="async"

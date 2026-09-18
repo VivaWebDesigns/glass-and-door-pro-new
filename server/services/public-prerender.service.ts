@@ -15,6 +15,7 @@ import {
 import {
   GLASS_PRIMARY_SERVICE_AREAS,
   GLASS_PRIMARY_SERVICE_AREA_NAMES,
+  GLASS_SERVICE_AREAS_HERO_IMAGE,
 } from "@shared/glass-service-areas";
 import type { CmsPage, SeoSettings } from "@shared/schema";
 import { normalizeSeoDescription } from "@shared/seo-description";
@@ -34,6 +35,7 @@ interface PublicHtmlSnapshot {
   bodyHtml: string;
   jsonLd?: Array<Record<string, unknown>>;
   cmsPage?: CmsPage;
+  heroImageUrl?: string;
 }
 
 type PrerenderLink = {
@@ -848,6 +850,7 @@ function buildFallbackSnapshot(
       ].filter(Boolean),
     ),
     jsonLd: fallbackJsonLd,
+    heroImageUrl: pathname === "/service-areas" ? GLASS_SERVICE_AREAS_HERO_IMAGE : undefined,
   };
 }
 
@@ -895,12 +898,15 @@ export async function getPublicHtmlSnapshot(
 
 // Match the first visible hero only. Static site assets have no legacy URL remapping;
 // uploaded/external assets are left to the renderer rather than risking a wasted preload.
-function getStaticHeroPreload(page: CmsPage | undefined) {
-  const content = page?.content;
-  if (!content || typeof content !== "object" || Array.isArray(content)) return "";
-  const blocks = (content as Record<string, unknown>).blocks;
-  if (!Array.isArray(blocks) || blocks[0]?.type !== "hero") return "";
-  const image = blocks[0]?.props?.backgroundImageUrl;
+function getStaticHeroPreload(page: CmsPage | undefined, fallbackImage?: string) {
+  let image: unknown = fallbackImage;
+  if (page) {
+    const content = page.content;
+    if (!content || typeof content !== "object" || Array.isArray(content)) return "";
+    const blocks = (content as Record<string, unknown>).blocks;
+    if (!Array.isArray(blocks) || blocks[0]?.type !== "hero") return "";
+    image = blocks[0]?.props?.backgroundImageUrl;
+  }
   if (
     typeof image !== "string" ||
     !/^\/images\/glass-door-pro\/[a-zA-Z0-9/_-]+\.(webp|png|jpe?g|avif)$/.test(image)
@@ -935,7 +941,7 @@ export function injectPublicHtmlSnapshot(
   }
 
   const headParts = [
-    getStaticHeroPreload(snapshot.cmsPage),
+    getStaticHeroPreload(snapshot.cmsPage, snapshot.heroImageUrl),
     `<meta name="description" content="${escapeHtml(snapshot.description)}" />`,
     `<meta property="og:title" content="${escapeHtml(snapshot.ogTitle || snapshot.title)}" />`,
     `<meta property="og:description" content="${escapeHtml(snapshot.ogDescription || snapshot.description)}" />`,
