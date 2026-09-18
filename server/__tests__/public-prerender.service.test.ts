@@ -114,9 +114,12 @@ describe("public-prerender.service", () => {
     );
     const head = html.split("</head>")[0];
     expect(head).toContain(
-      '<link rel="preload" as="image" href="/images/glass-door-pro/city-waxhaw-hero.webp" fetchpriority="high" />',
+      '<link rel="preload" as="image" href="/images/glass-door-pro/city-waxhaw-hero-mobile-1280w.webp" media="(max-width: 640px)" fetchpriority="high" />',
     );
-    expect(head.match(/rel="preload"/g)).toHaveLength(1);
+    expect(head).toContain(
+      '<link rel="preload" as="image" href="/images/glass-door-pro/city-waxhaw-hero.webp" media="(min-width: 641px)" fetchpriority="high" />',
+    );
+    expect(head.match(/rel="preload"/g)).toHaveLength(2);
     expect(head).not.toContain("reviews-hero-1920w.webp");
   });
 

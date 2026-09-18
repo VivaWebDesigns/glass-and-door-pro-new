@@ -33,6 +33,7 @@ import { SectionStyleWrapper } from "@/features/admin/cms/builder/section-style"
 import { useRowKeys } from "@/hooks/use-row-keys";
 import { sanitizeHtml } from "@/lib/sanitize-html";
 import { formatGlassReviewDate } from "@shared/glass-review-dates";
+import { getMobileHeroImageUrl, MOBILE_HERO_MEDIA } from "@shared/glass-hero-images";
 import { excludeServiceUtilitySnippets } from "@shared/glass-search-snippets";
 import {
   ArrowRight,
@@ -138,9 +139,31 @@ function DynamicFallback() {
   );
 }
 
+function useMobileHeroViewport() {
+  const [matches, setMatches] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia(MOBILE_HERO_MEDIA).matches,
+  );
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== "function") return;
+    const query = window.matchMedia(MOBILE_HERO_MEDIA);
+    const update = () => setMatches(query.matches);
+    query.addEventListener("change", update);
+    update();
+    return () => query.removeEventListener("change", update);
+  }, []);
+
+  return matches;
+}
+
 function HeroBlock({ props }: { props: Record<string, unknown> }) {
   const [location] = useLocation();
   const bg = resolveCmsAssetUrl(str(props.backgroundImageUrl));
+  const mobileBg = getMobileHeroImageUrl(bg);
+  const bgToRender = useMobileHeroViewport() && mobileBg ? mobileBg : bg;
   const bgAlt = str(props.backgroundImageAlt) || str(props.imageAlt);
   const bgWidth = num(props.backgroundImageWidth as number, 0);
   const bgHeight = num(props.backgroundImageHeight as number, 0);
@@ -179,7 +202,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
     >
       {bg && (
         <img
-          src={bg}
+          src={bgToRender}
           alt={bgAlt}
           width={bgWidth || undefined}
           height={bgHeight || undefined}
@@ -196,7 +219,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
           muted
           loop
           playsInline
-          poster={bg || undefined}
+          poster={bgToRender || undefined}
           className="absolute inset-0 w-full h-full object-cover"
         >
           <source src={videoBg} type="video/mp4" />

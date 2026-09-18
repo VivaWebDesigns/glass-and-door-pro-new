@@ -58,7 +58,16 @@ try {
                 status: "published",
                 content: {
                   version: 1,
-                  blocks: [{ id: "hero", type: "hero", props: { heading: "Local CMS homepage" } }],
+                  blocks: [
+                    {
+                      id: "hero",
+                      type: "hero",
+                      props: {
+                        heading: "Local CMS homepage",
+                        backgroundImageUrl: asset.url,
+                      },
+                    },
+                  ],
                 },
               },
             }
@@ -99,6 +108,19 @@ try {
   await page.reload();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Local CMS homepage");
   await page.waitForLoadState("networkidle");
+  const heroImage = page.locator(".public-hero-pattern img").first();
+  await expect(heroImage).toHaveJSProperty("complete", true);
+  assert((await heroImage.evaluate((img) => img.currentSrc)).endsWith(asset.url));
+  await page.setViewportSize({ width: 393, height: 852 });
+  await page.reload();
+  await expect(heroImage).toHaveJSProperty("complete", true);
+  assert(
+    (await heroImage.evaluate((img) => img.currentSrc)).endsWith(
+      "/images/glass-door-pro/gallery-shower1-1280w-mobile-1280w.webp",
+    ),
+    "Mobile CMS hero did not use the smaller image",
+  );
+  await page.setViewportSize({ width: 1280, height: 720 });
   assert(
     !scripts.some((url) =>
       /image-editor-|editor-panels-|tiptap-|prosemirror-|cms-page-editor-page-|cms-media-page-/.test(

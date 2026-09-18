@@ -1,4 +1,9 @@
 import { getGlassLocationSearchCopy } from "@shared/glass-location-search";
+import {
+  DESKTOP_HERO_MEDIA,
+  getMobileHeroImageUrl,
+  MOBILE_HERO_MEDIA,
+} from "@shared/glass-hero-images";
 import { correctGlassSearchTitle } from "@shared/glass-search-snippets";
 import {
   buildGlassBreadcrumbItems,
@@ -912,6 +917,13 @@ function getStaticHeroPreload(page: CmsPage | undefined, fallbackImage?: string)
     !/^\/images\/glass-door-pro\/[a-zA-Z0-9/_-]+\.(webp|png|jpe?g|avif)$/.test(image)
   )
     return "";
+  const mobileImage = getMobileHeroImageUrl(image);
+  if (mobileImage) {
+    return [
+      `<link rel="preload" as="image" href="${escapeHtml(mobileImage)}" media="${MOBILE_HERO_MEDIA}" fetchpriority="high" />`,
+      `<link rel="preload" as="image" href="${escapeHtml(image)}" media="${DESKTOP_HERO_MEDIA}" fetchpriority="high" />`,
+    ].join("\n");
+  }
   return `<link rel="preload" as="image" href="${escapeHtml(image)}" fetchpriority="high" />`;
 }
 
