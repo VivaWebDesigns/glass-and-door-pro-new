@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import NotFound from "@/pages/not-found";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
-import { Suspense, lazy, useEffect, useRef, type ComponentType, type ReactNode } from "react";
+import { Suspense, lazy, useEffect, useRef } from "react";
 import { Redirect, Route, Switch, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { pathRequiresSetupStatus, shouldRedirectToSetup } from "./lib/setup-routing";
@@ -16,7 +16,7 @@ const GalleryPage = lazy(() => import("@/features/public/gallery-page"));
 const ReviewsPage = lazy(() => import("@/features/public/reviews-page"));
 const ServicesPage = lazy(() => import("@/features/public/services-page"));
 const ServiceAreasPage = lazy(() => import("@/features/public/service-areas-page"));
-const LazyCmsHybridPage = lazy(() =>
+const CmsHybridPage = lazy(() =>
   import("@/features/public/cms-hybrid-page").then((module) => ({
     default: module.CmsHybridPage,
   })),
@@ -77,13 +77,7 @@ function AdminIndexRoute() {
   return <NotFound />;
 }
 
-type CmsPageComponent = ComponentType<{ slug: string; fallback: ReactNode }>;
-
-function Router({
-  cmsPageComponent: CmsHybridPage = LazyCmsHybridPage,
-}: {
-  cmsPageComponent?: CmsPageComponent;
-}) {
+function Router() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Switch>
@@ -535,7 +529,7 @@ function RouteAdminModeManager() {
   return null;
 }
 
-function App({ cmsPageComponent }: { cmsPageComponent?: CmsPageComponent } = {}) {
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrandingProvider>
@@ -544,7 +538,7 @@ function App({ cmsPageComponent }: { cmsPageComponent?: CmsPageComponent } = {})
           <SetupGuard>
             <RouteAdminModeManager />
             <RouteScrollManager />
-            <Router cmsPageComponent={cmsPageComponent} />
+            <Router />
           </SetupGuard>
         </TooltipProvider>
       </BrandingProvider>

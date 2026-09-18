@@ -59,16 +59,9 @@ export function serveStatic(app: Express) {
   }
 
   const indexPath = path.resolve(distPath, "index.html");
-  const cmsIndexPath = path.resolve(distPath, ".cms.html");
   let cachedIndexTemplate: string | null = null;
-  let cachedCmsTemplate: string | null = null;
 
-  async function getIndexTemplate(cms = false) {
-    if (cms) {
-      if (cachedCmsTemplate) return cachedCmsTemplate;
-      cachedCmsTemplate = await fs.promises.readFile(cmsIndexPath, "utf-8");
-      return cachedCmsTemplate;
-    }
+  async function getIndexTemplate() {
     if (cachedIndexTemplate) return cachedIndexTemplate;
     cachedIndexTemplate = await fs.promises.readFile(indexPath, "utf-8");
     return cachedIndexTemplate;
@@ -104,6 +97,7 @@ export function serveStatic(app: Express) {
 
   // fall through to index.html if the file doesn't exist
   app.use("/{*path}", async (req, res) => {
+    const template = await getIndexTemplate();
     const { pathname, search } = getRequestPathAndSearch(req.originalUrl || req.url || "/");
     const redirectTo = LEGACY_PUBLIC_REDIRECTS[pathname];
     if (redirectTo) {
@@ -128,7 +122,6 @@ export function serveStatic(app: Express) {
       return;
     }
     const snapshot = await getPublicHtmlSnapshot(pathname, search);
-    const template = await getIndexTemplate(Boolean(snapshot?.cmsPage));
     const shouldInjectPublicHead =
       !pathname.startsWith("/admin") &&
       !pathname.startsWith("/auth") &&
