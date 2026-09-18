@@ -1,6 +1,12 @@
+import { readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getMobileHeroImageUrl } from "@shared/glass-hero-images";
 import { GLASS_SERVICE_AREAS_HERO_IMAGE } from "@shared/glass-service-areas";
 import type { CmsPage, SeoSettings } from "@shared/schema";
+
+const heroPages = JSON.parse(
+  readFileSync(new URL("../../e2e/mobile-hero-pages.json", import.meta.url), "utf8"),
+) as Record<string, string>;
 
 const mockGetSeo = vi.fn();
 const mockGetSetting = vi.fn();
@@ -70,6 +76,29 @@ const cmsPage: CmsPage = {
 };
 
 describe("public-prerender.service", () => {
+  it.each(Object.entries(heroPages))(
+    "preloads the matching mobile hero on %s",
+    async (path, image) => {
+      if (path !== "/service-areas") {
+        mockGetPageBySlug.mockResolvedValue({
+          ...cmsPage,
+          content: {
+            blocks: [{ id: "hero", type: "hero", props: { backgroundImageUrl: image } }],
+          },
+        });
+      }
+      const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } =
+        await import("../services/public-prerender.service");
+      const snapshot = await getPublicHtmlSnapshot(path);
+      const head = injectPublicHtmlSnapshot("<head><!--APP_DYNAMIC_HEAD--></head>", snapshot);
+      expect(head).toContain(
+        `href="${getMobileHeroImageUrl(image)}" media="(max-width: 640px)" fetchpriority="high"`,
+      );
+      expect(head).toContain(`href="${image}" media="(min-width: 641px)" fetchpriority="high"`);
+      expect(head.match(/rel="preload"/g)).toHaveLength(2);
+    },
+  );
+
   it("preloads the standalone service-area hero using the renderer's shared asset", async () => {
     mockGetSeo.mockResolvedValue(seoSettings);
     mockGetPageBySlug.mockResolvedValue(null);
@@ -79,9 +108,12 @@ describe("public-prerender.service", () => {
     expect(snapshot?.heroImageUrl).toBe(GLASS_SERVICE_AREAS_HERO_IMAGE);
     const html = injectPublicHtmlSnapshot("<head><!--APP_DYNAMIC_HEAD--></head>", snapshot);
     expect(html).toContain(
-      `<link rel="preload" as="image" href="${GLASS_SERVICE_AREAS_HERO_IMAGE}" fetchpriority="high" />`,
+      '<link rel="preload" as="image" href="/images/glass-door-pro/charming-suburban-home-hero-1920x1080-mobile-1280w.webp" media="(max-width: 640px)" fetchpriority="high" />',
     );
-    expect(html.match(/rel="preload"/g)).toHaveLength(1);
+    expect(html).toContain(
+      `<link rel="preload" as="image" href="${GLASS_SERVICE_AREAS_HERO_IMAGE}" media="(min-width: 641px)" fetchpriority="high" />`,
+    );
+    expect(html.match(/rel="preload"/g)).toHaveLength(2);
     const gallery = injectPublicHtmlSnapshot(
       "<head><!--APP_DYNAMIC_HEAD--></head>",
       await getPublicHtmlSnapshot("/gallery"),

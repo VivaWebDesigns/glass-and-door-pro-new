@@ -31,9 +31,10 @@ import { FULL_WIDTH_BLOCK_TYPES } from "@/features/admin/cms/builder/page-builde
 import { SectionHeading } from "@/features/admin/cms/builder/section-heading";
 import { SectionStyleWrapper } from "@/features/admin/cms/builder/section-style";
 import { useRowKeys } from "@/hooks/use-row-keys";
+import { useMobileHeroViewport } from "@/hooks/use-mobile-hero-viewport";
 import { sanitizeHtml } from "@/lib/sanitize-html";
 import { formatGlassReviewDate } from "@shared/glass-review-dates";
-import { getMobileHeroImageUrl, MOBILE_HERO_MEDIA } from "@shared/glass-hero-images";
+import { getMobileHeroImageUrl } from "@shared/glass-hero-images";
 import { excludeServiceUtilitySnippets } from "@shared/glass-search-snippets";
 import {
   ArrowRight,
@@ -137,26 +138,6 @@ function DynamicFallback() {
       <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
     </div>
   );
-}
-
-function useMobileHeroViewport() {
-  const [matches, setMatches] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      typeof window.matchMedia === "function" &&
-      window.matchMedia(MOBILE_HERO_MEDIA).matches,
-  );
-
-  useEffect(() => {
-    if (typeof window.matchMedia !== "function") return;
-    const query = window.matchMedia(MOBILE_HERO_MEDIA);
-    const update = () => setMatches(query.matches);
-    query.addEventListener("change", update);
-    update();
-    return () => query.removeEventListener("change", update);
-  }, []);
-
-  return matches;
 }
 
 function HeroBlock({ props }: { props: Record<string, unknown> }) {

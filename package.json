@@ -22,7 +22,8 @@
     "doctor": "react-doctor --yes --no-supply-chain",
     "test:browser:local": "playwright test --config playwright.local.config.ts",
     "measure:mobile:local": "node e2e/mobile-performance.mjs",
-    "test:bundles:local": "node e2e/bundle-isolation.mjs"
+    "test:bundles:local": "node e2e/bundle-isolation.mjs",
+    "test:heroes:local": "node e2e/mobile-hero-coverage.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1004.0",

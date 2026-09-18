@@ -3,6 +3,8 @@ import { ArrowRight, MapPin } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
+import { useMobileHeroViewport } from "@/hooks/use-mobile-hero-viewport";
+import { getMobileHeroImageUrl } from "@shared/glass-hero-images";
 import {
   GLASS_PRIMARY_SERVICE_AREAS,
   GLASS_SERVICE_AREAS_HERO_IMAGE,
@@ -27,6 +29,9 @@ const serviceAreas = GLASS_PRIMARY_SERVICE_AREAS.map(
 );
 
 export default function ServiceAreasPage() {
+  const mobileHeroImage = getMobileHeroImageUrl(GLASS_SERVICE_AREAS_HERO_IMAGE);
+  const heroImage =
+    useMobileHeroViewport() && mobileHeroImage ? mobileHeroImage : GLASS_SERVICE_AREAS_HERO_IMAGE;
   return (
     <div className="public-page-shell min-h-screen flex flex-col">
       <Navbar />
@@ -36,7 +41,7 @@ export default function ServiceAreasPage() {
           style={{ minHeight: "700px" }}
         >
           <img
-            src={GLASS_SERVICE_AREAS_HERO_IMAGE}
+            src={heroImage}
             alt="Suburban home exterior with replacement windows installed"
             loading="eager"
             decoding="async"
