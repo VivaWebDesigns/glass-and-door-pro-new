@@ -144,7 +144,8 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
   const [location] = useLocation();
   const bg = resolveCmsAssetUrl(str(props.backgroundImageUrl));
   const mobileBg = getMobileHeroImageUrl(bg);
-  const bgToRender = useMobileHeroViewport() && mobileBg ? mobileBg : bg;
+  const isMobileHeroViewport = useMobileHeroViewport();
+  const bgToRender = isMobileHeroViewport && mobileBg ? mobileBg : bg;
   const bgAlt = str(props.backgroundImageAlt) || str(props.imageAlt);
   const bgWidth = num(props.backgroundImageWidth as number, 0);
   const bgHeight = num(props.backgroundImageHeight as number, 0);
@@ -194,7 +195,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
           style={{ objectPosition: `${bgPosX}% ${bgPosY}%` }}
         />
       )}
-      {videoBg && (
+      {videoBg && !isMobileHeroViewport && (
         <video
           autoPlay
           muted
