@@ -315,9 +315,10 @@ export async function sendEmail(
   html: string,
   options: SendEmailOptions = {},
 ): Promise<boolean> {
-  const { recordEmailOutcome } = await import("../utils/metrics");
-
-  const resendSent = await sendViaResend(to, subject, html, options);
+  const [{ recordEmailOutcome }, resendSent] = await Promise.all([
+    import("../utils/metrics"),
+    sendViaResend(to, subject, html, options),
+  ]);
   if (resendSent) {
     recordEmailOutcome(true);
     return true;

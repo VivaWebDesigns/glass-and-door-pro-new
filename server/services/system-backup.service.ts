@@ -181,7 +181,8 @@ function topologicallySortTables(tables: string[], edges: Array<{ child_table: s
   }
 
   if (order.length !== tables.length) {
-    const remaining = tables.filter((table) => !order.includes(table)).sort();
+    const ordered = new Set(order);
+    const remaining = tables.filter((table) => !ordered.has(table)).sort();
     logger.backup.warn("Detected cyclic or unresolved table dependencies during backup ordering; appending remaining tables alphabetically", {
       remainingTables: remaining,
     });

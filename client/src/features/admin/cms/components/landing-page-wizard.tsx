@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -53,7 +53,8 @@ export function LandingPageWizard({ open, onClose, onCreate }: LandingPageWizard
   const [subheadline, setSubheadline] = useState("");
   const [selectedAudiences, setSelectedAudiences] = useState<string[]>([]);
   const [selectedBlocks, setSelectedBlocks] = useState<string[]>([]);
-  const [blocksInitialized, setBlocksInitialized] = useState(false);
+  const selectedBlockSet = useMemo(() => new Set(selectedBlocks), [selectedBlocks]);
+  const blocksInitializedRef = useRef(false);
   const [ctaText, setCtaText] = useState("Get Started");
   const [ctaLink, setCtaLink] = useState("/#contact");
 
@@ -72,12 +73,12 @@ export function LandingPageWizard({ open, onClose, onCreate }: LandingPageWizard
   const blockOptions: WizardBlockOption[] = goalId ? getRecommendedBlocks(goalId) : [];
 
   const goToStep = (nextStep: number) => {
-    if (nextStep === 2 && !blocksInitialized && goalId) {
+    if (nextStep === 2 && !blocksInitializedRef.current && goalId) {
       const recommended = getRecommendedBlocks(goalId)
         .filter((b) => b.recommended)
         .map((b) => b.id);
       setSelectedBlocks(recommended);
-      setBlocksInitialized(true);
+      blocksInitializedRef.current = true;
     }
     setStep(nextStep);
   };
@@ -99,7 +100,7 @@ export function LandingPageWizard({ open, onClose, onCreate }: LandingPageWizard
     setSubheadline("");
     setSelectedAudiences([]);
     setSelectedBlocks([]);
-    setBlocksInitialized(false);
+    blocksInitializedRef.current = false;
     setCtaText("Get Started");
     setCtaLink("/#contact");
   };
@@ -191,7 +192,7 @@ export function LandingPageWizard({ open, onClose, onCreate }: LandingPageWizard
                       key={goal.id}
                       onClick={() => {
                         setGoalId(goal.id);
-                        setBlocksInitialized(false);
+                        blocksInitializedRef.current = false;
                       }}
                       className={`flex items-start gap-3 p-3 rounded-lg border-2 text-left transition-all ${
                         goalId === goal.id
@@ -317,7 +318,7 @@ export function LandingPageWizard({ open, onClose, onCreate }: LandingPageWizard
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {blockOptions.map((opt) => {
-                  const isSelected = selectedBlocks.includes(opt.id);
+                  const isSelected = selectedBlockSet.has(opt.id);
                   return (
                     <button
                       key={opt.id}

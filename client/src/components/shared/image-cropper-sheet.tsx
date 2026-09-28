@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 import ReactCrop, { type Crop, type PixelCrop, centerCrop, makeAspectCrop } from "react-image-crop";
 import imageCompression from "browser-image-compression";
 import "react-image-crop/dist/ReactCrop.css";
@@ -54,21 +54,17 @@ function makeInitialCrop(width: number, height: number, aspect?: number): Crop {
     };
   }
 
-  return centerCrop(
-    makeAspectCrop({ unit: "%", width: 90 }, aspect, width, height),
-    width,
-    height
-  );
+  return centerCrop(makeAspectCrop({ unit: "%", width: 90 }, aspect, width, height), width, height);
 }
 
 function cropToPixelCrop(crop: Crop, width: number, height: number): PixelCrop {
   if (crop.unit === "%") {
     return {
       unit: "px",
-      x: Math.round((crop.x ?? 0) * width / 100),
-      y: Math.round((crop.y ?? 0) * height / 100),
-      width: Math.round((crop.width ?? 0) * width / 100),
-      height: Math.round((crop.height ?? 0) * height / 100),
+      x: Math.round(((crop.x ?? 0) * width) / 100),
+      y: Math.round(((crop.y ?? 0) * height) / 100),
+      width: Math.round(((crop.width ?? 0) * width) / 100),
+      height: Math.round(((crop.height ?? 0) * height) / 100),
     };
   }
 
@@ -85,7 +81,7 @@ async function getCroppedFile(
   image: HTMLImageElement,
   crop: PixelCrop,
   fileName: string,
-  outputMimeType: "image/jpeg" | "image/png" | "image/webp"
+  outputMimeType: "image/jpeg" | "image/png" | "image/webp",
 ): Promise<File> {
   const canvas = document.createElement("canvas");
   const scaleX = image.naturalWidth / image.width;
@@ -103,21 +99,46 @@ async function getCroppedFile(
     0,
     0,
     canvas.width,
-    canvas.height
+    canvas.height,
   );
   return new Promise((resolve, reject) => {
     canvas.toBlob(
       (blob) => {
-        if (!blob) { reject(new Error("Could not crop image")); return; }
-        resolve(new File([blob], withFileExtension(fileName, outputMimeType), { type: outputMimeType }));
+        if (!blob) {
+          reject(new Error("Could not crop image"));
+          return;
+        }
+        resolve(
+          new File([blob], withFileExtension(fileName, outputMimeType), { type: outputMimeType }),
+        );
       },
       outputMimeType,
-      0.95
+      0.95,
     );
   });
 }
 
-export function ImageCropperSheet({
+export function ImageCropperSheet({ imageSrc, onCancel, ...props }: ImageCropperSheetProps) {
+  return (
+    <Sheet
+      open={!!imageSrc}
+      onOpenChange={(open) => {
+        if (!open) onCancel();
+      }}
+    >
+      <SheetContent side="right" className="w-full sm:max-w-lg z-[1300]">
+        <ImageCropperSheetBody
+          key={imageSrc ?? ""}
+          imageSrc={imageSrc}
+          onCancel={onCancel}
+          {...props}
+        />
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function ImageCropperSheetBody({
   imageSrc,
   fileName = "avatar.jpg",
   aspect,
@@ -135,20 +156,15 @@ export function ImageCropperSheet({
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [processing, setProcessing] = useState(false);
 
-  useEffect(() => {
-    if (!imageSrc) {
-      setCrop(undefined);
-      setCompletedCrop(undefined);
-      setProcessing(false);
-    }
-  }, [imageSrc]);
-
-  const onImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
-    const { width, height } = e.currentTarget;
-    const initialCrop = makeInitialCrop(width, height, aspect);
-    setCrop(initialCrop);
-    setCompletedCrop(cropToPixelCrop(initialCrop, width, height));
-  }, [aspect]);
+  const onImageLoad = useCallback(
+    (e: React.SyntheticEvent<HTMLImageElement>) => {
+      const { width, height } = e.currentTarget;
+      const initialCrop = makeInitialCrop(width, height, aspect);
+      setCrop(initialCrop);
+      setCompletedCrop(cropToPixelCrop(initialCrop, width, height));
+    },
+    [aspect],
+  );
 
   async function handleConfirm() {
     if (!imgRef.current || !completedCrop) return;
@@ -174,61 +190,59 @@ export function ImageCropperSheet({
   }
 
   return (
-    <Sheet open={!!imageSrc} onOpenChange={(open) => { if (!open) onCancel(); }}>
-      <SheetContent side="right" className="w-full sm:max-w-lg z-[1300]">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
-            <CropIcon className="h-4 w-4" />
-            {title}
-          </SheetTitle>
-          <SheetDescription>{description}</SheetDescription>
-        </SheetHeader>
-        <SheetBody>
-          {imageSrc && (
-            <div className="flex items-center justify-center rounded-lg overflow-hidden bg-muted/50 p-2">
-              <ReactCrop
-                crop={crop}
-                onChange={(c) => setCrop(c)}
-                onComplete={(c) => setCompletedCrop(c)}
-                aspect={aspect}
-                circularCrop={circularCrop}
-                keepSelection
-                minWidth={50}
-                minHeight={50}
-              >
-                <img
-                  ref={imgRef}
-                  src={imageSrc}
-                  alt="Crop preview"
-                  onLoad={onImageLoad}
-                  className="max-h-[400px] max-w-full object-contain"
-                  crossOrigin="anonymous"
-                />
-              </ReactCrop>
-            </div>
+    <>
+      <SheetHeader>
+        <SheetTitle className="flex items-center gap-2">
+          <CropIcon className="h-4 w-4" />
+          {title}
+        </SheetTitle>
+        <SheetDescription>{description}</SheetDescription>
+      </SheetHeader>
+      <SheetBody>
+        {imageSrc && (
+          <div className="flex items-center justify-center rounded-lg overflow-hidden bg-muted/50 p-2">
+            <ReactCrop
+              crop={crop}
+              onChange={(c) => setCrop(c)}
+              onComplete={(c) => setCompletedCrop(c)}
+              aspect={aspect}
+              circularCrop={circularCrop}
+              keepSelection
+              minWidth={50}
+              minHeight={50}
+            >
+              <img
+                ref={imgRef}
+                src={imageSrc}
+                alt="Crop preview"
+                onLoad={onImageLoad}
+                className="max-h-[400px] max-w-full object-contain"
+                crossOrigin="anonymous"
+              />
+            </ReactCrop>
+          </div>
+        )}
+        <p className="text-xs text-muted-foreground text-center mt-3">
+          Your photo will be compressed to under 2 MB automatically.
+        </p>
+      </SheetBody>
+      <SheetFooter>
+        <Button variant="outline" onClick={onCancel} disabled={processing}>
+          Cancel
+        </Button>
+        <Button
+          onClick={handleConfirm}
+          disabled={!completedCrop || processing || confirmDisabled}
+          data-testid="button-apply-crop"
+        >
+          {processing ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <CropIcon className="h-4 w-4 mr-2" />
           )}
-          <p className="text-xs text-muted-foreground text-center mt-3">
-            Your photo will be compressed to under 2 MB automatically.
-          </p>
-        </SheetBody>
-        <SheetFooter>
-          <Button variant="outline" onClick={onCancel} disabled={processing}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleConfirm}
-            disabled={!completedCrop || processing || confirmDisabled}
-            data-testid="button-apply-crop"
-          >
-            {processing ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <CropIcon className="h-4 w-4 mr-2" />
-            )}
-            {applyLabel}
-          </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+          {applyLabel}
+        </Button>
+      </SheetFooter>
+    </>
   );
 }

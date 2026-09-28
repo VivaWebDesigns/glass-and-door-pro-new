@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -56,6 +56,18 @@ interface UserProfileDialogProps {
 
 export function UserProfileDialog({ open, onOpenChange }: UserProfileDialogProps) {
   const { user } = useAuth();
+  if (!user) return null;
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="right" size="md">
+        <UserProfileSheetBody key={user.id} user={user} />
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function UserProfileSheetBody({ user }: { user: NonNullable<ReturnType<typeof useAuth>["user"]> }) {
   const { toast } = useToast();
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -63,9 +75,9 @@ export function UserProfileDialog({ open, onOpenChange }: UserProfileDialogProps
   const profileForm = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      firstName: user?.firstName || "",
-      lastName: user?.lastName || "",
-      email: user?.email || "",
+      firstName: user.firstName || "",
+      lastName: user.lastName || "",
+      email: user.email || "",
     },
   });
 
@@ -77,19 +89,6 @@ export function UserProfileDialog({ open, onOpenChange }: UserProfileDialogProps
       confirmPassword: "",
     },
   });
-
-  useEffect(() => {
-    if (open && user) {
-      profileForm.reset({
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        email: user.email || "",
-      });
-      passwordForm.reset();
-      setShowCurrentPassword(false);
-      setShowNewPassword(false);
-    }
-  }, [open, user]);
 
   const profileMutation = useMutation({
     mutationFn: async (data: ProfileFormData) => {
@@ -132,79 +131,191 @@ export function UserProfileDialog({ open, onOpenChange }: UserProfileDialogProps
     },
   });
 
-  if (!user) return null;
-
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" size="md">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2" data-testid="text-profile-title">
-            <User className="h-5 w-5" />
-            My Profile
-          </SheetTitle>
-          <SheetDescription className="sr-only">Edit your profile and password</SheetDescription>
-        </SheetHeader>
+    <>
+      <SheetHeader>
+        <SheetTitle className="flex items-center gap-2" data-testid="text-profile-title">
+          <User className="h-5 w-5" />
+          My Profile
+        </SheetTitle>
+        <SheetDescription className="sr-only">Edit your profile and password</SheetDescription>
+      </SheetHeader>
 
-        <SheetBody>
-          <div className="flex flex-col items-center gap-3 py-2">
-            <AvatarUpload
-              currentImageUrl={user.profileImageUrl}
-              fallbackInitials={`${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`}
-              size="lg"
-            />
-            <div className="text-center">
-              <p className="font-medium text-sm" data-testid="text-profile-name">
-                {user.firstName} {user.lastName}
-              </p>
-              <Badge variant="outline" className="text-xs capitalize" data-testid="badge-profile-role">
-                {user.role}
-              </Badge>
-            </div>
-          </div>
-
-          <Separator />
-
-          <Form {...profileForm}>
-            <form
-              onSubmit={profileForm.handleSubmit((data) => profileMutation.mutate(data))}
-              className="space-y-3"
+      <SheetBody>
+        <div className="flex flex-col items-center gap-3 py-2">
+          <AvatarUpload
+            currentImageUrl={user.profileImageUrl}
+            fallbackInitials={`${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`}
+            size="lg"
+          />
+          <div className="text-center">
+            <p className="font-medium text-sm" data-testid="text-profile-name">
+              {user.firstName} {user.lastName}
+            </p>
+            <Badge
+              variant="outline"
+              className="text-xs capitalize"
+              data-testid="badge-profile-role"
             >
-              <div className="flex gap-3">
-                <FormField
-                  control={profileForm.control}
-                  name="firstName"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>First Name</FormLabel>
-                      <FormControl>
-                        <Input {...field} data-testid="input-profile-firstname" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={profileForm.control}
-                  name="lastName"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>Last Name</FormLabel>
-                      <FormControl>
-                        <Input {...field} data-testid="input-profile-lastname" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              {user.role}
+            </Badge>
+          </div>
+        </div>
+
+        <Separator />
+
+        <Form {...profileForm}>
+          <form
+            onSubmit={profileForm.handleSubmit((data) => profileMutation.mutate(data))}
+            className="space-y-3"
+          >
+            <div className="flex gap-3">
               <FormField
                 control={profileForm.control}
-                name="email"
+                name="firstName"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>First Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} data-testid="input-profile-firstname" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={profileForm.control}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Last Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} data-testid="input-profile-lastname" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <FormField
+              control={profileForm.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input type="email" {...field} data-testid="input-profile-email" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              size="sm"
+              disabled={profileMutation.isPending}
+              data-testid="button-save-profile"
+            >
+              {profileMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              Save Profile
+            </Button>
+          </form>
+        </Form>
+
+        <Separator />
+
+        <div>
+          <h4 className="text-sm font-medium flex items-center gap-2 mb-3">
+            <Lock className="h-4 w-4" />
+            Change Password
+          </h4>
+          <Form {...passwordForm}>
+            <form
+              onSubmit={passwordForm.handleSubmit((data) => passwordMutation.mutate(data))}
+              className="space-y-3"
+            >
+              <FormField
+                control={passwordForm.control}
+                name="currentPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Current Password</FormLabel>
                     <FormControl>
-                      <Input type="email" {...field} data-testid="input-profile-email" />
+                      <div className="relative">
+                        <Input
+                          type={showCurrentPassword ? "text" : "password"}
+                          {...field}
+                          data-testid="input-current-password"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-0 top-0 h-full px-3"
+                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          data-testid="button-toggle-current-password"
+                        >
+                          {showCurrentPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={passwordForm.control}
+                name="newPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>New Password</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showNewPassword ? "text" : "password"}
+                          {...field}
+                          data-testid="input-new-password"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-0 top-0 h-full px-3"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          data-testid="button-toggle-new-password"
+                        >
+                          {showNewPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={passwordForm.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm New Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type={showNewPassword ? "text" : "password"}
+                        {...field}
+                        data-testid="input-confirm-password"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -213,133 +324,21 @@ export function UserProfileDialog({ open, onOpenChange }: UserProfileDialogProps
               <Button
                 type="submit"
                 size="sm"
-                disabled={profileMutation.isPending}
-                data-testid="button-save-profile"
+                variant="outline"
+                disabled={passwordMutation.isPending}
+                data-testid="button-change-password"
               >
-                {profileMutation.isPending ? (
+                {passwordMutation.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 ) : (
-                  <Save className="h-4 w-4 mr-2" />
+                  <Lock className="h-4 w-4 mr-2" />
                 )}
-                Save Profile
+                Change Password
               </Button>
             </form>
           </Form>
-
-          <Separator />
-
-          <div>
-            <h4 className="text-sm font-medium flex items-center gap-2 mb-3">
-              <Lock className="h-4 w-4" />
-              Change Password
-            </h4>
-            <Form {...passwordForm}>
-              <form
-                onSubmit={passwordForm.handleSubmit((data) => passwordMutation.mutate(data))}
-                className="space-y-3"
-              >
-                <FormField
-                  control={passwordForm.control}
-                  name="currentPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Current Password</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input
-                            type={showCurrentPassword ? "text" : "password"}
-                            {...field}
-                            data-testid="input-current-password"
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="absolute right-0 top-0 h-full px-3"
-                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                            data-testid="button-toggle-current-password"
-                          >
-                            {showCurrentPassword ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={passwordForm.control}
-                  name="newPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>New Password</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input
-                            type={showNewPassword ? "text" : "password"}
-                            {...field}
-                            data-testid="input-new-password"
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="absolute right-0 top-0 h-full px-3"
-                            onClick={() => setShowNewPassword(!showNewPassword)}
-                            data-testid="button-toggle-new-password"
-                          >
-                            {showNewPassword ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={passwordForm.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirm New Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type={showNewPassword ? "text" : "password"}
-                          {...field}
-                          data-testid="input-confirm-password"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="submit"
-                  size="sm"
-                  variant="outline"
-                  disabled={passwordMutation.isPending}
-                  data-testid="button-change-password"
-                >
-                  {passwordMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : (
-                    <Lock className="h-4 w-4 mr-2" />
-                  )}
-                  Change Password
-                </Button>
-              </form>
-            </Form>
-          </div>
-        </SheetBody>
-      </SheetContent>
-    </Sheet>
+        </div>
+      </SheetBody>
+    </>
   );
 }

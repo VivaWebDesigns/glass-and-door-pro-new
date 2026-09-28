@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState } from "react";
+import { useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Crosshair } from "lucide-react";
@@ -29,7 +29,7 @@ export function ImagePositionPicker({
   onPositionChange,
 }: ImagePositionPickerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
+  const isDraggingRef = useRef(false);
 
   const calcPosition = useCallback(
     (clientX: number, clientY: number) => {
@@ -45,7 +45,7 @@ export function ImagePositionPicker({
   const handlePointerDown = useCallback(
     (e: React.PointerEvent) => {
       e.preventDefault();
-      setIsDragging(true);
+      isDraggingRef.current = true;
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
       calcPosition(e.clientX, e.clientY);
     },
@@ -54,18 +54,18 @@ export function ImagePositionPicker({
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent) => {
-      if (!isDragging) return;
+      if (!isDraggingRef.current) return;
       calcPosition(e.clientX, e.clientY);
     },
-    [isDragging, calcPosition],
+    [calcPosition],
   );
 
   const handlePointerUp = useCallback(() => {
-    setIsDragging(false);
+    isDraggingRef.current = false;
   }, []);
 
   const handlePointerCancel = useCallback(() => {
-    setIsDragging(false);
+    isDraggingRef.current = false;
   }, []);
 
   return (

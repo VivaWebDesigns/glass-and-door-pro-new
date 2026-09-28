@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { AdminSidebar } from "./admin-sidebar";
@@ -82,7 +82,7 @@ function sortCategories(categories: string[]) {
 export default function DocsPage() {
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedDoc, setSelectedDoc] = useState<Doc | null>(null);
+  const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [editingDoc, setEditingDoc] = useState<Partial<Doc> | null>(null);
   const [savedDocSnapshot, setSavedDocSnapshot] = useState("");
@@ -123,8 +123,7 @@ export default function DocsPage() {
     },
     onSuccess: async (payload: { total: number; created: number; updated: number; docs: Doc[] }) => {
       await queryClient.invalidateQueries({ queryKey: ["/api/admin/docs"] });
-      const firstDoc = payload.docs?.[0] ?? null;
-      setSelectedDoc(firstDoc);
+      setSelectedDocId(payload.docs?.[0]?.id ?? null);
       toast({
         title: "System documentation synced",
         description: `${payload.total} documents available, ${payload.created} created, ${payload.updated} refreshed.`,
@@ -156,15 +155,12 @@ export default function DocsPage() {
       const res = await apiRequest("PUT", `/api/admin/docs/${id}`, data);
       return res.json();
     },
-    onSuccess: async (updated: Doc) => {
+    onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["/api/admin/docs"] });
       saveFeedbackRef.current.markSaved();
       setSheetOpen(false);
       setEditingDoc(null);
       setSavedDocSnapshot("");
-      if (selectedDoc?.id === updated.id) {
-        setSelectedDoc(updated);
-      }
       toast({ title: "Document updated" });
     },
     onError: (error: Error) => {
@@ -179,7 +175,7 @@ export default function DocsPage() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["/api/admin/docs"] });
-      setSelectedDoc(null);
+      setSelectedDocId(null);
       toast({ title: "Document deleted" });
     },
   });
@@ -208,21 +204,12 @@ export default function DocsPage() {
     [categories],
   );
 
-  useEffect(() => {
-    if (!selectedDoc && filteredDocs.length > 0) {
-      setSelectedDoc(filteredDocs[0]);
-      return;
-    }
-
-    if (selectedDoc && !allDocs.some((doc) => doc.id === selectedDoc.id)) {
-      setSelectedDoc(filteredDocs[0] ?? null);
-      return;
-    }
-
-    if (selectedDoc && filteredDocs.length > 0 && !filteredDocs.some((doc) => doc.id === selectedDoc.id)) {
-      setSelectedDoc(filteredDocs[0] ?? null);
-    }
-  }, [allDocs, filteredDocs, selectedDoc]);
+  const selectedDoc = useMemo(() => {
+    const match = filteredDocs.find((doc) => doc.id === selectedDocId);
+    if (match) return match;
+    if (filteredDocs.length > 0) return filteredDocs[0];
+    return allDocs.find((doc) => doc.id === selectedDocId) ?? null;
+  }, [allDocs, filteredDocs, selectedDocId]);
 
   useEffect(() => {
     if (selectedCategory && !categories.includes(selectedCategory)) {
@@ -253,7 +240,9 @@ export default function DocsPage() {
     isDirty,
     message: "You have unsaved changes to this document. Close without saving?",
   });
-  saveFeedbackRef.current = saveState;
+  useLayoutEffect(() => {
+    saveFeedbackRef.current = saveState;
+  });
 
   const handleSheetOpenChange = (open: boolean) => {
     if (open) {
@@ -417,7 +406,7 @@ export default function DocsPage() {
                         key={doc.id}
                         type="button"
                         className={`w-full rounded-xl border p-4 text-left transition-colors ${selectedDoc?.id === doc.id ? "border-primary bg-primary/5" : "hover:border-primary/40 hover:bg-muted/50"}`}
-                        onClick={() => setSelectedDoc(doc)}
+                        onClick={() => setSelectedDocId(doc.id)}
                         data-testid={`card-doc-${doc.id}`}
                       >
                         <div className="flex items-start justify-between gap-3">

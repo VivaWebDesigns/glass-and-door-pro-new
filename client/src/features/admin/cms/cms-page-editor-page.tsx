@@ -131,13 +131,11 @@ export default function CmsPageEditorPage() {
 
   const { data: page, isLoading: pageLoading } = useQuery<CmsPage>({
     queryKey: ["/api/admin/cms/pages", id],
-    queryFn: () => fetch(`/api/admin/cms/pages/${id}`, { credentials: "include" }).then((r) => r.json()),
     enabled: !isNew,
   });
 
   const { data: revisions = [] } = useQuery<CmsPageRevision[]>({
     queryKey: ["/api/admin/cms/pages", id, "revisions"],
-    queryFn: () => fetch(`/api/admin/cms/pages/${id}/revisions`, { credentials: "include" }).then((r) => r.json()),
     enabled: !isNew,
   });
 
@@ -237,7 +235,7 @@ export default function CmsPageEditorPage() {
       const created: CmsPage = await res.json();
       queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages"] });
       toast({ title: "Page created successfully" });
-      setDraftPreviewUrl("");
+      draftPreviewUrlRef.current = "";
       applySavedState(
         {
           title: variables.title,
@@ -273,7 +271,7 @@ export default function CmsPageEditorPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages", id] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages", id, "revisions"] });
       toast({ title: "Page saved" });
-      setDraftPreviewUrl("");
+      draftPreviewUrlRef.current = "";
       applySavedState(
         {
           title: variables.title,
@@ -322,7 +320,7 @@ export default function CmsPageEditorPage() {
 
   const [scheduleDate, setScheduleDate] = useState("");
   const [schedulePopoverOpen, setSchedulePopoverOpen] = useState(false);
-  const [draftPreviewUrl, setDraftPreviewUrl] = useState("");
+  const draftPreviewUrlRef = useRef("");
 
   const scheduleMutation = useMutation({
     mutationFn: (scheduledAt: string) =>
@@ -363,7 +361,7 @@ export default function CmsPageEditorPage() {
       return response.json() as Promise<{ previewUrl: string; previewPath: string; expiresInHours: number }>;
     },
     onSuccess: (result) => {
-      setDraftPreviewUrl(result.previewUrl);
+      draftPreviewUrlRef.current = result.previewUrl;
       toast({
         title: "Draft preview link ready",
         description: `This preview link is ready to use and will expire in ${result.expiresInHours} hours.`,
@@ -376,8 +374,8 @@ export default function CmsPageEditorPage() {
 
   const openDraftPreview = async () => {
     try {
-      const result = draftPreviewUrl
-        ? { previewUrl: draftPreviewUrl }
+      const result = draftPreviewUrlRef.current
+        ? { previewUrl: draftPreviewUrlRef.current }
         : await previewLinkMutation.mutateAsync();
       window.open(result.previewUrl, "_blank", "noopener,noreferrer");
     } catch {
@@ -387,8 +385,8 @@ export default function CmsPageEditorPage() {
 
   const copyDraftPreview = async () => {
     try {
-      const result = draftPreviewUrl
-        ? { previewUrl: draftPreviewUrl }
+      const result = draftPreviewUrlRef.current
+        ? { previewUrl: draftPreviewUrlRef.current }
         : await previewLinkMutation.mutateAsync();
       await navigator.clipboard.writeText(result.previewUrl);
       toast({ title: "Draft preview link copied" });

@@ -348,7 +348,7 @@ function MenuEditor({
       const item = arr[idx];
       const prevSibling = arr[idx - 1];
       arr.splice(idx, 1);
-      prevSibling.children = [...prevSibling.children, item];
+      arr[idx - 1] = { ...prevSibling, children: [...prevSibling.children, item] };
       return arr;
     });
   }, []);

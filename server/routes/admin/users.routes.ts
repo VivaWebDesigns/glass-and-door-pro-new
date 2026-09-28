@@ -162,8 +162,10 @@ router.post(
       return;
     }
 
-    const validFormIds = await normalizeActiveFormNotificationIds(data.formNotificationFormIds);
-    const hashedPassword = await hashPassword(data.password);
+    const [validFormIds, hashedPassword] = await Promise.all([
+      normalizeActiveFormNotificationIds(data.formNotificationFormIds),
+      hashPassword(data.password),
+    ]);
     const user = await storage.users.createUser({
       email: data.email,
       password: hashedPassword,

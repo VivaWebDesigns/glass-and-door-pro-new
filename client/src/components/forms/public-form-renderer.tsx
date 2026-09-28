@@ -191,18 +191,18 @@ function ChoiceGroup({
       ? "flex flex-wrap gap-4"
       : "space-y-3";
   const multiple = field.type === "checkbox" || field.type === "multiselect" || (field.type === "image-choice" && field.config?.selectionMode === "multiple");
-  const selectedValues = multiple ? arrayValue(value).map((item) => text(item)) : [];
+  const selectedValues = new Set(multiple ? arrayValue(value).map((item) => text(item)) : []);
   const selectedValue = multiple ? "" : text(value);
 
   return (
     <div className={choiceLayout}>
       {(field.options ?? []).map((option) => {
-        const checked = multiple ? selectedValues.includes(option.value) : selectedValue === option.value;
+        const checked = multiple ? selectedValues.has(option.value) : selectedValue === option.value;
         const toggle = (nextChecked: boolean) => {
           if (multiple) {
             const nextValues = nextChecked
               ? [...selectedValues, option.value]
-              : selectedValues.filter((item) => item !== option.value);
+              : [...selectedValues].filter((item) => item !== option.value);
             onChange(Array.from(new Set(nextValues)));
           } else {
             onChange(nextChecked ? option.value : "");
@@ -243,6 +243,8 @@ function ChoiceGroup({
           <label key={option.value} className="flex items-start gap-3 rounded-lg border px-3 py-2">
             <input
               type="radio"
+              name={field.key}
+              value={option.value}
               checked={checked}
               onChange={() => onChange(option.value)}
               className="mt-1 h-4 w-4"
@@ -539,17 +541,12 @@ export function PublicFormRenderer({
         credentials: "include",
         body: JSON.stringify(values),
       });
-      const payload = (await response.json().catch(() => ({}))) as {
-        message?: string;
-        error?: string;
-        submissionId?: string;
-      };
-
       if (!response.ok) {
-        throw new Error(payload.message || payload.error || "Failed to submit form.");
+        const errorPayload = (await response.json().catch(() => ({}))) as { message?: string; error?: string };
+        throw new Error(errorPayload.message || errorPayload.error || "Failed to submit form.");
       }
 
-      return payload;
+      return (await response.json().catch(() => ({}))) as { message?: string; submissionId?: string };
     },
     onSuccess: (payload) => {
       if (payload.submissionId) {

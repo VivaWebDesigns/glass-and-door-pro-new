@@ -1473,6 +1473,7 @@ export function BrandingTab({
                   </p>
                   <div className="flex flex-wrap items-center gap-4 text-sm">
                     <a
+                      id="branding-preview-link"
                       href="#branding-preview-link"
                       className="underline underline-offset-4"
                       style={previewLinkStyle}

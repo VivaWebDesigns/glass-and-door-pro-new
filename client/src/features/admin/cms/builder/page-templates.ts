@@ -165,12 +165,12 @@ export function generateLandingPageBlocks(
   ctaText: string,
   ctaLink: string,
 ): BlockInstance[] {
-  const blockOptions = getRecommendedBlocks(goalId);
+  const blockOptionsById = new Map(getRecommendedBlocks(goalId).map((item) => [item.id, item]));
   const blocks: BlockInstance[] = [];
   const audienceDescription = buildAudienceSubheading(audiences, "");
 
   for (const id of selectedBlockIds) {
-    const option = blockOptions.find((item) => item.id === id);
+    const option = blockOptionsById.get(id);
     if (!option) continue;
 
     if (option.type === "hero") {

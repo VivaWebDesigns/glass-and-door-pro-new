@@ -377,6 +377,8 @@ function FormNotificationPanel({
   onToggle: (formId: string) => void;
   activeForms: ActiveForm[];
 }) {
+  const selectedFormIdSet = new Set(selectedFormIds);
+
   return (
     <div className="rounded-lg border p-4 space-y-4">
       <div>
@@ -392,7 +394,7 @@ function FormNotificationPanel({
           {activeForms.map((form) => (
             <label key={form.id} className="flex items-start gap-3 rounded-md border p-3 cursor-pointer hover:bg-muted/30">
               <Checkbox
-                checked={selectedFormIds.includes(form.id)}
+                checked={selectedFormIdSet.has(form.id)}
                 onCheckedChange={() => onToggle(form.id)}
                 data-testid={`checkbox-form-notification-${form.slug}`}
               />

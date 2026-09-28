@@ -59,7 +59,7 @@ export default function CmsSectionEditorPage() {
   const isNew = !id || id === "new";
 
   const [builderContent, setBuilderContent] = useState<BuilderContent>(EMPTY_CONTENT);
-  const [initialized, setInitialized] = useState(false);
+  const initializedRef = useRef(false);
   const [savedBuilderSnapshot, setSavedBuilderSnapshot] = useState(() =>
     JSON.stringify(EMPTY_CONTENT)
   );
@@ -86,7 +86,7 @@ export default function CmsSectionEditorPage() {
   });
 
   useEffect(() => {
-    if (section && !initialized) {
+    if (section && !initializedRef.current) {
       form.reset({
         name: section.name,
         description: section.description ?? "",
@@ -95,9 +95,9 @@ export default function CmsSectionEditorPage() {
       const blocks = Array.isArray(section.blocks) ? section.blocks : [];
       setBuilderContent({ blocks: blocks as any });
       setSavedBuilderSnapshot(JSON.stringify({ blocks }));
-      setInitialized(true);
+      initializedRef.current = true;
     }
-  }, [section, initialized, form]);
+  }, [section, form]);
 
   useLockConflictGuard({
     active: !isNew,

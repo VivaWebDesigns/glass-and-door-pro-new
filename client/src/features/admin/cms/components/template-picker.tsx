@@ -72,7 +72,7 @@ export function TemplatePicker({ open, onClose, onSelect, onOpenWizard }: Templa
               <button
                 key={tmpl.id}
                 onClick={() => setSelected(tmpl.id)}
-                className={`relative flex flex-col items-center gap-2 p-4 rounded-lg border-2 text-center transition-all ${
+                className={`relative flex flex-col items-center gap-2 p-4 rounded-lg border-2 text-center transition ${
                   isSelected
                     ? "border-violet-500 bg-violet-50 dark:bg-violet-950/30 ring-1 ring-violet-500"
                     : "border-border hover:border-violet-300 hover:bg-muted/40"
@@ -110,7 +110,7 @@ export function TemplatePicker({ open, onClose, onSelect, onOpenWizard }: Templa
               onClose();
               onOpenWizard();
             }}
-            className="flex flex-col items-center gap-2 p-4 rounded-lg border-2 border-dashed border-violet-300 dark:border-violet-700 text-center transition-all hover:bg-violet-50 dark:hover:bg-violet-950/30 hover:border-violet-400"
+            className="flex flex-col items-center gap-2 p-4 rounded-lg border-2 border-dashed border-violet-300 dark:border-violet-700 text-center transition hover:bg-violet-50 dark:hover:bg-violet-950/30 hover:border-violet-400"
             data-testid="button-open-wizard"
           >
             <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-violet-100 to-purple-100 dark:from-violet-900/50 dark:to-purple-900/50 flex items-center justify-center">

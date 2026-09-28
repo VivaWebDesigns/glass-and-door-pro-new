@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ElementType } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ElementType } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   type CmsForm,
@@ -372,15 +372,17 @@ function stringifySubmissionValue(value: unknown): string {
   return String(value);
 }
 
+const submissionDateFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+});
+
 function formatSubmissionDate(value: string | Date | null | undefined) {
   if (!value) return "Unknown";
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(new Date(value));
+  return submissionDateFormatter.format(new Date(value));
 }
 
 function buildSubmissionCsv(submissions: CmsFormSubmission[]) {
@@ -548,7 +550,7 @@ function FormsPageContent() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"builder" | "entries">("builder");
   const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
-  const [selectedEntriesFormId, setSelectedEntriesFormId] = useState<string | null>(null);
+  const [requestedEntriesFormId, setRequestedEntriesFormId] = useState<string | null>(null);
   const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
   const [draft, setDraft] = useState<EditableForm | null>(null);
   const [savedDraftSnapshot, setSavedDraftSnapshot] = useState("");
@@ -558,8 +560,8 @@ function FormsPageContent() {
     clearFeedback: () => {},
   });
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
-  const [draggingFieldType, setDraggingFieldType] = useState<CmsFormFieldType | null>(null);
-  const [draggingFieldId, setDraggingFieldId] = useState<string | null>(null);
+  const draggingFieldTypeRef = useRef<CmsFormFieldType | null>(null);
+  const draggingFieldIdRef = useRef<string | null>(null);
   const [dropIndex, setDropIndex] = useState<number | null>(null);
   const [formSettingsOpen, setFormSettingsOpen] = useState(true);
   const [openGroups, setOpenGroups] = useState<Record<"standard" | "advanced", boolean>>({
@@ -576,6 +578,9 @@ function FormsPageContent() {
     () => forms.filter((form) => form.isActive),
     [forms]
   );
+  const selectedEntriesFormId = activeForms.some((form) => form.id === requestedEntriesFormId)
+    ? requestedEntriesFormId
+    : activeForms[0]?.id ?? null;
 
   const { data: submissions = [], isLoading: isSubmissionsLoading } = useQuery<CmsFormSubmission[]>({
     queryKey: ["/api/admin/forms", selectedEntriesFormId, "submissions"],
@@ -611,23 +616,6 @@ function FormsPageContent() {
       }
     }
   }, [forms, selectedFormId, draft]);
-
-  useEffect(() => {
-    if (!selectedEntriesFormId && activeForms.length > 0) {
-      setSelectedEntriesFormId(activeForms[0].id);
-      setSelectedEntryId(null);
-      return;
-    }
-
-    if (selectedEntriesFormId && !activeForms.some((form) => form.id === selectedEntriesFormId)) {
-      setSelectedEntriesFormId(activeForms[0]?.id ?? null);
-      setSelectedEntryId(null);
-    }
-  }, [activeForms, selectedEntriesFormId]);
-
-  useEffect(() => {
-    setSelectedEntryId(null);
-  }, [selectedEntriesFormId]);
 
   useEffect(() => {
     if (selectedEntryId && !submissions.some((submission) => submission.id === selectedEntryId)) {
@@ -685,7 +673,9 @@ function FormsPageContent() {
     isDirty: activeTab === "builder" && isDirty,
     message: "You have unsaved changes to this form. Leave without saving?",
   });
-  saveFeedbackRef.current = saveState;
+  useLayoutEffect(() => {
+    saveFeedbackRef.current = saveState;
+  });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -817,14 +807,15 @@ function FormsPageContent() {
   };
 
   const addField = (type: CmsFormFieldType, index?: number) => {
+    if (!draft) return;
+    const field = createField(type);
     updateDraft((current) => {
-      const field = createField(type);
       const insertAt = typeof index === "number" ? index : current.fields.length;
       const nextFields = [...current.fields];
       nextFields.splice(insertAt, 0, field);
-      setSelectedFieldId(field.id);
       return { ...current, fields: nextFields };
     });
+    setSelectedFieldId(field.id);
   };
 
   const removeField = (fieldId: string) => {
@@ -909,21 +900,21 @@ function FormsPageContent() {
   };
 
   const onDropFieldAtIndex = (index: number) => {
-    if (draggingFieldType) {
-      addField(draggingFieldType, index);
-    } else if (draggingFieldId && draft) {
-      const currentIndex = draft.fields.findIndex((field) => field.id === draggingFieldId);
+    if (draggingFieldTypeRef.current) {
+      addField(draggingFieldTypeRef.current, index);
+    } else if (draggingFieldIdRef.current && draft) {
+      const currentIndex = draft.fields.findIndex((field) => field.id === draggingFieldIdRef.current);
       if (currentIndex !== -1) {
         updateDraft((current) => ({
           ...current,
           fields: moveItem(current.fields, currentIndex, index),
         }));
-        setSelectedFieldId(draggingFieldId);
+        setSelectedFieldId(draggingFieldIdRef.current);
       }
     }
 
-    setDraggingFieldType(null);
-    setDraggingFieldId(null);
+    draggingFieldTypeRef.current = null;
+    draggingFieldIdRef.current = null;
     setDropIndex(null);
   };
 
@@ -1332,10 +1323,10 @@ function FormsPageContent() {
                                 onDragStart={(event) => {
                                   event.dataTransfer.effectAllowed = "move";
                                   event.dataTransfer.setData("text/plain", field.id);
-                                  setDraggingFieldId(field.id);
+                                  draggingFieldIdRef.current = field.id;
                                 }}
                                 onDragEnd={() => {
-                                  setDraggingFieldId(null);
+                                  draggingFieldIdRef.current = null;
                                   setDropIndex(null);
                                 }}
                                 onDragOver={(event) => {
@@ -1844,9 +1835,11 @@ function FormsPageContent() {
                               key={item.type}
                               item={item}
                               onAdd={addField}
-                              onDragStart={setDraggingFieldType}
+                              onDragStart={(type) => {
+                                draggingFieldTypeRef.current = type;
+                              }}
                               onDragEnd={() => {
-                                setDraggingFieldType(null);
+                                draggingFieldTypeRef.current = null;
                                 setDropIndex(null);
                               }}
                             />
@@ -1888,7 +1881,10 @@ function FormsPageContent() {
                     <button
                       key={form.id}
                       type="button"
-                      onClick={() => setSelectedEntriesFormId(form.id)}
+                      onClick={() => {
+                        setRequestedEntriesFormId(form.id);
+                        setSelectedEntryId(null);
+                      }}
                       className={cn(
                         "w-full rounded-lg border px-3 py-3 text-left transition-colors",
                         selectedEntriesFormId === form.id ? "border-primary bg-primary/5" : "hover:bg-muted/40"

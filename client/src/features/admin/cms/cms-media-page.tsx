@@ -91,7 +91,7 @@ export default function CmsMediaPage() {
   >("newest");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedAsset, setSelectedAsset] = useState<CmsMediaLibraryAsset | null>(null);
-  const [metadataForm, setMetadataForm] = useState<MediaMetadataForm>(buildMetadataForm(null));
+  const [metadataForm, setMetadataForm] = useState<MediaMetadataForm>(() => buildMetadataForm(null));
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [cropFileName, setCropFileName] = useState("image.webp");
   const [isPreparingCrop, setIsPreparingCrop] = useState(false);
@@ -264,7 +264,8 @@ export default function CmsMediaPage() {
         URL.revokeObjectURL(cropSrc);
       }
       setCropFileName(selectedAsset.originalName || "image.webp");
-      setCropSrc(URL.createObjectURL(blob));
+      const nextCropSrc = URL.createObjectURL(blob);
+      setCropSrc(nextCropSrc);
     } catch (error) {
       toast({
         title: "Unable to open crop tool",
@@ -396,7 +397,7 @@ export default function CmsMediaPage() {
             {filteredAssets.map((asset) => (
               <button
                 key={asset.id}
-                className="group relative aspect-square rounded-xl border bg-muted/20 overflow-hidden transition-all hover:border-violet-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-violet-400"
+                className="group relative aspect-square rounded-xl border bg-muted/20 overflow-hidden transition hover:border-violet-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-violet-400"
                 onClick={() => setSelectedAsset(asset)}
                 data-testid={`media-asset-${asset.id}`}
               >
