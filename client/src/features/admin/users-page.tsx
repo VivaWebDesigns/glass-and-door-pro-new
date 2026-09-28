@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { ProtectedRoute } from "@/components/shared/protected-route";
 import { AdminSidebar } from "./admin-sidebar";
@@ -39,7 +39,6 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
 import type { User } from "@shared/schema";
 import { AdminPermission } from "@shared/types";
 import {
@@ -55,10 +54,9 @@ import {
   ShieldCheck,
   AlertTriangle,
   Shield,
-  PanelsTopLeft,
+  
   Palette,
-  FolderKanban,
-} from "lucide-react";
+  FolderKanban } from "lucide-react";
 
 type SafeUser = Omit<User, "password"> & { country?: string | null };
 type ActiveForm = {
@@ -295,6 +293,7 @@ function UsersContent() {
                   <Button
                     variant="ghost"
                     size="icon"
+                    aria-label={`Open ${user.firstName} ${user.lastName}`}
                     onClick={() => setDetailUser(user)}
                     data-testid={`button-actions-${user.id}`}
                   >
@@ -521,6 +520,7 @@ export function CreateUserSheet({
                   type="button"
                   variant="ghost"
                   size="icon"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                   className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
                   onClick={() => setShowPassword(!showPassword)}
                 >
@@ -615,8 +615,9 @@ function UserDetailSheet({
   const [newPassword, setNewPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  useEffect(() => {
-    if (!user) return;
+  const [syncedUser, setSyncedUser] = useState<typeof user>(null);
+  if (user && user !== syncedUser) {
+    setSyncedUser(user);
     setFirstName(user.firstName ?? "");
     setLastName(user.lastName ?? "");
     setEmail(user.email);
@@ -626,7 +627,7 @@ function UserDetailSheet({
     setNewPassword("");
     setShowPassword(false);
     setActiveTab("profile");
-  }, [user]);
+  }
 
   const updateMutation = useMutation({
     mutationFn: async () => {
@@ -835,6 +836,7 @@ function UserDetailSheet({
                         type="button"
                         variant="ghost"
                         size="icon"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
                         className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
                         onClick={() => setShowPassword(!showPassword)}
                       >

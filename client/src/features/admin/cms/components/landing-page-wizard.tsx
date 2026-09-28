@@ -151,7 +151,7 @@ export function LandingPageWizard({ open, onClose, onCreate }: LandingPageWizard
             const isActive = i === step;
             const isDone = i < step;
             return (
-              <div key={i} className="flex items-center gap-1 flex-1">
+              <div key={s.label} className="flex items-center gap-1 flex-1">
                 <button
                   onClick={() => i < step && goToStep(i)}
                   disabled={i > step}

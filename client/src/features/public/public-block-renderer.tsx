@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense, type MouseEvent, type ReactElement } from "react";
+import { Fragment, useState, useEffect, lazy, Suspense, type MouseEvent, type ReactElement } from "react";
 import { useLocation } from "wouter";
 import { excludeServiceUtilitySnippets } from "@shared/glass-search-snippets";
 import { Button } from "@/components/ui/button";
@@ -18,13 +18,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-  SectionStyleWrapper,
   getSectionPaddingClasses,
   getSectionStyleConfig,
   hasSectionStyleConfig,
   hexToRgba,
   normalizeHexColor,
 } from "@/features/admin/cms/builder/section-style";
+import { SectionStyleWrapper } from "@/features/admin/cms/builder/section-style-wrapper";
 import {
   arr,
   colorStyle,
@@ -37,10 +37,8 @@ import {
   SPACING_MAP,
   str,
 } from "@/features/admin/cms/builder/block-renderer.shared";
-import {
-  renderPublicDisplayText,
-  SectionHeading,
-} from "@/features/admin/cms/builder/section-heading";
+import { SectionHeading } from "@/features/admin/cms/builder/section-heading";
+import { renderPublicDisplayText } from "@/features/admin/cms/builder/public-display-text";
 import {
   Globe,
   Heart,
@@ -78,6 +76,7 @@ import type { BlockInstance, BuilderContent } from "@/features/admin/cms/builder
 import { FULL_WIDTH_BLOCK_TYPES } from "@/features/admin/cms/builder/page-builder-constants";
 import { sanitizeEmbedHtml, sanitizeRichHtml } from "@/lib/sanitize-html";
 import { ReviewSourceBadge } from "@/components/shared/review-source-badge";
+import { withContentKeys } from "@/lib/content-keys";
 
 export type { BlockInstance, BuilderContent };
 
@@ -318,8 +317,8 @@ function TwoColumnTextBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-4">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
       <div className="grid gap-8 md:grid-cols-2">
-        {columns.map((column, index) => (
-          <div key={index} className="space-y-4">
+        {columns.map(withContentKeys((column, index, itemKey) => (
+          <div key={itemKey} className="space-y-4">
             {column.heading && (
               <h3 className="text-xl font-heading font-semibold">{column.heading}</h3>
             )}
@@ -340,7 +339,7 @@ function TwoColumnTextBlock({ props }: { props: Record<string, unknown> }) {
               <p className="text-sm text-muted-foreground">Add content for this column.</p>
             )}
           </div>
-        ))}
+        )))}
       </div>
     </div>
   );
@@ -393,9 +392,9 @@ function LinkListBlock({ props }: { props: Record<string, unknown> }) {
         {links.length === 0 ? (
           <div className="text-sm text-muted-foreground">Add links to display here.</div>
         ) : (
-          links.map((link, index) => (
+          links.map(withContentKeys((link, index, itemKey) => (
             <a
-              key={index}
+              key={itemKey}
               href={link.url || "#"}
               className="public-section-card public-section-card-hover group rounded-lg p-4 sm:p-5"
               data-testid={`link-list-item-${index}`}
@@ -414,7 +413,7 @@ function LinkListBlock({ props }: { props: Record<string, unknown> }) {
                 <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-accent transition-colors flex-shrink-0 mt-1" />
               </div>
             </a>
-          ))
+          )))
         )}
       </div>
     </div>
@@ -477,6 +476,7 @@ function RichTextBlock({ props }: { props: Record<string, unknown> }) {
       />
       <div
         className={`public-prose prose prose-sm max-w-none ${textAlign}`}
+        role="presentation"
         onClick={handleContentClick}
         dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(str(props.content) || "<p>No content.</p>") }}
       />
@@ -643,9 +643,9 @@ function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
             Add cards to display here
           </div>
         ) : (
-          cards.map((card, i) => (
+          cards.map(withContentKeys((card, i, itemKey) => (
             <Card
-              key={i}
+              key={itemKey}
               className={`public-section-card-hover h-full overflow-hidden rounded-lg border-border/70 text-center shadow-sm ${variant === "service-links" ? "border-none bg-white" : ""}`}
             >
               <CardContent className="public-service-card-content flex h-full flex-col px-4 pb-5 pt-6 sm:px-6 sm:pb-6 sm:pt-8">
@@ -678,7 +678,7 @@ function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
                 )}
               </CardContent>
             </Card>
-          ))
+          )))
         )}
       </div>
     </div>
@@ -694,9 +694,9 @@ function FaqBlock({ props }: { props: Record<string, unknown> }) {
         {items.length === 0 ? (
           <p className="text-muted-foreground">Add FAQ items to display here.</p>
         ) : (
-          items.map((item, i) => (
+          items.map(withContentKeys((item, i, itemKey) => (
             <AccordionItem
-              key={i}
+              key={itemKey}
               value={`faq-${i}`}
               className="public-section-card rounded-lg px-4"
             >
@@ -708,7 +708,7 @@ function FaqBlock({ props }: { props: Record<string, unknown> }) {
                 />
               </AccordionContent>
             </AccordionItem>
-          ))
+          )))
         )}
       </Accordion>
     </div>
@@ -745,10 +745,8 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
       date?: string;
       reviewDate?: string;
     },
-    i: number,
   ) => (
     <Card
-      key={i}
       className={`public-section-card h-full rounded-lg ${variant === "google-carousel" ? "border-none bg-white shadow-lg" : ""}`}
     >
       <CardContent className="pt-6">
@@ -798,11 +796,11 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
             className="w-full"
           >
             <CarouselContent className="-ml-6">
-              {items.map((item, i) => (
-                <CarouselItem key={i} className="pl-6 basis-full md:basis-1/2">
-                  {renderCard(item, i)}
+              {items.map(withContentKeys((item, i, itemKey) => (
+                <CarouselItem key={itemKey} className="pl-6 basis-full md:basis-1/2">
+                  {renderCard(item)}
                 </CarouselItem>
-              ))}
+              )))}
             </CarouselContent>
             <div className="mt-6 flex items-center justify-center gap-3">
               <CarouselPrevious className="static h-9 w-9 translate-x-0 translate-y-0 border-border/70 bg-background/95" />
@@ -826,7 +824,7 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {items.map((item, i) => renderCard(item, i))}
+          {items.map(withContentKeys((item, _index, itemKey) => <Fragment key={itemKey}>{renderCard(item)}</Fragment>))}
         </div>
       )}
       {!shouldCarousel && ctaText && ctaLink ? (
@@ -872,9 +870,9 @@ function ButtonGroupBlock({ props }: { props: Record<string, unknown> }) {
         {buttons.length === 0 ? (
           <p className="text-muted-foreground text-sm">Add buttons to display here</p>
         ) : (
-          buttons.map((btn, i) => (
+          buttons.map(withContentKeys((btn, i, itemKey) => (
             <FormModalButton
-              key={i}
+              key={itemKey}
               label={btn.text}
               action={btn.action}
               href={btn.link}
@@ -893,7 +891,7 @@ function ButtonGroupBlock({ props }: { props: Record<string, unknown> }) {
               size="lg"
               testId={`button-group-${i}`}
             />
-          ))
+          )))
         )}
       </div>
     </div>
@@ -1032,8 +1030,8 @@ function ContactInfoBlock({ props }: { props: Record<string, unknown> }) {
         {items.length === 0 ? (
           <p className="text-muted-foreground text-sm">Add contact items to display here.</p>
         ) : (
-          items.map((item, i) => (
-            <div key={i} className="flex items-start gap-3">
+          items.map(withContentKeys((item, i, itemKey) => (
+            <div key={itemKey} className="flex items-start gap-3">
               <div className="h-9 w-9 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
                 <LucideIcon name={item.icon || "Globe"} className="h-4 w-4 text-accent" />
               </div>
@@ -1042,7 +1040,7 @@ function ContactInfoBlock({ props }: { props: Record<string, unknown> }) {
                 <p className="break-words font-medium text-sm">{item.value}</p>
               </div>
             </div>
-          ))
+          )))
         )}
       </div>
     </div>
@@ -1074,8 +1072,8 @@ function FeatureListBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-4" data-testid="block-feature-list">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
       <div className={`grid grid-cols-1 ${colsClass} gap-6 sm:gap-8`}>
-        {features.map((f, i) => (
-          <div key={i} className="flex items-start gap-4" data-testid={`feature-item-${i}`}>
+        {features.map(withContentKeys((f, i, itemKey) => (
+          <div key={itemKey} className="flex items-start gap-4" data-testid={`feature-item-${i}`}>
             <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
               <LucideIcon name={f.icon || "CheckCircle"} className="h-5 w-5 text-accent" />
             </div>
@@ -1084,7 +1082,7 @@ function FeatureListBlock({ props }: { props: Record<string, unknown> }) {
               <p className="text-sm text-muted-foreground leading-relaxed">{f.description}</p>
             </div>
           </div>
-        ))}
+        )))}
       </div>
     </div>
   );
@@ -1096,8 +1094,8 @@ function ObjectionBustersBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-4" data-testid="block-objection-busters">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
       <div className="space-y-6 max-w-3xl mx-auto">
-        {items.map((item, i) => (
-          <div key={i} className="rounded-xl border p-6" data-testid={`objection-item-${i}`}>
+        {items.map(withContentKeys((item, i, itemKey) => (
+          <div key={itemKey} className="rounded-xl border p-6" data-testid={`objection-item-${i}`}>
             <div className="flex items-start gap-3 mb-3">
               <XCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
               <p className="font-medium text-sm">{item.concern}</p>
@@ -1107,7 +1105,7 @@ function ObjectionBustersBlock({ props }: { props: Record<string, unknown> }) {
               <p className="text-sm text-muted-foreground leading-relaxed">{item.response}</p>
             </div>
           </div>
-        ))}
+        )))}
       </div>
     </div>
   );
@@ -1121,8 +1119,8 @@ function BeforeAfterBlock({ props }: { props: Record<string, unknown> }) {
       <div className="relative max-w-3xl mx-auto">
         <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border hidden sm:block" />
         <div className="space-y-8">
-          {items.map((item, i) => (
-            <div key={i} className="flex gap-4 sm:gap-6" data-testid={`milestone-item-${i}`}>
+          {items.map(withContentKeys((item, i, itemKey) => (
+            <div key={itemKey} className="flex gap-4 sm:gap-6" data-testid={`milestone-item-${i}`}>
               <div className="relative z-10 flex-shrink-0 w-12 h-12 rounded-full bg-accent text-accent-foreground flex items-center justify-center font-bold text-xs">
                 {item.milestone}
               </div>
@@ -1139,7 +1137,7 @@ function BeforeAfterBlock({ props }: { props: Record<string, unknown> }) {
                 </div>
               </div>
             </div>
-          ))}
+          )))}
         </div>
       </div>
     </div>
@@ -1152,16 +1150,16 @@ function TrustBarBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-4 border-y bg-muted/20" data-testid="block-trust-bar">
       <SectionHeading props={props} defaultAlignment="center" className="mb-6" />
       <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
-        {items.map((item, i) => (
+        {items.map(withContentKeys((item, i, itemKey) => (
           <div
-            key={i}
+            key={itemKey}
             className="flex items-center gap-2 text-muted-foreground"
             data-testid={`trust-signal-${i}`}
           >
             <LucideIcon name={item.icon || "CheckCircle"} className="h-4 w-4 text-accent" />
             <span className="text-sm font-medium">{item.label}</span>
           </div>
-        ))}
+        )))}
       </div>
     </div>
   );
@@ -1173,7 +1171,7 @@ function PressMentionsBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-4" data-testid="block-press-mentions">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
       <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12">
-        {items.map((item, i) => {
+        {items.map(withContentKeys((item, i, itemKey) => {
           const content = item.logoUrl ? (
             <img
               src={item.logoUrl}
@@ -1187,7 +1185,7 @@ function PressMentionsBlock({ props }: { props: Record<string, unknown> }) {
           );
           return item.link ? (
             <a
-              key={i}
+              key={itemKey}
               href={item.link}
               target="_blank"
               rel="noopener noreferrer"
@@ -1198,11 +1196,11 @@ function PressMentionsBlock({ props }: { props: Record<string, unknown> }) {
               <ExternalLink className="h-3 w-3 text-muted-foreground" />
             </a>
           ) : (
-            <div key={i} data-testid={`press-item-${i}`}>
+            <div key={itemKey} data-testid={`press-item-${i}`}>
               {content}
             </div>
           );
-        })}
+        }))}
       </div>
     </div>
   );
@@ -1214,12 +1212,12 @@ function SocialProofStatsBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-4" data-testid="block-social-proof-stats">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
       <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
-        {stats.map((stat, i) => (
-          <div key={i} className="text-center" data-testid={`stat-item-${i}`}>
+        {stats.map(withContentKeys((stat, i, itemKey) => (
+          <div key={itemKey} className="text-center" data-testid={`stat-item-${i}`}>
             <p className="text-3xl md:text-4xl font-bold text-accent">{stat.value}</p>
             <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
           </div>
-        ))}
+        )))}
       </div>
       {str(props.disclaimer) && (
         <p className="text-xs text-muted-foreground text-center mt-6 italic">
@@ -1255,9 +1253,9 @@ function ImageGridBlock({ props }: { props: Record<string, unknown> }) {
               : `grid grid-cols-1 ${colsClass} ${gapClass}`
           }
         >
-          {images.map((img, i) => (
+          {images.map(withContentKeys((img, i, itemKey) => (
             <div
-              key={i}
+              key={itemKey}
               className={
                 variant === "gallery-strip"
                   ? "aspect-square overflow-hidden rounded-lg shadow-md"
@@ -1288,7 +1286,7 @@ function ImageGridBlock({ props }: { props: Record<string, unknown> }) {
                 </p>
               )}
             </div>
-          ))}
+          )))}
         </div>
       )}
     </div>
@@ -1342,6 +1340,7 @@ function SliderBlock({ props }: { props: Record<string, unknown> }) {
           <Button
             variant="outline"
             size="icon"
+            aria-label="Previous slide"
             className="rounded-full h-8 w-8"
             onClick={() => setCurrent((c) => (c - 1 + slides.length) % slides.length)}
             data-testid="button-slider-prev"
@@ -1349,18 +1348,22 @@ function SliderBlock({ props }: { props: Record<string, unknown> }) {
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <div className="flex gap-1.5">
-            {slides.map((_, i) => (
+            {slides.map(withContentKeys((_slide, i, itemKey) => (
               <button
-                key={i}
+                key={itemKey}
+                type="button"
+                aria-label={`Go to slide ${i + 1}`}
+                aria-current={i === current}
                 className={`w-2 h-2 rounded-full transition-colors ${i === current ? "bg-accent" : "bg-muted-foreground/30"}`}
                 onClick={() => setCurrent(i)}
                 data-testid={`button-slider-dot-${i}`}
               />
-            ))}
+            )))}
           </div>
           <Button
             variant="outline"
             size="icon"
+            aria-label="Next slide"
             className="rounded-full h-8 w-8"
             onClick={() => setCurrent((c) => (c + 1) % slides.length)}
             data-testid="button-slider-next"
@@ -1379,9 +1382,9 @@ function StatsBarBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-6 bg-muted/30 rounded-xl" data-testid="block-stats-bar">
       <SectionHeading props={props} defaultAlignment="center" className="mb-6 px-4" />
       <div className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
-        {items.map((item, i) => (
+        {items.map(withContentKeys((item, i, itemKey) => (
           <div
-            key={i}
+            key={itemKey}
             className="flex items-center justify-center gap-3 rounded-xl border border-border/50 bg-background/70 px-4 py-4 text-center sm:justify-start"
             data-testid={`stats-bar-item-${i}`}
           >
@@ -1393,7 +1396,7 @@ function StatsBarBlock({ props }: { props: Record<string, unknown> }) {
               <p className="text-xs text-muted-foreground">{item.label}</p>
             </div>
           </div>
-        ))}
+        )))}
       </div>
     </div>
   );
@@ -1414,9 +1417,9 @@ function IconGridBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-4" data-testid="block-icon-grid">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
       <div className={`grid grid-cols-1 ${colsClass} gap-4`}>
-        {items.map((item, i) => (
+        {items.map(withContentKeys((item, i, itemKey) => (
           <div
-            key={i}
+            key={itemKey}
             className="flex min-w-0 flex-col items-center gap-3 rounded-xl border p-4 text-center transition-shadow hover:shadow-sm sm:p-5"
             data-testid={`icon-grid-item-${i}`}
           >
@@ -1425,7 +1428,7 @@ function IconGridBlock({ props }: { props: Record<string, unknown> }) {
             </div>
             <p className="text-sm font-medium leading-snug break-words">{item.title}</p>
           </div>
-        ))}
+        )))}
       </div>
     </div>
   );
@@ -1441,9 +1444,9 @@ function BenefitStackBlock({ props }: { props: Record<string, unknown> }) {
       <div className={`relative ${isTimeline ? "pl-8" : ""}`}>
         {isTimeline && <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-accent/20" />}
         <div className={isTimeline ? "space-y-6" : "space-y-4"}>
-          {items.map((item, i) => (
+          {items.map(withContentKeys((item, i, itemKey) => (
             <div
-              key={i}
+              key={itemKey}
               className={`flex items-start gap-4 ${isTimeline ? "relative" : "p-4 rounded-lg border"}`}
               data-testid={`benefit-item-${i}`}
             >
@@ -1460,7 +1463,7 @@ function BenefitStackBlock({ props }: { props: Record<string, unknown> }) {
                 <p className="text-sm text-muted-foreground mt-0.5">{item.description}</p>
               </div>
             </div>
-          ))}
+          )))}
         </div>
       </div>
     </div>
@@ -1484,8 +1487,8 @@ function ScienceExplainerBlock({ props }: { props: Record<string, unknown> }) {
             Sources
           </p>
           <ol className="space-y-1">
-            {citations.map((c, i) => (
-              <li key={i} className="text-xs text-muted-foreground" data-testid={`citation-${i}`}>
+            {citations.map(withContentKeys((c, i, itemKey) => (
+              <li key={itemKey} className="text-xs text-muted-foreground" data-testid={`citation-${i}`}>
                 {c.url ? (
                   <a
                     href={c.url}
@@ -1499,7 +1502,7 @@ function ScienceExplainerBlock({ props }: { props: Record<string, unknown> }) {
                   c.text
                 )}
               </li>
-            ))}
+            )))}
           </ol>
         </div>
       )}
@@ -1513,8 +1516,8 @@ function SafetyChecklistBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-4" data-testid="block-safety-checklist">
       <SectionHeading props={props} defaultAlignment="left" className="mb-6" />
       <div className="space-y-3 max-w-2xl">
-        {items.map((item, i) => (
-          <div key={i} className="flex items-start gap-3" data-testid={`checklist-item-${i}`}>
+        {items.map(withContentKeys((item, i, itemKey) => (
+          <div key={itemKey} className="flex items-start gap-3" data-testid={`checklist-item-${i}`}>
             <CheckCircle
               className={`h-5 w-5 flex-shrink-0 mt-0.5 ${item.required ? "text-accent" : "text-muted-foreground/50"}`}
             />
@@ -1527,7 +1530,7 @@ function SafetyChecklistBlock({ props }: { props: Record<string, unknown> }) {
               )}
             </div>
           </div>
-        ))}
+        )))}
       </div>
       {str(props.disclaimer) && (
         <p className="text-xs text-muted-foreground mt-6 italic border-t pt-4">
@@ -1546,15 +1549,15 @@ function GuaranteeWarrantyBlock({ props }: { props: Record<string, unknown> }) {
         <BadgeCheck className="h-10 w-10 text-accent mx-auto mb-4" />
         <SectionHeading props={props} defaultAlignment="center" className="mb-6" />
         <ul className="space-y-2 max-w-lg mx-auto text-left mb-6">
-          {items.map((item, i) => {
+          {items.map(withContentKeys((item, i, itemKey) => {
             const text = typeof item === "string" ? item : (item as { text: string }).text;
             return (
-              <li key={i} className="flex items-start gap-2" data-testid={`guarantee-item-${i}`}>
+              <li key={itemKey} className="flex items-start gap-2" data-testid={`guarantee-item-${i}`}>
                 <CheckCircle className="h-4 w-4 text-accent flex-shrink-0 mt-0.5" />
                 <span className="text-sm">{text}</span>
               </li>
             );
-          })}
+          }))}
         </ul>
         {str(props.ctaText) && (
           <FormModalButton
@@ -1581,8 +1584,8 @@ function DeliverySetupBlock({ props }: { props: Record<string, unknown> }) {
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
       <div className="max-w-3xl mx-auto mb-8">
         <div className="space-y-6">
-          {steps.map((step, i) => (
-            <div key={i} className="flex gap-4 sm:gap-6" data-testid={`setup-step-${i}`}>
+          {steps.map(withContentKeys((step, i, itemKey) => (
+            <div key={itemKey} className="flex gap-4 sm:gap-6" data-testid={`setup-step-${i}`}>
               <div className="relative flex w-12 flex-shrink-0 justify-center">
                 {i < steps.length - 1 ? (
                   <div className="absolute left-1/2 top-12 h-[calc(100%+1.5rem)] w-0.5 -translate-x-1/2 bg-border hidden sm:block" />
@@ -1596,22 +1599,22 @@ function DeliverySetupBlock({ props }: { props: Record<string, unknown> }) {
                 <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
               </div>
             </div>
-          ))}
+          )))}
         </div>
       </div>
       {includedItems.length > 0 && (
         <div className="bg-muted/30 rounded-xl p-6 max-w-3xl mx-auto">
           <h3 className="font-semibold text-sm mb-3">What's Included</h3>
           <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {includedItems.map((item, i) => {
+            {includedItems.map(withContentKeys((item, i, itemKey) => {
               const text = typeof item === "string" ? item : (item as { text: string }).text;
               return (
-                <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+                <li key={itemKey} className="flex items-center gap-2 text-sm text-muted-foreground">
                   <CheckCircle className="h-3.5 w-3.5 text-accent flex-shrink-0" />
                   {text}
                 </li>
               );
-            })}
+            }))}
           </ul>
         </div>
       )}
@@ -1625,9 +1628,9 @@ function RecoveryUseCasesBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-4" data-testid="block-recovery-use-cases">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {personas.map((p, i) => (
+        {personas.map(withContentKeys((p, i, itemKey) => (
           <Card
-            key={i}
+            key={itemKey}
             className="text-center hover:shadow-md transition-shadow"
             data-testid={`persona-card-${i}`}
           >
@@ -1639,7 +1642,7 @@ function RecoveryUseCasesBlock({ props }: { props: Record<string, unknown> }) {
               <p className="text-sm text-muted-foreground leading-relaxed">{p.description}</p>
             </CardContent>
           </Card>
-        ))}
+        )))}
       </div>
     </div>
   );
@@ -1664,8 +1667,8 @@ function ProtocolBuilderBlock({ props }: { props: Record<string, unknown> }) {
         </span>
       </div>
       <div className="space-y-4">
-        {steps.map((step, i) => (
-          <div key={i} className="flex gap-4 items-start" data-testid={`protocol-step-${i}`}>
+        {steps.map(withContentKeys((step, i, itemKey) => (
+          <div key={itemKey} className="flex gap-4 items-start" data-testid={`protocol-step-${i}`}>
             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold text-sm">
               {i + 1}
             </div>
@@ -1674,7 +1677,7 @@ function ProtocolBuilderBlock({ props }: { props: Record<string, unknown> }) {
               <p className="text-sm text-muted-foreground">{step.description}</p>
             </div>
           </div>
-        ))}
+        )))}
       </div>
     </div>
   );

@@ -661,131 +661,133 @@ async function ensureCommercialDoorInstallationRelatedServicesBlock() {
 async function normalizeStoredCmsPages() {
   const pages = await storage.cmsPages.getAllPages();
 
-  for (const page of pages) {
-    const updates: {
-      seoTitle?: string;
-      seoDescription?: string | null;
-      content?: InsertCmsPage["content"];
-      noindex?: boolean;
-      updatedBy?: string | null;
-    } = {};
-    const correctedTitle = correctGlassSearchTitle(page.slug, page.seoTitle);
-    if (correctedTitle && correctedTitle !== page.seoTitle) {
-      updates.seoTitle = correctedTitle;
-    }
-    const normalized = normalizeSeoDescription(page.seoDescription);
-    if (normalized !== page.seoDescription) {
-      updates.seoDescription = normalized;
-    }
-
-    if (isGlassLegalNoindexSlug(page.slug) && page.noindex !== true) {
-      updates.noindex = true;
-    }
-
-    const currentResidentialUrl = residentialServicePageUrlsBySlug[page.slug];
-    if (currentResidentialUrl) {
-      const content = addRelatedServicesBlock(page.content, currentResidentialUrl);
-      if (content) updates.content = content as InsertCmsPage["content"];
-    }
-
-    if (page.slug === "home") {
-      if (page.seoTitle && legacyHomepageSeoTitles.has(page.seoTitle)) {
-        updates.seoTitle = "Glass and Door Pro | Charlotte Glass, Door & Window Services";
+  await Promise.all(
+    pages.map(async (page) => {
+      const updates: {
+        seoTitle?: string;
+        seoDescription?: string | null;
+        content?: InsertCmsPage["content"];
+        noindex?: boolean;
+        updatedBy?: string | null;
+      } = {};
+      const correctedTitle = correctGlassSearchTitle(page.slug, page.seoTitle);
+      if (correctedTitle && correctedTitle !== page.seoTitle) {
+        updates.seoTitle = correctedTitle;
+      }
+      const normalized = normalizeSeoDescription(page.seoDescription);
+      if (normalized !== page.seoDescription) {
+        updates.seoDescription = normalized;
       }
 
-      const content = ensureHomepageServiceCards(page.content);
-      if (content) updates.content = content as InsertCmsPage["content"];
-
-      const contentWithReviews = ensureGoogleReviewItems(updates.content ?? page.content, true);
-      if (contentWithReviews) updates.content = contentWithReviews as InsertCmsPage["content"];
-
-      const contentWithHomepageCorrections = replaceStoredStrings(
-        updates.content ?? page.content,
-        homepageContentReplacements,
-      );
-      if (contentWithHomepageCorrections !== (updates.content ?? page.content)) {
-        updates.content = contentWithHomepageCorrections as InsertCmsPage["content"];
+      if (isGlassLegalNoindexSlug(page.slug) && page.noindex !== true) {
+        updates.noindex = true;
       }
-    }
 
-    if (page.slug === "reviews") {
-      const content = ensureGoogleReviewItems(page.content, false);
-      if (content) updates.content = content as InsertCmsPage["content"];
-    }
+      const currentResidentialUrl = residentialServicePageUrlsBySlug[page.slug];
+      if (currentResidentialUrl) {
+        const content = addRelatedServicesBlock(page.content, currentResidentialUrl);
+        if (content) updates.content = content as InsertCmsPage["content"];
+      }
 
-    if (
-      page.slug === "privacy-policy" &&
-      JSON.stringify(page.content).includes(GLASS_PRIVACY_POLICY_LEGACY_MARKER)
-    ) {
-      updates.content = buildPrivacyPolicyContent();
-    }
+      if (page.slug === "home") {
+        if (page.seoTitle && legacyHomepageSeoTitles.has(page.seoTitle)) {
+          updates.seoTitle = "Glass and Door Pro | Charlotte Glass, Door & Window Services";
+        }
 
-    const cityPositioningUpdate = cityPositioningUpdates[page.slug];
-    if (cityPositioningUpdate) {
-      const currentSeoDescription = updates.seoDescription ?? page.seoDescription;
+        const content = ensureHomepageServiceCards(page.content);
+        if (content) updates.content = content as InsertCmsPage["content"];
+
+        const contentWithReviews = ensureGoogleReviewItems(updates.content ?? page.content, true);
+        if (contentWithReviews) updates.content = contentWithReviews as InsertCmsPage["content"];
+
+        const contentWithHomepageCorrections = replaceStoredStrings(
+          updates.content ?? page.content,
+          homepageContentReplacements,
+        );
+        if (contentWithHomepageCorrections !== (updates.content ?? page.content)) {
+          updates.content = contentWithHomepageCorrections as InsertCmsPage["content"];
+        }
+      }
+
+      if (page.slug === "reviews") {
+        const content = ensureGoogleReviewItems(page.content, false);
+        if (content) updates.content = content as InsertCmsPage["content"];
+      }
+
       if (
-        currentSeoDescription &&
-        cityPositioningUpdate.legacySeoDescriptions.includes(currentSeoDescription)
+        page.slug === "privacy-policy" &&
+        JSON.stringify(page.content).includes(GLASS_PRIVACY_POLICY_LEGACY_MARKER)
       ) {
-        updates.seoDescription = cityPositioningUpdate.seoDescription;
+        updates.content = buildPrivacyPolicyContent();
       }
 
-      const positionedContent = replaceStoredStrings(
-        updates.content ?? page.content,
-        cityPositioningUpdate.replacements,
+      const cityPositioningUpdate = cityPositioningUpdates[page.slug];
+      if (cityPositioningUpdate) {
+        const currentSeoDescription = updates.seoDescription ?? page.seoDescription;
+        if (
+          currentSeoDescription &&
+          cityPositioningUpdate.legacySeoDescriptions.includes(currentSeoDescription)
+        ) {
+          updates.seoDescription = cityPositioningUpdate.seoDescription;
+        }
+
+        const positionedContent = replaceStoredStrings(
+          updates.content ?? page.content,
+          cityPositioningUpdate.replacements,
+        );
+        if (positionedContent !== (updates.content ?? page.content)) {
+          updates.content = positionedContent as InsertCmsPage["content"];
+        }
+      }
+
+      const currentSeoDescription = updates.seoDescription ?? page.seoDescription;
+      const seoDescriptionWithoutLegacyMonroeBase = replaceStoredStrings(
+        currentSeoDescription,
+        legacyMonroeBaseReplacements,
       );
-      if (positionedContent !== (updates.content ?? page.content)) {
-        updates.content = positionedContent as InsertCmsPage["content"];
+      if (seoDescriptionWithoutLegacyMonroeBase !== currentSeoDescription) {
+        updates.seoDescription = seoDescriptionWithoutLegacyMonroeBase as string;
       }
-    }
 
-    const currentSeoDescription = updates.seoDescription ?? page.seoDescription;
-    const seoDescriptionWithoutLegacyMonroeBase = replaceStoredStrings(
-      currentSeoDescription,
-      legacyMonroeBaseReplacements,
-    );
-    if (seoDescriptionWithoutLegacyMonroeBase !== currentSeoDescription) {
-      updates.seoDescription = seoDescriptionWithoutLegacyMonroeBase as string;
-    }
+      const contentWithoutLegacyMonroeBase = replaceStoredStrings(
+        updates.content ?? page.content,
+        legacyMonroeBaseReplacements,
+      );
+      if (contentWithoutLegacyMonroeBase !== (updates.content ?? page.content)) {
+        updates.content = contentWithoutLegacyMonroeBase as InsertCmsPage["content"];
+      }
 
-    const contentWithoutLegacyMonroeBase = replaceStoredStrings(
-      updates.content ?? page.content,
-      legacyMonroeBaseReplacements,
-    );
-    if (contentWithoutLegacyMonroeBase !== (updates.content ?? page.content)) {
-      updates.content = contentWithoutLegacyMonroeBase as InsertCmsPage["content"];
-    }
+      const contentWithCurrentBusinessDetails = updateStoredBusinessDetails(
+        updates.content ?? page.content,
+      );
+      if (contentWithCurrentBusinessDetails !== (updates.content ?? page.content)) {
+        updates.content = contentWithCurrentBusinessDetails as InsertCmsPage["content"];
+      }
 
-    const contentWithCurrentBusinessDetails = updateStoredBusinessDetails(
-      updates.content ?? page.content,
-    );
-    if (contentWithCurrentBusinessDetails !== (updates.content ?? page.content)) {
-      updates.content = contentWithCurrentBusinessDetails as InsertCmsPage["content"];
-    }
+      const contentWithServiceAreaOrder = replaceStoredStrings(
+        updates.content ?? page.content,
+        legacyServiceAreaListReplacements,
+      );
+      if (contentWithServiceAreaOrder !== (updates.content ?? page.content)) {
+        updates.content = contentWithServiceAreaOrder as InsertCmsPage["content"];
+      }
 
-    const contentWithServiceAreaOrder = replaceStoredStrings(
-      updates.content ?? page.content,
-      legacyServiceAreaListReplacements,
-    );
-    if (contentWithServiceAreaOrder !== (updates.content ?? page.content)) {
-      updates.content = contentWithServiceAreaOrder as InsertCmsPage["content"];
-    }
+      const contentWithPlainServiceAreaOrder = replaceStoredStrings(
+        updates.content ?? page.content,
+        legacyPlainServiceAreaListReplacements,
+      );
+      if (contentWithPlainServiceAreaOrder !== (updates.content ?? page.content)) {
+        updates.content = contentWithPlainServiceAreaOrder as InsertCmsPage["content"];
+      }
 
-    const contentWithPlainServiceAreaOrder = replaceStoredStrings(
-      updates.content ?? page.content,
-      legacyPlainServiceAreaListReplacements,
-    );
-    if (contentWithPlainServiceAreaOrder !== (updates.content ?? page.content)) {
-      updates.content = contentWithPlainServiceAreaOrder as InsertCmsPage["content"];
-    }
-
-    if (Object.keys(updates).length > 0) {
-      await storage.cmsPages.updatePage(page.id, {
-        ...updates,
-        updatedBy: page.updatedBy,
-      });
-    }
-  }
+      if (Object.keys(updates).length > 0) {
+        await storage.cmsPages.updatePage(page.id, {
+          ...updates,
+          updatedBy: page.updatedBy,
+        });
+      }
+    }),
+  );
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -808,28 +810,23 @@ export function isSystemRetiredCmsPageContent(content: unknown) {
 export async function ensureSystemCmsPages() {
   await normalizeStoredCmsPages();
 
-  for (const retiredSlug of [
-    "about",
-    "contact",
-    "directory",
-    "events",
-    "insights",
-    "join",
-    "recordings",
-  ]) {
-    const existingPage = await storage.cmsPages.getPageBySlug(retiredSlug);
-    if (
-      existingPage &&
-      isSystemRetiredCmsPageContent(existingPage.content) &&
-      (existingPage.status !== "draft" || existingPage.noindex !== true)
-    ) {
-      await storage.cmsPages.updatePage(existingPage.id, {
-        status: "draft",
-        noindex: true,
-        updatedBy: existingPage.updatedBy,
-      });
-    }
-  }
+  const retiredSlugs = ["about", "contact", "directory", "events", "insights", "join", "recordings"];
+  await Promise.all(
+    retiredSlugs.map(async (retiredSlug) => {
+      const existingPage = await storage.cmsPages.getPageBySlug(retiredSlug);
+      if (
+        existingPage &&
+        isSystemRetiredCmsPageContent(existingPage.content) &&
+        (existingPage.status !== "draft" || existingPage.noindex !== true)
+      ) {
+        await storage.cmsPages.updatePage(existingPage.id, {
+          status: "draft",
+          noindex: true,
+          updatedBy: existingPage.updatedBy,
+        });
+      }
+    }),
+  );
 
   await ensureCommercialDoorInstallationRelatedServicesBlock();
 

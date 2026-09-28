@@ -22,19 +22,16 @@ import {
   type BlockInstance,
   type BuilderContent,
 } from "./block-registry";
-import { createFallbackBlockDef } from "./block-editor";
+import { createFallbackBlockDef } from "./block-fallback-def";
 import { FrontendPreviewDialog, type PreviewDevice } from "./page-builder-preview";
 import type { VisualCanvasProps } from "./page-builder-canvas";
 import { BlockInspectorPanel } from "./page-builder-inspector";
 import { BuilderLeftRail, DesktopBuilderLayout, MobileBuilderLayout } from "./page-builder-layout";
 import { InserterPanel, StructurePanel } from "./page-builder-panels";
-import {
-  BLOCK_CATEGORY_LABELS,
-  duplicateBlockInstance,
-  getBlockSummary,
-  groupBlocksByCategory,
-  SaveSectionDialog,
-} from "./page-builder-support";
+import { SaveSectionDialog } from "./page-builder-support";
+import { BLOCK_CATEGORY_LABELS, duplicateBlockInstance, getBlockSummary, groupBlocksByCategory } from "./page-builder-utils";
+
+const EMPTY_BLOCKS: BlockInstance[] = [];
 
 interface PageBuilderProps {
   content: BuilderContent;
@@ -64,7 +61,7 @@ export function PageBuilder({ content, onChange }: PageBuilderProps) {
   const desktopInspectorShellRef = useRef<HTMLDivElement | null>(null);
   const [desktopInspectorOffset, setDesktopInspectorOffset] = useState(0);
 
-  const blocks = content.blocks ?? [];
+  const blocks = content.blocks ?? EMPTY_BLOCKS;
   const selectedBlock = blocks.find((block) => block.id === selectedId) ?? null;
   const selectedDef = selectedBlock ? getBlockDef(selectedBlock.type) : null;
   const selectedEditorDef = selectedBlock

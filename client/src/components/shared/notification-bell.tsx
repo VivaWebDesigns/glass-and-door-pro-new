@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Bell, Settings, Check, CheckCheck } from "lucide-react";
 import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -242,14 +241,12 @@ function NotifItem({
 }) {
   const timeAgo = formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true });
 
-  const inner = (
-    <div
-      className={`flex items-start gap-3 px-4 py-3 border-b last:border-0 hover:bg-muted/40 transition-colors cursor-pointer ${
-        !notif.isRead ? "bg-accent/5" : ""
-      }`}
-      onClick={() => onClick(notif)}
-      data-testid={`notification-item-${notif.id}`}
-    >
+  const handleClick = () => onClick(notif);
+  const className = `flex items-start gap-3 px-4 py-3 border-b last:border-0 hover:bg-muted/40 transition-colors cursor-pointer ${
+    !notif.isRead ? "bg-accent/5" : ""
+  }`;
+  const content = (
+    <>
       <div className="mt-0.5 flex-shrink-0">
         <div className={`h-2 w-2 rounded-full ${notif.isRead ? "bg-transparent" : "bg-accent"}`} />
       </div>
@@ -261,11 +258,29 @@ function NotifItem({
         <p className="text-[10px] text-muted-foreground/70 mt-1">{timeAgo}</p>
       </div>
       {notif.isRead && <Check className="h-3.5 w-3.5 text-muted-foreground/40 flex-shrink-0 mt-0.5" />}
-    </div>
+    </>
   );
 
   if (notif.linkUrl) {
-    return <Link href={notif.linkUrl}>{inner}</Link>;
+    return (
+      <Link
+        href={notif.linkUrl}
+        onClick={handleClick}
+        className={className}
+        data-testid={`notification-item-${notif.id}`}
+      >
+        {content}
+      </Link>
+    );
   }
-  return inner;
+  return (
+    <button
+      type="button"
+      className={`w-full text-left ${className}`}
+      onClick={handleClick}
+      data-testid={`notification-item-${notif.id}`}
+    >
+      {content}
+    </button>
+  );
 }

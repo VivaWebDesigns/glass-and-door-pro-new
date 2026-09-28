@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { BlockInstance } from "@/features/admin/cms/builder/block-registry";
-import { prepareLocationServiceBlocks } from "./location-service-layout";
+import { prepareSectionAnchorBlocks } from "./section-anchor-blocks";
 
-describe("prepareLocationServiceBlocks", () => {
+describe("prepareSectionAnchorBlocks", () => {
   it("adds navigation anchors without changing location-page copy", () => {
     const blocks = [
       {
@@ -16,7 +16,7 @@ describe("prepareLocationServiceBlocks", () => {
       },
     ] as BlockInstance[];
 
-    const prepared = prepareLocationServiceBlocks(blocks);
+    const prepared = prepareSectionAnchorBlocks(blocks);
 
     expect(prepared[0].props).toEqual({
       title: "Our Services in Indian Trail, NC",
@@ -47,7 +47,7 @@ describe("prepareLocationServiceBlocks", () => {
       },
     ] as BlockInstance[];
 
-    const prepared = prepareLocationServiceBlocks(blocks);
+    const prepared = prepareSectionAnchorBlocks(blocks);
 
     expect(prepared.map((block) => block.props.title)).toEqual([
       "Your Charlotte-Based Glass & Door Company",

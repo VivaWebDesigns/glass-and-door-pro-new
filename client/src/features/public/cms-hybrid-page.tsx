@@ -32,6 +32,7 @@ import {
 import { getPrerenderedCmsPage } from "@/lib/cms-prerender";
 import { ServiceEditorialLayout } from "@/features/public/service-editorial-layout";
 import { LocationServiceLayout } from "@/features/public/location-service-layout";
+import { isValidCmsPage } from "@/lib/cms-prerender";
 
 interface CmsHybridPageProps {
   slug: string;
@@ -49,17 +50,6 @@ class CmsNotFoundError extends Error {
     super(`CMS page not found: ${slug}`);
     this.name = "CmsNotFoundError";
   }
-}
-
-export function isValidCmsPage(data: unknown): data is CmsPage {
-  if (!data || typeof data !== "object") return false;
-  const obj = data as Record<string, unknown>;
-  return (
-    (typeof obj.id === "string" || typeof obj.id === "number") &&
-    typeof obj.slug === "string" &&
-    typeof obj.title === "string" &&
-    typeof obj.status === "string"
-  );
 }
 
 function parseCmsContent(content: unknown): BlockInstance[] {

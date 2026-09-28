@@ -631,6 +631,7 @@ export default function CmsSeoPage() {
                   <span className="flex-1">/api/seo/global</span>
                   <a
                     href="/api/seo/global"
+                    aria-label="Open global SEO API response"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-violet-500 hover:text-violet-600"

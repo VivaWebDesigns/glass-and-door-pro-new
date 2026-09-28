@@ -410,12 +410,11 @@ function IntegrationCard({
   });
 
   const saveAll = async () => {
-    for (const field of config.fields) {
+    const changedFields = config.fields.filter((field) => {
       const val = values[field.key];
-      if (val !== undefined && val !== "") {
-        await saveMutation.mutateAsync(field);
-      }
-    }
+      return val !== undefined && val !== "";
+    });
+    await Promise.all(changedFields.map((field) => saveMutation.mutateAsync(field)));
     setValues({});
   };
 
@@ -557,6 +556,7 @@ function IntegrationCard({
                   <Button
                     variant="ghost"
                     size="icon"
+                    aria-label={showSecrets[field.key] ? "Hide value" : "Show value"}
                     onClick={() =>
                       setShowSecrets((prev) => ({
                         ...prev,
@@ -914,17 +914,7 @@ export function BrandingTab({
     ...getBrandingColorValues(),
   });
 
-  useEffect(() => {
-    setBodyFont(brandingSettings.frontend_body_font?.value || "__default__");
-    setHeadingFont(brandingSettings.frontend_heading_font?.value || "__default__");
-    setCompanyInfo({
-      company_name: brandingSettings.company_name?.value || "",
-      company_address: brandingSettings.company_address?.value || "",
-      company_phone_numbers: brandingSettings.company_phone_numbers?.value || "",
-      company_google_business_url: brandingSettings.company_google_business_url?.value || "",
-    });
-    setColorValues(getBrandingColorValues());
-  }, [
+  const brandingSignature = JSON.stringify([
     brandingSettings.frontend_body_font?.value,
     brandingSettings.frontend_heading_font?.value,
     brandingSettings.company_name?.value,
@@ -949,8 +939,21 @@ export function BrandingTab({
     brandingSettings.text_inverse_color?.value,
     brandingSettings.text_primary_foreground_color?.value,
     brandingSettings.text_secondary_foreground_color?.value,
-    brandingSettings.text_tertiary_foreground_color?.value,
+    brandingSettings.text_tertiary_foreground_color?.value
   ]);
+  const [syncedBrandingSignature, setSyncedBrandingSignature] = useState(brandingSignature);
+  if (brandingSignature !== syncedBrandingSignature) {
+    setSyncedBrandingSignature(brandingSignature);
+    setBodyFont(brandingSettings.frontend_body_font?.value || "__default__");
+    setHeadingFont(brandingSettings.frontend_heading_font?.value || "__default__");
+    setCompanyInfo({
+      company_name: brandingSettings.company_name?.value || "",
+      company_address: brandingSettings.company_address?.value || "",
+      company_phone_numbers: brandingSettings.company_phone_numbers?.value || "",
+      company_google_business_url: brandingSettings.company_google_business_url?.value || "",
+    });
+    setColorValues(getBrandingColorValues());
+  }
 
   const saveFontsMutation = useMutation({
     mutationFn: async () => {
@@ -1331,6 +1334,7 @@ export function BrandingTab({
                             onChange={(event) =>
                               updateColorValue(field.key, event.target.value.toUpperCase())
                             }
+                            aria-label={`${field.label} color`}
                             className="h-10 w-12 cursor-pointer rounded-md border bg-background p-1"
                             data-testid={`input-color-${field.key}`}
                           />
@@ -1706,14 +1710,16 @@ function TemplateEditor({
     enabled: open,
   });
 
-  useEffect(() => {
+  const [syncedTemplate, setSyncedTemplate] = useState(template);
+  if (template !== syncedTemplate) {
+    setSyncedTemplate(template);
     setSubject(template.subject);
     setHtmlBody(template.htmlBody);
     setPreviewHtml(null);
     setEditorTab("visual");
     setLinkUrl("");
     setShowLinkPanel(false);
-  }, [template]);
+  }
 
   useLockConflictGuard({
     active: open,
@@ -1788,14 +1794,15 @@ function TemplateEditor({
     },
   });
 
+  const { mutate: requestPreview } = previewMutation;
   useEffect(() => {
     if (!open) return;
     const timeout = window.setTimeout(() => {
-      previewMutation.mutate();
+      requestPreview();
     }, 250);
 
     return () => window.clearTimeout(timeout);
-  }, [open, subject, htmlBody]);
+  }, [open, subject, htmlBody, requestPreview]);
 
   const syncVisualHtml = () => {
     const editor = visualEditorRef.current;
@@ -1951,6 +1958,7 @@ function TemplateEditor({
                         type="button"
                         variant="ghost"
                         size="icon"
+                        aria-label="Bold"
                         className="h-8 w-8"
                         onClick={() => applyCommand("bold")}
                       >
@@ -1960,6 +1968,7 @@ function TemplateEditor({
                         type="button"
                         variant="ghost"
                         size="icon"
+                        aria-label="Italic"
                         className="h-8 w-8"
                         onClick={() => applyCommand("italic")}
                       >
@@ -1969,6 +1978,7 @@ function TemplateEditor({
                         type="button"
                         variant="ghost"
                         size="icon"
+                        aria-label="Underline"
                         className="h-8 w-8"
                         onClick={() => applyCommand("underline")}
                       >
@@ -1978,6 +1988,7 @@ function TemplateEditor({
                         type="button"
                         variant="ghost"
                         size="icon"
+                        aria-label="Bulleted list"
                         className="h-8 w-8"
                         onClick={() => applyCommand("insertUnorderedList")}
                       >
@@ -1987,6 +1998,7 @@ function TemplateEditor({
                         type="button"
                         variant="ghost"
                         size="icon"
+                        aria-label="Numbered list"
                         className="h-8 w-8"
                         onClick={() => applyCommand("insertOrderedList")}
                       >

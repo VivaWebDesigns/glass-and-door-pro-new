@@ -230,14 +230,14 @@ async function pruneExpiredBackups(retentionDays: number, maxSnapshots: number) 
   const cutoff = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
   const objects = await listBackupObjects(SNAPSHOT_PREFIX, 500);
 
-  for (const [index, object] of objects.entries()) {
+  const expired = objects.filter((object, index) => {
     const modifiedAt = object.lastModified ? new Date(object.lastModified).getTime() : 0;
     const overCountLimit = index >= maxSnapshots;
     const overAgeLimit = Boolean(modifiedAt) && modifiedAt < cutoff;
+    return overCountLimit || overAgeLimit;
+  });
 
-    if (!overCountLimit && !overAgeLimit) continue;
-    await deleteBackupObject(object.key);
-  }
+  await Promise.all(expired.map((object) => deleteBackupObject(object.key)));
 }
 
 async function acquireBackupLock() {
@@ -347,23 +347,23 @@ export async function runSystemBackup(reason: BackupRunReason = "manual") {
 
 export async function listRecentBackupManifests(limit = 10): Promise<BackupManifest[]> {
   const objects = await listBackupObjects(SNAPSHOT_PREFIX, Math.max(limit, 20));
-  const manifests: BackupManifest[] = [];
-
-  for (const object of objects.slice(0, limit)) {
-    try {
-      const buffer = await downloadBackupObject(object.key);
-      if (!buffer) continue;
-      const snapshot = JSON.parse(gunzipSync(buffer).toString("utf8")) as DatabaseBackupSnapshot;
-      if (snapshot?.manifest?.schemaVersion === 1) {
-        manifests.push(snapshot.manifest);
+  const results = await Promise.all(
+    objects.slice(0, limit).map(async (object): Promise<BackupManifest | null> => {
+      try {
+        const buffer = await downloadBackupObject(object.key);
+        if (!buffer) return null;
+        const snapshot = JSON.parse(gunzipSync(buffer).toString("utf8")) as DatabaseBackupSnapshot;
+        return snapshot?.manifest?.schemaVersion === 1 ? snapshot.manifest : null;
+      } catch (error) {
+        logger.backup.warn("Failed to read backup object while listing manifests", {
+          key: object.key,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return null;
       }
-    } catch (error) {
-      logger.backup.warn("Failed to read backup object while listing manifests", {
-        key: object.key,
-        error: error instanceof Error ? error.message : String(error),
-      });
-    }
-  }
+    }),
+  );
+  const manifests = results.filter((manifest): manifest is BackupManifest => manifest !== null);
 
   return manifests.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }

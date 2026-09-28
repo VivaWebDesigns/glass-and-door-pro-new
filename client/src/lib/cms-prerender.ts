@@ -6,7 +6,7 @@ declare global {
   }
 }
 
-function isValidCmsPage(data: unknown): data is CmsPage {
+export function isValidCmsPage(data: unknown): data is CmsPage {
   if (!data || typeof data !== "object") return false;
   const obj = data as Record<string, unknown>;
   return (

@@ -25,7 +25,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -66,13 +65,13 @@ import {
   LayoutTemplate,
   ArrowLeft,
   Download,
-  Inbox,
-  FileText,
-} from "lucide-react";
+  Inbox } from "lucide-react";
 import { useEditorLock } from "@/hooks/use-editor-lock";
 import { useLockConflictGuard } from "@/hooks/use-lock-conflict-guard";
 import { useEditorSaveState } from "@/hooks/use-editor-save-state";
 import { useUnsavedChangesGuard } from "@/hooks/use-unsaved-changes-guard";
+import { onActivateKey } from "@/lib/a11y";
+import { pairWithKeys, useListKeys } from "@/hooks/use-list-keys";
 
 type EditableForm = Omit<CmsForm, "createdAt" | "updatedAt">;
 
@@ -719,6 +718,7 @@ function FormsPageContent() {
     () => draft?.fields.find((field) => field.id === selectedFieldId) ?? null,
     [draft?.fields, selectedFieldId]
   );
+  const { keys: choiceKeys, removeKey: removeChoiceKey } = useListKeys(selectedField?.options?.length ?? 0);
 
   const groupedFieldLibrary = useMemo(
     () =>
@@ -1087,7 +1087,7 @@ function FormsPageContent() {
                         Delete
                       </Button>
                     ) : null}
-                    <Button type="button" variant="outline" size="icon" onClick={() => setFormSettingsOpen((current) => !current)}>
+                    <Button type="button" variant="outline" size="icon" aria-label={formSettingsOpen ? "Collapse form settings" : "Expand form settings"} onClick={() => setFormSettingsOpen((current) => !current)}>
                       {formSettingsOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     </Button>
                   </div>
@@ -1338,6 +1338,10 @@ function FormsPageContent() {
                                   onDropFieldAtIndex(index);
                                 }}
                                 onClick={() => setSelectedFieldId(field.id)}
+                                onKeyDown={onActivateKey(() => setSelectedFieldId(field.id))}
+                                role="button"
+                                tabIndex={0}
+                                aria-pressed={selectedFieldId === field.id}
                                 className={cn(
                                   "rounded-xl border bg-background p-4 transition-colors",
                                   selectedFieldId === field.id ? "border-primary ring-2 ring-primary/10" : "hover:bg-muted/20"
@@ -1363,6 +1367,7 @@ function FormsPageContent() {
                                     type="button"
                                     variant="ghost"
                                     size="icon"
+                                    aria-label="Remove field"
                                     onClick={(event) => {
                                       event.stopPropagation();
                                       removeField(field.id);
@@ -1782,8 +1787,8 @@ function FormsPageContent() {
                         ) : null}
 
                         <div className="space-y-3">
-                          {(selectedField.options ?? []).map((option, index) => (
-                            <div key={`${option.value}-${index}`} className="rounded-lg border bg-background p-3">
+                          {pairWithKeys(selectedField.options ?? [], choiceKeys).map(({ item: option, key: choiceKey }, index) => (
+                            <div key={choiceKey} className="rounded-lg border bg-background p-3">
                               <div className="grid gap-3">
                                 <div className="space-y-1.5">
                                   <Label>Choice Label</Label>
@@ -1809,7 +1814,10 @@ function FormsPageContent() {
                                     />
                                   </div>
                                 ) : null}
-                                <Button type="button" variant="ghost" size="sm" className="justify-start text-destructive" onClick={() => removeChoice(selectedField.id, option.value)}>
+                                <Button type="button" variant="ghost" size="sm" className="justify-start text-destructive" onClick={() => {
+                                  removeChoiceKey(index);
+                                  removeChoice(selectedField.id, option.value);
+                                }}>
                                   <Trash2 className="mr-1.5 h-3.5 w-3.5" />
                                   Remove Choice
                                 </Button>

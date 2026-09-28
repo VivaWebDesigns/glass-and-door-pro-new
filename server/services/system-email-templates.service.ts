@@ -122,66 +122,68 @@ export async function ensureSystemEmailTemplates(refreshExisting = false) {
   let created = 0;
   let updated = 0;
 
-  for (const template of SYSTEM_EMAIL_TEMPLATE_DEFAULTS) {
-    if (!refreshExisting) {
-      const existing = await db.query.emailTemplates.findFirst({
-        where: (emailTemplate, { eq }) => eq(emailTemplate.slug, template.slug),
-      });
+  await Promise.all(
+    SYSTEM_EMAIL_TEMPLATE_DEFAULTS.map(async (template) => {
+      if (!refreshExisting) {
+        const existing = await db.query.emailTemplates.findFirst({
+          where: (emailTemplate, { eq }) => eq(emailTemplate.slug, template.slug),
+        });
 
-      if (
-        existing &&
-        (template.slug === "contact-form-submission" || template.slug === "managed-form-submission")
-      ) {
-        const contactTemplateNeedsUpgrade =
-          template.slug === "contact-form-submission" &&
-          (!existing.variables.includes("senderPhone") ||
-            !existing.variables.includes("replyToEmail"));
-        const nextHtmlBody = contactTemplateNeedsUpgrade
-          ? template.htmlBody
-          : removeContactPreferenceRow(removeLegacyAdminCta(existing.htmlBody));
-        const nextVariables = template.variables;
-        const variablesChanged =
-          JSON.stringify(existing.variables) !== JSON.stringify(nextVariables);
+        if (
+          existing &&
+          (template.slug === "contact-form-submission" || template.slug === "managed-form-submission")
+        ) {
+          const contactTemplateNeedsUpgrade =
+            template.slug === "contact-form-submission" &&
+            (!existing.variables.includes("senderPhone") ||
+              !existing.variables.includes("replyToEmail"));
+          const nextHtmlBody = contactTemplateNeedsUpgrade
+            ? template.htmlBody
+            : removeContactPreferenceRow(removeLegacyAdminCta(existing.htmlBody));
+          const nextVariables = template.variables;
+          const variablesChanged =
+            JSON.stringify(existing.variables) !== JSON.stringify(nextVariables);
 
-        if (nextHtmlBody !== existing.htmlBody || variablesChanged) {
-          await db
-            .update(emailTemplates)
-            .set({
-              htmlBody: nextHtmlBody,
-              variables: nextVariables,
-              updatedAt: new Date(),
-            })
-            .where(eq(emailTemplates.slug, template.slug));
-          updated += 1;
+          if (nextHtmlBody !== existing.htmlBody || variablesChanged) {
+            await db
+              .update(emailTemplates)
+              .set({
+                htmlBody: nextHtmlBody,
+                variables: nextVariables,
+                updatedAt: new Date(),
+              })
+              .where(eq(emailTemplates.slug, template.slug));
+            updated += 1;
+          }
         }
       }
-    }
 
-    if (refreshExisting) {
-      await db
-        .insert(emailTemplates)
-        .values(template)
-        .onConflictDoUpdate({
-          target: emailTemplates.slug,
-          set: {
-            name: template.name,
-            subject: template.subject,
-            htmlBody: template.htmlBody,
-            description: template.description,
-            variables: template.variables,
-            isActive: template.isActive ?? true,
-            updatedAt: new Date(),
-          },
-        });
-      updated += 1;
-      continue;
-    }
+      if (refreshExisting) {
+        await db
+          .insert(emailTemplates)
+          .values(template)
+          .onConflictDoUpdate({
+            target: emailTemplates.slug,
+            set: {
+              name: template.name,
+              subject: template.subject,
+              htmlBody: template.htmlBody,
+              description: template.description,
+              variables: template.variables,
+              isActive: template.isActive ?? true,
+              updatedAt: new Date(),
+            },
+          });
+        updated += 1;
+        return;
+      }
 
-    const inserted = await db.insert(emailTemplates).values(template).onConflictDoNothing({
-      target: emailTemplates.slug,
-    });
-    created += inserted.rowCount ?? 0;
-  }
+      const inserted = await db.insert(emailTemplates).values(template).onConflictDoNothing({
+        target: emailTemplates.slug,
+      });
+      created += inserted.rowCount ?? 0;
+    }),
+  );
 
   logger.app.info("System email templates ensured", {
     total: SYSTEM_EMAIL_TEMPLATE_DEFAULTS.length,

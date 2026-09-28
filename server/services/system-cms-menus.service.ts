@@ -258,24 +258,28 @@ export async function ensureSystemCmsMenus() {
       .filter((entry) => entry.location !== "main_navigation")
       .some((entry) => assignedLocations.has(entry.location));
   if (!hasAnyFooterMenus) {
-    for (const menu of defaultMenus.filter((entry) => entry.location !== "main_navigation")) {
-      await storage.cmsMenus.create(menu);
-    }
+    await Promise.all(
+      defaultMenus
+        .filter((entry) => entry.location !== "main_navigation")
+        .map((menu) => storage.cmsMenus.create(menu)),
+    );
   }
 
-  for (const menu of menus) {
-    if (!menu.items) continue;
-    const existingItems = menu.items as MenuItem[];
-    const patched = isSystemManagedCmsMenu(menu)
-      ? patchRetiredPublicUrls(existingItems)
-      : { items: existingItems, changed: false };
-    const reorderedItems = migrateServiceAreaMenuOrder(patched.items);
-    if (patched.changed || reorderedItems !== patched.items) {
-      await storage.cmsMenus.update(menu.id, {
-        items: reorderedItems,
-      });
-    }
-  }
+  await Promise.all(
+    menus.map(async (menu) => {
+      if (!menu.items) return;
+      const existingItems = menu.items as MenuItem[];
+      const patched = isSystemManagedCmsMenu(menu)
+        ? patchRetiredPublicUrls(existingItems)
+        : { items: existingItems, changed: false };
+      const reorderedItems = migrateServiceAreaMenuOrder(patched.items);
+      if (patched.changed || reorderedItems !== patched.items) {
+        await storage.cmsMenus.update(menu.id, {
+          items: reorderedItems,
+        });
+      }
+    }),
+  );
 
   const legalMenu = await storage.cmsMenus.getByLocation("footer_legal");
   if (legalMenu?.items && isSystemManagedCmsMenu(legalMenu)) {

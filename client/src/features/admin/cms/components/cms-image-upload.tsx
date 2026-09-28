@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { MediaPickerDialog } from "./media-picker-dialog";
 import type { CmsMediaAsset, CmsMediaLibraryAsset } from "@shared/schema";
 import { handleCmsPreviewImageError } from "../builder/block-renderer.shared";
+import { onActivateKey } from "@/lib/a11y";
 
 const IMAGE_ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
 const IMAGE_ACCEPTED_EXTENSIONS = [".png", ".jpg", ".jpeg", ".webp", ".gif"];
@@ -280,6 +281,11 @@ export function CmsImageUpload({
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onClick={() => !isUploading && fileInputRef.current?.click()}
+          onKeyDown={onActivateKey(() => !isUploading && fileInputRef.current?.click())}
+          role="button"
+          tabIndex={0}
+          aria-label="Upload image"
+          aria-disabled={isUploading}
           data-testid={testId ? `${testId}-dropzone` : "cms-image-dropzone"}
         >
           {isUploading ? (

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback,   useState } from "react";
 import type { ElementType } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -370,15 +370,16 @@ function SidebarEditor({ sidebar, onClose }: { sidebar: CmsSidebar | null; onClo
                         <WidgetSettings widget={widget} onChange={(updates) => updateWidget(widget.id, updates)} />
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => moveWidget(widget.id, -1)} disabled={index === 0}>
+                        <Button variant="ghost" size="icon" aria-label="Move widget up" onClick={() => moveWidget(widget.id, -1)} disabled={index === 0}>
                           <ArrowUp className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => moveWidget(widget.id, 1)} disabled={index === widgets.length - 1}>
+                        <Button variant="ghost" size="icon" aria-label="Move widget down" onClick={() => moveWidget(widget.id, 1)} disabled={index === widgets.length - 1}>
                           <ArrowDown className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
+                          aria-label="Remove widget"
                           className="text-destructive hover:text-destructive"
                           onClick={() => setWidgets((current) => current.filter((item) => item.id !== widget.id))}
                         >

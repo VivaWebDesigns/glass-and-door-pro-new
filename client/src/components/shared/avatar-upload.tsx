@@ -6,6 +6,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Upload, Loader2, Camera } from "lucide-react";
 import { ImageCropperSheet } from "./image-cropper-sheet";
+import { onActivateKey } from "@/lib/a11y";
 
 interface AvatarUploadProps {
   currentImageUrl?: string | null;
@@ -152,6 +153,10 @@ export function AvatarUpload({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
+          onKeyDown={onActivateKey(() => fileInputRef.current?.click())}
+          role="button"
+          tabIndex={0}
+          aria-label="Upload profile photo"
           data-testid="dropzone-avatar"
         >
           <Avatar className={sizeClasses[size]}>

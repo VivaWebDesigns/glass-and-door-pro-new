@@ -510,6 +510,7 @@ export default function CmsPageEditorPage() {
             <Button
               variant="ghost"
               size="icon"
+              aria-label="Back to pages"
               onClick={() =>
                 unsavedChangesGuard.confirmDiscardChanges(() => navigate("/admin/cms/pages"))
               }
@@ -671,6 +672,7 @@ export default function CmsPageEditorPage() {
                         type="datetime-local"
                         value={scheduleDate}
                         onChange={(e) => setScheduleDate(e.target.value)}
+                        aria-label="Scheduled publish date"
                         min={new Date().toISOString().slice(0, 16)}
                         className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         data-testid="input-schedule-date"

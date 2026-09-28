@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, Mail, MapPin, Phone, Send } from "lucide-react";
 import { PublicFormRenderer } from "@/components/forms/public-form-renderer";
 import { CompanyInformationCard } from "@/components/shared/company-information-card";
+import { withContentKeys } from "@/lib/content-keys";
+import { ContactFormGrid } from "@/components/forms/contact-form-grid";
 
 function str(v: unknown): string {
   return typeof v === "string" ? v : "";
@@ -53,11 +55,11 @@ export function ContactFormBlock({ props = {} }: { props?: Record<string, unknow
           </Card>
           <div className="space-y-4 lg:col-span-2">
             {items.length > 0 ? (
-              items.map((item, index) => {
+              items.map(withContentKeys((item, _index, itemKey) => {
                 const Icon = CONTACT_ICON_MAP[item.icon] ?? MapPin;
                 const content = <span className="whitespace-pre-line">{item.value}</span>;
                 return (
-                  <Card key={`${item.label}-${index}`} className="border-none bg-white text-slate-900 shadow-sm">
+                  <Card key={itemKey} className="border-none bg-white text-slate-900 shadow-sm">
                     <CardContent className="flex gap-4 p-6">
                       <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#1a8ead] text-white">
                         <Icon className="h-7 w-7" />
@@ -75,7 +77,7 @@ export function ContactFormBlock({ props = {} }: { props?: Record<string, unknow
                     </CardContent>
                   </Card>
                 );
-              })
+              }))
             ) : (
               <CompanyInformationCard
                 titleClassName="public-heading-3"
@@ -91,28 +93,7 @@ export function ContactFormBlock({ props = {} }: { props?: Record<string, unknow
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8" data-testid="dynamic-contact-form">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Send className="w-5 h-5" />
-                Send a Message
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <PublicFormRenderer slug="contact-form" showHeader={false} />
-            </CardContent>
-          </Card>
-        </div>
-        <div className="space-y-4">
-          <CompanyInformationCard
-            titleClassName="public-heading-3"
-            bodyClassName="public-helper-text"
-            linkClassName="public-text-link hover:text-[hsl(var(--public-text-link-hover))]"
-          />
-        </div>
-      </div>
+      <ContactFormGrid />
     </div>
   );
 }

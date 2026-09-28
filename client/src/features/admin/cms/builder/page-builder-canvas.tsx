@@ -21,11 +21,11 @@ import {
   getSectionPaddingClasses,
   getSectionStyleConfig,
   hasSectionStyleConfig,
-  SectionStyleWrapper,
 } from "./section-style";
+import { SectionStyleWrapper } from "./section-style-wrapper";
 import { cn } from "@/lib/utils";
 import { ErrorBoundary } from "@/components/shared/error-boundary";
-import { getBlockSummary } from "./page-builder-support";
+import { getBlockSummary } from "./page-builder-utils";
 import { FULL_WIDTH_BLOCK_TYPES } from "./page-builder-constants";
 import { reportBuilderRenderError } from "./builder-diagnostics";
 
@@ -229,6 +229,7 @@ function CanvasBlockFrame({
           type="button"
           variant="secondary"
           size="icon"
+          aria-label="Edit block"
           className="h-8 w-8 shadow-sm"
           onClick={(event) => {
             event.stopPropagation();
@@ -242,6 +243,7 @@ function CanvasBlockFrame({
           type="button"
           variant="secondary"
           size="icon"
+          aria-label="Move block up"
           className="h-8 w-8 shadow-sm"
           onClick={(event) => {
             event.stopPropagation();
@@ -255,6 +257,7 @@ function CanvasBlockFrame({
           type="button"
           variant="secondary"
           size="icon"
+          aria-label="Move block down"
           className="h-8 w-8 shadow-sm"
           onClick={(event) => {
             event.stopPropagation();
@@ -268,6 +271,7 @@ function CanvasBlockFrame({
           type="button"
           variant="secondary"
           size="icon"
+          aria-label="Add block below"
           className="h-8 w-8 shadow-sm"
           onClick={(event) => {
             event.stopPropagation();
@@ -281,6 +285,7 @@ function CanvasBlockFrame({
           type="button"
           variant="secondary"
           size="icon"
+          aria-label="Duplicate block"
           className="h-8 w-8 shadow-sm"
           onClick={(event) => {
             event.stopPropagation();
@@ -294,6 +299,7 @@ function CanvasBlockFrame({
           type="button"
           variant="destructive"
           size="icon"
+          aria-label="Delete block"
           className="h-8 w-8 shadow-sm"
           onClick={(event) => {
             event.stopPropagation();

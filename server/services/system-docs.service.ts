@@ -157,34 +157,38 @@ export async function ensureSystemDocs(options: EnsureSystemDocsOptions = {}) {
   let created = 0;
   let updated = 0;
 
-  for (const definition of definitions) {
-    const absolutePath = path.join(DOCS_ROOT, definition.relativePath);
-    const content = await fs.readFile(absolutePath, "utf8");
-    const existing = await storage.docs.getDocBySlug(definition.slug);
+  await Promise.all(
+    definitions.map(async (definition) => {
+      const absolutePath = path.join(DOCS_ROOT, definition.relativePath);
+      const [content, existing] = await Promise.all([
+        fs.readFile(absolutePath, "utf8"),
+        storage.docs.getDocBySlug(definition.slug),
+      ]);
 
-    if (existing) {
-      if (refreshExisting) {
-        await storage.docs.updateDoc(existing.id, {
-          title: definition.title,
-          category: definition.category,
-          content,
-          sortOrder: definition.sortOrder,
-        });
-        updated += 1;
+      if (existing) {
+        if (refreshExisting) {
+          await storage.docs.updateDoc(existing.id, {
+            title: definition.title,
+            category: definition.category,
+            content,
+            sortOrder: definition.sortOrder,
+          });
+          updated += 1;
+        }
+        return;
       }
-      continue;
-    }
 
-    await storage.docs.createDoc({
-      title: definition.title,
-      slug: definition.slug,
-      category: definition.category,
-      content,
-      sortOrder: definition.sortOrder,
-      isPublished: true,
-    });
-    created += 1;
-  }
+      await storage.docs.createDoc({
+        title: definition.title,
+        slug: definition.slug,
+        category: definition.category,
+        content,
+        sortOrder: definition.sortOrder,
+        isPublished: true,
+      });
+      created += 1;
+    }),
+  );
 
   logger.app.info("System documentation synced", {
     total: definitions.length,

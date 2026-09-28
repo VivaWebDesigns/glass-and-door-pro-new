@@ -82,48 +82,50 @@ const SYSTEM_FORMS: ManagedSystemForm[] = [
 export async function ensureSystemForms() {
   logger.app.info("Ensuring system forms");
 
-  for (const systemForm of SYSTEM_FORMS) {
-    const existing = await storage.forms.getBySlug(systemForm.slug);
-    if (existing) {
-      const existingSettings =
-        (typeof existing.settings === "object" && existing.settings
-          ? existing.settings
-          : {}) as Partial<CmsFormSettings>;
-      const existingSchemaVersion =
-        typeof existingSettings.schemaVersion === "number" ? existingSettings.schemaVersion : 0;
-      const systemSchemaVersion =
-        typeof systemForm.settings.schemaVersion === "number" ? systemForm.settings.schemaVersion : 0;
-      const shouldUpgradeFields = existingSchemaVersion < systemSchemaVersion;
-      const existingFields = Array.isArray(existing.fields) ? existing.fields : [];
-      const upgradedFields =
-        existingSchemaVersion >= 2
-          ? existingFields.filter((existingField) => existingField.key !== "contactPreference")
-          : systemForm.fields;
+  await Promise.all(
+    SYSTEM_FORMS.map(async (systemForm) => {
+      const existing = await storage.forms.getBySlug(systemForm.slug);
+      if (existing) {
+        const existingSettings =
+          (typeof existing.settings === "object" && existing.settings
+            ? existing.settings
+            : {}) as Partial<CmsFormSettings>;
+        const existingSchemaVersion =
+          typeof existingSettings.schemaVersion === "number" ? existingSettings.schemaVersion : 0;
+        const systemSchemaVersion =
+          typeof systemForm.settings.schemaVersion === "number" ? systemForm.settings.schemaVersion : 0;
+        const shouldUpgradeFields = existingSchemaVersion < systemSchemaVersion;
+        const existingFields = Array.isArray(existing.fields) ? existing.fields : [];
+        const upgradedFields =
+          existingSchemaVersion >= 2
+            ? existingFields.filter((existingField) => existingField.key !== "contactPreference")
+            : systemForm.fields;
 
-      await storage.forms.update(existing.id, {
-        name: existing.name || systemForm.name,
-        description: existing.description ?? systemForm.description ?? "",
-        kind: existing.kind || systemForm.kind,
-        isSystem: true,
-        isActive: existing.isActive ?? true,
-        fields:
-          shouldUpgradeFields
-            ? upgradedFields
-            : existingFields.length > 0
-              ? existingFields
-              : systemForm.fields,
-        settings:
-          {
-            ...systemForm.settings,
-            ...existingSettings,
-            schemaVersion: Math.max(existingSchemaVersion, systemSchemaVersion),
-          },
-      });
-      continue;
-    }
+        await storage.forms.update(existing.id, {
+          name: existing.name || systemForm.name,
+          description: existing.description ?? systemForm.description ?? "",
+          kind: existing.kind || systemForm.kind,
+          isSystem: true,
+          isActive: existing.isActive ?? true,
+          fields:
+            shouldUpgradeFields
+              ? upgradedFields
+              : existingFields.length > 0
+                ? existingFields
+                : systemForm.fields,
+          settings:
+            {
+              ...systemForm.settings,
+              ...existingSettings,
+              schemaVersion: Math.max(existingSchemaVersion, systemSchemaVersion),
+            },
+        });
+        return;
+      }
 
-    await storage.forms.create(systemForm);
-  }
+      await storage.forms.create(systemForm);
+    }),
+  );
 
   logger.app.info("System forms ensured");
 }

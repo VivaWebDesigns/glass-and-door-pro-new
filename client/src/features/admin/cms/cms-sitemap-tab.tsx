@@ -326,8 +326,8 @@ export function CmsSitemapTab() {
                 icon: CheckCircle2,
                 text: "The home route is always included.",
               },
-            ].map(({ icon: Icon, text }, i) => (
-              <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+            ].map(({ icon: Icon, text }) => (
+              <div key={text} className="flex items-start gap-2 text-xs text-muted-foreground">
                 <Icon className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
                 <span>{text}</span>
               </div>

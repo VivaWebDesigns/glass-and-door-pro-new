@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import type { CmsPage } from "@shared/schema";
 import { format } from "date-fns";
+import { onActivateKey } from "@/lib/a11y";
 
 const HIDDEN_CMS_PAGE_SLUGS = new Set(["directory", "recordings", "events", "insights"]);
 
@@ -207,6 +208,8 @@ export default function CmsOverviewPage() {
                       key={page.id}
                       className="border-b last:border-0 hover:bg-muted/30 cursor-pointer"
                       onClick={() => navigate(`/admin/cms/pages/${page.id}`)}
+                      onKeyDown={onActivateKey(() => navigate(`/admin/cms/pages/${page.id}`))}
+                      tabIndex={0}
                       data-testid={`row-recent-page-${page.id}`}
                     >
                       <td className="py-2 font-medium">{page.title}</td>

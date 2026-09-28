@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { CmsForm, CmsFormField, CmsFormListColumn } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
@@ -18,6 +18,8 @@ import { Loader2, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { pushGlassDoorProLeadSuccess } from "@/lib/lead-tracking";
 import { sanitizeRichHtml } from "@/lib/sanitize-html";
+import { onActivateKey } from "@/lib/a11y";
+import { pairWithKeys, useListKeys } from "@/hooks/use-list-keys";
 
 interface PublicFormRendererProps {
   slug: string;
@@ -213,7 +215,12 @@ function ChoiceGroup({
           return (
             <div
               key={option.value}
+              role="checkbox"
+              aria-checked={checked}
+              aria-label={option.label}
+              tabIndex={0}
               onClick={() => toggle(!checked)}
+              onKeyDown={onActivateKey(() => toggle(!checked))}
               className={cn(
                 "cursor-pointer rounded-xl border p-3 text-left transition-colors",
                 checked ? "border-primary ring-2 ring-primary/10" : "hover:border-primary/50"
@@ -223,7 +230,7 @@ function ChoiceGroup({
                 <img src={option.imageUrl} alt={option.label} className="mb-3 h-32 w-full rounded-lg object-cover" />
               ) : null}
               <div className="flex items-center gap-3">
-                <Checkbox checked={checked} className="pointer-events-none" />
+                <Checkbox checked={checked} className="pointer-events-none" tabIndex={-1} aria-hidden="true" />
                 <span className="text-sm font-medium">{option.label}</span>
               </div>
             </div>
@@ -285,14 +292,17 @@ function ListField({
     onChange([...rows, nextRow]);
   };
 
+  const { keys: rowKeys, removeKey: removeRowKey } = useListKeys(rows.length);
+
   const removeRow = (index: number) => {
+    removeRowKey(index);
     onChange(rows.filter((_, rowIndex) => rowIndex !== index));
   };
 
   return (
     <div className="space-y-3 rounded-xl border p-3">
-      {rows.map((row, index) => (
-        <div key={index} className="rounded-lg border bg-muted/10 p-3">
+      {pairWithKeys(rows, rowKeys).map(({ item: row, key: rowKey }, index) => (
+        <div key={rowKey} className="rounded-lg border bg-muted/10 p-3">
           <div className="grid gap-3 md:grid-cols-2">
             {columns.map((column) => (
               <div key={column.id} className="space-y-1.5">
@@ -379,6 +389,7 @@ function renderFieldInput(
     return (
       <select
         multiple
+        aria-label={field.label}
         value={current}
         onChange={(event) =>
           setValue(Array.from(event.target.selectedOptions).map((option) => option.value))
@@ -516,10 +527,12 @@ export function PublicFormRenderer({
   const activePage = pages[currentPageIndex] ?? pages[0] ?? { meta: null, fields: fields };
   const visibleFields = currentPageFields(activePage);
 
-  useEffect(() => {
+  const [syncedForm, setSyncedForm] = useState<{ fields: typeof fields; slug: string } | null>(null);
+  if (syncedForm?.fields !== fields || syncedForm.slug !== slug) {
+    setSyncedForm({ fields, slug });
     setValues(buildInitialValues(fields));
     setCurrentPageIndex(0);
-  }, [fields, slug]);
+  }
 
   const description =
     descriptionOverride ??

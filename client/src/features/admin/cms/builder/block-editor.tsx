@@ -20,6 +20,8 @@ import { CmsImageUpload } from "../components/cms-image-upload";
 import { ImagePositionPicker } from "../components/image-position-picker";
 import { CmsRichTextEditor } from "./cms-rich-text-editor";
 import type { CmsForm, CmsPage } from "@shared/schema";
+import { pairWithKeys, useListKeys } from "@/hooks/use-list-keys";
+import { createFallbackBlockDef } from "./block-fallback-def";
 
 interface BlockEditorProps {
   blockDef: BlockDef;
@@ -228,59 +230,6 @@ const CONTEXTUAL_PRIORITY: Record<string, number> = {
   imagePosition: 65,
 };
 
-function humanizeBlockType(type: string) {
-  return type
-    .replace(/[-_]+/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
-}
-
-function inferFallbackPropDef(key: string, value: unknown): PropDef | null {
-  if (typeof value === "boolean") {
-    return { key, label: humanizeBlockType(key), type: "boolean" };
-  }
-
-  if (typeof value === "number") {
-    return { key, label: humanizeBlockType(key), type: "number" };
-  }
-
-  if (typeof value === "string") {
-    const normalizedKey = key.toLowerCase();
-    const label = humanizeBlockType(key);
-
-    if (normalizedKey.includes("image") && normalizedKey.includes("url")) {
-      return { key, label, type: "image-url", placeholder: "Upload or select image" };
-    }
-
-    if (normalizedKey.endsWith("link") || normalizedKey.endsWith("url") || normalizedKey.includes("link")) {
-      return { key, label, type: "url", placeholder: "Enter a link" };
-    }
-
-    if (value.includes("<") || value.includes("\n") || value.length > 140) {
-      return { key, label, type: "textarea", placeholder: `Enter ${label.toLowerCase()}` };
-    }
-
-    return { key, label, type: "text", placeholder: `Enter ${label.toLowerCase()}` };
-  }
-
-  return null;
-}
-
-export function createFallbackBlockDef(blockType: string, values: Record<string, unknown>): BlockDef {
-  const propDefs = Object.entries(values)
-    .map(([key, value]) => inferFallbackPropDef(key, value))
-    .filter((propDef): propDef is PropDef => Boolean(propDef));
-
-  return {
-    type: blockType,
-    label: `${humanizeBlockType(blockType)} (Compatibility Mode)`,
-    iconName: "Settings2",
-    description: "This block is using a compatibility editor because its normal inspector fields could not be loaded.",
-    category: "content",
-    defaultProps: values,
-    propDefs,
-  };
-}
-
 function getActionControllerKey(key: string) {
   if (key === "link" || key === "formSlug" || key === "modalTitle" || key === "modalDescription") {
     return "action";
@@ -486,7 +435,10 @@ function ArrayItemsField({
     onChange([...value, blank]);
   };
 
+  const { keys: itemKeys, removeKey: removeItemKey } = useListKeys(value.length);
+
   const removeItem = (idx: number) => {
+    removeItemKey(idx);
     onChange(value.filter((_, i) => i !== idx));
   };
 
@@ -499,8 +451,8 @@ function ArrayItemsField({
 
   return (
     <div className="space-y-3">
-      {value.map((item, idx) => (
-        <div key={idx} className="border rounded-lg p-3 space-y-2 bg-muted/20 relative">
+      {pairWithKeys(value, itemKeys).map(({ item, key: itemKey }, idx) => (
+        <div key={itemKey} className="border rounded-lg p-3 space-y-2 bg-muted/20 relative">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
               Item {idx + 1}
@@ -509,6 +461,7 @@ function ArrayItemsField({
               type="button"
               variant="ghost"
               size="icon"
+              aria-label={`Remove item ${idx + 1}`}
               className="h-6 w-6 text-destructive"
               onClick={() => removeItem(idx)}
               data-testid={`array-item-remove-${idx}`}
@@ -799,6 +752,7 @@ function PropField({
             type="color"
             value={normalizeColorValue(strVal, propDef.key)}
             onChange={(e) => onChange(e.target.value)}
+            aria-label={`${propDef.label} color`}
             className="h-10 w-12 rounded-md border border-input bg-background p-1 cursor-pointer"
             data-testid={`prop-color-swatch-${propDef.key}`}
           />

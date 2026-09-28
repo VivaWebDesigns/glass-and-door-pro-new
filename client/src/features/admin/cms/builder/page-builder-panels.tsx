@@ -15,12 +15,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getBlockDef, isDynamicBlock, type BlockDef, type BlockInstance } from "./block-registry";
-import {
-  BlockIcon,
-  getBlockSummary,
-  groupBlocksByCategory,
-  SectionsLibrary,
-} from "./page-builder-support";
+import { BlockIcon, SectionsLibrary } from "./page-builder-support";
+import { getBlockSummary } from "./page-builder-utils";
 import { FULL_WIDTH_BLOCK_TYPES } from "./page-builder-constants";
 
 interface StructurePanelProps {
@@ -193,6 +189,7 @@ export function StructurePanel({
                         type="button"
                         variant="ghost"
                         size="icon"
+                        aria-label="Move block up"
                         className="h-6 w-6"
                         disabled={blockIndex === 0}
                         onClick={() => onMoveBlock(block.id, "up")}
@@ -204,6 +201,7 @@ export function StructurePanel({
                         type="button"
                         variant="ghost"
                         size="icon"
+                        aria-label="Move block down"
                         className="h-6 w-6"
                         disabled={blockIndex === blocks.length - 1}
                         onClick={() => onMoveBlock(block.id, "down")}
@@ -215,6 +213,7 @@ export function StructurePanel({
                         type="button"
                         variant="ghost"
                         size="icon"
+                        aria-label="Duplicate block"
                         className="h-6 w-6"
                         onClick={() => onDuplicateBlock(block.id)}
                         data-testid={`button-duplicate-block-${block.id}`}
@@ -225,6 +224,7 @@ export function StructurePanel({
                         type="button"
                         variant="ghost"
                         size="icon"
+                        aria-label="Delete block"
                         className="h-6 w-6 text-destructive hover:text-destructive"
                         onClick={() => onDeleteBlock(block.id)}
                         data-testid={`button-delete-block-${block.id}`}

@@ -135,36 +135,40 @@ export async function ensureSystemCmsSections(options?: { refreshExisting?: bool
   let deleted = 0;
 
   if (refreshExisting) {
-    for (const section of existingSections) {
-      if (section.name.startsWith(SYSTEM_SECTION_NAME_PREFIX) && !desiredStarterNames.has(section.name)) {
-        await storage.cmsSections.deleteSection(section.id);
-        deleted += 1;
-      }
-    }
+    const retiredStarterSections = existingSections.filter(
+      (section) => section.name.startsWith(SYSTEM_SECTION_NAME_PREFIX) && !desiredStarterNames.has(section.name),
+    );
+    await Promise.all(retiredStarterSections.map((section) => storage.cmsSections.deleteSection(section.id)));
+    deleted = retiredStarterSections.length;
   }
 
-  for (const block of STARTER_LIBRARY_BLOCKS) {
-    const starterSection = buildStarterSectionRecord(block);
-    const existing = existingByName.get(starterSection.name);
+  const starterSections = STARTER_LIBRARY_BLOCKS.map(buildStarterSectionRecord);
 
-    if (!existing) {
-      await storage.cmsSections.createSection({
-        ...starterSection,
-        blocks: starterSection.blocks as any,
-      });
-      created += 1;
-      continue;
-    }
+  // Create missing starters one at a time so the library keeps its createdAt ordering.
+  for (const starterSection of starterSections.filter((section) => !existingByName.has(section.name))) {
+    await storage.cmsSections.createSection({
+      ...starterSection,
+      blocks: starterSection.blocks as any,
+    });
+    created += 1;
+  }
 
-    if (refreshExisting) {
-      await storage.cmsSections.updateSection(existing.id, {
-        name: starterSection.name,
-        description: starterSection.description,
-        category: starterSection.category,
-        blocks: starterSection.blocks as any,
-      });
-      updated += 1;
-    }
+  if (refreshExisting) {
+    const refreshable = starterSections.flatMap((starterSection) => {
+      const existing = existingByName.get(starterSection.name);
+      return existing ? [{ existing, starterSection }] : [];
+    });
+    await Promise.all(
+      refreshable.map(({ existing, starterSection }) =>
+        storage.cmsSections.updateSection(existing.id, {
+          name: starterSection.name,
+          description: starterSection.description,
+          category: starterSection.category,
+          blocks: starterSection.blocks as any,
+        }),
+      ),
+    );
+    updated = refreshable.length;
   }
 
   logger.cms.info("Ensured system CMS reusable sections", {

@@ -2,37 +2,10 @@ import { ChevronDown } from "lucide-react";
 import { PublicPageRenderer } from "@/features/public/public-block-renderer";
 import { resolveCmsAssetUrl } from "@/features/admin/cms/builder/block-renderer.shared";
 import type { BlockInstance } from "@/features/admin/cms/builder/block-registry";
+import { prepareSectionAnchorBlocks } from "./section-anchor-blocks";
 
 function text(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
-}
-
-function sectionId(title: string, index: number) {
-  const normalized = title
-    .toLowerCase()
-    .replace(/&/g, "and")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-
-  return normalized || `section-${index + 1}`;
-}
-
-export function prepareLocationServiceBlocks(blocks: BlockInstance[]) {
-  return blocks.map((block, index) => {
-    const title = text(block.props.title);
-    const existingAnchor = text(block.props.anchorId);
-    const anchorId = existingAnchor || (title ? sectionId(title, index) : "");
-
-    return anchorId
-      ? {
-          ...block,
-          props: {
-            ...block.props,
-            anchorId,
-          },
-        }
-      : block;
-  });
 }
 
 function PageSectionLinks({ blocks }: { blocks: BlockInstance[] }) {
@@ -109,7 +82,7 @@ export function LocationServiceLayout({
     return <PublicPageRenderer blocks={blocks} />;
   }
 
-  const contentBlocks = prepareLocationServiceBlocks(blocks.slice(1));
+  const contentBlocks = prepareSectionAnchorBlocks(blocks.slice(1));
   const closingCta = contentBlocks.at(-1)?.type === "cta" ? contentBlocks.at(-1) : undefined;
   const pageBlocks = closingCta ? contentBlocks.slice(0, -1) : contentBlocks;
   const serviceBlock = pageBlocks.find(

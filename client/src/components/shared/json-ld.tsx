@@ -41,10 +41,10 @@ function schemaIdentity(schema: JsonLdObject) {
 
 export function JsonLd({ schemas }: JsonLdProps) {
   const uid = useId().replace(/:/g, "");
-  const valid = schemas.filter((s): s is JsonLdObject => !!s);
-  const serializedSchemas = JSON.stringify(valid);
+  const serializedSchemas = JSON.stringify(schemas.filter((s): s is JsonLdObject => !!s));
 
   useEffect(() => {
+    const valid = JSON.parse(serializedSchemas) as JsonLdObject[];
     if (valid.length === 0) return;
 
     const schemaSet = new Set(valid.map(schemaIdentity).filter((key): key is string => !!key));

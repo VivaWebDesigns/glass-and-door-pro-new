@@ -332,6 +332,7 @@ export function Navbar() {
             <SheetTrigger asChild>
               <Button
                 size="icon"
+                aria-label="Open menu"
                 variant="ghost"
                 className="rounded-full border border-border/70 bg-background/70"
                 data-testid="button-mobile-menu"

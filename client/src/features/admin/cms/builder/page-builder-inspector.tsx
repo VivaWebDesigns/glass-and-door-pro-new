@@ -80,6 +80,7 @@ export function BlockInspectorPanel({
               type="button"
               variant="ghost"
               size="icon"
+              aria-label="Close editor panel"
               className="h-7 w-7"
               onClick={onClose}
               data-testid="button-close-editor-panel"

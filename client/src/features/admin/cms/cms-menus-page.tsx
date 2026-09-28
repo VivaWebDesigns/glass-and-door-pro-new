@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { AdminSidebar } from "@/features/admin/admin-sidebar";
@@ -152,6 +152,9 @@ function MenuItemEditor({
 
         {hasChildren ? (
           <button
+            type="button"
+            aria-label={expanded ? "Collapse submenu" : "Expand submenu"}
+            aria-expanded={expanded}
             onClick={() => setExpanded(!expanded)}
             className="shrink-0"
             data-testid={`toggle-children-${item.id}`}
@@ -196,7 +199,7 @@ function MenuItemEditor({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" data-testid={`menu-item-actions-${item.id}`}>
+            <Button variant="ghost" size="icon" aria-label="Menu item actions" className="h-7 w-7 shrink-0" data-testid={`menu-item-actions-${item.id}`}>
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>

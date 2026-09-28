@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { BlockInstance } from "@/features/admin/cms/builder/block-registry";
-import { prepareServiceEditorialBlocks } from "./service-editorial-layout";
+import { prepareSectionAnchorBlocks } from "./section-anchor-blocks";
 
-describe("prepareServiceEditorialBlocks", () => {
+describe("prepareSectionAnchorBlocks", () => {
   it("adds navigation anchors without changing CMS copy", () => {
     const blocks = [
       {
@@ -23,7 +23,7 @@ describe("prepareServiceEditorialBlocks", () => {
       },
     ] as BlockInstance[];
 
-    const prepared = prepareServiceEditorialBlocks(blocks);
+    const prepared = prepareSectionAnchorBlocks(blocks);
 
     expect(prepared[0].props).toEqual({
       title: "Frameless vs. Semi-Frameless: Which Is Right for You?",

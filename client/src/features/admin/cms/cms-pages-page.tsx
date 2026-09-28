@@ -2,7 +2,7 @@ import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { AdminSidebar } from "@/features/admin/admin-sidebar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,7 +17,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, Eye, EyeOff, Globe, FileCode, CalendarClock } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, Globe,  CalendarClock } from "lucide-react";
 import type { CmsPage } from "@shared/schema";
 import { format } from "date-fns";
 import { useState } from "react";
@@ -193,6 +193,7 @@ export default function CmsPagesPage() {
                           <Button
                             variant="ghost"
                             size="icon"
+                            aria-label={`Edit ${page.title}`}
                             className="h-8 w-8"
                             onClick={() => navigate(getEditorHref(page))}
                             disabled={isLockedByOther}
@@ -228,6 +229,7 @@ export default function CmsPagesPage() {
                           <Button
                             variant="ghost"
                             size="icon"
+                            aria-label={`Delete ${page.title}`}
                             className="h-8 w-8 text-destructive"
                             onClick={() => setDeleteTarget(page)}
                             disabled={isLockedByOther}

@@ -44,6 +44,7 @@ import {
 import { apiRequest } from "@/lib/queryClient";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageCropperSheet } from "@/components/shared/image-cropper-sheet";
+import { withContentKeys } from "@/lib/content-keys";
 
 type MediaMetadataForm = {
   originalName: string;
@@ -322,6 +323,7 @@ export default function CmsMediaPage() {
           <select
             value={usageFilter}
             onChange={(e) => setUsageFilter(e.target.value as typeof usageFilter)}
+            aria-label="Filter by usage"
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             data-testid="select-media-usage-filter"
           >
@@ -333,6 +335,7 @@ export default function CmsMediaPage() {
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value as typeof typeFilter)}
+            aria-label="Filter by type"
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             data-testid="select-media-type-filter"
           >
@@ -343,6 +346,7 @@ export default function CmsMediaPage() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+            aria-label="Sort media"
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             data-testid="select-media-sort"
           >
@@ -529,6 +533,7 @@ export default function CmsMediaPage() {
                     type="button"
                     variant="ghost"
                     size="icon"
+                    aria-label="Copy URL"
                     className="h-7 w-7 flex-shrink-0"
                     onClick={() => copyUrl(selectedAsset.url)}
                     data-testid="button-copy-url"
@@ -572,9 +577,9 @@ export default function CmsMediaPage() {
                 </div>
                 {selectedAsset.usageRefs.length > 0 ? (
                   <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
-                    {selectedAsset.usageRefs.map((reference, index) => (
+                    {selectedAsset.usageRefs.map(withContentKeys((reference, _index, itemKey) => (
                       <div
-                        key={`${reference.entityType}-${reference.entityId}-${reference.field}-${index}`}
+                        key={itemKey}
                         className="rounded-lg border bg-background px-3 py-2 text-sm"
                       >
                         <div className="flex flex-wrap items-center gap-2">
@@ -590,7 +595,7 @@ export default function CmsMediaPage() {
                           <p className="mt-1 text-xs text-muted-foreground">{reference.path}</p>
                         )}
                       </div>
-                    ))}
+                    )))}
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground">
