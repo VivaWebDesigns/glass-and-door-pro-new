@@ -17,6 +17,7 @@ import {
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { pushGlassDoorProLeadSuccess } from "@/lib/lead-tracking";
+import { sanitizeRichHtml } from "@/lib/sanitize-html";
 
 interface PublicFormRendererProps {
   slug: string;
@@ -326,7 +327,7 @@ function renderFieldInput(
     return (
       <div
         className="rounded-xl border bg-muted/20 p-4 text-sm"
-        dangerouslySetInnerHTML={{ __html: text(field.config?.htmlContent) }}
+        dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(text(field.config?.htmlContent)) }}
       />
     );
   }

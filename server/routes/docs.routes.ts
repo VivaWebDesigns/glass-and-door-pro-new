@@ -4,6 +4,15 @@ import { authenticateToken, requireRole } from "../middleware/auth";
 import { asyncHandler } from "../middleware/error-handler";
 import { paramString } from "../utils/params";
 import { ensureSystemDocs } from "../services/system-docs.service";
+import { insertDocSchema } from "@shared/schema";
+import { validateBody } from "../middleware/validation";
+import type { z } from "zod";
+
+const createDocSchema = insertDocSchema.omit({ createdBy: true });
+const updateDocSchema = createDocSchema.partial();
+
+type CreateDocInput = z.infer<typeof createDocSchema>;
+type UpdateDocInput = z.infer<typeof updateDocSchema>;
 
 const router = Router();
 
@@ -44,9 +53,11 @@ router.get(
 
 router.post(
   "/",
+  validateBody(createDocSchema),
   asyncHandler(async (req, res) => {
+    const input: CreateDocInput = req.body;
     const doc = await storage.docs.createDoc({
-      ...req.body,
+      ...input,
       createdBy: req.user!.id,
     });
     res.status(201).json(doc);
@@ -55,8 +66,10 @@ router.post(
 
 router.put(
   "/:id",
+  validateBody(updateDocSchema),
   asyncHandler(async (req, res) => {
-    const doc = await storage.docs.updateDoc(paramString(req.params.id), req.body);
+    const input: UpdateDocInput = req.body;
+    const doc = await storage.docs.updateDoc(paramString(req.params.id), input);
     if (!doc) {
       res.status(404).json({ message: "Document not found" });
       return;

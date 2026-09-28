@@ -32,7 +32,7 @@ export default function AdminSetupPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const { data: setupStatus, isLoading: statusLoading, isError: statusError } = useQuery<{ needsSetup: boolean }>({
+  const { data: setupStatus, isLoading: statusLoading, isError: statusError } = useQuery<{ needsSetup: boolean; requiresToken?: boolean }>({
     queryKey: ["/api/setup/status"],
   });
 
@@ -42,7 +42,7 @@ export default function AdminSetupPage() {
     }
   }, [setupStatus, setLocation]);
 
-  const requiresToken = !!import.meta.env.VITE_SETUP_TOKEN_REQUIRED;
+  const requiresToken = setupStatus?.requiresToken === true;
 
   const form = useForm<SetupForm>({
     resolver: zodResolver(setupSchema),

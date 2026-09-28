@@ -5,9 +5,13 @@ import crypto from "crypto";
 import { logger } from "../utils/logger";
 
 const ALGORITHM = "aes-256-cbc";
-const SECRET = process.env.SESSION_SECRET || "dev-secret-change-me";
+const isDev = process.env.NODE_ENV !== "production";
+const SECRET = process.env.SESSION_SECRET || (isDev ? "dev-secret-change-me" : "");
 
 function getKey(): Buffer {
+  if (!SECRET) {
+    throw new Error("SESSION_SECRET is required to encrypt or decrypt settings");
+  }
   return crypto.createHash("sha256").update(SECRET).digest();
 }
 

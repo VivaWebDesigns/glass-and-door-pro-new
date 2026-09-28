@@ -47,7 +47,7 @@ router.get(
   "/status",
   asyncHandler(async (_req, res) => {
     const adminExists = await hasAdminUser();
-    res.json({ needsSetup: !adminExists });
+    res.json({ needsSetup: !adminExists, requiresToken: Boolean(process.env.SETUP_TOKEN) });
   })
 );
 

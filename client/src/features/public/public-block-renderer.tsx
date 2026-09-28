@@ -77,6 +77,7 @@ import {
 } from "lucide-react";
 import type { BlockInstance, BuilderContent } from "@/features/admin/cms/builder/block-registry";
 import { FULL_WIDTH_BLOCK_TYPES } from "@/features/admin/cms/builder/page-builder-constants";
+import { sanitizeEmbedHtml, sanitizeRichHtml } from "@/lib/sanitize-html";
 
 export type { BlockInstance, BuilderContent };
 
@@ -245,7 +246,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
           <div
             className={`mb-9 text-base leading-8 text-white/85 sm:text-lg [&_a]:text-white [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-white/80 [&_p]:m-0 ${isSplit ? "max-w-2xl" : "max-w-2xl mx-auto"}`}
             style={subheadingTextStyle}
-            dangerouslySetInnerHTML={{ __html: str(props.subheading) }}
+            dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(str(props.subheading)) }}
           />
         )}
         <div
@@ -325,7 +326,7 @@ function TwoColumnTextBlock({ props }: { props: Record<string, unknown> }) {
             {column.body && (
               <div
                 className="prose prose-sm max-w-none text-foreground"
-                dangerouslySetInnerHTML={{ __html: column.body }}
+                dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(column.body) }}
               />
             )}
             {column.items.length > 0 && (
@@ -360,7 +361,7 @@ function CalloutBoxBlock({ props }: { props: Record<string, unknown> }) {
       <div className={`public-section-card rounded-lg p-5 sm:p-8 ${variantClass}`}>
         <div
           className="public-prose prose prose-sm max-w-none break-words"
-          dangerouslySetInnerHTML={{ __html: str(props.content) || "<p>Add callout content.</p>" }}
+          dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(str(props.content) || "<p>Add callout content.</p>") }}
         />
         {str(props.ctaText) && (
           <div className="mt-6">
@@ -477,7 +478,7 @@ function RichTextBlock({ props }: { props: Record<string, unknown> }) {
       <div
         className={`public-prose prose prose-sm max-w-none ${textAlign}`}
         onClick={handleContentClick}
-        dangerouslySetInnerHTML={{ __html: str(props.content) || "<p>No content.</p>" }}
+        dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(str(props.content) || "<p>No content.</p>") }}
       />
     </div>
   );
@@ -505,7 +506,7 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
         {str(props.body) && (
           <div
             className={`public-prose prose prose-sm max-w-none ${bodyAlign}`}
-            dangerouslySetInnerHTML={{ __html: str(props.body) }}
+            dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(str(props.body)) }}
           />
         )}
       </div>
@@ -572,7 +573,7 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
       {str(props.subheading) && (
         <div
           className={`mb-8 mx-auto max-w-xl text-sm leading-relaxed sm:text-base [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:opacity-80 [&_p]:m-0 ${variant === "light" ? "text-muted-foreground [&_a]:text-primary" : "opacity-80 [&_a]:text-current"}`}
-          dangerouslySetInnerHTML={{ __html: str(props.subheading) }}
+          dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(str(props.subheading)) }}
         />
       )}
       <div
@@ -703,7 +704,7 @@ function FaqBlock({ props }: { props: Record<string, unknown> }) {
               <AccordionContent>
                 <div
                   className="text-muted-foreground [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-primary/80 [&_p]:m-0"
-                  dangerouslySetInnerHTML={{ __html: item.answer }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(item.answer) }}
                 />
               </AccordionContent>
             </AccordionItem>
@@ -945,7 +946,7 @@ function RawHtmlBlock({ props }: { props: Record<string, unknown> }) {
       <SectionHeading props={props} defaultAlignment="center" className="mb-6" />
       <div
         className="prose prose-sm max-w-none text-foreground"
-        dangerouslySetInnerHTML={{ __html: str(props.html) || "" }}
+        dangerouslySetInnerHTML={{ __html: sanitizeEmbedHtml(str(props.html) || "") }}
       />
     </div>
   );
@@ -1036,6 +1037,7 @@ function VideoEmbedBlock({ props }: { props: Record<string, unknown> }) {
           {ytId && (
             <iframe
               src={`https://www.youtube.com/embed/${ytId}`}
+              title="YouTube video"
               className="absolute inset-0 w-full h-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
@@ -1044,7 +1046,9 @@ function VideoEmbedBlock({ props }: { props: Record<string, unknown> }) {
           {vimeoId && (
             <iframe
               src={`https://player.vimeo.com/video/${vimeoId}`}
+              title="Vimeo video"
               className="absolute inset-0 w-full h-full"
+              allow="autoplay; fullscreen; picture-in-picture"
               allowFullScreen
             />
           )}
@@ -1511,7 +1515,7 @@ function ScienceExplainerBlock({ props }: { props: Record<string, unknown> }) {
       {str(props.body) && (
         <div
           className="prose prose-sm max-w-none text-foreground mb-6"
-          dangerouslySetInnerHTML={{ __html: str(props.body) }}
+          dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(str(props.body)) }}
         />
       )}
       {citations.length > 0 && (

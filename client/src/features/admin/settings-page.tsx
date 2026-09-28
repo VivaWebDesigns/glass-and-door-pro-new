@@ -2095,6 +2095,7 @@ function TemplateEditor({
               {previewHtml ? (
                 <iframe
                   srcDoc={previewHtml}
+                  sandbox=""
                   className="w-full h-[420px] bg-white"
                   title="Email preview"
                   data-testid="iframe-email-preview"
