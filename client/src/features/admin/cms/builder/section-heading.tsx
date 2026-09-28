@@ -28,6 +28,34 @@ function headingAlignment(v: unknown, fallback: HeadingAlignment): HeadingAlignm
   return value === "left" || value === "right" || value === "center" ? value : fallback;
 }
 
+const ALIGNMENT_CLASSES: Record<HeadingAlignment, string> = {
+  left: "items-start text-left",
+  center: "items-center text-center",
+  right: "items-end text-right",
+};
+
+const TITLE_CLASSES: Record<HeadingLevel, string> = {
+  h1: "text-3xl sm:text-4xl md:text-5xl font-heading font-bold leading-tight public-heading-1",
+  h2: "text-2xl sm:text-3xl md:text-4xl font-heading font-bold leading-tight public-heading-2",
+};
+
+function firstText(...values: unknown[]) {
+  for (const value of values) {
+    const text = str(value);
+    if (text) return text;
+  }
+  return "";
+}
+
+function getSectionHeadingContent(props: Record<string, unknown>, fallbackTitle: string | undefined) {
+  return {
+    eyebrow: firstText(props.sectionEyebrow, props.eyebrow),
+    title: firstText(props.title, props.heading, fallbackTitle),
+    subtitle: firstText(props.subtitle, props.subheading),
+    level: headingLevel(props.sectionHeadingLevel ?? props.headingLevel),
+  };
+}
+
 export function SectionHeading({
   props,
   defaultAlignment = "center",
@@ -36,31 +64,22 @@ export function SectionHeading({
   subtitleClassName,
   fallbackTitle,
 }: SectionHeadingProps) {
-  const eyebrow = str(props.sectionEyebrow) || str(props.eyebrow);
-  const title = str(props.title) || str(props.heading) || fallbackTitle || "";
-  const subtitle = str(props.subtitle) || str(props.subheading);
-  const level = headingLevel(props.sectionHeadingLevel ?? props.headingLevel);
+  const { eyebrow, title, subtitle, level } = getSectionHeadingContent(props, fallbackTitle);
   const alignment = headingAlignment(props.sectionHeadingAlignment ?? props.alignment, defaultAlignment);
 
   if (!eyebrow && !title && !subtitle) return null;
 
   const HeadingTag = level as ElementType;
-  const textAlign = alignment === "left" ? "text-left" : alignment === "right" ? "text-right" : "text-center";
-  const itemsAlign = alignment === "left" ? "items-start" : alignment === "right" ? "items-end" : "items-center";
-  const defaultTitleClass =
-    level === "h1"
-      ? "text-3xl sm:text-4xl md:text-5xl font-heading font-bold leading-tight public-heading-1"
-      : "text-2xl sm:text-3xl md:text-4xl font-heading font-bold leading-tight public-heading-2";
 
   return (
-    <div className={cn("flex flex-col gap-2", itemsAlign, textAlign, className)}>
+    <div className={cn("flex flex-col gap-2", ALIGNMENT_CLASSES[alignment], className)}>
       {eyebrow && (
         <span className="text-xs font-semibold uppercase tracking-widest text-accent">
           {eyebrow}
         </span>
       )}
       {title && (
-        <HeadingTag className={cn(defaultTitleClass, titleClassName)}>
+        <HeadingTag className={cn(TITLE_CLASSES[level], titleClassName)}>
           {renderPublicDisplayText(title)}
         </HeadingTag>
       )}

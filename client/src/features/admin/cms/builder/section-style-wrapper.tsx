@@ -1,8 +1,7 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 import {
-  backgroundImageWithFallback,
-  DEFAULT_SECTION_LINEAR_GRADIENT,
   getRadialGradientStyle,
+  getSectionWrapperStyle,
   getSectionStyleConfig,
   hasSectionStyleConfig,
   hexToRgba,
@@ -31,40 +30,7 @@ export function SectionStyleWrapper({
     return <>{children}</>;
   }
 
-  const defaultBackgroundColor =
-    !config.backgroundColor && !config.backgroundImageUrl && config.showRadialGradient
-      ? "#ffffff"
-      : "";
-
-  const wrapperStyle: CSSProperties = {
-    ...(config.backgroundColor || defaultBackgroundColor
-      ? { backgroundColor: config.backgroundColor || defaultBackgroundColor }
-      : {}),
-    ...(config.backgroundImageUrl
-      ? {
-          backgroundImage: backgroundImageWithFallback(config.backgroundImageUrl),
-          backgroundSize: "cover",
-          backgroundPosition: `${config.backgroundPositionX}% ${config.backgroundPositionY}%`,
-          backgroundRepeat: "no-repeat",
-        }
-      : !config.backgroundColor && !defaultBackgroundColor
-        ? { background: DEFAULT_SECTION_LINEAR_GRADIENT }
-        : {}),
-    ...(config.borderTopWidth > 0
-      ? {
-          borderTopStyle: "solid",
-          borderTopWidth: `${config.borderTopWidth}px`,
-          borderTopColor: config.borderTopColor,
-        }
-      : {}),
-    ...(config.borderBottomWidth > 0
-      ? {
-          borderBottomStyle: "solid",
-          borderBottomWidth: `${config.borderBottomWidth}px`,
-          borderBottomColor: config.borderBottomColor,
-        }
-      : {}),
-  };
+  const wrapperStyle = getSectionWrapperStyle(config);
   const overlayOpacity = config.backgroundImageUrl ? config.backgroundOverlayOpacity / 100 : 0;
 
   return (

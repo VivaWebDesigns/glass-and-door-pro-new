@@ -496,7 +496,137 @@ function renderFieldInput(
   );
 }
 
-export function PublicFormRenderer({
+type FormPage = ReturnType<typeof splitPages>[number];
+
+function getFormDescription(form: CmsForm, override: string | undefined) {
+  if (override !== undefined) return override;
+  return typeof form.description === "string" && form.description.trim() ? form.description : "";
+}
+
+function getSubmitLabel(form: CmsForm, override: string | undefined) {
+  if (override !== undefined) return override;
+  const settings = typeof form.settings === "object" && form.settings ? form.settings : null;
+  const configured = typeof settings?.submitButtonText === "string" ? settings.submitButtonText.trim() : "";
+  return configured || "Submit";
+}
+
+async function submitPublicForm(slug: string, values: FormValues) {
+  const response = await fetch(`/api/forms/${slug}/submit`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(values),
+  });
+  if (!response.ok) {
+    const errorPayload = (await response.json().catch(() => ({}))) as { message?: string; error?: string };
+    throw new Error(errorPayload.message || errorPayload.error || "Failed to submit form.");
+  }
+
+  return (await response.json().catch(() => ({}))) as { message?: string; submissionId?: string };
+}
+
+function PublicFormHeader({ name, description, showName }: { name: string; description: string; showName: boolean }) {
+  const descriptionNode = description ? <p className="text-sm public-supporting-copy">{description}</p> : null;
+  if (!showName) return descriptionNode;
+  return (
+    <div className="space-y-1">
+      <h3 className="font-semibold public-heading-3">{name}</h3>
+      {descriptionNode}
+    </div>
+  );
+}
+
+function FormStepProgress({ page, pageIndex, pageCount }: { page: FormPage; pageIndex: number; pageCount: number }) {
+  const pageTitle = text(page.meta?.config?.pageTitle);
+  const pageDescription = text(page.meta?.config?.pageDescription);
+  const percent = ((pageIndex + 1) / pageCount) * 100;
+  return (
+    <div className="space-y-3 rounded-xl border bg-muted/10 p-4">
+      <div className="flex items-center justify-between gap-3 text-sm">
+        <span className="font-medium">Step {pageIndex + 1} of {pageCount}</span>
+        <span className="text-muted-foreground">{Math.round(percent)}%</span>
+      </div>
+      <div className="h-2 rounded-full bg-muted">
+        <div
+          className="h-2 rounded-full bg-primary transition-[width] duration-200"
+          style={{ width: `${percent}%` }}
+        />
+      </div>
+      {pageTitle ? <h4 className="text-base font-semibold">{pageTitle}</h4> : null}
+      {pageDescription ? <p className="text-sm text-muted-foreground">{pageDescription}</p> : null}
+    </div>
+  );
+}
+
+function PublicFormField({
+  field,
+  slug,
+  value,
+  compact,
+  onChange,
+}: {
+  field: CmsFormField;
+  slug: string;
+  value: unknown;
+  compact: boolean;
+  onChange: (next: unknown) => void;
+}) {
+  const showLabel = field.type !== "html" && field.type !== "section";
+  const showHelpText = !isStructuralField(field.type) && Boolean(field.helpText);
+  return (
+    <div className={cn("space-y-1.5", fieldSpanClass(field, compact))}>
+      {showLabel ? <Label htmlFor={`${slug}-${field.key}`}>{field.label}</Label> : null}
+      {renderFieldInput(field, value, onChange, compact)}
+      {showHelpText ? <p className="text-xs public-helper-text">{field.helpText}</p> : null}
+    </div>
+  );
+}
+
+function FormNavigation({
+  page,
+  hasPrevious,
+  isLastPage,
+  isSubmitting,
+  submitLabel,
+  submitClassName,
+  onPrevious,
+  onNext,
+}: {
+  page: FormPage;
+  hasPrevious: boolean;
+  isLastPage: boolean;
+  isSubmitting: boolean;
+  submitLabel: string;
+  submitClassName?: string;
+  onPrevious: () => void;
+  onNext: () => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      {hasPrevious ? (
+        <Button type="button" variant="outline" onClick={onPrevious}>
+          {text(page.meta?.config?.previousButtonText) || "Previous"}
+        </Button>
+      ) : null}
+
+      {isLastPage ? (
+        <Button type="submit" disabled={isSubmitting} className={submitClassName}>
+          {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+          {submitLabel}
+        </Button>
+      ) : (
+        <Button type="button" onClick={onNext}>
+          {text(page.meta?.config?.nextButtonText) || "Next"}
+        </Button>
+      )}
+    </div>
+  );
+}
+
+type LoadedPublicFormProps = Omit<PublicFormRendererProps, "className"> & { form: CmsForm; className?: string };
+
+function LoadedPublicForm({
+  form,
   slug,
   className,
   showHeader = true,
@@ -505,27 +635,15 @@ export function PublicFormRenderer({
   submitButtonClassName,
   compact = false,
   onSubmitSuccess,
-}: PublicFormRendererProps) {
+}: LoadedPublicFormProps) {
   const { toast } = useToast();
   const [values, setValues] = useState<FormValues>({});
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
-  const { data: form, isLoading } = useQuery<CmsForm>({
-    queryKey: ["/api/forms", slug],
-    queryFn: async () => {
-      const response = await fetch(`/api/forms/${slug}`, { credentials: "include" });
-      if (!response.ok) {
-        throw new Error("Form not found");
-      }
-      return response.json();
-    },
-    staleTime: 60_000,
-  });
-
-  const fields = useMemo(() => (Array.isArray(form?.fields) ? form.fields : []), [form?.fields]);
+  const fields = useMemo(() => (Array.isArray(form.fields) ? form.fields : []), [form.fields]);
   const pages = useMemo(() => splitPages(fields), [fields]);
-  const activePage = pages[currentPageIndex] ?? pages[0] ?? { meta: null, fields: fields };
-  const visibleFields = currentPageFields(activePage);
+  const activePage = pages[currentPageIndex] ?? pages[0] ?? { meta: null, fields };
+  const visibleFields = currentPageFields(activePage).filter((field) => field.type !== "hidden");
 
   const [syncedForm, setSyncedForm] = useState<{ fields: typeof fields; slug: string } | null>(null);
   if (syncedForm?.fields !== fields || syncedForm.slug !== slug) {
@@ -534,38 +652,15 @@ export function PublicFormRenderer({
     setCurrentPageIndex(0);
   }
 
-  const description =
-    descriptionOverride ??
-    (typeof form?.description === "string" && form.description.trim() ? form.description : "");
-  const submitLabel =
-    buttonTextOverride ??
-    (typeof form?.settings === "object" &&
-    form?.settings &&
-    typeof form.settings.submitButtonText === "string" &&
-    form.settings.submitButtonText.trim()
-      ? form.settings.submitButtonText.trim()
-      : "Submit");
+  const description = getFormDescription(form, descriptionOverride);
 
   const mutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch(`/api/forms/${slug}/submit`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(values),
-      });
-      if (!response.ok) {
-        const errorPayload = (await response.json().catch(() => ({}))) as { message?: string; error?: string };
-        throw new Error(errorPayload.message || errorPayload.error || "Failed to submit form.");
-      }
-
-      return (await response.json().catch(() => ({}))) as { message?: string; submissionId?: string };
-    },
+    mutationFn: () => submitPublicForm(slug, values),
     onSuccess: (payload) => {
       if (payload.submissionId) {
         pushGlassDoorProLeadSuccess({
-          leadType: form?.kind || "custom",
-          formName: form?.slug || slug,
+          leadType: form.kind || "custom",
+          formName: form.slug || slug,
           leadEventId: payload.submissionId,
         });
       }
@@ -587,6 +682,77 @@ export function PublicFormRenderer({
     },
   });
 
+  const goToNextPage = () => {
+    const error = validatePageFields(currentPageFields(activePage), values);
+    if (error) {
+      toast({ title: "Complete this step", description: error, variant: "destructive" });
+      return;
+    }
+    setCurrentPageIndex((current) => Math.min(pages.length - 1, current + 1));
+  };
+
+  return (
+    <div className={cn("space-y-4", className)} data-testid={`public-form-${slug}`}>
+      <PublicFormHeader name={form.name} description={description} showName={showHeader} />
+
+      {pages.length > 1 ? (
+        <FormStepProgress page={activePage} pageIndex={currentPageIndex} pageCount={pages.length} />
+      ) : null}
+
+      <form
+        className={compact ? "space-y-3" : "space-y-4"}
+        onSubmit={(event) => {
+          event.preventDefault();
+          const error = validatePageFields(fields, values);
+          if (error) {
+            toast({ title: "Check your information", description: error, variant: "destructive" });
+            return;
+          }
+          mutation.mutate();
+        }}
+      >
+        <div className={cn("grid gap-4", compact ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2")}>
+          {visibleFields.map((field) => (
+            <PublicFormField
+              key={field.id}
+              field={field}
+              slug={slug}
+              value={values[field.key]}
+              compact={compact}
+              onChange={(next) => setValues((current) => ({ ...current, [field.key]: next }))}
+            />
+          ))}
+        </div>
+
+        <FormNavigation
+          page={activePage}
+          hasPrevious={pages.length > 1 && currentPageIndex > 0}
+          isLastPage={currentPageIndex >= pages.length - 1}
+          isSubmitting={mutation.isPending}
+          submitLabel={getSubmitLabel(form, buttonTextOverride)}
+          submitClassName={cn(compact ? "w-full" : undefined, submitButtonClassName)}
+          onPrevious={() => setCurrentPageIndex((current) => Math.max(0, current - 1))}
+          onNext={goToNextPage}
+        />
+      </form>
+    </div>
+  );
+}
+
+export function PublicFormRenderer(props: PublicFormRendererProps) {
+  const { slug, className } = props;
+  const { data: form, isLoading } = useQuery<CmsForm>({
+    queryKey: ["/api/forms", slug],
+    queryFn: async () => {
+      const response = await fetch(`/api/forms/${slug}`, { credentials: "include" });
+      if (!response.ok) {
+        throw new Error("Form not found");
+      }
+      return response.json();
+    },
+    staleTime: 60_000,
+  });
+
   if (isLoading) {
     return (
       <div className={cn("flex items-center justify-center py-10", className)}>
@@ -603,108 +769,5 @@ export function PublicFormRenderer({
     );
   }
 
-  const isLastPage = currentPageIndex >= pages.length - 1;
-  const pageTitle = text(activePage.meta?.config?.pageTitle);
-  const pageDescription = text(activePage.meta?.config?.pageDescription);
-  const nextButtonText = text(activePage.meta?.config?.nextButtonText) || "Next";
-  const previousButtonText = text(activePage.meta?.config?.previousButtonText) || "Previous";
-
-  return (
-    <div className={cn("space-y-4", className)} data-testid={`public-form-${slug}`}>
-      {showHeader && (
-        <div className="space-y-1">
-          <h3 className="font-semibold public-heading-3">{form.name}</h3>
-          {description ? <p className="text-sm public-supporting-copy">{description}</p> : null}
-        </div>
-      )}
-      {!showHeader && description ? <p className="text-sm public-supporting-copy">{description}</p> : null}
-
-      {pages.length > 1 ? (
-        <div className="space-y-3 rounded-xl border bg-muted/10 p-4">
-          <div className="flex items-center justify-between gap-3 text-sm">
-            <span className="font-medium">Step {currentPageIndex + 1} of {pages.length}</span>
-            <span className="text-muted-foreground">{Math.round(((currentPageIndex + 1) / pages.length) * 100)}%</span>
-          </div>
-          <div className="h-2 rounded-full bg-muted">
-            <div
-              className="h-2 rounded-full bg-primary transition-[width] duration-200"
-              style={{ width: `${((currentPageIndex + 1) / pages.length) * 100}%` }}
-            />
-          </div>
-          {pageTitle ? <h4 className="text-base font-semibold">{pageTitle}</h4> : null}
-          {pageDescription ? <p className="text-sm text-muted-foreground">{pageDescription}</p> : null}
-        </div>
-      ) : null}
-
-      <form
-        className={cn("space-y-4", compact ? "space-y-3" : "space-y-4")}
-        onSubmit={(event) => {
-          event.preventDefault();
-          const error = validatePageFields(fields, values);
-          if (error) {
-            toast({ title: "Check your information", description: error, variant: "destructive" });
-            return;
-          }
-          mutation.mutate();
-        }}
-      >
-        <div className={cn("grid gap-4", compact ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2")}>
-          {visibleFields.map((field) => {
-            if (field.type === "hidden") return null;
-            const structural = isStructuralField(field.type);
-            return (
-              <div
-                key={field.id}
-                className={cn("space-y-1.5", fieldSpanClass(field, compact))}
-              >
-                {!["html", "section"].includes(field.type) ? (
-                  <Label htmlFor={`${slug}-${field.key}`}>{field.label}</Label>
-                ) : null}
-                {renderFieldInput(
-                  field,
-                  values[field.key],
-                  (next) => setValues((current) => ({ ...current, [field.key]: next })),
-                  compact
-                )}
-                {!structural && field.helpText ? <p className="text-xs public-helper-text">{field.helpText}</p> : null}
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          {pages.length > 1 && currentPageIndex > 0 ? (
-            <Button type="button" variant="outline" onClick={() => setCurrentPageIndex((current) => Math.max(0, current - 1))}>
-              {previousButtonText}
-            </Button>
-          ) : null}
-
-          {!isLastPage ? (
-            <Button
-              type="button"
-              onClick={() => {
-                const error = validatePageFields(visibleFields, values);
-                if (error) {
-                  toast({ title: "Complete this step", description: error, variant: "destructive" });
-                  return;
-                }
-                setCurrentPageIndex((current) => Math.min(pages.length - 1, current + 1));
-              }}
-            >
-              {nextButtonText}
-            </Button>
-          ) : (
-            <Button
-              type="submit"
-              disabled={mutation.isPending}
-              className={cn(compact ? "w-full" : undefined, submitButtonClassName)}
-            >
-              {mutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              {submitLabel}
-            </Button>
-          )}
-        </div>
-      </form>
-    </div>
-  );
+  return <LoadedPublicForm {...props} form={form} />;
 }

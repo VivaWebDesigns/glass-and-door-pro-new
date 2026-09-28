@@ -1,4 +1,4 @@
-import { useCallback,   useState } from "react";
+import {    useState } from "react";
 import type { ElementType } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -42,8 +42,7 @@ import {
   Type,
 } from "lucide-react";
 import { SIDEBAR_WIDGET_TYPES, type CmsForm, type CmsSidebar, type SidebarWidget, type SidebarWidgetType } from "@shared/schema";
-import { useEditorLock } from "@/hooks/use-editor-lock";
-import { useLockConflictGuard } from "@/hooks/use-lock-conflict-guard";
+import { useLockedResourceEditor } from "@/hooks/use-locked-resource-editor";
 
 const WIDGET_LABELS: Record<SidebarWidgetType, string> = {
   form: "Form",
@@ -221,64 +220,195 @@ function WidgetSettings({
   );
 }
 
+function moveInList<T extends { id: string }>(items: T[], id: string, direction: -1 | 1): T[] {
+  const index = items.findIndex((item) => item.id === id);
+  const nextIndex = index + direction;
+  if (index < 0 || nextIndex < 0 || nextIndex >= items.length) return items;
+  const next = [...items];
+  [next[index], next[nextIndex]] = [next[nextIndex], next[index]];
+  return next;
+}
+
+function SidebarDetailsCard({
+  name,
+  description,
+  isDefault,
+  locked,
+  onNameChange,
+  onDescriptionChange,
+  onDefaultChange,
+}: {
+  name: string;
+  description: string;
+  isDefault: boolean;
+  locked: string | false;
+  onNameChange: (value: string) => void;
+  onDescriptionChange: (value: string) => void;
+  onDefaultChange: (value: boolean) => void;
+}) {
+  return (
+    <Card className={cn(locked)}>
+      <CardHeader>
+        <CardTitle className="text-base">Sidebar Details</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label>Name</Label>
+            <Input value={name} onChange={(event) => onNameChange(event.target.value)} placeholder="Blog Sidebar" data-testid="input-sidebar-name" />
+          </div>
+          <div className="flex items-center justify-between rounded-lg border px-4 py-3">
+            <div>
+              <Label>Default Blog Sidebar</Label>
+              <p className="text-xs text-muted-foreground mt-0.5">Used automatically by blog posts.</p>
+            </div>
+            <Switch checked={isDefault} onCheckedChange={onDefaultChange} data-testid="switch-sidebar-default" />
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label>Description</Label>
+          <Textarea value={description} onChange={(event) => onDescriptionChange(event.target.value)} rows={2} placeholder="Internal note for admins" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function SidebarWidgetRow({
+  widget,
+  isFirst,
+  isLast,
+  onChange,
+  onMove,
+  onRemove,
+}: {
+  widget: SidebarWidget;
+  isFirst: boolean;
+  isLast: boolean;
+  onChange: (updates: Partial<SidebarWidget>) => void;
+  onMove: (direction: -1 | 1) => void;
+  onRemove: () => void;
+}) {
+  const Icon = WIDGET_ICONS[widget.type];
+  return (
+    <div className="rounded-lg border bg-card p-4" data-testid={`sidebar-widget-${widget.id}`}>
+      <div className="flex items-start gap-3">
+        <GripVertical className="mt-2 h-4 w-4 text-muted-foreground" />
+        <Icon className="mt-2 h-4 w-4 text-primary" />
+        <div className="flex-1">
+          <WidgetSettings widget={widget} onChange={onChange} />
+        </div>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" aria-label="Move widget up" onClick={() => onMove(-1)} disabled={isFirst}>
+            <ArrowUp className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" aria-label="Move widget down" onClick={() => onMove(1)} disabled={isLast}>
+            <ArrowDown className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Remove widget"
+            className="text-destructive hover:text-destructive"
+            onClick={onRemove}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SidebarWidgetsCard({
+  widgets,
+  locked,
+  onWidgetsChange,
+}: {
+  widgets: SidebarWidget[];
+  locked: string | false;
+  onWidgetsChange: (update: (current: SidebarWidget[]) => SidebarWidget[]) => void;
+}) {
+  return (
+    <Card className={cn(locked)}>
+      <CardHeader>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <CardTitle className="text-base">Widgets</CardTitle>
+            <CardDescription>Stack widgets in the order they should appear on the sidebar.</CardDescription>
+          </div>
+          <Select onValueChange={(value) => onWidgetsChange((current) => [...current, defaultWidget(value as SidebarWidgetType)])}>
+            <SelectTrigger className="w-[210px]" data-testid="select-add-widget">
+              <SelectValue placeholder="Add widget..." />
+            </SelectTrigger>
+            <SelectContent>
+              {SIDEBAR_WIDGET_TYPES.map((type) => (
+                <SelectItem key={type} value={type}>{WIDGET_LABELS[type]}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {widgets.length === 0 ? (
+          <div className="rounded-lg border border-dashed p-10 text-center text-muted-foreground" data-testid="text-empty-widgets">
+            <Type className="mx-auto mb-3 h-10 w-10 opacity-40" />
+            <p className="font-medium">No widgets yet</p>
+            <p className="text-sm">Use the Add widget dropdown to start building this sidebar.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {widgets.map((widget, index) => (
+              <SidebarWidgetRow
+                key={widget.id}
+                widget={widget}
+                isFirst={index === 0}
+                isLast={index === widgets.length - 1}
+                onChange={(updates) =>
+                  onWidgetsChange((current) => current.map((item) => (item.id === widget.id ? { ...item, ...updates } : item)))
+                }
+                onMove={(direction) => onWidgetsChange((current) => moveInList(current, widget.id, direction))}
+                onRemove={() => onWidgetsChange((current) => current.filter((item) => item.id !== widget.id))}
+              />
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function SidebarEditor({ sidebar, onClose }: { sidebar: CmsSidebar | null; onClose: () => void }) {
   const { toast } = useToast();
-  const isNew = !sidebar;
   const [name, setName] = useState(sidebar?.name ?? "");
   const [description, setDescription] = useState(sidebar?.description ?? "");
   const [isDefault, setIsDefault] = useState(Boolean(sidebar?.isDefault));
   const [widgets, setWidgets] = useState<SidebarWidget[]>(
-    Array.isArray(sidebar?.widgets) ? (sidebar!.widgets as SidebarWidget[]) : []
+    Array.isArray(sidebar?.widgets) ? (sidebar.widgets as SidebarWidget[]) : []
   );
-  const editorLock = useEditorLock({
+  const { editorLock, lockedClass } = useLockedResourceEditor({
     resourceType: "cms_sidebar",
-    resourceId: isNew ? null : sidebar?.id ?? null,
-    enabled: !isNew,
+    resourceId: sidebar?.id ?? null,
+    resourceLabel: "sidebar",
+    onConflict: onClose,
   });
 
   const saveMutation = useMutation({
     mutationFn: async () => {
       const body = { name, description: description || null, isDefault, widgets };
-      if (isNew) return apiRequest("POST", "/api/admin/cms/sidebars", body);
-      return apiRequest("PUT", `/api/admin/cms/sidebars/${sidebar!.id}`, body);
+      if (!sidebar) return apiRequest("POST", "/api/admin/cms/sidebars", body);
+      return apiRequest("PUT", `/api/admin/cms/sidebars/${sidebar.id}`, body);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/sidebars"] });
       queryClient.invalidateQueries({ queryKey: ["/api/cms/sidebars"] });
-      toast({ title: isNew ? "Sidebar created" : "Sidebar saved" });
+      toast({ title: sidebar ? "Sidebar saved" : "Sidebar created" });
       onClose();
     },
     onError: (error: Error) => {
       toast({ title: "Failed to save sidebar", description: error.message, variant: "destructive" });
     },
   });
-
-  useLockConflictGuard({
-    active: !isNew && Boolean(sidebar?.id),
-    resourceId: isNew ? null : sidebar?.id ?? null,
-    resourceLabel: "sidebar",
-    editorLock,
-    onConflict: onClose,
-  });
-
-  const updateWidget = useCallback((id: string, updates: Partial<SidebarWidget>) => {
-    setWidgets((current) => current.map((widget) => widget.id === id ? { ...widget, ...updates } : widget));
-  }, []);
-
-  const moveWidget = (id: string, direction: -1 | 1) => {
-    setWidgets((current) => {
-      const index = current.findIndex((widget) => widget.id === id);
-      const nextIndex = index + direction;
-      if (index < 0 || nextIndex < 0 || nextIndex >= current.length) return current;
-      const next = [...current];
-      [next[index], next[nextIndex]] = [next[nextIndex], next[index]];
-      return next;
-    });
-  };
-
-  const addWidget = (type: SidebarWidgetType) => {
-    setWidgets((current) => [...current, defaultWidget(type)]);
-  };
 
   return (
     <div className="space-y-6">
@@ -294,106 +424,28 @@ function SidebarEditor({ sidebar, onClose }: { sidebar: CmsSidebar | null; onClo
 
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-heading font-semibold">{isNew ? "Create Sidebar" : `Edit ${sidebar.name}`}</h1>
+          <h1 className="text-2xl font-heading font-semibold">{sidebar ? `Edit ${sidebar.name}` : "Create Sidebar"}</h1>
           <p className="text-sm text-muted-foreground">Build reusable sidebars from widget components.</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={onClose}>Cancel</Button>
           <Button onClick={() => saveMutation.mutate()} disabled={!name.trim() || saveMutation.isPending || editorLock.isReadOnly} data-testid="button-save-sidebar">
             {saveMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isNew ? "Create Sidebar" : "Save Sidebar"}
+            {sidebar ? "Save Sidebar" : "Create Sidebar"}
           </Button>
         </div>
       </div>
 
-      <Card className={cn(editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
-        <CardHeader>
-          <CardTitle className="text-base">Sidebar Details</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label>Name</Label>
-              <Input value={name} onChange={(event) => setName(event.target.value)} placeholder="Blog Sidebar" data-testid="input-sidebar-name" />
-            </div>
-            <div className="flex items-center justify-between rounded-lg border px-4 py-3">
-              <div>
-                <Label>Default Blog Sidebar</Label>
-                <p className="text-xs text-muted-foreground mt-0.5">Used automatically by blog posts.</p>
-              </div>
-              <Switch checked={isDefault} onCheckedChange={setIsDefault} data-testid="switch-sidebar-default" />
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            <Label>Description</Label>
-            <Textarea value={description} onChange={(event) => setDescription(event.target.value)} rows={2} placeholder="Internal note for admins" />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className={cn(editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
-        <CardHeader>
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <CardTitle className="text-base">Widgets</CardTitle>
-              <CardDescription>Stack widgets in the order they should appear on the sidebar.</CardDescription>
-            </div>
-            <Select onValueChange={(value) => addWidget(value as SidebarWidgetType)}>
-              <SelectTrigger className="w-[210px]" data-testid="select-add-widget">
-                <SelectValue placeholder="Add widget..." />
-              </SelectTrigger>
-              <SelectContent>
-                {SIDEBAR_WIDGET_TYPES.map((type) => (
-                  <SelectItem key={type} value={type}>{WIDGET_LABELS[type]}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {widgets.length === 0 ? (
-            <div className="rounded-lg border border-dashed p-10 text-center text-muted-foreground" data-testid="text-empty-widgets">
-              <Type className="mx-auto mb-3 h-10 w-10 opacity-40" />
-              <p className="font-medium">No widgets yet</p>
-              <p className="text-sm">Use the Add widget dropdown to start building this sidebar.</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {widgets.map((widget, index) => {
-                const Icon = WIDGET_ICONS[widget.type];
-                return (
-                  <div key={widget.id} className="rounded-lg border bg-card p-4" data-testid={`sidebar-widget-${widget.id}`}>
-                    <div className="flex items-start gap-3">
-                      <GripVertical className="mt-2 h-4 w-4 text-muted-foreground" />
-                      <Icon className="mt-2 h-4 w-4 text-primary" />
-                      <div className="flex-1">
-                        <WidgetSettings widget={widget} onChange={(updates) => updateWidget(widget.id, updates)} />
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" aria-label="Move widget up" onClick={() => moveWidget(widget.id, -1)} disabled={index === 0}>
-                          <ArrowUp className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" aria-label="Move widget down" onClick={() => moveWidget(widget.id, 1)} disabled={index === widgets.length - 1}>
-                          <ArrowDown className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          aria-label="Remove widget"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => setWidgets((current) => current.filter((item) => item.id !== widget.id))}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <SidebarDetailsCard
+        name={name}
+        description={description}
+        isDefault={isDefault}
+        locked={lockedClass}
+        onNameChange={setName}
+        onDescriptionChange={setDescription}
+        onDefaultChange={setIsDefault}
+      />
+      <SidebarWidgetsCard widgets={widgets} locked={lockedClass} onWidgetsChange={setWidgets} />
     </div>
   );
 }

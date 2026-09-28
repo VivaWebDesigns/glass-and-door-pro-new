@@ -49,12 +49,16 @@ import {
   type MenuItem,
   type MenuLocation,
 } from "@shared/schema";
-import { useEditorLock } from "@/hooks/use-editor-lock";
-import { useLockConflictGuard } from "@/hooks/use-lock-conflict-guard";
-
-function generateId() {
-  return Math.random().toString(36).substring(2, 10);
-}
+import { useLockedResourceEditor } from "@/hooks/use-locked-resource-editor";
+import {
+  countMenuItems,
+  createMenuItem,
+  indentMenuItem,
+  moveMenuItem,
+  outdentMenuItem,
+  removeMenuItem,
+  updateMenuItem,
+} from "./menu-item-tree";
 
 const STANDARD_LOCATION_OPTIONS = STANDARD_MENU_LOCATIONS.map((location) => ({
   value: location,
@@ -93,57 +97,36 @@ function MenuItemEditor({
   const hasChildren = item.children && item.children.length > 0;
   const canNest = depth < 3;
 
+  const updateChildren = useCallback(
+    (transform: (children: MenuItem[]) => MenuItem[]) => {
+      onUpdate(item.id, { children: transform(item.children) });
+    },
+    [item, onUpdate]
+  );
   const updateChild = useCallback(
-    (childId: string, updates: Partial<MenuItem>) => {
-      const updatedChildren = item.children.map((c) =>
-        c.id === childId ? { ...c, ...updates } : c
-      );
-      onUpdate(item.id, { children: updatedChildren });
-    },
-    [item, onUpdate]
+    (childId: string, updates: Partial<MenuItem>) => updateChildren((children) => updateMenuItem(children, childId, updates)),
+    [updateChildren]
   );
-
   const deleteChild = useCallback(
-    (childId: string) => {
-      onUpdate(item.id, {
-        children: item.children.filter((c) => c.id !== childId),
-      });
-    },
-    [item, onUpdate]
+    (childId: string) => updateChildren((children) => removeMenuItem(children, childId)),
+    [updateChildren]
   );
-
   const moveChildUp = useCallback(
-    (childId: string) => {
-      const idx = item.children.findIndex((c) => c.id === childId);
-      if (idx <= 0) return;
-      const arr = [...item.children];
-      [arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]];
-      onUpdate(item.id, { children: arr });
-    },
-    [item, onUpdate]
+    (childId: string) => updateChildren((children) => moveMenuItem(children, childId, "up")),
+    [updateChildren]
   );
-
   const moveChildDown = useCallback(
-    (childId: string) => {
-      const idx = item.children.findIndex((c) => c.id === childId);
-      if (idx < 0 || idx >= item.children.length - 1) return;
-      const arr = [...item.children];
-      [arr[idx], arr[idx + 1]] = [arr[idx + 1], arr[idx]];
-      onUpdate(item.id, { children: arr });
-    },
-    [item, onUpdate]
+    (childId: string) => updateChildren((children) => moveMenuItem(children, childId, "down")),
+    [updateChildren]
   );
-
-  const addChild = useCallback(() => {
-    const newChild: MenuItem = {
-      id: generateId(),
-      label: "",
-      url: "/",
-      openInNewTab: false,
-      children: [],
-    };
-    onUpdate(item.id, { children: [...item.children, newChild] });
-  }, [item, onUpdate]);
+  const indentChild = useCallback(
+    (childId: string) => updateChildren((children) => indentMenuItem(children, childId)),
+    [updateChildren]
+  );
+  const addChild = useCallback(
+    () => updateChildren((children) => [...children, createMenuItem()]),
+    [updateChildren]
+  );
 
   return (
     <div className="border rounded-lg bg-card" data-testid={`menu-item-${item.id}`}>
@@ -248,16 +231,110 @@ function MenuItemEditor({
               onDelete={deleteChild}
               onMoveUp={moveChildUp}
               onMoveDown={moveChildDown}
-              onIndent={(childId) => {
-                if (cIdx === 0) return;
-                const arr = [...item.children];
-                const prevSibling = arr[cIdx - 1];
-                const child = arr[cIdx];
-                arr.splice(cIdx, 1);
-                prevSibling.children = [...prevSibling.children, child];
-                onUpdate(item.id, { children: arr });
-              }}
+              onIndent={indentChild}
               onOutdent={onOutdent}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+type MenuItemHandlers = Pick<
+  Parameters<typeof MenuItemEditor>[0],
+  "onUpdate" | "onDelete" | "onMoveUp" | "onMoveDown" | "onIndent" | "onOutdent"
+>;
+
+function MenuSettingsFields({
+  name,
+  location,
+  onNameChange,
+  onLocationChange,
+  locked,
+}: {
+  name: string;
+  location: MenuLocation;
+  onNameChange: (name: string) => void;
+  onLocationChange: (location: MenuLocation) => void;
+  locked: string | false;
+}) {
+  return (
+    <div className={cn("grid grid-cols-1 sm:grid-cols-2 gap-4", locked)}>
+      <div className="space-y-2">
+        <Label htmlFor="menu-name">Menu Name</Label>
+        <Input
+          id="menu-name"
+          value={name}
+          onChange={(e) => onNameChange(e.target.value)}
+          placeholder="e.g. Main Navigation"
+          data-testid="input-menu-name"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="menu-location">Location</Label>
+        <select
+          id="menu-location"
+          value={location}
+          onChange={(e) => onLocationChange(e.target.value as MenuLocation)}
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          data-testid="select-menu-location"
+        >
+          <option value="unassigned">Unassigned</option>
+          <optgroup label="Theme Locations">
+            {STANDARD_LOCATION_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </optgroup>
+          <optgroup label="Legacy Locations">
+            {LEGACY_LOCATION_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </optgroup>
+        </select>
+      </div>
+    </div>
+  );
+}
+
+function MenuItemsList({
+  items,
+  locked,
+  onAdd,
+  ...handlers
+}: MenuItemHandlers & {
+  items: MenuItem[];
+  locked: string | false;
+  onAdd: () => void;
+}) {
+  return (
+    <div className={cn("space-y-3", locked)}>
+      <div className="flex items-center justify-between">
+        <Label>Menu Items</Label>
+        <Button variant="outline" size="sm" onClick={onAdd} data-testid="button-add-menu-item">
+          <Plus className="mr-1 h-4 w-4" /> Add Item
+        </Button>
+      </div>
+
+      {items.length === 0 ? (
+        <div className="border border-dashed rounded-lg p-8 text-center text-muted-foreground" data-testid="text-no-items">
+          <MenuIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <p className="text-sm">No menu items yet. Click "Add Item" to get started.</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {items.map((item, idx) => (
+            <MenuItemEditor
+              key={item.id}
+              item={item}
+              depth={1}
+              index={idx}
+              totalSiblings={items.length}
+              {...handlers}
             />
           ))}
         </div>
@@ -280,10 +357,11 @@ function MenuEditor({
   const [name, setName] = useState(menu?.name || draft?.name || "");
   const [location, setLocation] = useState<MenuLocation>((menu?.location as MenuLocation) || (draft?.location as MenuLocation) || "unassigned");
   const [items, setItems] = useState<MenuItem[]>((menu?.items as MenuItem[]) || []);
-  const editorLock = useEditorLock({
+  const { editorLock, lockedClass } = useLockedResourceEditor({
     resourceType: "cms_menu",
-    resourceId: isNew ? null : menu?.id ?? null,
-    enabled: !isNew,
+    resourceId: menu?.id ?? null,
+    resourceLabel: "menu",
+    onConflict: onClose,
   });
 
   const saveMutation = useMutation({
@@ -305,113 +383,15 @@ function MenuEditor({
     },
   });
 
-  useLockConflictGuard({
-    active: !isNew && Boolean(menu?.id),
-    resourceId: isNew ? null : menu?.id ?? null,
-    resourceLabel: "menu",
-    editorLock,
-    onConflict: onClose,
-  });
-
   const updateItem = useCallback((id: string, updates: Partial<MenuItem>) => {
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, ...updates } : item))
-    );
+    setItems((prev) => updateMenuItem(prev, id, updates));
   }, []);
-
-  const deleteItem = useCallback((id: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  }, []);
-
-  const moveItemUp = useCallback((id: string) => {
-    setItems((prev) => {
-      const idx = prev.findIndex((i) => i.id === id);
-      if (idx <= 0) return prev;
-      const arr = [...prev];
-      [arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]];
-      return arr;
-    });
-  }, []);
-
-  const moveItemDown = useCallback((id: string) => {
-    setItems((prev) => {
-      const idx = prev.findIndex((i) => i.id === id);
-      if (idx < 0 || idx >= prev.length - 1) return prev;
-      const arr = [...prev];
-      [arr[idx], arr[idx + 1]] = [arr[idx + 1], arr[idx]];
-      return arr;
-    });
-  }, []);
-
-  const indentItem = useCallback((id: string) => {
-    setItems((prev) => {
-      const idx = prev.findIndex((i) => i.id === id);
-      if (idx <= 0) return prev;
-      const arr = [...prev];
-      const item = arr[idx];
-      const prevSibling = arr[idx - 1];
-      arr.splice(idx, 1);
-      arr[idx - 1] = { ...prevSibling, children: [...prevSibling.children, item] };
-      return arr;
-    });
-  }, []);
-
-  const outdentItem = useCallback((id: string) => {
-    setItems((prev) => {
-      const result: MenuItem[] = [];
-      for (let i = 0; i < prev.length; i++) {
-        const parent = prev[i];
-        const childIdx = parent.children.findIndex((c) => c.id === id);
-        if (childIdx >= 0) {
-          const child = parent.children[childIdx];
-          const newParentChildren = parent.children.filter((_, idx) => idx !== childIdx);
-          result.push({ ...parent, children: newParentChildren });
-          result.push({ ...child });
-        } else {
-          const outdented = outdentFromChildren(parent, id);
-          result.push(outdented.item);
-          if (outdented.extracted) {
-            result.push(outdented.extracted);
-          }
-        }
-      }
-      return result;
-    });
-  }, []);
-
-  function outdentFromChildren(parent: MenuItem, targetId: string): { item: MenuItem; extracted?: MenuItem } {
-    const newChildren: MenuItem[] = [];
-    let extracted: MenuItem | undefined;
-    for (const child of parent.children) {
-      const childIdx = child.children.findIndex((c) => c.id === targetId);
-      if (childIdx >= 0) {
-        const target = child.children[childIdx];
-        const updatedChild = { ...child, children: child.children.filter((_, idx) => idx !== childIdx) };
-        newChildren.push(updatedChild);
-        newChildren.push({ ...target });
-      } else {
-        const result = outdentFromChildren(child, targetId);
-        newChildren.push(result.item);
-        if (result.extracted) {
-          newChildren.push(result.extracted);
-        }
-      }
-    }
-    return { item: { ...parent, children: newChildren } };
-  }
-
-  const addItem = useCallback(() => {
-    setItems((prev) => [
-      ...prev,
-      {
-        id: generateId(),
-        label: "",
-        url: "/",
-        openInNewTab: false,
-        children: [],
-      },
-    ]);
-  }, []);
+  const deleteItem = useCallback((id: string) => setItems((prev) => removeMenuItem(prev, id)), []);
+  const moveItemUp = useCallback((id: string) => setItems((prev) => moveMenuItem(prev, id, "up")), []);
+  const moveItemDown = useCallback((id: string) => setItems((prev) => moveMenuItem(prev, id, "down")), []);
+  const indentItem = useCallback((id: string) => setItems((prev) => indentMenuItem(prev, id)), []);
+  const outdentItem = useCallback((id: string) => setItems((prev) => outdentMenuItem(prev, id)), []);
+  const addItem = useCallback(() => setItems((prev) => [...prev, createMenuItem()]), []);
 
   return (
     <div className="space-y-6">
@@ -444,78 +424,25 @@ function MenuEditor({
         </div>
       </div>
 
-      <div className={cn("grid grid-cols-1 sm:grid-cols-2 gap-4", editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
-        <div className="space-y-2">
-          <Label htmlFor="menu-name">Menu Name</Label>
-          <Input
-            id="menu-name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Main Navigation"
-            data-testid="input-menu-name"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="menu-location">Location</Label>
-          <select
-            id="menu-location"
-            value={location}
-            onChange={(e) => setLocation(e.target.value as MenuLocation)}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            data-testid="select-menu-location"
-          >
-            <option value="unassigned">Unassigned</option>
-            <optgroup label="Theme Locations">
-              {STANDARD_LOCATION_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </optgroup>
-            <optgroup label="Legacy Locations">
-              {LEGACY_LOCATION_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </optgroup>
-          </select>
-        </div>
-      </div>
+      <MenuSettingsFields
+        name={name}
+        location={location}
+        onNameChange={setName}
+        onLocationChange={setLocation}
+        locked={lockedClass}
+      />
 
-      <div className={cn("space-y-3", editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
-        <div className="flex items-center justify-between">
-          <Label>Menu Items</Label>
-          <Button variant="outline" size="sm" onClick={addItem} data-testid="button-add-menu-item">
-            <Plus className="mr-1 h-4 w-4" /> Add Item
-          </Button>
-        </div>
-
-        {items.length === 0 ? (
-          <div className="border border-dashed rounded-lg p-8 text-center text-muted-foreground" data-testid="text-no-items">
-            <MenuIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">No menu items yet. Click "Add Item" to get started.</p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {items.map((item, idx) => (
-              <MenuItemEditor
-                key={item.id}
-                item={item}
-                depth={1}
-                index={idx}
-                totalSiblings={items.length}
-                onUpdate={updateItem}
-                onDelete={deleteItem}
-                onMoveUp={moveItemUp}
-                onMoveDown={moveItemDown}
-                onIndent={indentItem}
-                onOutdent={outdentItem}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      <MenuItemsList
+        items={items}
+        locked={lockedClass}
+        onAdd={addItem}
+        onUpdate={updateItem}
+        onDelete={deleteItem}
+        onMoveUp={moveItemUp}
+        onMoveDown={moveItemDown}
+        onIndent={indentItem}
+        onOutdent={outdentItem}
+      />
     </div>
   );
 }
@@ -545,14 +472,6 @@ export default function CmsMenusPage() {
     },
   });
 
-  const countItems = (items: MenuItem[]): number => {
-    let count = 0;
-    for (const item of items) {
-      count += 1;
-      if (item.children) count += countItems(item.children);
-    }
-    return count;
-  };
 
   const menusByLocation = new Map<MenuLocation, CmsMenu>();
   for (const menu of menus || []) {
@@ -689,7 +608,7 @@ export default function CmsMenusPage() {
           <div className="grid gap-4">
             {menus.map((menu) => {
               const menuItems = (menu.items as MenuItem[]) || [];
-              const itemCount = countItems(menuItems);
+              const itemCount = countMenuItems(menuItems);
               return (
                 <Card key={menu.id} data-testid={`card-menu-${menu.id}`}>
                   <CardHeader className="pb-3">
@@ -734,7 +653,7 @@ export default function CmsMenusPage() {
                             <span className="opacity-75">{item.url}</span>
                             {item.children?.length > 0 && (
                               <span className="opacity-50">
-                                (+{countItems(item.children)} nested)
+                                (+{countMenuItems(item.children)} nested)
                               </span>
                             )}
                           </div>

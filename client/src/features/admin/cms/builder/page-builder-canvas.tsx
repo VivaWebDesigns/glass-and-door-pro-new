@@ -1,4 +1,4 @@
-import type { DragEvent } from "react";
+import type { DragEvent, ElementType } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -76,9 +76,105 @@ function BlockPreviewFallback({
   );
 }
 
-function CanvasBlockFrame({
+function CanvasBlockPreview({ block, index }: { block: BlockInstance; index: number }) {
+  const label = getBlockDef(block.type)?.label ?? block.type;
+  return (
+    <div className="pointer-events-none select-none">
+      <ErrorBoundary
+        name={`builder-block-preview:${block.type}`}
+        onError={(error, errorInfo) =>
+          reportBuilderRenderError({
+            surface: "builder-block-preview",
+            block: { id: block.id, type: block.type },
+            error,
+            errorInfo,
+            context: { index, label },
+          })
+        }
+        fallback={<BlockPreviewFallback blockType={label} summary={getBlockSummary(block)} blockId={block.id} />}
+      >
+        <AdminBlockRenderer block={block} isAdminPreview disableSectionStyleWrap />
+      </ErrorBoundary>
+    </div>
+  );
+}
+
+function CanvasBlockBadges({ block, index }: { block: BlockInstance; index: number }) {
+  const summary = getBlockSummary(block);
+  return (
+    <div className="pointer-events-none absolute left-3 top-3 z-20 flex max-w-[70%] flex-wrap items-center gap-2">
+      <Badge className="bg-slate-900/80 text-white hover:bg-slate-900/80">{index + 1}</Badge>
+      <Badge variant="secondary" className="bg-background/90 backdrop-blur">
+        {getBlockDef(block.type)?.label ?? block.type}
+      </Badge>
+      {isDynamicBlock(block.type) && (
+        <Badge variant="outline" className="border-amber-300 bg-amber-50/90 text-amber-800 backdrop-blur dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-300">
+          <Lock className="mr-1 h-2.5 w-2.5" />
+          Dynamic
+        </Badge>
+      )}
+      {block.props.isActive === false && (
+        <Badge variant="outline" className="border-slate-300 bg-slate-50/90 text-slate-700 backdrop-blur dark:border-slate-700 dark:bg-slate-950/40 dark:text-slate-300">
+          Inactive
+        </Badge>
+      )}
+      {summary && (
+        <span className="truncate rounded-full bg-background/90 px-2 py-1 text-[11px] text-muted-foreground shadow-sm backdrop-blur">
+          {summary}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function CanvasToolbarButton({
+  label,
+  icon: Icon,
+  onActivate,
+  testId,
+  destructive = false,
+}: {
+  label: string;
+  icon: ElementType;
+  onActivate: () => void;
+  testId: string;
+  destructive?: boolean;
+}) {
+  return (
+    <Button
+      type="button"
+      variant={destructive ? "destructive" : "secondary"}
+      size="icon"
+      aria-label={label}
+      title={label}
+      className="h-8 w-8 shadow-sm"
+      onClick={(event) => {
+        event.stopPropagation();
+        onActivate();
+      }}
+      data-testid={testId}
+    >
+      <Icon className="h-3.5 w-3.5" />
+    </Button>
+  );
+}
+
+type CanvasBlockToolbarProps = Pick<
+  CanvasBlockFrameProps,
+  | "block"
+  | "isSelected"
+  | "onSelect"
+  | "onToggleActive"
+  | "onDuplicate"
+  | "onDelete"
+  | "onMove"
+  | "onAddBelow"
+  | "onCanvasDragStart"
+  | "onCanvasDragEnd"
+>;
+
+function CanvasBlockToolbar({
   block,
-  index,
   isSelected,
   onSelect,
   onToggleActive,
@@ -86,21 +182,68 @@ function CanvasBlockFrame({
   onDelete,
   onMove,
   onAddBelow,
-  registerBlockRef,
   onCanvasDragStart,
   onCanvasDragEnd,
-  draggedBlockId,
-  hasActiveDragPayload,
-  dropTarget,
-  onBlockDragOver,
-  onBlockDrop,
-  onBlockDragEnd,
-}: CanvasBlockFrameProps) {
-  const blockDef = getBlockDef(block.type);
-  const summary = getBlockSummary(block);
-  const isDynamic = isDynamicBlock(block.type);
-  const showDropBefore = dropTarget?.id === block.id && dropTarget.position === "before";
-  const showDropAfter = dropTarget?.id === block.id && dropTarget.position === "after";
+}: CanvasBlockToolbarProps) {
+  const isInactive = block.props.isActive === false;
+  return (
+    <div
+      className={cn(
+        "absolute right-3 top-3 z-20 flex items-center gap-1 transition-opacity",
+        isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+      )}
+    >
+      <Button
+        type="button"
+        variant="secondary"
+        size="icon"
+        aria-label="Drag to move"
+        className="h-8 w-8 cursor-grab shadow-sm active:cursor-grabbing"
+        draggable
+        onDragStart={(event) => {
+          event.stopPropagation();
+          onCanvasDragStart(event, block.id);
+        }}
+        onDragEnd={(event) => {
+          event.stopPropagation();
+          onCanvasDragEnd();
+        }}
+        data-testid={`canvas-drag-${block.id}`}
+        title="Drag to move"
+      >
+        <GripVertical className="h-3.5 w-3.5" />
+      </Button>
+      <CanvasToolbarButton
+        label={isInactive ? "Show on public site" : "Hide from public site"}
+        icon={isInactive ? EyeOff : Eye}
+        onActivate={() => onToggleActive(block.id)}
+        testId={`canvas-toggle-active-${block.id}`}
+      />
+      <CanvasToolbarButton label="Edit block" icon={Pencil} onActivate={() => onSelect(block.id)} testId={`canvas-edit-${block.id}`} />
+      <CanvasToolbarButton label="Move block up" icon={ArrowUp} onActivate={() => onMove(block.id, "up")} testId={`canvas-move-up-${block.id}`} />
+      <CanvasToolbarButton label="Move block down" icon={ArrowDown} onActivate={() => onMove(block.id, "down")} testId={`canvas-move-down-${block.id}`} />
+      <CanvasToolbarButton label="Add block below" icon={Plus} onActivate={() => onAddBelow(block.id)} testId={`canvas-add-below-${block.id}`} />
+      <CanvasToolbarButton label="Duplicate block" icon={Copy} onActivate={() => onDuplicate(block.id)} testId={`canvas-duplicate-${block.id}`} />
+      <CanvasToolbarButton label="Delete block" icon={Trash2} onActivate={() => onDelete(block.id)} testId={`canvas-delete-${block.id}`} destructive />
+    </div>
+  );
+}
+
+function CanvasBlockFrame(props: CanvasBlockFrameProps) {
+  const {
+    block,
+    index,
+    isSelected,
+    onSelect,
+    registerBlockRef,
+    draggedBlockId,
+    hasActiveDragPayload,
+    dropTarget,
+    onBlockDragOver,
+    onBlockDrop,
+    onBlockDragEnd,
+  } = props;
+  const dropPosition = dropTarget?.id === block.id ? dropTarget.position : null;
 
   return (
     <div
@@ -110,8 +253,8 @@ function CanvasBlockFrame({
       className={cn(
         "group relative scroll-mt-24 transition-all",
         draggedBlockId === block.id && "opacity-60",
-        showDropBefore && "pt-4 before:absolute before:left-6 before:right-6 before:top-1 before:z-30 before:h-1 before:rounded-full before:bg-violet-500",
-        showDropAfter && "pb-4 after:absolute after:left-6 after:right-6 after:bottom-1 after:z-30 after:h-1 after:rounded-full after:bg-violet-500",
+        dropPosition === "before" && "pt-4 before:absolute before:left-6 before:right-6 before:top-1 before:z-30 before:h-1 before:rounded-full before:bg-violet-500",
+        dropPosition === "after" && "pb-4 after:absolute after:left-6 after:right-6 after:bottom-1 after:z-30 after:h-1 after:rounded-full after:bg-violet-500",
       )}
       onDragOver={(event) => onBlockDragOver(event, block.id)}
       onDrop={(event) => onBlockDrop(event, block.id)}
@@ -127,189 +270,19 @@ function CanvasBlockFrame({
           hasActiveDragPayload && !isSelected && "ring-offset-background",
         )}
       >
-        <div className="pointer-events-none select-none">
-          <ErrorBoundary
-            name={`builder-block-preview:${block.type}`}
-            onError={(error, errorInfo) =>
-              reportBuilderRenderError({
-                surface: "builder-block-preview",
-                block: { id: block.id, type: block.type },
-                error,
-                errorInfo,
-                context: {
-                  index,
-                  label: blockDef?.label ?? block.type,
-                },
-              })
-            }
-            fallback={
-              <BlockPreviewFallback
-                blockType={blockDef?.label ?? block.type}
-                summary={summary}
-                blockId={block.id}
-              />
-            }
-          >
-            <AdminBlockRenderer block={block} isAdminPreview disableSectionStyleWrap />
-          </ErrorBoundary>
-        </div>
+        <CanvasBlockPreview block={block} index={index} />
       </div>
 
       <button
         type="button"
         onClick={() => onSelect(block.id)}
         className="absolute inset-0 z-10"
-        aria-label={`Select ${blockDef?.label ?? block.type} block`}
+        aria-label={`Select ${getBlockDef(block.type)?.label ?? block.type} block`}
         data-testid={`select-canvas-block-${block.id}`}
       />
 
-      <div className="pointer-events-none absolute left-3 top-3 z-20 flex max-w-[70%] flex-wrap items-center gap-2">
-        <Badge className="bg-slate-900/80 text-white hover:bg-slate-900/80">{index + 1}</Badge>
-        <Badge variant="secondary" className="bg-background/90 backdrop-blur">
-          {blockDef?.label ?? block.type}
-        </Badge>
-        {isDynamic && (
-          <Badge variant="outline" className="border-amber-300 bg-amber-50/90 text-amber-800 backdrop-blur dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-300">
-            <Lock className="mr-1 h-2.5 w-2.5" />
-            Dynamic
-          </Badge>
-        )}
-        {block.props.isActive === false && (
-          <Badge variant="outline" className="border-slate-300 bg-slate-50/90 text-slate-700 backdrop-blur dark:border-slate-700 dark:bg-slate-950/40 dark:text-slate-300">
-            Inactive
-          </Badge>
-        )}
-        {summary && (
-          <span className="truncate rounded-full bg-background/90 px-2 py-1 text-[11px] text-muted-foreground shadow-sm backdrop-blur">
-            {summary}
-          </span>
-        )}
-      </div>
-
-      <div
-        className={cn(
-          "absolute right-3 top-3 z-20 flex items-center gap-1 transition-opacity",
-          isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100",
-        )}
-      >
-        <Button
-          type="button"
-          variant="secondary"
-          size="icon"
-          className="h-8 w-8 cursor-grab shadow-sm active:cursor-grabbing"
-          draggable
-          onDragStart={(event) => {
-            event.stopPropagation();
-            onCanvasDragStart(event, block.id);
-          }}
-          onDragEnd={(event) => {
-            event.stopPropagation();
-            onCanvasDragEnd();
-          }}
-          data-testid={`canvas-drag-${block.id}`}
-          title="Drag to move"
-        >
-          <GripVertical className="h-3.5 w-3.5" />
-        </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          size="icon"
-          className="h-8 w-8 shadow-sm"
-          onClick={(event) => {
-            event.stopPropagation();
-            onToggleActive(block.id);
-          }}
-          data-testid={`canvas-toggle-active-${block.id}`}
-          title={block.props.isActive === false ? "Show on public site" : "Hide from public site"}
-        >
-          {block.props.isActive === false ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-        </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          size="icon"
-          aria-label="Edit block"
-          className="h-8 w-8 shadow-sm"
-          onClick={(event) => {
-            event.stopPropagation();
-            onSelect(block.id);
-          }}
-          data-testid={`canvas-edit-${block.id}`}
-        >
-          <Pencil className="h-3.5 w-3.5" />
-        </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          size="icon"
-          aria-label="Move block up"
-          className="h-8 w-8 shadow-sm"
-          onClick={(event) => {
-            event.stopPropagation();
-            onMove(block.id, "up");
-          }}
-          data-testid={`canvas-move-up-${block.id}`}
-        >
-          <ArrowUp className="h-3.5 w-3.5" />
-        </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          size="icon"
-          aria-label="Move block down"
-          className="h-8 w-8 shadow-sm"
-          onClick={(event) => {
-            event.stopPropagation();
-            onMove(block.id, "down");
-          }}
-          data-testid={`canvas-move-down-${block.id}`}
-        >
-          <ArrowDown className="h-3.5 w-3.5" />
-        </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          size="icon"
-          aria-label="Add block below"
-          className="h-8 w-8 shadow-sm"
-          onClick={(event) => {
-            event.stopPropagation();
-            onAddBelow(block.id);
-          }}
-          data-testid={`canvas-add-below-${block.id}`}
-        >
-          <Plus className="h-3.5 w-3.5" />
-        </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          size="icon"
-          aria-label="Duplicate block"
-          className="h-8 w-8 shadow-sm"
-          onClick={(event) => {
-            event.stopPropagation();
-            onDuplicate(block.id);
-          }}
-          data-testid={`canvas-duplicate-${block.id}`}
-        >
-          <Copy className="h-3.5 w-3.5" />
-        </Button>
-        <Button
-          type="button"
-          variant="destructive"
-          size="icon"
-          aria-label="Delete block"
-          className="h-8 w-8 shadow-sm"
-          onClick={(event) => {
-            event.stopPropagation();
-            onDelete(block.id);
-          }}
-          data-testid={`canvas-delete-${block.id}`}
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </Button>
-      </div>
+      <CanvasBlockBadges block={block} index={index} />
+      <CanvasBlockToolbar {...props} />
     </div>
   );
 }

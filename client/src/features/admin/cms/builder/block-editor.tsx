@@ -1,4 +1,4 @@
-import { Component, useMemo, type ReactNode } from "react";
+import { Component, useMemo, type ReactElement, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -592,199 +592,206 @@ function ArrayItemsField({
   );
 }
 
-function PropField({
-  propDef,
-  value,
-  onChange,
-  values,
-}: {
+type PropFieldProps = {
   propDef: PropDef;
   value: unknown;
   onChange: (val: unknown) => void;
   values: Record<string, unknown>;
-}) {
-  const { data: forms = [] } = useQuery<CmsForm[]>({
-    queryKey: ["/api/admin/forms"],
-    staleTime: 60_000,
-    enabled: propDef.type === "form-select",
-  });
+};
+
+function RichTextPropField({ propDef, value, onChange }: PropFieldProps) {
+  return (
+    <CmsRichTextEditor
+      value={String(value ?? "")}
+      onChange={onChange}
+      placeholder={propDef.placeholder}
+      data-testid={`prop-richtext-${propDef.key}`}
+    />
+  );
+}
+
+function InternalPageSelectField({ propDef, value, onChange }: PropFieldProps) {
   const { data: pages = [] } = useQuery<CmsPage[]>({
     queryKey: ["/api/admin/cms/pages"],
     staleTime: 60_000,
-    enabled: propDef.type === "url" && isButtonLinkFieldKey(propDef.key),
   });
-  const strVal = String(value ?? "");
-  const numVal = Number(value ?? 0);
-  const boolVal = propDef.key === "isActive" ? value !== false : Boolean(value);
-  const useRichTextEditor = shouldUseRichTextEditor(propDef);
-  const actionValue = normalizeButtonActionValue(propDef.key, values);
+  return (
+    <Select value={String(value ?? "")} onValueChange={onChange} data-testid={`prop-page-select-${propDef.key}`}>
+      <SelectTrigger>
+        <SelectValue placeholder="Select internal page…" />
+      </SelectTrigger>
+      <SelectContent>
+        {pages.map((page) => (
+          <SelectItem key={page.id} value={page.slug === "home" || page.slug === "" ? "/" : `/${page.slug}`}>
+            {page.title}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
 
-  switch (propDef.type) {
-    case "text":
-    case "url":
-      if (useRichTextEditor && propDef.type !== "url") {
-        return (
-          <CmsRichTextEditor
-            value={strVal}
-            onChange={onChange}
-            placeholder={propDef.placeholder}
-            data-testid={`prop-richtext-${propDef.key}`}
-          />
-        );
-      }
-      if (propDef.type === "url" && isButtonLinkFieldKey(propDef.key) && actionValue === "internal-link") {
-        return (
-          <Select value={strVal} onValueChange={onChange} data-testid={`prop-page-select-${propDef.key}`}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select internal page…" />
-            </SelectTrigger>
-            <SelectContent>
-              {pages.map((page) => {
-                const path = page.slug === "home" || page.slug === "" ? "/" : `/${page.slug}`;
-                return (
-                  <SelectItem key={page.id} value={path}>
-                    {page.title}
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
-        );
-      }
-      return (
-        <Input
-          value={strVal}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={propDef.placeholder}
-          autoPrependHttps={propDef.type === "url"}
-          className="text-sm"
-          data-testid={`prop-input-${propDef.key}`}
-        />
-      );
-    case "textarea":
-      if (useRichTextEditor) {
-        return (
-          <CmsRichTextEditor
-            value={strVal}
-            onChange={onChange}
-            placeholder={propDef.placeholder}
-            data-testid={`prop-richtext-${propDef.key}`}
-          />
-        );
-      }
-      return (
-        <Textarea
-          value={strVal}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={propDef.placeholder}
-          rows={4}
-          className="text-sm"
-          data-testid={`prop-textarea-${propDef.key}`}
-        />
-      );
-    case "richtext":
-      return (
-        <CmsRichTextEditor
-          value={strVal}
-          onChange={onChange}
-          placeholder={propDef.placeholder}
-          data-testid={`prop-richtext-${propDef.key}`}
-        />
-      );
-    case "image-url":
-      return (
-        <CmsImageUpload
-          value={strVal}
-          onChange={(url) => onChange(url)}
-          data-testid={`prop-image-${propDef.key}`}
-        />
-      );
-    case "select":
-    case "form-select":
-      return (
-        <Select
-          value={propDef.key.endsWith("Action") ? normalizeButtonActionValue(propDef.key, values) : strVal}
-          onValueChange={onChange}
-          data-testid={`prop-select-${propDef.key}`}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select…" />
-          </SelectTrigger>
-          <SelectContent>
-            {(propDef.type === "form-select"
-              ? forms.map((form) => ({ label: form.name, value: form.slug }))
-              : propDef.options ?? []
-            ).map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      );
-    case "boolean":
-      return (
-        <div className="flex items-center gap-2">
-          <Switch
-            checked={boolVal}
-            onCheckedChange={onChange}
-            data-testid={`prop-switch-${propDef.key}`}
-          />
-          <span className="text-sm text-muted-foreground">{boolVal ? "Enabled" : "Disabled"}</span>
-        </div>
-      );
-    case "number":
-      return (
-        <Input
-          type="number"
-          value={numVal}
-          min={propDef.min}
-          max={propDef.max}
-          onChange={(e) => onChange(Number(e.target.value))}
-          className="text-sm"
-          data-testid={`prop-number-${propDef.key}`}
-        />
-      );
-    case "color":
-      return (
-        <div className="flex items-center gap-2">
-          <input
-            type="color"
-            value={normalizeColorValue(strVal, propDef.key)}
-            onChange={(e) => onChange(e.target.value)}
-            aria-label={`${propDef.label} color`}
-            className="h-10 w-12 rounded-md border border-input bg-background p-1 cursor-pointer"
-            data-testid={`prop-color-swatch-${propDef.key}`}
-          />
-          <Input
-            value={strVal}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder={propDef.placeholder ?? defaultColorValueForKey(propDef.key)}
-            className="text-sm font-mono"
-            data-testid={`prop-color-${propDef.key}`}
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => onChange("")}
-            data-testid={`prop-color-clear-${propDef.key}`}
-          >
-            Clear
-          </Button>
-        </div>
-      );
-    case "array-items":
-      return (
-        <ArrayItemsField
-          propDef={propDef}
-          value={Array.isArray(value) ? (value as Record<string, unknown>[]) : []}
-          onChange={onChange}
-        />
-      );
-    default:
-      return null;
+function TextPropField(props: PropFieldProps) {
+  const { propDef, value, onChange, values } = props;
+  const isUrl = propDef.type === "url";
+  if (!isUrl && shouldUseRichTextEditor(propDef)) {
+    return <RichTextPropField {...props} />;
   }
+  if (isUrl && isButtonLinkFieldKey(propDef.key) && normalizeButtonActionValue(propDef.key, values) === "internal-link") {
+    return <InternalPageSelectField {...props} />;
+  }
+  return (
+    <Input
+      value={String(value ?? "")}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={propDef.placeholder}
+      autoPrependHttps={isUrl}
+      className="text-sm"
+      data-testid={`prop-input-${propDef.key}`}
+    />
+  );
+}
+
+function TextareaPropField(props: PropFieldProps) {
+  const { propDef, value, onChange } = props;
+  if (shouldUseRichTextEditor(propDef)) {
+    return <RichTextPropField {...props} />;
+  }
+  return (
+    <Textarea
+      value={String(value ?? "")}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={propDef.placeholder}
+      rows={4}
+      className="text-sm"
+      data-testid={`prop-textarea-${propDef.key}`}
+    />
+  );
+}
+
+function SelectPropField({ propDef, value, onChange, values }: PropFieldProps) {
+  const isFormSelect = propDef.type === "form-select";
+  const { data: forms = [] } = useQuery<CmsForm[]>({
+    queryKey: ["/api/admin/forms"],
+    staleTime: 60_000,
+    enabled: isFormSelect,
+  });
+  const options = isFormSelect
+    ? forms.map((form) => ({ label: form.name, value: form.slug }))
+    : (propDef.options ?? []);
+  return (
+    <Select
+      value={propDef.key.endsWith("Action") ? normalizeButtonActionValue(propDef.key, values) : String(value ?? "")}
+      onValueChange={onChange}
+      data-testid={`prop-select-${propDef.key}`}
+    >
+      <SelectTrigger>
+        <SelectValue placeholder="Select…" />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map((opt) => (
+          <SelectItem key={opt.value} value={opt.value}>
+            {opt.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
+function BooleanPropField({ propDef, value, onChange }: PropFieldProps) {
+  const checked = propDef.key === "isActive" ? value !== false : Boolean(value);
+  return (
+    <div className="flex items-center gap-2">
+      <Switch checked={checked} onCheckedChange={onChange} data-testid={`prop-switch-${propDef.key}`} />
+      <span className="text-sm text-muted-foreground">{checked ? "Enabled" : "Disabled"}</span>
+    </div>
+  );
+}
+
+function NumberPropField({ propDef, value, onChange }: PropFieldProps) {
+  return (
+    <Input
+      type="number"
+      value={Number(value ?? 0)}
+      min={propDef.min}
+      max={propDef.max}
+      onChange={(e) => onChange(Number(e.target.value))}
+      className="text-sm"
+      data-testid={`prop-number-${propDef.key}`}
+    />
+  );
+}
+
+function ColorPropField({ propDef, value, onChange }: PropFieldProps) {
+  const strVal = String(value ?? "");
+  return (
+    <div className="flex items-center gap-2">
+      <input
+        type="color"
+        value={normalizeColorValue(strVal, propDef.key)}
+        onChange={(e) => onChange(e.target.value)}
+        aria-label={`${propDef.label} color`}
+        className="h-10 w-12 rounded-md border border-input bg-background p-1 cursor-pointer"
+        data-testid={`prop-color-swatch-${propDef.key}`}
+      />
+      <Input
+        value={strVal}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={propDef.placeholder ?? defaultColorValueForKey(propDef.key)}
+        className="text-sm font-mono"
+        data-testid={`prop-color-${propDef.key}`}
+      />
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => onChange("")}
+        data-testid={`prop-color-clear-${propDef.key}`}
+      >
+        Clear
+      </Button>
+    </div>
+  );
+}
+
+function ImagePropField({ propDef, value, onChange }: PropFieldProps) {
+  return (
+    <CmsImageUpload
+      value={String(value ?? "")}
+      onChange={(url) => onChange(url)}
+      data-testid={`prop-image-${propDef.key}`}
+    />
+  );
+}
+
+function ArrayPropField({ propDef, value, onChange }: PropFieldProps) {
+  return (
+    <ArrayItemsField
+      propDef={propDef}
+      value={Array.isArray(value) ? (value as Record<string, unknown>[]) : []}
+      onChange={onChange}
+    />
+  );
+}
+
+const PROP_FIELD_COMPONENTS: Partial<Record<PropDef["type"], (props: PropFieldProps) => ReactElement | null>> = {
+  text: TextPropField,
+  url: TextPropField,
+  textarea: TextareaPropField,
+  richtext: RichTextPropField,
+  "image-url": ImagePropField,
+  select: SelectPropField,
+  "form-select": SelectPropField,
+  boolean: BooleanPropField,
+  number: NumberPropField,
+  color: ColorPropField,
+  "array-items": ArrayPropField,
+};
+
+function PropField(props: PropFieldProps) {
+  const FieldComponent = PROP_FIELD_COMPONENTS[props.propDef.type];
+  return FieldComponent ? <FieldComponent {...props} /> : null;
 }
 
 export function BlockEditor({

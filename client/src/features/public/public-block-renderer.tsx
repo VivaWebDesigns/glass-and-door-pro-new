@@ -138,71 +138,65 @@ function DynamicFallback() {
   );
 }
 
-function HeroBlock({ props }: { props: Record<string, unknown> }) {
-  const [location] = useLocation();
-  const bg = resolveCmsAssetUrl(str(props.backgroundImageUrl));
-  const bgAlt = str(props.backgroundImageAlt) || str(props.imageAlt);
-  const bgWidth = num(props.backgroundImageWidth as number, 0);
-  const bgHeight = num(props.backgroundImageHeight as number, 0);
-  const videoBg = str(props.videoBackgroundUrl);
+function clampPercent(value: number) {
+  return Math.max(0, Math.min(100, value));
+}
+
+function getHeroConfig(props: Record<string, unknown>) {
   const variant = str(props.variant);
   const isGlassService = variant === "glass-service";
-  const usesGlassCtas = isGlassService || variant === "glass-reviews";
-  const opacity = num(props.overlayOpacity as number, 50);
+  const minHeight = str(props.minHeight) || "420";
   const overlayColor = normalizeHexColor(str(props.overlayColor)) || "#000000";
-  const layout = str(props.layout) || "stacked";
-  const badge = str(props.badge);
-  const accentHeading = str(props.accentHeading);
-  const minH = str(props.minHeight) || "420";
-  const minHeightStyle = minH === "100vh" ? "100vh" : `${minH}px`;
-  const bgPosX = Math.max(0, Math.min(100, num(props.backgroundPositionX as number, 50)));
-  const bgPosY = Math.max(0, Math.min(100, num(props.backgroundPositionY as number, 50)));
-  const isSplit = layout === "split" || isGlassService;
-  const overlayStrength = Math.max(0, Math.min(opacity, 100)) / 100;
-  const sectionStyleConfig = getSectionStyleConfig(props, { resolveAssetUrl: resolveCmsAssetUrl });
-  const overlayStyle = { backgroundColor: hexToRgba(overlayColor, overlayStrength) };
-  const isGlassReviews = variant === "glass-reviews";
-  const headingTextStyle = colorStyle(props.headingColor);
-  const accentHeadingTextStyle = colorStyle(props.accentHeadingColor);
-  const subheadingTextStyle = colorStyle(props.subheadingColor);
+  const overlayStrength = clampPercent(num(props.overlayOpacity as number, 50)) / 100;
+  return {
+    variant,
+    isGlassService,
+    isGlassReviews: variant === "glass-reviews",
+    usesGlassCtas: isGlassService || variant === "glass-reviews",
+    isSplit: str(props.layout) === "split" || isGlassService,
+    background: resolveCmsAssetUrl(str(props.backgroundImageUrl)),
+    backgroundAlt: str(props.backgroundImageAlt) || str(props.imageAlt),
+    backgroundWidth: num(props.backgroundImageWidth as number, 0) || undefined,
+    backgroundHeight: num(props.backgroundImageHeight as number, 0) || undefined,
+    objectPosition: `${clampPercent(num(props.backgroundPositionX as number, 50))}% ${clampPercent(num(props.backgroundPositionY as number, 50))}%`,
+    videoBackground: str(props.videoBackgroundUrl),
+    minHeightStyle: minHeight === "100vh" ? "100vh" : `${minHeight}px`,
+    overlayStyle: { backgroundColor: hexToRgba(overlayColor, overlayStrength) },
+    sectionBackgroundColor: getSectionStyleConfig(props, { resolveAssetUrl: resolveCmsAssetUrl }).backgroundColor,
+  };
+}
 
+type HeroConfig = ReturnType<typeof getHeroConfig>;
+
+function HeroBackdrop({ config }: { config: HeroConfig }) {
   return (
-    <section
-      id={str(props.anchorId) || undefined}
-      className={`public-hero-pattern relative flex items-center overflow-hidden ${isSplit ? "justify-start text-left" : "justify-center text-center"}`}
-      style={{
-        minHeight: minHeightStyle,
-        ...(sectionStyleConfig.backgroundColor
-          ? { backgroundColor: sectionStyleConfig.backgroundColor }
-          : {}),
-      }}
-    >
-      {bg && (
+    <>
+      {config.background && (
         <img
-          src={bg}
-          alt={bgAlt}
-          width={bgWidth || undefined}
-          height={bgHeight || undefined}
+          src={config.background}
+          alt={config.backgroundAlt}
+          width={config.backgroundWidth}
+          height={config.backgroundHeight}
           loading="eager"
           decoding="async"
           fetchPriority="high"
           className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: `${bgPosX}% ${bgPosY}%` }}
+          style={{ objectPosition: config.objectPosition }}
         />
       )}
-      {videoBg && (
+      {config.videoBackground && (
         <video
           autoPlay
           muted
           loop
           playsInline
-          poster={bg || undefined}
+          poster={config.background || undefined}
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src={videoBg} type="video/mp4" />
+          <source src={config.videoBackground} type="video/mp4" />
         </video>
       )}
-      {isGlassReviews ? (
+      {config.isGlassReviews ? (
         <>
           <div
             className="absolute inset-0"
@@ -215,81 +209,114 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
         </>
       ) : (
         <>
-          <div className="absolute inset-0" style={overlayStyle} />
+          <div className="absolute inset-0" style={config.overlayStyle} />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-background/35 to-transparent" />
         </>
       )}
+    </>
+  );
+}
+
+function HeroHeading({ props, variant }: { props: Record<string, unknown>; variant: string }) {
+  const accentHeading = str(props.accentHeading);
+  return (
+    <h1
+      className={`mb-5 font-heading font-bold leading-tight text-white ${variant === "glass-home" ? "text-4xl sm:text-5xl md:text-6xl lg:text-7xl" : "text-4xl sm:text-5xl md:text-6xl"}`}
+      style={colorStyle(props.headingColor)}
+    >
+      {renderPublicDisplayText(str(props.heading) || "Hero Heading")}
+      {accentHeading && (
+        <>
+          {" "}
+          <span className="text-accent" style={colorStyle(props.accentHeadingColor)}>
+            {renderPublicDisplayText(accentHeading)}
+          </span>
+        </>
+      )}
+    </h1>
+  );
+}
+
+function HeroCtas({ props, config }: { props: Record<string, unknown>; config: HeroConfig }) {
+  const [location] = useLocation();
+  return (
+    <div
+      data-nosnippet={excludeServiceUtilitySnippets(location) ? "" : undefined}
+      className={`flex flex-col gap-3 sm:flex-row sm:flex-wrap ${config.isSplit ? "sm:justify-start" : "sm:justify-center"}`}
+    >
+      {str(props.ctaText) && (
+        <FormModalButton
+          label={str(props.ctaText)}
+          action={props.ctaAction}
+          href={props.ctaLink}
+          openInNewTab={props.ctaOpenInNewTab}
+          formSlug={props.ctaFormSlug}
+          modalTitle={props.ctaModalTitle}
+          modalDescription={props.ctaModalDescription}
+          size="lg"
+          className={`w-full sm:w-auto ${config.usesGlassCtas ? GLASS_CTA_PRIMARY_CLASS : "rounded-full bg-white px-7 text-primary shadow-lg hover:bg-white/90"}`}
+          testId="hero-cta-primary"
+        />
+      )}
+      {str(props.ctaSecondaryText) && (
+        <FormModalButton
+          label={str(props.ctaSecondaryText)}
+          action={props.ctaSecondaryAction}
+          href={props.ctaSecondaryLink}
+          openInNewTab={props.ctaSecondaryOpenInNewTab}
+          formSlug={props.ctaSecondaryFormSlug}
+          modalTitle={props.ctaSecondaryModalTitle}
+          modalDescription={props.ctaSecondaryModalDescription}
+          size="lg"
+          variant="outline"
+          className={`w-full sm:w-auto ${config.usesGlassCtas ? GLASS_CTA_SECONDARY_CLASS : "rounded-full border-white/60 bg-white/10 px-7 text-white shadow-sm backdrop-blur hover:bg-white/20"}`}
+          testId="hero-cta-secondary"
+        />
+      )}
+    </div>
+  );
+}
+
+function HeroBlock({ props }: { props: Record<string, unknown> }) {
+  const config = getHeroConfig(props);
+  const badge = str(props.badge);
+  const subheading = str(props.subheading);
+
+  return (
+    <section
+      id={str(props.anchorId) || undefined}
+      className={`public-hero-pattern relative flex items-center overflow-hidden ${config.isSplit ? "justify-start text-left" : "justify-center text-center"}`}
+      style={{
+        minHeight: config.minHeightStyle,
+        ...(config.sectionBackgroundColor ? { backgroundColor: config.sectionBackgroundColor } : {}),
+      }}
+    >
+      <HeroBackdrop config={config} />
       <div
-        className={`relative z-10 px-6 py-20 sm:px-8 sm:py-24 md:py-28 ${isSplit ? "max-w-3xl lg:ml-[max(2rem,calc((100vw-80rem)/2))]" : "max-w-4xl mx-auto"}`}
+        className={`relative z-10 px-6 py-20 sm:px-8 sm:py-24 md:py-28 ${config.isSplit ? "max-w-3xl lg:ml-[max(2rem,calc((100vw-80rem)/2))]" : "max-w-4xl mx-auto"}`}
       >
         {badge && (
           <span className="mb-5 inline-flex rounded-full border border-white/25 bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-white shadow-sm backdrop-blur">
             {badge}
           </span>
         )}
-        <h1
-          className={`mb-5 font-heading font-bold leading-tight text-white ${variant === "glass-home" ? "text-4xl sm:text-5xl md:text-6xl lg:text-7xl" : "text-4xl sm:text-5xl md:text-6xl"}`}
-          style={headingTextStyle}
-        >
-          {renderPublicDisplayText(str(props.heading) || "Hero Heading")}
-          {accentHeading && (
-            <>
-              {" "}
-              <span className="text-accent" style={accentHeadingTextStyle}>
-                {renderPublicDisplayText(accentHeading)}
-              </span>
-            </>
-          )}
-        </h1>
-        {str(props.subheading) && (
+        <HeroHeading props={props} variant={config.variant} />
+        {subheading && (
           <div
-            className={`mb-9 text-base leading-8 text-white/85 sm:text-lg [&_a]:text-white [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-white/80 [&_p]:m-0 ${isSplit ? "max-w-2xl" : "max-w-2xl mx-auto"}`}
-            style={subheadingTextStyle}
-            dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(str(props.subheading)) }}
+            className={`mb-9 text-base leading-8 text-white/85 sm:text-lg [&_a]:text-white [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-white/80 [&_p]:m-0 ${config.isSplit ? "max-w-2xl" : "max-w-2xl mx-auto"}`}
+            style={colorStyle(props.subheadingColor)}
+            dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(subheading) }}
           />
         )}
-        <div
-          data-nosnippet={excludeServiceUtilitySnippets(location) ? "" : undefined}
-          className={`flex flex-col gap-3 sm:flex-row sm:flex-wrap ${isSplit ? "sm:justify-start" : "sm:justify-center"}`}
-        >
-          {str(props.ctaText) && (
-            <FormModalButton
-              label={str(props.ctaText)}
-              action={props.ctaAction}
-              href={props.ctaLink}
-              openInNewTab={props.ctaOpenInNewTab}
-              formSlug={props.ctaFormSlug}
-              modalTitle={props.ctaModalTitle}
-              modalDescription={props.ctaModalDescription}
-              size="lg"
-              className={`w-full sm:w-auto ${usesGlassCtas ? GLASS_CTA_PRIMARY_CLASS : "rounded-full bg-white px-7 text-primary shadow-lg hover:bg-white/90"}`}
-              testId="hero-cta-primary"
-            />
-          )}
-          {str(props.ctaSecondaryText) && (
-            <FormModalButton
-              label={str(props.ctaSecondaryText)}
-              action={props.ctaSecondaryAction}
-              href={props.ctaSecondaryLink}
-              openInNewTab={props.ctaSecondaryOpenInNewTab}
-              formSlug={props.ctaSecondaryFormSlug}
-              modalTitle={props.ctaSecondaryModalTitle}
-              modalDescription={props.ctaSecondaryModalDescription}
-              size="lg"
-              variant="outline"
-              className={`w-full sm:w-auto ${usesGlassCtas ? GLASS_CTA_SECONDARY_CLASS : "rounded-full border-white/60 bg-white/10 px-7 text-white shadow-sm backdrop-blur hover:bg-white/20"}`}
-              testId="hero-cta-secondary"
-            />
-          )}
-        </div>
+        <HeroCtas props={props} config={config} />
       </div>
-      {isSplit && bg && !isGlassService && (
+      {config.isSplit && config.background && !config.isGlassService && (
         <div className="hidden md:block absolute right-0 top-0 bottom-0 w-1/3">
           <img
-            src={bg}
+            src={config.background}
             alt=""
             className="w-full h-full object-cover"
-            style={{ objectPosition: `${bgPosX}% ${bgPosY}%` }}
+            style={{ objectPosition: config.objectPosition }}
           />
         </div>
       )}
@@ -549,68 +576,90 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
   );
 }
 
-function CtaBlock({ props }: { props: Record<string, unknown> }) {
-  const [location] = useLocation();
+const CTA_VARIANT_CLASSES: Record<string, string> = {
+  dark: "bg-foreground text-background",
+  accent: "bg-accent text-accent-foreground",
+};
+
+function getCtaStyle(props: Record<string, unknown>) {
   const variant = str(props.variant) || "dark";
   const isGlassService =
     variant === "glass-service" ||
     (variant === "dark" && str(props.secondaryText).toLowerCase() === "back to home");
-  const bgClass = isGlassService
+  const backgroundClass = isGlassService
     ? "bg-[#1a8ead] text-white"
-    : variant === "dark"
-      ? "bg-foreground text-background"
-      : variant === "accent"
-        ? "bg-accent text-accent-foreground"
-        : "bg-muted/40 border";
+    : (CTA_VARIANT_CLASSES[variant] ?? "bg-muted/40 border");
+  return {
+    variant,
+    isGlassService,
+    containerClass: `${isGlassService ? "" : "rounded-lg shadow-xl"} ${backgroundClass}`,
+    primaryVariant: (!isGlassService && variant === "dark" ? "secondary" : "default") as "secondary" | "default",
+  };
+}
+
+function CtaButtons({ props, isGlassService, primaryVariant }: {
+  props: Record<string, unknown>;
+  isGlassService: boolean;
+  primaryVariant: "secondary" | "default";
+}) {
+  const [location] = useLocation();
   return (
     <div
-      className={`px-4 py-10 text-center sm:px-8 sm:py-16 ${isGlassService ? "" : "rounded-lg shadow-xl"} ${bgClass}`}
+      data-nosnippet={excludeServiceUtilitySnippets(location) ? "" : undefined}
+      className="flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap"
+    >
+      {str(props.primaryText) && (
+        <FormModalButton
+          label={str(props.primaryText)}
+          action={props.primaryAction}
+          href={props.primaryLink}
+          openInNewTab={props.primaryOpenInNewTab}
+          formSlug={props.primaryFormSlug}
+          modalTitle={props.primaryModalTitle}
+          modalDescription={props.primaryModalDescription}
+          size="lg"
+          variant={primaryVariant}
+          className={`w-full sm:w-auto ${isGlassService ? GLASS_CTA_PRIMARY_CLASS : "rounded-full"}`}
+          testId="cta-primary"
+        />
+      )}
+      {str(props.secondaryText) && (
+        <FormModalButton
+          label={str(props.secondaryText)}
+          action={props.secondaryAction}
+          href={props.secondaryLink}
+          openInNewTab={props.secondaryOpenInNewTab}
+          formSlug={props.secondaryFormSlug}
+          modalTitle={props.secondaryModalTitle}
+          modalDescription={props.secondaryModalDescription}
+          size="lg"
+          variant="outline"
+          className={`w-full sm:w-auto ${isGlassService ? GLASS_CTA_SECONDARY_CLASS : "rounded-full"}`}
+          testId="cta-secondary"
+        />
+      )}
+    </div>
+  );
+}
+
+function CtaBlock({ props }: { props: Record<string, unknown> }) {
+  const { variant, isGlassService, containerClass, primaryVariant } = getCtaStyle(props);
+  const subheading = str(props.subheading);
+  return (
+    <div
+      className={`px-4 py-10 text-center sm:px-8 sm:py-16 ${containerClass}`}
       style={isGlassService ? { backgroundColor: "#1a8ead", color: "#ffffff" } : undefined}
     >
       <h2 className="mb-3 text-2xl font-heading font-bold leading-tight sm:text-3xl md:text-4xl">
         {str(props.heading) || "Ready to Get Started?"}
       </h2>
-      {str(props.subheading) && (
+      {subheading && (
         <div
           className={`mb-8 mx-auto max-w-xl text-sm leading-relaxed sm:text-base [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:opacity-80 [&_p]:m-0 ${variant === "light" ? "text-muted-foreground [&_a]:text-primary" : "opacity-80 [&_a]:text-current"}`}
-          dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(str(props.subheading)) }}
+          dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(subheading) }}
         />
       )}
-      <div
-        data-nosnippet={excludeServiceUtilitySnippets(location) ? "" : undefined}
-        className="flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap"
-      >
-        {str(props.primaryText) && (
-          <FormModalButton
-            label={str(props.primaryText)}
-            action={props.primaryAction}
-            href={props.primaryLink}
-            openInNewTab={props.primaryOpenInNewTab}
-            formSlug={props.primaryFormSlug}
-            modalTitle={props.primaryModalTitle}
-            modalDescription={props.primaryModalDescription}
-            size="lg"
-            variant={isGlassService ? "default" : variant === "dark" ? "secondary" : "default"}
-            className={`w-full sm:w-auto ${isGlassService ? GLASS_CTA_PRIMARY_CLASS : "rounded-full"}`}
-            testId="cta-primary"
-          />
-        )}
-        {str(props.secondaryText) && (
-          <FormModalButton
-            label={str(props.secondaryText)}
-            action={props.secondaryAction}
-            href={props.secondaryLink}
-            openInNewTab={props.secondaryOpenInNewTab}
-            formSlug={props.secondaryFormSlug}
-            modalTitle={props.secondaryModalTitle}
-            modalDescription={props.secondaryModalDescription}
-            size="lg"
-            variant="outline"
-            className={`w-full sm:w-auto ${isGlassService ? GLASS_CTA_SECONDARY_CLASS : "rounded-full"}`}
-            testId="cta-secondary"
-          />
-        )}
-      </div>
+      <CtaButtons props={props} isGlassService={isGlassService} primaryVariant={primaryVariant} />
     </div>
   );
 }

@@ -222,7 +222,29 @@ function CmsLoadingPage() {
   );
 }
 
-export function CmsPageView({ page, globalSeo, previewLabel }: CmsPageViewProps) {
+function CmsSidebarPageBody({ page, blocks }: { page: CmsPage; blocks: BlockInstance[] }) {
+  const heroBlocks = blocks[0] && /hero/i.test(blocks[0].type) ? [blocks[0]] : [];
+  const contentBlocks = heroBlocks.length > 0 ? blocks.slice(1) : blocks;
+  const useDefaultSidebar = !page.sidebarId && page.slug === "insights";
+
+  return (
+    <>
+      {heroBlocks.length > 0 && <PublicPageRenderer blocks={heroBlocks} />}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+        <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="space-y-8" data-testid="cms-page-main-with-sidebar">
+            {contentBlocks.map((block) => (
+              <PublicBlockRenderer key={block.id} block={block} />
+            ))}
+          </div>
+          <PublicSidebar sidebarId={page.sidebarId} useDefault={useDefaultSidebar} />
+        </div>
+      </div>
+    </>
+  );
+}
+
+function CmsPageBody({ page }: { page: CmsPage }) {
   const parsedBlocks = parseCmsContent(page.content);
   const hiddenServiceAreaGallery = parsedBlocks.find((block) =>
     shouldHideServiceAreaWorkGallery(page.slug, block),
@@ -230,14 +252,27 @@ export function CmsPageView({ page, globalSeo, previewLabel }: CmsPageViewProps)
   const blocks = parsedBlocks.filter(
     (block) => !shouldHideServiceAreaWorkGallery(page.slug, block),
   );
-  const showSidebar =
-    page.template === "with-sidebar" && Boolean(page.sidebarId || page.slug === "insights");
-  const useDefaultSidebar = !page.sidebarId && page.slug === "insights";
-  const heroBlocks = showSidebar && blocks[0] && /hero/i.test(blocks[0].type) ? [blocks[0]] : [];
-  const contentBlocks = heroBlocks.length > 0 ? blocks.slice(1) : blocks;
-  const isServiceDetailPage = isGlassServicePageSlug(page.slug);
-  const isLocationDetailPage = isServiceAreaPageSlug(page.slug);
 
+  if (blocks.length === 0) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-16">
+        <h1 className="text-3xl font-heading font-semibold">{page.title}</h1>
+      </div>
+    );
+  }
+  if (page.template === "with-sidebar" && Boolean(page.sidebarId || page.slug === "insights")) {
+    return <CmsSidebarPageBody page={page} blocks={blocks} />;
+  }
+  if (isServiceAreaPageSlug(page.slug)) {
+    return <LocationServiceLayout blocks={blocks} galleryBlock={hiddenServiceAreaGallery} />;
+  }
+  if (isGlassServicePageSlug(page.slug)) {
+    return <ServiceEditorialLayout blocks={blocks} />;
+  }
+  return <PublicPageRenderer blocks={blocks} />;
+}
+
+export function CmsPageView({ page, globalSeo, previewLabel }: CmsPageViewProps) {
   return (
     <div className="public-page-shell min-h-screen flex flex-col" data-testid="cms-public-page">
       <CmsPageSeo page={page} globalSeo={globalSeo} />
@@ -248,33 +283,7 @@ export function CmsPageView({ page, globalSeo, previewLabel }: CmsPageViewProps)
       ) : null}
       <Navbar />
       <main className="flex-1">
-        {blocks.length > 0 ? (
-          showSidebar ? (
-            <>
-              {heroBlocks.length > 0 && <PublicPageRenderer blocks={heroBlocks} />}
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-                <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
-                  <div className="space-y-8" data-testid="cms-page-main-with-sidebar">
-                    {contentBlocks.map((block) => (
-                      <PublicBlockRenderer key={block.id} block={block} />
-                    ))}
-                  </div>
-                  <PublicSidebar sidebarId={page.sidebarId} useDefault={useDefaultSidebar} />
-                </div>
-              </div>
-            </>
-          ) : isLocationDetailPage ? (
-            <LocationServiceLayout blocks={blocks} galleryBlock={hiddenServiceAreaGallery} />
-          ) : isServiceDetailPage ? (
-            <ServiceEditorialLayout blocks={blocks} />
-          ) : (
-            <PublicPageRenderer blocks={blocks} />
-          )
-        ) : (
-          <div className="max-w-4xl mx-auto px-4 py-16">
-            <h1 className="text-3xl font-heading font-semibold">{page.title}</h1>
-          </div>
-        )}
+        <CmsPageBody page={page} />
       </main>
       <Footer />
     </div>

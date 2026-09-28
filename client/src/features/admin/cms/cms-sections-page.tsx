@@ -45,6 +45,150 @@ const CATEGORY_COLORS: Record<string, string> = {
   team: "bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300",
 };
 
+function containsDynamicStarterBlock(section: CmsSection) {
+  const sectionBlocks = Array.isArray(section.blocks) ? (section.blocks as BlockInstance[]) : [];
+  return (
+    section.name.startsWith(SYSTEM_SECTION_NAME_PREFIX) &&
+    sectionBlocks.some((block) => getBlockDef(block.type)?.isDynamic)
+  );
+}
+
+function sectionMatchesFilters(section: CmsSection, search: string, categoryFilter: string) {
+  if (containsDynamicStarterBlock(section)) return false;
+  const query = search.toLowerCase();
+  const matchSearch =
+    !search ||
+    section.name.toLowerCase().includes(query) ||
+    (section.description ?? "").toLowerCase().includes(query);
+  return matchSearch && (categoryFilter === "all" || section.category === categoryFilter);
+}
+
+function RestoreStartersButton({
+  onRestore,
+  isRestoring,
+  testId,
+}: {
+  onRestore: () => void;
+  isRestoring: boolean;
+  testId?: string;
+}) {
+  return (
+    <Button type="button" variant="outline" onClick={onRestore} disabled={isRestoring} data-testid={testId}>
+      <RefreshCcw className="h-4 w-4 mr-2" />
+      {isRestoring ? "Updating Starter Library..." : "Restore Starter Sections"}
+    </Button>
+  );
+}
+
+function SectionsEmptyState({
+  hasFilters,
+  onRestore,
+  isRestoring,
+}: {
+  hasFilters: boolean;
+  onRestore: () => void;
+  isRestoring: boolean;
+}) {
+  return (
+    <Card>
+      <CardContent className="pt-14 pb-14 text-center">
+        <div className="h-16 w-16 rounded-2xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center mx-auto mb-4">
+          <Blocks className="h-8 w-8 text-violet-400" />
+        </div>
+        <h2 className="text-lg font-semibold mb-2">
+          {hasFilters ? "No sections match your filters" : "No reusable sections yet"}
+        </h2>
+        <p className="text-muted-foreground text-sm max-w-sm mx-auto mb-5">
+          {hasFilters
+            ? "Try a different search or category."
+            : "Save block groups as reusable sections to speed up page building. You can also save a block directly from the page builder or restore the full starter library."}
+        </p>
+        {!hasFilters && (
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <RestoreStartersButton onRestore={onRestore} isRestoring={isRestoring} />
+            <Button asChild variant="outline">
+              <Link href="/admin/cms/sections/new">
+                <Plus className="h-4 w-4 mr-2" />
+                Create First Section
+              </Link>
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function SectionCard({ section, onDelete }: { section: CmsSection; onDelete: () => void }) {
+  const blockCount = Array.isArray(section.blocks) ? section.blocks.length : 0;
+  const category = section.category ?? "general";
+  return (
+    <Card
+      className="group hover:border-violet-300 transition-colors"
+      data-testid={`section-card-${section.id}`}
+    >
+      <CardContent className="p-4 space-y-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="h-7 w-7 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center flex-shrink-0">
+                <Layers className="h-3.5 w-3.5 text-violet-600" />
+              </div>
+              <h3 className="text-sm font-semibold truncate" data-testid={`text-section-name-${section.id}`}>
+                {section.name}
+              </h3>
+            </div>
+            {section.description && (
+              <p className="text-xs text-muted-foreground line-clamp-2 pl-9">
+                {section.description}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap pl-9">
+          <Badge
+            variant="secondary"
+            className={`text-[10px] capitalize ${CATEGORY_COLORS[category] ?? ""}`}
+          >
+            {category}
+          </Badge>
+          <span className="text-[10px] text-muted-foreground">
+            {blockCount} block{blockCount !== 1 ? "s" : ""}
+          </span>
+          {section.createdAt && (
+            <span className="text-[10px] text-muted-foreground">
+              {format(new Date(section.createdAt), "MMM d, yyyy")}
+            </span>
+          )}
+        </div>
+        <div className="flex gap-2 pt-1 border-t">
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="flex-1 text-xs"
+            data-testid={`button-edit-section-${section.id}`}
+          >
+            <Link href={`/admin/cms/sections/${section.id}`}>
+              <Pencil className="h-3 w-3 mr-1.5" />
+              Edit
+            </Link>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-destructive hover:text-destructive text-xs"
+            onClick={onDelete}
+            data-testid={`button-delete-section-${section.id}`}
+          >
+            <Trash2 className="h-3 w-3" />
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function CmsSectionsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -85,26 +229,8 @@ export default function CmsSectionsPage() {
     },
   });
 
-  const filtered = sections.filter((s) => {
-    const sectionBlocks = Array.isArray(s.blocks) ? (s.blocks as BlockInstance[]) : [];
-    const containsDynamicStarterBlock =
-      s.name.startsWith(SYSTEM_SECTION_NAME_PREFIX) &&
-      sectionBlocks.some((block) => getBlockDef(block.type)?.isDynamic);
+  const filtered = sections.filter((section) => sectionMatchesFilters(section, search, categoryFilter));
 
-    if (containsDynamicStarterBlock) return false;
-
-    const matchSearch =
-      !search ||
-      s.name.toLowerCase().includes(search.toLowerCase()) ||
-      (s.description ?? "").toLowerCase().includes(search.toLowerCase());
-    const matchCat = categoryFilter === "all" || s.category === categoryFilter;
-    return matchSearch && matchCat;
-  });
-
-  const blockCount = (s: CmsSection) => {
-    const blocks = Array.isArray(s.blocks) ? s.blocks : [];
-    return blocks.length;
-  };
 
   return (
     <AdminSidebar>
@@ -119,16 +245,11 @@ export default function CmsSectionsPage() {
             </p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => restoreStartersMutation.mutate()}
-              disabled={restoreStartersMutation.isPending}
-              data-testid="button-restore-starter-sections"
-            >
-              <RefreshCcw className="h-4 w-4 mr-2" />
-              {restoreStartersMutation.isPending ? "Updating Starter Library..." : "Restore Starter Sections"}
-            </Button>
+            <RestoreStartersButton
+              onRestore={() => restoreStartersMutation.mutate()}
+              isRestoring={restoreStartersMutation.isPending}
+              testId="button-restore-starter-sections"
+            />
             <Button asChild data-testid="button-new-section">
               <Link href="/admin/cms/sections/new">
                 <Plus className="h-4 w-4 mr-2" />
@@ -168,107 +289,15 @@ export default function CmsSectionsPage() {
             {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-36 rounded-xl" />)}
           </div>
         ) : filtered.length === 0 ? (
-          <Card>
-            <CardContent className="pt-14 pb-14 text-center">
-              <div className="h-16 w-16 rounded-2xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center mx-auto mb-4">
-                <Blocks className="h-8 w-8 text-violet-400" />
-              </div>
-              <h2 className="text-lg font-semibold mb-2">
-                {search || categoryFilter !== "all" ? "No sections match your filters" : "No reusable sections yet"}
-              </h2>
-              <p className="text-muted-foreground text-sm max-w-sm mx-auto mb-5">
-                {search || categoryFilter !== "all"
-                  ? "Try a different search or category."
-                  : "Save block groups as reusable sections to speed up page building. You can also save a block directly from the page builder or restore the full starter library."}
-              </p>
-              {!search && categoryFilter === "all" && (
-                <div className="flex items-center justify-center gap-2 flex-wrap">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => restoreStartersMutation.mutate()}
-                    disabled={restoreStartersMutation.isPending}
-                  >
-                    <RefreshCcw className="h-4 w-4 mr-2" />
-                    {restoreStartersMutation.isPending ? "Updating Starter Library..." : "Restore Starter Sections"}
-                  </Button>
-                  <Button asChild variant="outline">
-                    <Link href="/admin/cms/sections/new">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create First Section
-                    </Link>
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <SectionsEmptyState
+            hasFilters={Boolean(search) || categoryFilter !== "all"}
+            onRestore={() => restoreStartersMutation.mutate()}
+            isRestoring={restoreStartersMutation.isPending}
+          />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map((section) => (
-              <Card
-                key={section.id}
-                className="group hover:border-violet-300 transition-colors"
-                data-testid={`section-card-${section.id}`}
-              >
-                <CardContent className="p-4 space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="h-7 w-7 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center flex-shrink-0">
-                          <Layers className="h-3.5 w-3.5 text-violet-600" />
-                        </div>
-                        <h3 className="text-sm font-semibold truncate" data-testid={`text-section-name-${section.id}`}>
-                          {section.name}
-                        </h3>
-                      </div>
-                      {section.description && (
-                        <p className="text-xs text-muted-foreground line-clamp-2 pl-9">
-                          {section.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 flex-wrap pl-9">
-                    <Badge
-                      variant="secondary"
-                      className={`text-[10px] capitalize ${CATEGORY_COLORS[section.category ?? "general"] ?? ""}`}
-                    >
-                      {section.category ?? "general"}
-                    </Badge>
-                    <span className="text-[10px] text-muted-foreground">
-                      {blockCount(section)} block{blockCount(section) !== 1 ? "s" : ""}
-                    </span>
-                    {section.createdAt && (
-                      <span className="text-[10px] text-muted-foreground">
-                        {format(new Date(section.createdAt), "MMM d, yyyy")}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex gap-2 pt-1 border-t">
-                    <Button
-                      asChild
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 text-xs"
-                      data-testid={`button-edit-section-${section.id}`}
-                    >
-                      <Link href={`/admin/cms/sections/${section.id}`}>
-                        <Pencil className="h-3 w-3 mr-1.5" />
-                        Edit
-                      </Link>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-destructive hover:text-destructive text-xs"
-                      onClick={() => setDeletingId(section.id)}
-                      data-testid={`button-delete-section-${section.id}`}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <SectionCard key={section.id} section={section} onDelete={() => setDeletingId(section.id)} />
             ))}
           </div>
         )}

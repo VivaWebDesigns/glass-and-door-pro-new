@@ -12,7 +12,7 @@ const SECTION_PADDING_CLASS_MAP: Record<string, string> = {
   xl: "14 sm:20",
 };
 
-interface SectionStyleConfig {
+export interface SectionStyleConfig {
   backgroundColor: string;
   backgroundImageUrl: string;
   backgroundPositionX: number;
@@ -120,7 +120,7 @@ export function getRadialGradientStyle(
   };
 }
 
-export function backgroundImageWithFallback(url: string) {
+function backgroundImageWithFallback(url: string) {
   return `url(${JSON.stringify(url)})`;
 }
 
@@ -139,3 +139,45 @@ export function getSectionPaddingClasses(props: Record<string, unknown>) {
   );
 }
 
+
+function getSectionBackgroundStyle(config: SectionStyleConfig): CSSProperties {
+  const defaultBackgroundColor =
+    !config.backgroundColor && !config.backgroundImageUrl && config.showRadialGradient ? "#ffffff" : "";
+  const backgroundColor = config.backgroundColor || defaultBackgroundColor;
+  const colorStyle: CSSProperties = backgroundColor ? { backgroundColor } : {};
+
+  if (config.backgroundImageUrl) {
+    return {
+      ...colorStyle,
+      backgroundImage: backgroundImageWithFallback(config.backgroundImageUrl),
+      backgroundSize: "cover",
+      backgroundPosition: `${config.backgroundPositionX}% ${config.backgroundPositionY}%`,
+      backgroundRepeat: "no-repeat",
+    };
+  }
+
+  return backgroundColor ? colorStyle : { background: DEFAULT_SECTION_LINEAR_GRADIENT };
+}
+
+function getSectionBorderStyle(config: SectionStyleConfig): CSSProperties {
+  return {
+    ...(config.borderTopWidth > 0
+      ? {
+          borderTopStyle: "solid",
+          borderTopWidth: `${config.borderTopWidth}px`,
+          borderTopColor: config.borderTopColor,
+        }
+      : {}),
+    ...(config.borderBottomWidth > 0
+      ? {
+          borderBottomStyle: "solid",
+          borderBottomWidth: `${config.borderBottomWidth}px`,
+          borderBottomColor: config.borderBottomColor,
+        }
+      : {}),
+  };
+}
+
+export function getSectionWrapperStyle(config: SectionStyleConfig): CSSProperties {
+  return { ...getSectionBackgroundStyle(config), ...getSectionBorderStyle(config) };
+}

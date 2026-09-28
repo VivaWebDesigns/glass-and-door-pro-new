@@ -19,6 +19,78 @@ export interface FormModalButtonProps extends Omit<ButtonProps, "children"> {
   testId?: string;
 }
 
+type ButtonAction = "form-modal" | "internal-link" | "custom-link";
+
+function resolveButtonAction(rawAction: string, href: string): ButtonAction {
+  if (rawAction === "form-modal" || rawAction === "internal-link" || rawAction === "custom-link") {
+    return rawAction;
+  }
+  return href.startsWith("/") || href.startsWith("#") ? "internal-link" : "custom-link";
+}
+
+interface FormModalDialogButtonProps extends Omit<ButtonProps, "children"> {
+  label: string;
+  formSlug: string;
+  modalTitle: string;
+  modalDescription: string;
+  testId?: string;
+}
+
+function FormModalDialogButton({
+  label,
+  formSlug,
+  modalTitle,
+  modalDescription,
+  testId,
+  ...buttonProps
+}: FormModalDialogButtonProps) {
+  const [open, setOpen] = useState(false);
+  const closeTimeoutRef = useRef<number | null>(null);
+
+  const clearCloseTimeout = () => {
+    if (closeTimeoutRef.current !== null) {
+      window.clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+  };
+
+  useEffect(() => clearCloseTimeout, []);
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) clearCloseTimeout();
+        setOpen(nextOpen);
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button {...buttonProps} data-testid={testId}>
+          {label}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{modalTitle}</DialogTitle>
+          {modalDescription ? <DialogDescription>{modalDescription}</DialogDescription> : null}
+        </DialogHeader>
+        <PublicFormRenderer
+          slug={formSlug}
+          showHeader={false}
+          descriptionOverride={modalDescription || undefined}
+          onSubmitSuccess={() => {
+            clearCloseTimeout();
+            closeTimeoutRef.current = window.setTimeout(() => {
+              setOpen(false);
+              closeTimeoutRef.current = null;
+            }, 1200);
+          }}
+        />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export function FormModalButton({
   label,
   action,
@@ -30,82 +102,32 @@ export function FormModalButton({
   testId,
   ...buttonProps
 }: FormModalButtonProps) {
-  const [open, setOpen] = useState(false);
-  const closeTimeoutRef = useRef<number | null>(null);
-  const rawAction = text(action);
   const normalizedHref = text(href) || "#";
-  const normalizedAction =
-    rawAction === "form-modal" || rawAction === "internal-link" || rawAction === "custom-link"
-      ? rawAction
-      : normalizedHref.startsWith("/") || normalizedHref.startsWith("#") || normalizedHref === "#"
-        ? "internal-link"
-        : "custom-link";
-  const shouldOpenInNewTab = openInNewTab === true;
+  const normalizedAction = resolveButtonAction(text(action), normalizedHref);
   const normalizedFormSlug = text(formSlug);
-  const resolvedModalTitle = text(modalTitle) || label;
-  const resolvedModalDescription = text(modalDescription);
-
-  useEffect(() => {
-    return () => {
-      if (closeTimeoutRef.current !== null) {
-        window.clearTimeout(closeTimeoutRef.current);
-      }
-    };
-  }, []);
 
   if (normalizedAction === "form-modal" && normalizedFormSlug) {
     return (
-      <Dialog
-        open={open}
-        onOpenChange={(nextOpen) => {
-          if (!nextOpen && closeTimeoutRef.current !== null) {
-            window.clearTimeout(closeTimeoutRef.current);
-            closeTimeoutRef.current = null;
-          }
-          setOpen(nextOpen);
-        }}
-      >
-        <DialogTrigger asChild>
-          <Button {...buttonProps} data-testid={testId}>
-            {label}
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{resolvedModalTitle}</DialogTitle>
-            {resolvedModalDescription ? (
-              <DialogDescription>{resolvedModalDescription}</DialogDescription>
-            ) : null}
-          </DialogHeader>
-          <PublicFormRenderer
-            slug={normalizedFormSlug}
-            showHeader={false}
-            descriptionOverride={resolvedModalDescription || undefined}
-            onSubmitSuccess={() => {
-              if (closeTimeoutRef.current !== null) {
-                window.clearTimeout(closeTimeoutRef.current);
-              }
-              closeTimeoutRef.current = window.setTimeout(() => {
-                setOpen(false);
-                closeTimeoutRef.current = null;
-              }, 1200);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+      <FormModalDialogButton
+        {...buttonProps}
+        label={label}
+        formSlug={normalizedFormSlug}
+        modalTitle={text(modalTitle) || label}
+        modalDescription={text(modalDescription)}
+        testId={testId}
+      />
     );
   }
 
   if (normalizedAction === "internal-link") {
     return (
       <Button {...buttonProps} asChild data-testid={testId}>
-        <Link href={normalizedHref}>
-          {label}
-        </Link>
+        <Link href={normalizedHref}>{label}</Link>
       </Button>
     );
   }
 
+  const shouldOpenInNewTab = openInNewTab === true;
   return (
     <Button {...buttonProps} asChild data-testid={testId}>
       <a
