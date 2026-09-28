@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, type UseMutationResult } from "@tanstack/react-query";
 import { ProtectedRoute } from "@/components/shared/protected-route";
 import { AdminSidebar } from "./admin-sidebar";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
@@ -592,6 +592,286 @@ export function CreateUserSheet({
   );
 }
 
+function DeleteUserDialog({
+  deleteConfirmOpen,
+  setDeleteConfirmOpen,
+  fullName,
+  user,
+  deleteMutation,
+}: {
+  deleteConfirmOpen: boolean;
+  setDeleteConfirmOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  fullName: string;
+  user: SafeUser | null;
+  deleteMutation: UseMutationResult<void, Error, void, unknown>;
+}) {
+  return (
+    <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete System User</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to permanently delete <strong>{fullName}</strong> ({user?.email})? This action is irreversible.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel data-testid="button-delete-cancel">Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => deleteMutation.mutate()}
+            disabled={deleteMutation.isPending}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            data-testid="button-delete-confirm"
+          >
+            {deleteMutation.isPending ? "Deleting..." : "Yes, delete account"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
+function UserSecurityTab({
+  resetPasswordMutation,
+  showPassword,
+  newPassword,
+  setNewPassword,
+  setShowPassword,
+  user,
+  sendResetLinkMutation,
+  suspendMutation,
+  setDeleteConfirmOpen,
+}: {
+  resetPasswordMutation: UseMutationResult<void, Error, void, unknown>;
+  showPassword: boolean;
+  newPassword: string;
+  setNewPassword: React.Dispatch<React.SetStateAction<string>>;
+  setShowPassword: React.Dispatch<React.SetStateAction<boolean>>;
+  user: SafeUser | null;
+  sendResetLinkMutation: UseMutationResult<void, Error, void, unknown>;
+  suspendMutation: UseMutationResult<SafeUser, Error, void, unknown>;
+  setDeleteConfirmOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  return (
+    <>
+      <div className="rounded-lg border p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <KeyRound className="h-4 w-4 text-muted-foreground" />
+          <h3 className="font-medium text-sm">Reset Password</h3>
+        </div>
+        <p className="text-xs text-muted-foreground">Set a new password directly for this account.</p>
+        <form
+          id="detail-reset-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            resetPasswordMutation.mutate();
+          }}
+          className="flex gap-2"
+        >
+          <div className="relative flex-1">
+            <Input
+              type={showPassword ? "text" : "password"}
+              value={newPassword}
+              onChange={(event) => setNewPassword(event.target.value)}
+              placeholder="New password (min 6 chars)"
+              minLength={6}
+              required
+              data-testid="input-detail-new-password"
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </Button>
+          </div>
+          <Button type="submit" disabled={resetPasswordMutation.isPending || !newPassword.trim()} data-testid="button-detail-reset-password">
+            {resetPasswordMutation.isPending ? "Saving..." : "Set"}
+          </Button>
+        </form>
+      </div>
+  
+      <div className="rounded-lg border p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Mail className="h-4 w-4 text-muted-foreground" />
+          <h3 className="font-medium text-sm">Send Reset Email</h3>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Email a password reset link to <span className="font-medium">{user?.email}</span>.
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => sendResetLinkMutation.mutate()}
+          disabled={sendResetLinkMutation.isPending}
+          data-testid="button-detail-send-reset-link"
+        >
+          {sendResetLinkMutation.isPending ? "Sending..." : "Send Reset Link"}
+        </Button>
+      </div>
+  
+      <div className="rounded-lg border p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {user?.isSuspended ? (
+              <ShieldAlert className="h-4 w-4 text-red-500" />
+            ) : (
+              <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+            )}
+            <h3 className="font-medium text-sm">Suspend Account</h3>
+          </div>
+          <Switch
+            checked={user?.isSuspended ?? false}
+            onCheckedChange={() => suspendMutation.mutate()}
+            disabled={suspendMutation.isPending}
+            data-testid="switch-suspend-account"
+          />
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {user?.isSuspended
+            ? "This system user is suspended and can no longer log in."
+            : "Suspending this system user will prevent them from logging in."}
+        </p>
+      </div>
+  
+      <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <AlertTriangle className="h-4 w-4 text-destructive" />
+          <h3 className="font-medium text-sm text-destructive">Danger Zone</h3>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Permanently delete this system account. This action cannot be undone.
+        </p>
+        <Button variant="destructive" size="sm" onClick={() => setDeleteConfirmOpen(true)} data-testid="button-detail-delete">
+          <Trash2 className="mr-2 h-4 w-4" />
+          Delete Account
+        </Button>
+      </div>
+    </>
+  );
+}
+
+function UserProfileForm({
+  updateMutation,
+  firstName,
+  setFirstName,
+  lastName,
+  setLastName,
+  email,
+  setEmail,
+  role,
+  setRole,
+  adminPermissions,
+  setAdminPermissions,
+  formNotificationFormIds,
+  setFormNotificationFormIds,
+  activeForms,
+}: {
+  updateMutation: UseMutationResult<SafeUser, Error, void, unknown>;
+  firstName: string;
+  setFirstName: React.Dispatch<React.SetStateAction<string>>;
+  lastName: string;
+  setLastName: React.Dispatch<React.SetStateAction<string>>;
+  email: string;
+  setEmail: React.Dispatch<React.SetStateAction<string>>;
+  role: "admin" | "editor";
+  setRole: React.Dispatch<React.SetStateAction<"editor" | "admin">>;
+  adminPermissions: string[];
+  setAdminPermissions: React.Dispatch<React.SetStateAction<string[]>>;
+  formNotificationFormIds: string[];
+  setFormNotificationFormIds: React.Dispatch<React.SetStateAction<string[]>>;
+  activeForms: ActiveForm[];
+}) {
+  return (
+    <form
+      id="detail-profile-form"
+      onSubmit={(event) => {
+        event.preventDefault();
+        updateMutation.mutate();
+      }}
+      className="space-y-4"
+    >
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="detail-first">First Name</Label>
+          <Input id="detail-first" value={firstName} onChange={(event) => setFirstName(event.target.value)} data-testid="input-detail-first-name" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="detail-last">Last Name</Label>
+          <Input id="detail-last" value={lastName} onChange={(event) => setLastName(event.target.value)} data-testid="input-detail-last-name" />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="detail-email">Email</Label>
+        <Input id="detail-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required data-testid="input-detail-email" />
+      </div>
+
+      <div className="rounded-lg border bg-muted/20 p-4 space-y-3">
+        <div>
+          <Label htmlFor="detail-role" className="text-sm font-medium">System Role</Label>
+          <p className="text-xs text-muted-foreground mt-1">
+            Editors can only access the tool groups you assign here. System remains admin-only.
+          </p>
+        </div>
+        <SystemRoleSelector role={role} onChange={setRole} testIdPrefix="detail-role" />
+      </div>
+
+      {role === "editor" ? (
+        <EditorPermissionsPanel
+          permissions={adminPermissions}
+          onToggle={(permission) => setAdminPermissions((current) => toggleValue(current, permission))}
+        />
+      ) : (
+        <div className="rounded-lg border bg-muted/20 p-4">
+          <div className="flex items-center gap-2">
+            <Shield className="h-4 w-4 text-primary" />
+            <p className="text-sm font-medium">System Admins always have full platform access, including the System tool group.</p>
+          </div>
+        </div>
+      )}
+
+      <FormNotificationPanel
+        selectedFormIds={formNotificationFormIds}
+        onToggle={(formId) => setFormNotificationFormIds((current) => toggleValue(current, formId))}
+        activeForms={activeForms}
+      />
+    </form>
+  );
+}
+
+function UserSheetHeader({ fullName, user }: {
+  fullName: string;
+  user: SafeUser | null;
+}) {
+  return (
+    <SheetHeader>
+      <div className="flex items-start justify-between">
+        <div className="space-y-1">
+          <SheetTitle className="font-heading" data-testid="text-detail-name">
+            {fullName}
+          </SheetTitle>
+          <SheetDescription data-testid="text-detail-email">{user?.email}</SheetDescription>
+        </div>
+        {user && (
+          <div className="flex flex-col items-end gap-1 pt-1">
+            <Badge variant="secondary" className={ROLE_COLORS[user.role] || ""} data-testid="badge-detail-role">
+              {displayRole(user.role)}
+            </Badge>
+            {user.isSuspended && (
+              <Badge variant="secondary" className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-xs">
+                Suspended
+              </Badge>
+            )}
+          </div>
+        )}
+      </div>
+    </SheetHeader>
+  );
+}
+
 function UserDetailSheet({
   user,
   onClose,
@@ -715,28 +995,7 @@ function UserDetailSheet({
     <>
       <Sheet open={!!user} onOpenChange={(open) => !open && onClose()}>
         <SheetContent side="right" size="default">
-          <SheetHeader>
-            <div className="flex items-start justify-between">
-              <div className="space-y-1">
-                <SheetTitle className="font-heading" data-testid="text-detail-name">
-                  {fullName}
-                </SheetTitle>
-                <SheetDescription data-testid="text-detail-email">{user?.email}</SheetDescription>
-              </div>
-              {user && (
-                <div className="flex flex-col items-end gap-1 pt-1">
-                  <Badge variant="secondary" className={ROLE_COLORS[user.role] || ""} data-testid="badge-detail-role">
-                    {displayRole(user.role)}
-                  </Badge>
-                  {user.isSuspended && (
-                    <Badge variant="secondary" className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-xs">
-                      Suspended
-                    </Badge>
-                  )}
-                </div>
-              )}
-            </div>
-          </SheetHeader>
+          <UserSheetHeader fullName={fullName} user={user} />
 
           <SheetBody>
             <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -751,160 +1010,37 @@ function UserDetailSheet({
 
               <TabsContent value="profile" className="mt-0">
                 {user && (
-                  <form
-                    id="detail-profile-form"
-                    onSubmit={(event) => {
-                      event.preventDefault();
-                      updateMutation.mutate();
-                    }}
-                    className="space-y-4"
-                  >
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="detail-first">First Name</Label>
-                        <Input id="detail-first" value={firstName} onChange={(event) => setFirstName(event.target.value)} data-testid="input-detail-first-name" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="detail-last">Last Name</Label>
-                        <Input id="detail-last" value={lastName} onChange={(event) => setLastName(event.target.value)} data-testid="input-detail-last-name" />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="detail-email">Email</Label>
-                      <Input id="detail-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required data-testid="input-detail-email" />
-                    </div>
-
-                    <div className="rounded-lg border bg-muted/20 p-4 space-y-3">
-                      <div>
-                        <Label htmlFor="detail-role" className="text-sm font-medium">System Role</Label>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Editors can only access the tool groups you assign here. System remains admin-only.
-                        </p>
-                      </div>
-                      <SystemRoleSelector role={role} onChange={setRole} testIdPrefix="detail-role" />
-                    </div>
-
-                    {role === "editor" ? (
-                      <EditorPermissionsPanel
-                        permissions={adminPermissions}
-                        onToggle={(permission) => setAdminPermissions((current) => toggleValue(current, permission))}
-                      />
-                    ) : (
-                      <div className="rounded-lg border bg-muted/20 p-4">
-                        <div className="flex items-center gap-2">
-                          <Shield className="h-4 w-4 text-primary" />
-                          <p className="text-sm font-medium">System Admins always have full platform access, including the System tool group.</p>
-                        </div>
-                      </div>
-                    )}
-
-                    <FormNotificationPanel
-                      selectedFormIds={formNotificationFormIds}
-                      onToggle={(formId) => setFormNotificationFormIds((current) => toggleValue(current, formId))}
-                      activeForms={activeForms}
-                    />
-                  </form>
+                  <UserProfileForm
+                    updateMutation={updateMutation}
+                    firstName={firstName}
+                    setFirstName={setFirstName}
+                    lastName={lastName}
+                    setLastName={setLastName}
+                    email={email}
+                    setEmail={setEmail}
+                    role={role}
+                    setRole={setRole}
+                    adminPermissions={adminPermissions}
+                    setAdminPermissions={setAdminPermissions}
+                    formNotificationFormIds={formNotificationFormIds}
+                    setFormNotificationFormIds={setFormNotificationFormIds}
+                    activeForms={activeForms}
+                  />
                 )}
               </TabsContent>
 
               <TabsContent value="security" className="mt-0 space-y-4">
-                <div className="rounded-lg border p-4 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <KeyRound className="h-4 w-4 text-muted-foreground" />
-                    <h3 className="font-medium text-sm">Reset Password</h3>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Set a new password directly for this account.</p>
-                  <form
-                    id="detail-reset-form"
-                    onSubmit={(event) => {
-                      event.preventDefault();
-                      resetPasswordMutation.mutate();
-                    }}
-                    className="flex gap-2"
-                  >
-                    <div className="relative flex-1">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        value={newPassword}
-                        onChange={(event) => setNewPassword(event.target.value)}
-                        placeholder="New password (min 6 chars)"
-                        minLength={6}
-                        required
-                        data-testid="input-detail-new-password"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        aria-label={showPassword ? "Hide password" : "Show password"}
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                    <Button type="submit" disabled={resetPasswordMutation.isPending || !newPassword.trim()} data-testid="button-detail-reset-password">
-                      {resetPasswordMutation.isPending ? "Saving..." : "Set"}
-                    </Button>
-                  </form>
-                </div>
-
-                <div className="rounded-lg border p-4 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    <h3 className="font-medium text-sm">Send Reset Email</h3>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Email a password reset link to <span className="font-medium">{user?.email}</span>.
-                  </p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => sendResetLinkMutation.mutate()}
-                    disabled={sendResetLinkMutation.isPending}
-                    data-testid="button-detail-send-reset-link"
-                  >
-                    {sendResetLinkMutation.isPending ? "Sending..." : "Send Reset Link"}
-                  </Button>
-                </div>
-
-                <div className="rounded-lg border p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      {user?.isSuspended ? (
-                        <ShieldAlert className="h-4 w-4 text-red-500" />
-                      ) : (
-                        <ShieldCheck className="h-4 w-4 text-muted-foreground" />
-                      )}
-                      <h3 className="font-medium text-sm">Suspend Account</h3>
-                    </div>
-                    <Switch
-                      checked={user?.isSuspended ?? false}
-                      onCheckedChange={() => suspendMutation.mutate()}
-                      disabled={suspendMutation.isPending}
-                      data-testid="switch-suspend-account"
-                    />
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {user?.isSuspended
-                      ? "This system user is suspended and can no longer log in."
-                      : "Suspending this system user will prevent them from logging in."}
-                  </p>
-                </div>
-
-                <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-destructive" />
-                    <h3 className="font-medium text-sm text-destructive">Danger Zone</h3>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Permanently delete this system account. This action cannot be undone.
-                  </p>
-                  <Button variant="destructive" size="sm" onClick={() => setDeleteConfirmOpen(true)} data-testid="button-detail-delete">
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete Account
-                  </Button>
-                </div>
+                <UserSecurityTab
+                  resetPasswordMutation={resetPasswordMutation}
+                  showPassword={showPassword}
+                  newPassword={newPassword}
+                  setNewPassword={setNewPassword}
+                  setShowPassword={setShowPassword}
+                  user={user}
+                  sendResetLinkMutation={sendResetLinkMutation}
+                  suspendMutation={suspendMutation}
+                  setDeleteConfirmOpen={setDeleteConfirmOpen}
+                />
               </TabsContent>
             </Tabs>
           </SheetBody>
@@ -922,27 +1058,13 @@ function UserDetailSheet({
         </SheetContent>
       </Sheet>
 
-      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete System User</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to permanently delete <strong>{fullName}</strong> ({user?.email})? This action is irreversible.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-delete-cancel">Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => deleteMutation.mutate()}
-              disabled={deleteMutation.isPending}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              data-testid="button-delete-confirm"
-            >
-              {deleteMutation.isPending ? "Deleting..." : "Yes, delete account"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteUserDialog
+        deleteConfirmOpen={deleteConfirmOpen}
+        setDeleteConfirmOpen={setDeleteConfirmOpen}
+        fullName={fullName}
+        user={user}
+        deleteMutation={deleteMutation}
+      />
     </>
   );
 }

@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, type UseMutationResult } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { AdminSidebar } from "./admin-sidebar";
 import { Button } from "@/components/ui/button";
@@ -77,6 +77,432 @@ function sortCategories(categories: string[]) {
 
     return aIndex - bIndex;
   });
+}
+
+function DocEditorSheet({
+  sheetOpen,
+  handleSheetOpenChange,
+  editingDoc,
+  editorLock,
+  setEditingDoc,
+  categoryOptions,
+  setShowPreview,
+  showPreview,
+  saveState,
+  unsavedChangesGuard,
+  setSheetOpen,
+  handleSave,
+  isSaving,
+}: {
+  sheetOpen: boolean;
+  handleSheetOpenChange: (open: boolean) => void;
+  editingDoc: Partial<{ id: string; title: string; slug: string; category: string; content: string; sortOrder: number | null; isPublished: boolean | null; createdAt: Date | null; updatedAt: Date | null; createdBy: string | null; }> | null;
+  editorLock: ReturnType<typeof useEditorLock>;
+  setEditingDoc: React.Dispatch<React.SetStateAction<Partial<{ id: string; title: string; slug: string; category: string; content: string; sortOrder: number | null; isPublished: boolean | null; createdAt: Date | null; updatedAt: Date | null; createdBy: string | null; }> | null>>;
+  categoryOptions: string[];
+  setShowPreview: React.Dispatch<React.SetStateAction<boolean>>;
+  showPreview: boolean;
+  saveState: ReturnType<typeof useEditorSaveState>;
+  unsavedChangesGuard: ReturnType<typeof useUnsavedChangesGuard>;
+  setSheetOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  handleSave: () => void;
+  isSaving: boolean;
+}) {
+  return (
+    <Sheet open={sheetOpen} onOpenChange={handleSheetOpenChange}>
+      <SheetContent side="right" size="xl">
+        <SheetHeader>
+          <SheetTitle>{editingDoc?.id ? "Edit Document" : "New Document"}</SheetTitle>
+          <SheetDescription className="sr-only">
+            {editingDoc?.id ? "Edit document content" : "Create a new document"}
+          </SheetDescription>
+        </SheetHeader>
+        <SheetBody>
+          {editorLock.summary ? (
+            <div className="mb-4">
+              <EditorLockBanner
+                variant={editorLock.summary.variant}
+                title={editorLock.summary.title}
+                description={editorLock.summary.description}
+                isLoading={editorLock.isLoading}
+                onRefresh={editorLock.acquire}
+              />
+            </div>
+          ) : null}
+
+          {editingDoc && (
+            <div className={cn("space-y-4", editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Title</Label>
+                  <Input
+                    value={editingDoc.title || ""}
+                    onChange={(e) => setEditingDoc({ ...editingDoc, title: e.target.value })}
+                    data-testid="input-doc-title"
+                  />
+                </div>
+                <div>
+                  <Label>Slug</Label>
+                  <Input
+                    value={editingDoc.slug || ""}
+                    onChange={(e) => setEditingDoc({ ...editingDoc, slug: e.target.value })}
+                    data-testid="input-doc-slug"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Category</Label>
+                  <Select
+                    value={editingDoc.category || ""}
+                    onValueChange={(value) => setEditingDoc({ ...editingDoc, category: value })}
+                  >
+                    <SelectTrigger data-testid="select-doc-category">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categoryOptions.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-end gap-4">
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={editingDoc.isPublished ?? true}
+                      onCheckedChange={(value) => setEditingDoc({ ...editingDoc, isPublished: value })}
+                      data-testid="switch-doc-published"
+                    />
+                    <Label>{editingDoc.isPublished ? "Published" : "Draft"}</Label>
+                  </div>
+                  <div>
+                    <Label>Sort Order</Label>
+                    <Input
+                      type="number"
+                      value={editingDoc.sortOrder || 0}
+                      onChange={(e) =>
+                        setEditingDoc({
+                          ...editingDoc,
+                          sortOrder: Number.parseInt(e.target.value, 10) || 0,
+                        })
+                      }
+                      className="w-20"
+                      data-testid="input-doc-sort"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div className="mb-2 flex items-center justify-between">
+                  <Label>Content (Markdown)</Label>
+                  <Button variant="ghost" size="sm" onClick={() => setShowPreview(!showPreview)}>
+                    {showPreview ? (
+                      <>
+                        <EyeOff className="mr-1 h-4 w-4" />
+                        Edit
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="mr-1 h-4 w-4" />
+                        Preview
+                      </>
+                    )}
+                  </Button>
+                </div>
+                {showPreview ? (
+                  <div className="min-h-[300px] rounded-md border p-4">
+                    <MarkdownDocument content={editingDoc.content || ""} />
+                  </div>
+                ) : (
+                  <Textarea
+                    value={editingDoc.content || ""}
+                    onChange={(e) => setEditingDoc({ ...editingDoc, content: e.target.value })}
+                    rows={18}
+                    className="font-mono text-sm"
+                    data-testid="textarea-doc-content"
+                  />
+                )}
+              </div>
+            </div>
+          )}
+        </SheetBody>
+        <SheetFooter>
+          <div className="flex w-full items-center justify-between gap-3">
+            <EditorSaveIndicator state={saveState.state} />
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => unsavedChangesGuard.confirmDiscardChanges(() => setSheetOpen(false))}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={isSaving || editorLock.isReadOnly}
+                data-testid="button-save-doc"
+              >
+                {isSaving && <LoadingSpinner />}
+                {editingDoc?.id ? "Save Document" : "Create Document"}
+              </Button>
+            </div>
+          </div>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function DocViewerCard({ selectedDoc, openEdit, deleteMutation }: {
+  selectedDoc: { id: string; title: string; slug: string; category: string; content: string; sortOrder: number | null; isPublished: boolean | null; createdAt: Date | null; updatedAt: Date | null; createdBy: string | null; } | null;
+  openEdit: (doc: Doc) => void;
+  deleteMutation: UseMutationResult<void, Error, string, unknown>;
+}) {
+  return (
+    <Card className="flex min-h-0 flex-col overflow-hidden">
+      {selectedDoc ? (
+        <>
+          <CardHeader className="shrink-0 border-b">
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <CardTitle className="font-heading text-xl" data-testid="text-doc-title">
+                    {selectedDoc.title}
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    System and editorial documentation for the Glass & Door Pro website.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="outline">{selectedDoc.category}</Badge>
+                  {selectedDoc.isPublished ? (
+                    <Badge data-testid="badge-published">Published</Badge>
+                  ) : (
+                    <Badge variant="secondary" data-testid="badge-draft">
+                      Draft
+                    </Badge>
+                  )}
+                  <Badge variant="secondary">Slug: {selectedDoc.slug}</Badge>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={() => openEdit(selectedDoc)} data-testid="button-edit-doc">
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => deleteMutation.mutate(selectedDoc.id)}
+                  data-testid="button-delete-doc"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden pb-4 pt-6">
+            <ScrollArea className="min-h-0 flex-1 pr-4">
+              <MarkdownDocument content={selectedDoc.content} data-testid="text-doc-content" />
+            </ScrollArea>
+          </CardContent>
+        </>
+      ) : (
+        <CardContent className="flex h-full items-center justify-center p-8 text-center text-sm text-muted-foreground">
+          <div className="space-y-3">
+            <BookOpenText className="mx-auto h-12 w-12 opacity-50" />
+            <p>Select a document to read it here.</p>
+          </div>
+        </CardContent>
+      )}
+    </Card>
+  );
+}
+
+function DocListCard({ filteredDocs, selectedDoc, setSelectedDocId }: {
+  filteredDocs: { id: string; title: string; slug: string; category: string; content: string; sortOrder: number | null; isPublished: boolean | null; createdAt: Date | null; updatedAt: Date | null; createdBy: string | null; }[];
+  selectedDoc: { id: string; title: string; slug: string; category: string; content: string; sortOrder: number | null; isPublished: boolean | null; createdAt: Date | null; updatedAt: Date | null; createdBy: string | null; } | null;
+  setSelectedDocId: React.Dispatch<React.SetStateAction<string | null>>;
+}) {
+  return (
+    <Card className="flex min-h-0 flex-col overflow-hidden">
+      <CardHeader>
+        <CardTitle className="text-base">Library</CardTitle>
+      </CardHeader>
+      <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden pb-4">
+        <ScrollArea className="min-h-0 flex-1 pr-3">
+          <div className="space-y-3">
+            {filteredDocs.length === 0 ? (
+              <div className="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
+                <BookOpenText className="mx-auto mb-3 h-10 w-10 opacity-50" />
+                <p>No documentation found yet.</p>
+                <p className="mt-1">Use “Sync System Docs” to import the repo documentation into the admin library.</p>
+              </div>
+            ) : (
+              filteredDocs.map((doc) => (
+                <button
+                  key={doc.id}
+                  type="button"
+                  className={`w-full rounded-xl border p-4 text-left transition-colors ${selectedDoc?.id === doc.id ? "border-primary bg-primary/5" : "hover:border-primary/40 hover:bg-muted/50"}`}
+                  onClick={() => setSelectedDocId(doc.id)}
+                  data-testid={`card-doc-${doc.id}`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-2">
+                      <div className="font-medium leading-snug">{doc.title}</div>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant="outline" className="text-xs">
+                          {doc.category}
+                        </Badge>
+                        {!doc.isPublished && (
+                          <Badge variant="secondary" className="text-xs">
+                            Draft
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm leading-6 text-muted-foreground">
+                        {markdownToExcerpt(doc.content)}
+                      </p>
+                    </div>
+                    <FileText className="mt-1 h-4 w-4 shrink-0 text-muted-foreground" />
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        </ScrollArea>
+      </CardContent>
+    </Card>
+  );
+}
+
+function DocCategoriesCard({
+  searchQuery,
+  setSearchQuery,
+  setSelectedCategory,
+  selectedCategory,
+  categories,
+  allDocs,
+}: {
+  searchQuery: string;
+  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedCategory: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedCategory: string | null;
+  categories: string[];
+  allDocs: { id: string; title: string; slug: string; category: string; content: string; sortOrder: number | null; isPublished: boolean | null; createdAt: Date | null; updatedAt: Date | null; createdBy: string | null; }[];
+}) {
+  return (
+    <Card className="flex min-h-0 flex-col overflow-hidden">
+      <CardHeader className="space-y-3">
+        <CardTitle className="text-base">Browse</CardTitle>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search docs..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+            data-testid="input-search-docs"
+          />
+        </div>
+      </CardHeader>
+      <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden pb-4">
+        <ScrollArea className="min-h-0 flex-1 pr-3">
+          <div className="space-y-1">
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className={`w-full rounded-md px-3 py-2 text-left text-sm ${!selectedCategory ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
+              data-testid="button-category-all"
+            >
+              All Documents
+            </button>
+            {categories.map((category) => {
+              const count = allDocs.filter((doc) => doc.category === category).length;
+              return (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm ${selectedCategory === category ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
+                  data-testid={`button-category-${category.toLowerCase().replace(/\s+/g, "-")}`}
+                >
+                  <span>{category}</span>
+                  <span className="text-xs opacity-80">{count}</span>
+                </button>
+              );
+            })}
+          </div>
+        </ScrollArea>
+      </CardContent>
+    </Card>
+  );
+}
+
+function DocsStats({ allDocs, categories, filteredDocs }: {
+  allDocs: { id: string; title: string; slug: string; category: string; content: string; sortOrder: number | null; isPublished: boolean | null; createdAt: Date | null; updatedAt: Date | null; createdBy: string | null; }[];
+  categories: string[];
+  filteredDocs: { id: string; title: string; slug: string; category: string; content: string; sortOrder: number | null; isPublished: boolean | null; createdAt: Date | null; updatedAt: Date | null; createdBy: string | null; }[];
+}) {
+  return (
+    <div className="grid gap-4 md:grid-cols-3">
+      <Card>
+        <CardContent className="py-4">
+          <div className="text-sm text-muted-foreground">Published library</div>
+          <div className="mt-1 text-2xl font-semibold" data-testid="text-doc-count">{allDocs.length}</div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardContent className="py-4">
+          <div className="text-sm text-muted-foreground">Categories</div>
+          <div className="mt-1 text-2xl font-semibold">{categories.length}</div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardContent className="py-4">
+          <div className="text-sm text-muted-foreground">Visible results</div>
+          <div className="mt-1 text-2xl font-semibold">{filteredDocs.length}</div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function DocsHeader({ syncMutation, openCreate }: {
+  syncMutation: UseMutationResult<{ total: number; created: number; updated: number; docs: Doc[]; }, Error, void, unknown>;
+  openCreate: () => void;
+}) {
+  return (
+    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-heading font-bold" data-testid="text-page-title">
+          Documentation Library
+        </h1>
+        <p className="max-w-3xl text-sm text-muted-foreground">
+          Internal operating documentation for the CMS, content workflows, infrastructure, deployment, and system architecture.
+        </p>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          variant="outline"
+          onClick={() => syncMutation.mutate()}
+          disabled={syncMutation.isPending}
+          data-testid="button-sync-system-docs"
+        >
+          {syncMutation.isPending ? (
+            <LoadingSpinner />
+          ) : (
+            <RefreshCw className="mr-2 h-4 w-4" />
+          )}
+          Sync System Docs
+        </Button>
+        <Button onClick={openCreate} data-testid="button-create-doc">
+          <Plus className="mr-2 h-4 w-4" />
+          New Document
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 export default function DocsPage() {
@@ -291,353 +717,41 @@ export default function DocsPage() {
   return (
     <AdminSidebar>
       <div className="flex h-[calc(100vh-4rem)] min-h-0 flex-col gap-6 overflow-hidden p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div className="space-y-2">
-            <h1 className="text-2xl font-heading font-bold" data-testid="text-page-title">
-              Documentation Library
-            </h1>
-            <p className="max-w-3xl text-sm text-muted-foreground">
-              Internal operating documentation for the CMS, content workflows, infrastructure, deployment, and system architecture.
-            </p>
-          </div>
+        <DocsHeader syncMutation={syncMutation} openCreate={openCreate} />
 
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={() => syncMutation.mutate()}
-              disabled={syncMutation.isPending}
-              data-testid="button-sync-system-docs"
-            >
-              {syncMutation.isPending ? (
-                <LoadingSpinner />
-              ) : (
-                <RefreshCw className="mr-2 h-4 w-4" />
-              )}
-              Sync System Docs
-            </Button>
-            <Button onClick={openCreate} data-testid="button-create-doc">
-              <Plus className="mr-2 h-4 w-4" />
-              New Document
-            </Button>
-          </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardContent className="py-4">
-              <div className="text-sm text-muted-foreground">Published library</div>
-              <div className="mt-1 text-2xl font-semibold" data-testid="text-doc-count">{allDocs.length}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="py-4">
-              <div className="text-sm text-muted-foreground">Categories</div>
-              <div className="mt-1 text-2xl font-semibold">{categories.length}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="py-4">
-              <div className="text-sm text-muted-foreground">Visible results</div>
-              <div className="mt-1 text-2xl font-semibold">{filteredDocs.length}</div>
-            </CardContent>
-          </Card>
-        </div>
+        <DocsStats allDocs={allDocs} categories={categories} filteredDocs={filteredDocs} />
 
         <div className="grid min-h-0 flex-1 gap-6 overflow-hidden xl:grid-cols-[260px_340px_minmax(0,1fr)]">
-          <Card className="flex min-h-0 flex-col overflow-hidden">
-            <CardHeader className="space-y-3">
-              <CardTitle className="text-base">Browse</CardTitle>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search docs..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                  data-testid="input-search-docs"
-                />
-              </div>
-            </CardHeader>
-            <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden pb-4">
-              <ScrollArea className="min-h-0 flex-1 pr-3">
-                <div className="space-y-1">
-                  <button
-                    onClick={() => setSelectedCategory(null)}
-                    className={`w-full rounded-md px-3 py-2 text-left text-sm ${!selectedCategory ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
-                    data-testid="button-category-all"
-                  >
-                    All Documents
-                  </button>
-                  {categories.map((category) => {
-                    const count = allDocs.filter((doc) => doc.category === category).length;
-                    return (
-                      <button
-                        key={category}
-                        onClick={() => setSelectedCategory(category)}
-                        className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm ${selectedCategory === category ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
-                        data-testid={`button-category-${category.toLowerCase().replace(/\s+/g, "-")}`}
-                      >
-                        <span>{category}</span>
-                        <span className="text-xs opacity-80">{count}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
+          <DocCategoriesCard
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            setSelectedCategory={setSelectedCategory}
+            selectedCategory={selectedCategory}
+            categories={categories}
+            allDocs={allDocs}
+          />
 
-          <Card className="flex min-h-0 flex-col overflow-hidden">
-            <CardHeader>
-              <CardTitle className="text-base">Library</CardTitle>
-            </CardHeader>
-            <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden pb-4">
-              <ScrollArea className="min-h-0 flex-1 pr-3">
-                <div className="space-y-3">
-                  {filteredDocs.length === 0 ? (
-                    <div className="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
-                      <BookOpenText className="mx-auto mb-3 h-10 w-10 opacity-50" />
-                      <p>No documentation found yet.</p>
-                      <p className="mt-1">Use “Sync System Docs” to import the repo documentation into the admin library.</p>
-                    </div>
-                  ) : (
-                    filteredDocs.map((doc) => (
-                      <button
-                        key={doc.id}
-                        type="button"
-                        className={`w-full rounded-xl border p-4 text-left transition-colors ${selectedDoc?.id === doc.id ? "border-primary bg-primary/5" : "hover:border-primary/40 hover:bg-muted/50"}`}
-                        onClick={() => setSelectedDocId(doc.id)}
-                        data-testid={`card-doc-${doc.id}`}
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="space-y-2">
-                            <div className="font-medium leading-snug">{doc.title}</div>
-                            <div className="flex flex-wrap gap-2">
-                              <Badge variant="outline" className="text-xs">
-                                {doc.category}
-                              </Badge>
-                              {!doc.isPublished && (
-                                <Badge variant="secondary" className="text-xs">
-                                  Draft
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-sm leading-6 text-muted-foreground">
-                              {markdownToExcerpt(doc.content)}
-                            </p>
-                          </div>
-                          <FileText className="mt-1 h-4 w-4 shrink-0 text-muted-foreground" />
-                        </div>
-                      </button>
-                    ))
-                  )}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
+          <DocListCard filteredDocs={filteredDocs} selectedDoc={selectedDoc} setSelectedDocId={setSelectedDocId} />
 
-          <Card className="flex min-h-0 flex-col overflow-hidden">
-            {selectedDoc ? (
-              <>
-                <CardHeader className="shrink-0 border-b">
-                  <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-                    <div className="space-y-3">
-                      <div className="space-y-2">
-                        <CardTitle className="font-heading text-xl" data-testid="text-doc-title">
-                          {selectedDoc.title}
-                        </CardTitle>
-                        <p className="text-sm text-muted-foreground">
-                          System and editorial documentation for the Glass & Door Pro website.
-                        </p>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <Badge variant="outline">{selectedDoc.category}</Badge>
-                        {selectedDoc.isPublished ? (
-                          <Badge data-testid="badge-published">Published</Badge>
-                        ) : (
-                          <Badge variant="secondary" data-testid="badge-draft">
-                            Draft
-                          </Badge>
-                        )}
-                        <Badge variant="secondary">Slug: {selectedDoc.slug}</Badge>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Button variant="outline" size="sm" onClick={() => openEdit(selectedDoc)} data-testid="button-edit-doc">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => deleteMutation.mutate(selectedDoc.id)}
-                        data-testid="button-delete-doc"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden pb-4 pt-6">
-                  <ScrollArea className="min-h-0 flex-1 pr-4">
-                    <MarkdownDocument content={selectedDoc.content} data-testid="text-doc-content" />
-                  </ScrollArea>
-                </CardContent>
-              </>
-            ) : (
-              <CardContent className="flex h-full items-center justify-center p-8 text-center text-sm text-muted-foreground">
-                <div className="space-y-3">
-                  <BookOpenText className="mx-auto h-12 w-12 opacity-50" />
-                  <p>Select a document to read it here.</p>
-                </div>
-              </CardContent>
-            )}
-          </Card>
+          <DocViewerCard selectedDoc={selectedDoc} openEdit={openEdit} deleteMutation={deleteMutation} />
         </div>
       </div>
 
-      <Sheet open={sheetOpen} onOpenChange={handleSheetOpenChange}>
-        <SheetContent side="right" size="xl">
-          <SheetHeader>
-            <SheetTitle>{editingDoc?.id ? "Edit Document" : "New Document"}</SheetTitle>
-            <SheetDescription className="sr-only">
-              {editingDoc?.id ? "Edit document content" : "Create a new document"}
-            </SheetDescription>
-          </SheetHeader>
-          <SheetBody>
-            {editorLock.summary ? (
-              <div className="mb-4">
-                <EditorLockBanner
-                  variant={editorLock.summary.variant}
-                  title={editorLock.summary.title}
-                  description={editorLock.summary.description}
-                  isLoading={editorLock.isLoading}
-                  onRefresh={editorLock.acquire}
-                />
-              </div>
-            ) : null}
-
-            {editingDoc && (
-              <div className={cn("space-y-4", editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Title</Label>
-                    <Input
-                      value={editingDoc.title || ""}
-                      onChange={(e) => setEditingDoc({ ...editingDoc, title: e.target.value })}
-                      data-testid="input-doc-title"
-                    />
-                  </div>
-                  <div>
-                    <Label>Slug</Label>
-                    <Input
-                      value={editingDoc.slug || ""}
-                      onChange={(e) => setEditingDoc({ ...editingDoc, slug: e.target.value })}
-                      data-testid="input-doc-slug"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Category</Label>
-                    <Select
-                      value={editingDoc.category || ""}
-                      onValueChange={(value) => setEditingDoc({ ...editingDoc, category: value })}
-                    >
-                      <SelectTrigger data-testid="select-doc-category">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categoryOptions.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="flex items-end gap-4">
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        checked={editingDoc.isPublished ?? true}
-                        onCheckedChange={(value) => setEditingDoc({ ...editingDoc, isPublished: value })}
-                        data-testid="switch-doc-published"
-                      />
-                      <Label>{editingDoc.isPublished ? "Published" : "Draft"}</Label>
-                    </div>
-                    <div>
-                      <Label>Sort Order</Label>
-                      <Input
-                        type="number"
-                        value={editingDoc.sortOrder || 0}
-                        onChange={(e) =>
-                          setEditingDoc({
-                            ...editingDoc,
-                            sortOrder: Number.parseInt(e.target.value, 10) || 0,
-                          })
-                        }
-                        className="w-20"
-                        data-testid="input-doc-sort"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <div className="mb-2 flex items-center justify-between">
-                    <Label>Content (Markdown)</Label>
-                    <Button variant="ghost" size="sm" onClick={() => setShowPreview(!showPreview)}>
-                      {showPreview ? (
-                        <>
-                          <EyeOff className="mr-1 h-4 w-4" />
-                          Edit
-                        </>
-                      ) : (
-                        <>
-                          <Eye className="mr-1 h-4 w-4" />
-                          Preview
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                  {showPreview ? (
-                    <div className="min-h-[300px] rounded-md border p-4">
-                      <MarkdownDocument content={editingDoc.content || ""} />
-                    </div>
-                  ) : (
-                    <Textarea
-                      value={editingDoc.content || ""}
-                      onChange={(e) => setEditingDoc({ ...editingDoc, content: e.target.value })}
-                      rows={18}
-                      className="font-mono text-sm"
-                      data-testid="textarea-doc-content"
-                    />
-                  )}
-                </div>
-              </div>
-            )}
-          </SheetBody>
-          <SheetFooter>
-            <div className="flex w-full items-center justify-between gap-3">
-              <EditorSaveIndicator state={saveState.state} />
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => unsavedChangesGuard.confirmDiscardChanges(() => setSheetOpen(false))}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleSave}
-                  disabled={isSaving || editorLock.isReadOnly}
-                  data-testid="button-save-doc"
-                >
-                  {isSaving && <LoadingSpinner />}
-                  {editingDoc?.id ? "Save Document" : "Create Document"}
-                </Button>
-              </div>
-            </div>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+      <DocEditorSheet
+        sheetOpen={sheetOpen}
+        handleSheetOpenChange={handleSheetOpenChange}
+        editingDoc={editingDoc}
+        editorLock={editorLock}
+        setEditingDoc={setEditingDoc}
+        categoryOptions={categoryOptions}
+        setShowPreview={setShowPreview}
+        showPreview={showPreview}
+        saveState={saveState}
+        unsavedChangesGuard={unsavedChangesGuard}
+        setSheetOpen={setSheetOpen}
+        handleSave={handleSave}
+        isSaving={isSaving}
+      />
     </AdminSidebar>
   );
 }

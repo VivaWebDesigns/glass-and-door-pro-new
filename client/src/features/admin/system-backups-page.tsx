@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, type UseMutationResult } from "@tanstack/react-query";
 import { format, formatDistanceToNow } from "date-fns";
 import { useState } from "react";
 import {
@@ -86,6 +86,416 @@ function reasonLabel(reason: BackupManifest["reason"]) {
   return "Manual";
 }
 
+function RestoreBackupDialog({ restoreTarget, restoreBackupMutation, setRestoreTarget }: {
+  restoreTarget: BackupManifest | null;
+  restoreBackupMutation: UseMutationResult<{ restored: true; message: string; manifest: BackupManifest; }, Error, string, unknown>;
+  setRestoreTarget: React.Dispatch<React.SetStateAction<BackupManifest | null>>;
+}) {
+  return (
+    <AlertDialog
+      open={!!restoreTarget}
+      onOpenChange={(open) => {
+        if (!open && !restoreBackupMutation.isPending) {
+          setRestoreTarget(null);
+        }
+      }}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Restore this backup?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This will replace the live database with the snapshot from{" "}
+            <strong>{restoreTarget ? formatDateTime(restoreTarget.createdAt) : "the selected backup"}</strong>.
+            Any content changes made after that point will be lost. Creating a fresh manual backup first
+            is strongly recommended.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        {restoreTarget && (
+          <div className="rounded-lg bg-muted/40 px-3 py-3 text-sm">
+            <p>
+              <span className="font-medium">Reason:</span> {reasonLabel(restoreTarget.reason)}
+            </p>
+            <p className="mt-1">
+              <span className="font-medium">Rows:</span> {restoreTarget.totalRowCount.toLocaleString()}
+            </p>
+            <p className="mt-1 break-all font-mono text-xs text-muted-foreground">{restoreTarget.key}</p>
+          </div>
+        )}
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={restoreBackupMutation.isPending}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(event) => {
+              event.preventDefault();
+              if (restoreTarget) {
+                restoreBackupMutation.mutate(restoreTarget.key);
+              }
+            }}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            disabled={restoreBackupMutation.isPending}
+            data-testid="button-confirm-restore-backup"
+          >
+            {restoreBackupMutation.isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RotateCcw className="mr-2 h-4 w-4" />
+            )}
+            Restore Backup
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
+function RecentBackupsCard({
+  isLoading,
+  recent,
+  setRestoreTarget,
+  isRestoreBackupPending,
+  isRunBackupPending,
+}: {
+  isLoading: boolean;
+  recent: BackupManifest[];
+  setRestoreTarget: React.Dispatch<React.SetStateAction<BackupManifest | null>>;
+  isRestoreBackupPending: boolean;
+  isRunBackupPending: boolean;
+}) {
+  return (
+    <Card data-testid="card-recent-backups">
+      <CardHeader>
+        <CardTitle>Recent Backups</CardTitle>
+        <CardDescription>
+          The newest snapshots currently retained in your rolling backup window.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="space-y-3">
+            {[...Array(4)].map((_, index) => (
+              <Skeleton key={index} className="h-12 w-full" />
+            ))}
+          </div>
+        ) : recent.length > 0 ? (
+          <ScrollArea className="w-full">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Created</TableHead>
+                  <TableHead>Reason</TableHead>
+                  <TableHead>Rows</TableHead>
+                  <TableHead>Version</TableHead>
+                  <TableHead>Key</TableHead>
+                  <TableHead className="w-[120px] text-right">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {recent.map((backup) => (
+                  <TableRow key={backup.key} data-testid={`row-backup-${backup.createdAt}`}>
+                    <TableCell>
+                      <div className="min-w-[180px]">
+                        <p className="font-medium">{formatDateTime(backup.createdAt)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDistanceToNow(new Date(backup.createdAt), { addSuffix: true })}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{reasonLabel(backup.reason)}</Badge>
+                    </TableCell>
+                    <TableCell>{backup.totalRowCount.toLocaleString()}</TableCell>
+                    <TableCell>{backup.appVersion}</TableCell>
+                    <TableCell className="max-w-[320px]">
+                      <span className="block truncate font-mono text-xs text-muted-foreground">
+                        {backup.key}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setRestoreTarget(backup)}
+                        disabled={isRestoreBackupPending || isRunBackupPending}
+                        data-testid={`button-restore-backup-${backup.createdAt}`}
+                      >
+                        <RotateCcw className="mr-2 h-3.5 w-3.5" />
+                        Restore
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </ScrollArea>
+        ) : (
+          <div className="flex items-center gap-3 rounded-lg border border-dashed p-4 text-muted-foreground">
+            <AlertCircle className="h-4 w-4" />
+            <p className="text-sm">No backup history is available yet for this environment.</p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function BackupPolicyCard({ isLoading, data }: {
+  isLoading: boolean;
+  data: BackupStatusResponse | undefined;
+}) {
+  return (
+    <Card data-testid="card-backup-policy">
+      <CardHeader>
+        <CardTitle>Policy</CardTitle>
+        <CardDescription>
+          Current automatic backup settings for this environment.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {isLoading ? (
+          <div className="space-y-3">
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-5/6" />
+            <Skeleton className="h-5 w-4/5" />
+          </div>
+        ) : (
+          <>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Bucket</p>
+              <p className="mt-1 text-sm">{data?.storage?.bucketName || "Not configured"}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Prefix</p>
+              <p className="mt-1 break-all rounded-lg bg-muted/40 px-3 py-2 font-mono text-xs">
+                {data?.storage?.prefix || "Not configured"}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Retention Rule</p>
+              <p className="mt-1 text-sm">
+                Keep newest <strong>{data?.maxSnapshots ?? 0}</strong> snapshots and prune anything older than{" "}
+                <strong>{data?.retentionDays ?? 0}</strong> days.
+              </p>
+            </div>
+            <Alert>
+              <ShieldAlert className="h-4 w-4" />
+              <AlertTitle>Restore is available with confirmation</AlertTitle>
+              <AlertDescription>
+                Restoring replaces the live database with the selected snapshot. Use it carefully,
+                ideally after creating a fresh manual backup first.
+              </AlertDescription>
+            </Alert>
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function LatestBackupCard({ isLoading, latest }: {
+  isLoading: boolean;
+  latest: BackupManifest | null;
+}) {
+  return (
+    <Card data-testid="card-latest-backup-details">
+      <CardHeader>
+        <CardTitle>Latest Backup</CardTitle>
+        <CardDescription>
+          The most recent snapshot created by the backup system.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="space-y-3">
+            <Skeleton className="h-5 w-2/3" />
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-5/6" />
+          </div>
+        ) : latest ? (
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge>{reasonLabel(latest.reason)}</Badge>
+              <Badge variant="outline">{latest.environment}</Badge>
+              {latest.railwayEnvironment && <Badge variant="outline">{latest.railwayEnvironment}</Badge>}
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Created</p>
+                <p className="mt-1 text-sm">{formatDateTime(latest.createdAt)}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">App Version</p>
+                <p className="mt-1 text-sm">{latest.appVersion}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Tables</p>
+                <p className="mt-1 text-sm">{latest.tableCount}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Rows</p>
+                <p className="mt-1 text-sm">{latest.totalRowCount.toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Media Rows</p>
+                <p className="mt-1 text-sm">{latest.mediaAssetCount.toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Storage Source</p>
+                <p className="mt-1 text-sm capitalize">{latest.storageSource}</p>
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Backup Object Key</p>
+              <p className="mt-1 break-all rounded-lg bg-muted/40 px-3 py-2 font-mono text-xs">{latest.key}</p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 rounded-lg border border-dashed p-4 text-muted-foreground">
+            <AlertCircle className="h-4 w-4" />
+            <p className="text-sm">
+              No backup has been recorded yet. Once the first scheduled or manual run completes,
+              details will appear here.
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function BackupStatsGrid({ isLoading, data, latest }: {
+  isLoading: boolean;
+  data: BackupStatusResponse | undefined;
+  latest: BackupManifest | null;
+}) {
+  return (
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <Card data-testid="card-backup-enabled">
+        <CardContent className="pt-5">
+          {isLoading ? (
+            <Skeleton className="h-12 w-full" />
+          ) : (
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                <CheckCircle2 className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Backup Service</p>
+                <div className="mt-1">
+                  <Badge variant={data?.enabled ? "default" : "outline"}>{data?.enabled ? "Enabled" : "Disabled"}</Badge>
+                </div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card data-testid="card-backup-interval">
+        <CardContent className="pt-5">
+          {isLoading ? (
+            <Skeleton className="h-12 w-full" />
+          ) : (
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-100 text-sky-700">
+                <Clock3 className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Interval</p>
+                <p className="text-xl font-semibold">{data?.intervalHours}h</p>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card data-testid="card-backup-retention">
+        <CardContent className="pt-5">
+          {isLoading ? (
+            <Skeleton className="h-12 w-full" />
+          ) : (
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100 text-violet-700">
+                <HardDrive className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Rolling Retention</p>
+                <p className="text-xl font-semibold">{data?.maxSnapshots} backups</p>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card data-testid="card-backup-latest-age">
+        <CardContent className="pt-5">
+          {isLoading ? (
+            <Skeleton className="h-12 w-full" />
+          ) : (
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+                <Database className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Latest Backup</p>
+                <p className="text-sm font-semibold">
+                  {latest ? formatDistanceToNow(new Date(latest.createdAt), { addSuffix: true }) : "No backups yet"}
+                </p>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function BackupsHeader({
+  refetch,
+  isFetching,
+  runBackupMutation,
+  isRestoreBackupPending,
+  data,
+}: {
+  refetch: () => void;
+  isFetching: boolean;
+  runBackupMutation: UseMutationResult<BackupManifest, Error, void, unknown>;
+  isRestoreBackupPending: boolean;
+  data: BackupStatusResponse | undefined;
+}) {
+  return (
+    <div className="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <h1 className="text-2xl font-heading font-semibold" data-testid="text-system-backups-title">
+          System Backups
+        </h1>
+        <p className="mt-1 text-muted-foreground">
+          Monitor automated snapshots, verify retention, and run a manual backup before risky changes.
+        </p>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => refetch()}
+          disabled={isFetching || runBackupMutation.isPending || isRestoreBackupPending}
+          data-testid="button-refresh-backup-status"
+        >
+          {isFetching ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+          Refresh
+        </Button>
+        <Button
+          type="button"
+          onClick={() => runBackupMutation.mutate()}
+          disabled={!data?.configured || runBackupMutation.isPending || isRestoreBackupPending}
+          data-testid="button-run-backup-now"
+        >
+          {runBackupMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Database className="mr-2 h-4 w-4" />}
+          Run Backup Now
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function SystemBackupsPage() {
   const { toast } = useToast();
   const [restoreTarget, setRestoreTarget] = useState<BackupManifest | null>(null);
@@ -151,37 +561,13 @@ export default function SystemBackupsPage() {
   return (
     <AdminSidebar>
       <div className="mx-auto max-w-6xl space-y-6 p-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-heading font-semibold" data-testid="text-system-backups-title">
-              System Backups
-            </h1>
-            <p className="mt-1 text-muted-foreground">
-              Monitor automated snapshots, verify retention, and run a manual backup before risky changes.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => refetch()}
-              disabled={isFetching || runBackupMutation.isPending || restoreBackupMutation.isPending}
-              data-testid="button-refresh-backup-status"
-            >
-              {isFetching ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
-              Refresh
-            </Button>
-            <Button
-              type="button"
-              onClick={() => runBackupMutation.mutate()}
-              disabled={!data?.configured || runBackupMutation.isPending || restoreBackupMutation.isPending}
-              data-testid="button-run-backup-now"
-            >
-              {runBackupMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Database className="mr-2 h-4 w-4" />}
-              Run Backup Now
-            </Button>
-          </div>
-        </div>
+        <BackupsHeader
+          refetch={refetch}
+          isFetching={isFetching}
+          runBackupMutation={runBackupMutation}
+          isRestoreBackupPending={restoreBackupMutation.isPending}
+          data={data}
+        />
 
         {!isLoading && data && !data.configured && (
           <Alert variant="destructive" data-testid="alert-backups-not-configured">
@@ -207,324 +593,24 @@ export default function SystemBackupsPage() {
           </Alert>
         )}
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <Card data-testid="card-backup-enabled">
-            <CardContent className="pt-5">
-              {isLoading ? (
-                <Skeleton className="h-12 w-full" />
-              ) : (
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
-                    <CheckCircle2 className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Backup Service</p>
-                    <div className="mt-1">
-                      <Badge variant={data?.enabled ? "default" : "outline"}>{data?.enabled ? "Enabled" : "Disabled"}</Badge>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card data-testid="card-backup-interval">
-            <CardContent className="pt-5">
-              {isLoading ? (
-                <Skeleton className="h-12 w-full" />
-              ) : (
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-100 text-sky-700">
-                    <Clock3 className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Interval</p>
-                    <p className="text-xl font-semibold">{data?.intervalHours}h</p>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card data-testid="card-backup-retention">
-            <CardContent className="pt-5">
-              {isLoading ? (
-                <Skeleton className="h-12 w-full" />
-              ) : (
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100 text-violet-700">
-                    <HardDrive className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Rolling Retention</p>
-                    <p className="text-xl font-semibold">{data?.maxSnapshots} backups</p>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card data-testid="card-backup-latest-age">
-            <CardContent className="pt-5">
-              {isLoading ? (
-                <Skeleton className="h-12 w-full" />
-              ) : (
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
-                    <Database className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Latest Backup</p>
-                    <p className="text-sm font-semibold">
-                      {latest ? formatDistanceToNow(new Date(latest.createdAt), { addSuffix: true }) : "No backups yet"}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+        <BackupStatsGrid isLoading={isLoading} data={data} latest={latest} />
 
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-          <Card data-testid="card-latest-backup-details">
-            <CardHeader>
-              <CardTitle>Latest Backup</CardTitle>
-              <CardDescription>
-                The most recent snapshot created by the backup system.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <div className="space-y-3">
-                  <Skeleton className="h-5 w-2/3" />
-                  <Skeleton className="h-5 w-full" />
-                  <Skeleton className="h-5 w-5/6" />
-                </div>
-              ) : latest ? (
-                <div className="space-y-4">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge>{reasonLabel(latest.reason)}</Badge>
-                    <Badge variant="outline">{latest.environment}</Badge>
-                    {latest.railwayEnvironment && <Badge variant="outline">{latest.railwayEnvironment}</Badge>}
-                  </div>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Created</p>
-                      <p className="mt-1 text-sm">{formatDateTime(latest.createdAt)}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">App Version</p>
-                      <p className="mt-1 text-sm">{latest.appVersion}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Tables</p>
-                      <p className="mt-1 text-sm">{latest.tableCount}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Rows</p>
-                      <p className="mt-1 text-sm">{latest.totalRowCount.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Media Rows</p>
-                      <p className="mt-1 text-sm">{latest.mediaAssetCount.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Storage Source</p>
-                      <p className="mt-1 text-sm capitalize">{latest.storageSource}</p>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Backup Object Key</p>
-                    <p className="mt-1 break-all rounded-lg bg-muted/40 px-3 py-2 font-mono text-xs">{latest.key}</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center gap-3 rounded-lg border border-dashed p-4 text-muted-foreground">
-                  <AlertCircle className="h-4 w-4" />
-                  <p className="text-sm">
-                    No backup has been recorded yet. Once the first scheduled or manual run completes,
-                    details will appear here.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <LatestBackupCard isLoading={isLoading} latest={latest} />
 
-          <Card data-testid="card-backup-policy">
-            <CardHeader>
-              <CardTitle>Policy</CardTitle>
-              <CardDescription>
-                Current automatic backup settings for this environment.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {isLoading ? (
-                <div className="space-y-3">
-                  <Skeleton className="h-5 w-full" />
-                  <Skeleton className="h-5 w-5/6" />
-                  <Skeleton className="h-5 w-4/5" />
-                </div>
-              ) : (
-                <>
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Bucket</p>
-                    <p className="mt-1 text-sm">{data?.storage?.bucketName || "Not configured"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Prefix</p>
-                    <p className="mt-1 break-all rounded-lg bg-muted/40 px-3 py-2 font-mono text-xs">
-                      {data?.storage?.prefix || "Not configured"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Retention Rule</p>
-                    <p className="mt-1 text-sm">
-                      Keep newest <strong>{data?.maxSnapshots ?? 0}</strong> snapshots and prune anything older than{" "}
-                      <strong>{data?.retentionDays ?? 0}</strong> days.
-                    </p>
-                  </div>
-                  <Alert>
-                    <ShieldAlert className="h-4 w-4" />
-                    <AlertTitle>Restore is available with confirmation</AlertTitle>
-                    <AlertDescription>
-                      Restoring replaces the live database with the selected snapshot. Use it carefully,
-                      ideally after creating a fresh manual backup first.
-                    </AlertDescription>
-                  </Alert>
-                </>
-              )}
-            </CardContent>
-          </Card>
+          <BackupPolicyCard isLoading={isLoading} data={data} />
         </div>
 
-        <Card data-testid="card-recent-backups">
-          <CardHeader>
-            <CardTitle>Recent Backups</CardTitle>
-            <CardDescription>
-              The newest snapshots currently retained in your rolling backup window.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="space-y-3">
-                {[...Array(4)].map((_, index) => (
-                  <Skeleton key={index} className="h-12 w-full" />
-                ))}
-              </div>
-            ) : recent.length > 0 ? (
-              <ScrollArea className="w-full">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Created</TableHead>
-                      <TableHead>Reason</TableHead>
-                      <TableHead>Rows</TableHead>
-                      <TableHead>Version</TableHead>
-                      <TableHead>Key</TableHead>
-                      <TableHead className="w-[120px] text-right">Action</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recent.map((backup) => (
-                      <TableRow key={backup.key} data-testid={`row-backup-${backup.createdAt}`}>
-                        <TableCell>
-                          <div className="min-w-[180px]">
-                            <p className="font-medium">{formatDateTime(backup.createdAt)}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {formatDistanceToNow(new Date(backup.createdAt), { addSuffix: true })}
-                            </p>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{reasonLabel(backup.reason)}</Badge>
-                        </TableCell>
-                        <TableCell>{backup.totalRowCount.toLocaleString()}</TableCell>
-                        <TableCell>{backup.appVersion}</TableCell>
-                        <TableCell className="max-w-[320px]">
-                          <span className="block truncate font-mono text-xs text-muted-foreground">
-                            {backup.key}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setRestoreTarget(backup)}
-                            disabled={restoreBackupMutation.isPending || runBackupMutation.isPending}
-                            data-testid={`button-restore-backup-${backup.createdAt}`}
-                          >
-                            <RotateCcw className="mr-2 h-3.5 w-3.5" />
-                            Restore
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </ScrollArea>
-            ) : (
-              <div className="flex items-center gap-3 rounded-lg border border-dashed p-4 text-muted-foreground">
-                <AlertCircle className="h-4 w-4" />
-                <p className="text-sm">No backup history is available yet for this environment.</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <RecentBackupsCard
+          isLoading={isLoading}
+          recent={recent}
+          setRestoreTarget={setRestoreTarget}
+          isRestoreBackupPending={restoreBackupMutation.isPending}
+          isRunBackupPending={runBackupMutation.isPending}
+        />
       </div>
 
-      <AlertDialog
-        open={!!restoreTarget}
-        onOpenChange={(open) => {
-          if (!open && !restoreBackupMutation.isPending) {
-            setRestoreTarget(null);
-          }
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Restore this backup?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will replace the live database with the snapshot from{" "}
-              <strong>{restoreTarget ? formatDateTime(restoreTarget.createdAt) : "the selected backup"}</strong>.
-              Any content changes made after that point will be lost. Creating a fresh manual backup first
-              is strongly recommended.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          {restoreTarget && (
-            <div className="rounded-lg bg-muted/40 px-3 py-3 text-sm">
-              <p>
-                <span className="font-medium">Reason:</span> {reasonLabel(restoreTarget.reason)}
-              </p>
-              <p className="mt-1">
-                <span className="font-medium">Rows:</span> {restoreTarget.totalRowCount.toLocaleString()}
-              </p>
-              <p className="mt-1 break-all font-mono text-xs text-muted-foreground">{restoreTarget.key}</p>
-            </div>
-          )}
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={restoreBackupMutation.isPending}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(event) => {
-                event.preventDefault();
-                if (restoreTarget) {
-                  restoreBackupMutation.mutate(restoreTarget.key);
-                }
-              }}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={restoreBackupMutation.isPending}
-              data-testid="button-confirm-restore-backup"
-            >
-              {restoreBackupMutation.isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <RotateCcw className="mr-2 h-4 w-4" />
-              )}
-              Restore Backup
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <RestoreBackupDialog restoreTarget={restoreTarget} restoreBackupMutation={restoreBackupMutation} setRestoreTarget={setRestoreTarget} />
     </AdminSidebar>
   );
 }

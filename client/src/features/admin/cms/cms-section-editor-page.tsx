@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Save, Layers } from "lucide-react";
-import { apiRequest, queryClient as qc } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
 import type { CmsSection } from "@shared/schema";
 import { PageBuilder } from "./builder/page-builder";
 import type { BuilderContent } from "./builder/block-registry";
@@ -50,6 +50,141 @@ const sectionFormSchema = z.object({
 type SectionForm = z.infer<typeof sectionFormSchema>;
 
 const CATEGORIES = ["general", "hero", "cta", "testimonials", "faq", "features", "content", "team"];
+
+function SectionDetailsCard({ editorLock, form }: {
+  editorLock: ReturnType<typeof useEditorLock>;
+  form: ReturnType<typeof useForm<SectionForm>>;
+}) {
+  return (
+    <Card className={cn(editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
+      <CardHeader>
+        <CardTitle className="text-sm font-medium text-muted-foreground">Section Details</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g. Homepage Hero"
+                        {...field}
+                        data-testid="input-section-name"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-section-category">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {CATEGORIES.map((c) => (
+                          <SelectItem key={c} value={c} className="capitalize">
+                            {c}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Brief description of when to use this section…"
+                      rows={2}
+                      {...field}
+                      data-testid="input-section-description"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  );
+}
+
+function SectionEditorHeader({
+  unsavedChangesGuard,
+  navigate,
+  isNew,
+  form,
+  saveState,
+  onSave,
+  isSaving,
+  editorLock,
+}: {
+  unsavedChangesGuard: ReturnType<typeof useUnsavedChangesGuard>;
+  navigate: <S = any>(to: string | URL, options?: { replace?: boolean; state?: S; }) => void;
+  isNew: boolean;
+  form: ReturnType<typeof useForm<SectionForm>>;
+  saveState: ReturnType<typeof useEditorSaveState>;
+  onSave: () => void;
+  isSaving: boolean;
+  editorLock: ReturnType<typeof useEditorLock>;
+}) {
+  return (
+    <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex items-center gap-3">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="gap-1.5"
+          onClick={() =>
+            unsavedChangesGuard.confirmDiscardChanges(() => navigate("/admin/cms/sections"))
+          }
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Sections
+        </Button>
+        <div className="flex items-center gap-2">
+          <Layers className="h-5 w-5 text-violet-500" />
+          <h1 className="text-xl font-heading font-semibold" data-testid="text-section-editor-title">
+            {isNew ? "New Section" : (form.watch("name") || "Edit Section")}
+          </h1>
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <EditorSaveIndicator state={saveState.state} />
+        <Button
+          onClick={onSave}
+          disabled={isSaving || editorLock.isReadOnly}
+          data-testid="button-save-section"
+        >
+          <Save className="h-4 w-4 mr-2" />
+          {isSaving ? "Saving…" : "Save Section"}
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export default function CmsSectionEditorPage() {
   const { id } = useParams<{ id: string }>();
@@ -113,76 +248,34 @@ export default function CmsSectionEditorPage() {
     setSavedBuilderSnapshot(JSON.stringify(content));
   };
 
-  const createMutation = useMutation({
+  const saveMutation = useMutation({
     mutationFn: async (payload: SectionForm & { content: BuilderContent }) => {
-      return apiRequest("POST", "/api/admin/cms/sections", {
-        ...payload,
-        blocks: payload.content.blocks,
-      });
+      const body = { ...payload, blocks: payload.content.blocks };
+      const res = await (isNew
+        ? apiRequest("POST", "/api/admin/cms/sections", body)
+        : apiRequest("PUT", `/api/admin/cms/sections/${id}`, body));
+      return isNew ? ((await res.json()) as CmsSection) : null;
     },
-    onSuccess: async (res, variables) => {
-      const created: CmsSection = await res.json();
+    onSuccess: (created, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/sections"] });
-      toast({ title: "Section created" });
-      applySavedState(
-        {
-          name: variables.name,
-          description: variables.description,
-          category: variables.category,
-        },
-        variables.content
-      );
+      if (!isNew) queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/sections", id] });
+      toast({ title: isNew ? "Section created" : "Section saved" });
+      const { content, ...data } = variables;
+      applySavedState(data, content);
       saveState.markSaved();
-      navigate(`/admin/cms/sections/${created.id}`);
+      if (created) navigate(`/admin/cms/sections/${created.id}`);
     },
     onError: () => {
-      toast({ title: "Failed to create section", variant: "destructive" });
-      saveState.markError();
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async (payload: SectionForm & { content: BuilderContent }) => {
-      return apiRequest("PUT", `/api/admin/cms/sections/${id}`, {
-        ...payload,
-        blocks: payload.content.blocks,
-      });
-    },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/sections"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/sections", id] });
-      toast({ title: "Section saved" });
-      applySavedState(
-        {
-          name: variables.name,
-          description: variables.description,
-          category: variables.category,
-        },
-        variables.content
-      );
-      saveState.markSaved();
-    },
-    onError: () => {
-      toast({ title: "Failed to save section", variant: "destructive" });
+      toast({ title: isNew ? "Failed to create section" : "Failed to save section", variant: "destructive" });
       saveState.markError();
     },
   });
 
   const onSave = () => {
-    form.handleSubmit((data) => {
-      const payload = {
-        ...data,
-        content: builderContent,
-      };
-      if (isNew) {
-        createMutation.mutate(payload);
-      } else {
-        updateMutation.mutate(payload);
-      }
-    })();
+    form.handleSubmit((data) => saveMutation.mutate({ ...data, content: builderContent }))();
   };
 
-  const isSaving = createMutation.isPending || updateMutation.isPending;
+  const isSaving = saveMutation.isPending;
   const builderDirty =
     JSON.stringify(builderContent) !== savedBuilderSnapshot;
   const isDirty = form.formState.isDirty || builderDirty;
@@ -220,111 +313,18 @@ export default function CmsSectionEditorPage() {
           />
         ) : null}
 
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="gap-1.5"
-              onClick={() =>
-                unsavedChangesGuard.confirmDiscardChanges(() => navigate("/admin/cms/sections"))
-              }
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Sections
-            </Button>
-            <div className="flex items-center gap-2">
-              <Layers className="h-5 w-5 text-violet-500" />
-              <h1 className="text-xl font-heading font-semibold" data-testid="text-section-editor-title">
-                {isNew ? "New Section" : (form.watch("name") || "Edit Section")}
-              </h1>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <EditorSaveIndicator state={saveState.state} />
-            <Button
-              onClick={onSave}
-              disabled={isSaving || editorLock.isReadOnly}
-              data-testid="button-save-section"
-            >
-              <Save className="h-4 w-4 mr-2" />
-              {isSaving ? "Saving…" : "Save Section"}
-            </Button>
-          </div>
-        </div>
+        <SectionEditorHeader
+          unsavedChangesGuard={unsavedChangesGuard}
+          navigate={navigate}
+          isNew={isNew}
+          form={form}
+          saveState={saveState}
+          onSave={onSave}
+          isSaving={isSaving}
+          editorLock={editorLock}
+        />
 
-        <Card className={cn(editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium text-muted-foreground">Section Details</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="e.g. Homepage Hero"
-                            {...field}
-                            data-testid="input-section-name"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="category"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Category</FormLabel>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <FormControl>
-                            <SelectTrigger data-testid="select-section-category">
-                              <SelectValue />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {CATEGORIES.map((c) => (
-                              <SelectItem key={c} value={c} className="capitalize">
-                                {c}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Brief description of when to use this section…"
-                          rows={2}
-                          {...field}
-                          data-testid="input-section-description"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+        <SectionDetailsCard editorLock={editorLock} form={form} />
 
         <div className="space-y-2">
           <h2 className="text-sm font-medium text-muted-foreground">Blocks</h2>

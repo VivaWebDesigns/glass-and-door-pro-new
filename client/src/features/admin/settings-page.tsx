@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent, type ElementType } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, type UseMutationResult } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLockConflictGuard } from "@/hooks/use-lock-conflict-guard";
@@ -853,264 +853,25 @@ function BrandingImageCard({
 
 export type BrandingSubview = "branding" | "colors" | "typography";
 
-export function BrandingTab({
-  settings,
-  initialSubtab = "branding",
-  showHeader = true,
+function FontOptionCard({
+  option,
+  selectedValue,
+  onSelect,
+  sampleKind,
 }: {
-  settings: SettingsData;
-  initialSubtab?: BrandingSubview;
-  showHeader?: boolean;
+  option: BrandingFontOption;
+  selectedValue: string;
+  onSelect: (value: string) => void;
+  sampleKind: "heading" | "body";
 }) {
-  const { toast } = useToast();
-  const brandingSettings = settings.branding || {};
-  const [bodyFont, setBodyFont] = useState(
-    brandingSettings.frontend_body_font?.value || "__default__",
-  );
-  const [headingFont, setHeadingFont] = useState(
-    brandingSettings.frontend_heading_font?.value || "__default__",
-  );
-  const [companyInfo, setCompanyInfo] = useState<Record<BrandingCompanyInfoSettingKey, string>>({
-    company_name: brandingSettings.company_name?.value || "",
-    company_address: brandingSettings.company_address?.value || "",
-    company_phone_numbers: brandingSettings.company_phone_numbers?.value || "",
-    company_google_business_url: brandingSettings.company_google_business_url?.value || "",
-  });
-
-  const getBrandingColor = (key: BrandingColorSettingKey, fallbackValue?: string | null): string =>
-    resolveBrandingColor(key, brandingSettings[key]?.value || fallbackValue);
-
-  const getBrandingColorValues = (): Record<BrandingColorSettingKey, string> => ({
-    brand_primary_color: getBrandingColor("brand_primary_color"),
-    brand_secondary_color: getBrandingColor("brand_secondary_color"),
-    brand_tertiary_color: getBrandingColor("brand_tertiary_color"),
-    brand_quaternary_color: getBrandingColor("brand_quaternary_color"),
-    text_h1_color: getBrandingColor("text_h1_color"),
-    text_h2_color: getBrandingColor("text_h2_color"),
-    text_h3_h6_color: getBrandingColor("text_h3_h6_color"),
-    text_body_color: getBrandingColor("text_body_color"),
-    text_heading_subtext_color: getBrandingColor(
-      "text_heading_subtext_color",
-      brandingSettings.text_muted_color?.value,
-    ),
-    text_supporting_copy_color: getBrandingColor(
-      "text_supporting_copy_color",
-      brandingSettings.text_muted_color?.value,
-    ),
-    text_helper_text_color: getBrandingColor(
-      "text_helper_text_color",
-      brandingSettings.text_muted_color?.value,
-    ),
-    text_meta_color: getBrandingColor("text_meta_color"),
-    text_link_color: getBrandingColor("text_link_color"),
-    text_link_hover_color: getBrandingColor("text_link_hover_color"),
-    text_inverse_color: getBrandingColor("text_inverse_color"),
-    text_primary_foreground_color: getBrandingColor("text_primary_foreground_color"),
-    text_secondary_foreground_color: getBrandingColor("text_secondary_foreground_color"),
-    text_tertiary_foreground_color: getBrandingColor("text_tertiary_foreground_color"),
-  });
-
-  const [colorValues, setColorValues] = useState<Record<BrandingColorSettingKey, string>>({
-    ...getBrandingColorValues(),
-  });
-
-  const brandingSignature = JSON.stringify([
-    brandingSettings.frontend_body_font?.value,
-    brandingSettings.frontend_heading_font?.value,
-    brandingSettings.company_name?.value,
-    brandingSettings.company_address?.value,
-    brandingSettings.company_phone_numbers?.value,
-    brandingSettings.company_google_business_url?.value,
-    brandingSettings.brand_primary_color?.value,
-    brandingSettings.brand_secondary_color?.value,
-    brandingSettings.brand_tertiary_color?.value,
-    brandingSettings.brand_quaternary_color?.value,
-    brandingSettings.text_h1_color?.value,
-    brandingSettings.text_h2_color?.value,
-    brandingSettings.text_h3_h6_color?.value,
-    brandingSettings.text_body_color?.value,
-    brandingSettings.text_heading_subtext_color?.value,
-    brandingSettings.text_supporting_copy_color?.value,
-    brandingSettings.text_helper_text_color?.value,
-    brandingSettings.text_muted_color?.value,
-    brandingSettings.text_meta_color?.value,
-    brandingSettings.text_link_color?.value,
-    brandingSettings.text_link_hover_color?.value,
-    brandingSettings.text_inverse_color?.value,
-    brandingSettings.text_primary_foreground_color?.value,
-    brandingSettings.text_secondary_foreground_color?.value,
-    brandingSettings.text_tertiary_foreground_color?.value
-  ]);
-  const [syncedBrandingSignature, setSyncedBrandingSignature] = useState(brandingSignature);
-  if (brandingSignature !== syncedBrandingSignature) {
-    setSyncedBrandingSignature(brandingSignature);
-    setBodyFont(brandingSettings.frontend_body_font?.value || "__default__");
-    setHeadingFont(brandingSettings.frontend_heading_font?.value || "__default__");
-    setCompanyInfo({
-      company_name: brandingSettings.company_name?.value || "",
-      company_address: brandingSettings.company_address?.value || "",
-      company_phone_numbers: brandingSettings.company_phone_numbers?.value || "",
-      company_google_business_url: brandingSettings.company_google_business_url?.value || "",
-    });
-    setColorValues(getBrandingColorValues());
-  }
-
-  const saveFontsMutation = useMutation({
-    mutationFn: async () => {
-      const requests = [
-        apiRequest("PUT", "/api/admin/settings", {
-          key: "frontend_body_font",
-          value: bodyFont === "__default__" ? "" : bodyFont,
-          category: "branding",
-          isSecret: false,
-        }),
-        apiRequest("PUT", "/api/admin/settings", {
-          key: "frontend_heading_font",
-          value: headingFont === "__default__" ? "" : headingFont,
-          category: "branding",
-          isSecret: false,
-        }),
-      ];
-
-      await Promise.all(requests);
-    },
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["/api/admin/settings"] }),
-        queryClient.invalidateQueries({ queryKey: ["/api/branding"] }),
-      ]);
-      toast({ title: "Branding fonts updated" });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Could not save branding fonts",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const hasFontChanges =
-    bodyFont !== (brandingSettings.frontend_body_font?.value || "__default__") ||
-    headingFont !== (brandingSettings.frontend_heading_font?.value || "__default__");
-
-  const saveCompanyInfoMutation = useMutation({
-    mutationFn: async () => {
-      const companyFields: BrandingCompanyInfoSettingKey[] = [
-        "company_name",
-        "company_address",
-        "company_phone_numbers",
-        "company_google_business_url",
-      ];
-
-      await Promise.all(
-        companyFields.map((key) =>
-          apiRequest("PUT", "/api/admin/settings", {
-            key,
-            value: companyInfo[key].trim(),
-            category: "branding",
-            isSecret: false,
-          }),
-        ),
-      );
-    },
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["/api/admin/settings"] }),
-        queryClient.invalidateQueries({ queryKey: ["/api/branding"] }),
-      ]);
-      toast({ title: "Company information updated" });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Could not save company information",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const hasCompanyInfoChanges = (
-    [
-      "company_name",
-      "company_address",
-      "company_phone_numbers",
-      "company_google_business_url",
-    ] as BrandingCompanyInfoSettingKey[]
-  ).some((key) => companyInfo[key] !== (brandingSettings[key]?.value || ""));
-
-  const saveColorsMutation = useMutation({
-    mutationFn: async () => {
-      await Promise.all(
-        BRANDING_COLOR_FIELDS.map((field) =>
-          apiRequest("PUT", "/api/admin/settings", {
-            key: field.key,
-            value: normalizeHexColor(colorValues[field.key]) || "",
-            category: "branding",
-            isSecret: false,
-          }),
-        ),
-      );
-    },
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["/api/admin/settings"] }),
-        queryClient.invalidateQueries({ queryKey: ["/api/branding"] }),
-      ]);
-      toast({ title: "Brand color palette updated" });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Could not save brand colors",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const hasColorChanges = BRANDING_COLOR_FIELDS.some(
-    (field) => colorValues[field.key] !== getBrandingColor(field.key),
-  );
-
-  const previewBodyStyle = {
-    fontFamily:
-      fontFamilyForBrandingOption(bodyFont === "__default__" ? null : bodyFont) ?? undefined,
-  };
-  const previewHeadingStyle = {
-    fontFamily:
-      fontFamilyForBrandingOption(headingFont === "__default__" ? null : headingFont) ?? undefined,
-  };
-
-  const previewPaletteStyle = {
-    backgroundColor: colorValues.brand_primary_color || undefined,
-    color: colorValues.text_primary_foreground_color || undefined,
-  };
-  const previewLinkStyle = {
-    color: colorValues.text_link_color || undefined,
-  };
-  const previewLinkHoverStyle = {
-    color: colorValues.text_link_hover_color || colorValues.text_link_color || undefined,
-  };
-
-  const updateColorValue = (key: BrandingColorSettingKey, value: string) => {
-    setColorValues((current) => ({ ...current, [key]: value }));
-  };
-
-  const renderFontOptionCard = (
-    option: BrandingFontOption,
-    selectedValue: string,
-    onSelect: (value: string) => void,
-    sampleKind: "heading" | "body",
-  ) => (
+  const isSelected = selectedValue === option.value;
+  return (
     <button
-      key={option.value}
       type="button"
       onClick={() => onSelect(option.value)}
       className={cn(
         "w-full rounded-xl border p-4 text-left transition-all hover:border-primary/50 hover:bg-primary/5",
-        selectedValue === option.value
-          ? "border-primary bg-primary/5 ring-1 ring-primary/20"
-          : "border-border/70 bg-background",
+        isSelected ? "border-primary bg-primary/5 ring-1 ring-primary/20" : "border-border/70 bg-background",
       )}
       data-testid={`button-branding-font-${sampleKind}-${option.value}`}
     >
@@ -1123,7 +884,7 @@ export function BrandingTab({
             {option.category === "sans" ? "Sans Serif" : "Serif"}
           </p>
         </div>
-        {selectedValue === option.value && (
+        {isSelected && (
           <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary">
             <Check className="h-3.5 w-3.5" />
           </span>
@@ -1143,6 +904,695 @@ export function BrandingTab({
       <p className="mt-2 text-xs text-muted-foreground">{option.preview}</p>
     </button>
   );
+}
+
+const COMPANY_INFO_KEYS: BrandingCompanyInfoSettingKey[] = [
+  "company_name",
+  "company_address",
+  "company_phone_numbers",
+  "company_google_business_url",
+];
+
+const MUTED_COLOR_FALLBACK_KEYS = new Set<BrandingColorSettingKey>([
+  "text_heading_subtext_color",
+  "text_supporting_copy_color",
+  "text_helper_text_color",
+]);
+
+type BrandingSettingsMap = SettingsData[string];
+
+function readBrandingFont(settings: BrandingSettingsMap, key: "frontend_body_font" | "frontend_heading_font") {
+  return settings[key]?.value || "__default__";
+}
+
+function readCompanyInfo(settings: BrandingSettingsMap): Record<BrandingCompanyInfoSettingKey, string> {
+  return Object.fromEntries(
+    COMPANY_INFO_KEYS.map((key) => [key, settings[key]?.value || ""]),
+  ) as Record<BrandingCompanyInfoSettingKey, string>;
+}
+
+function readBrandingColorValues(settings: BrandingSettingsMap): Record<BrandingColorSettingKey, string> {
+  return Object.fromEntries(
+    BRANDING_COLOR_FIELDS.map((field) => {
+      const fallback = MUTED_COLOR_FALLBACK_KEYS.has(field.key) ? settings.text_muted_color?.value : undefined;
+      return [field.key, resolveBrandingColor(field.key, settings[field.key]?.value || fallback)];
+    }),
+  ) as Record<BrandingColorSettingKey, string>;
+}
+
+function getBrandingSignature(settings: BrandingSettingsMap) {
+  const keys = [
+    "frontend_body_font",
+    "frontend_heading_font",
+    ...COMPANY_INFO_KEYS,
+    ...BRANDING_COLOR_FIELDS.map((field) => field.key),
+    "text_muted_color",
+  ];
+  return JSON.stringify(keys.map((key) => settings[key]?.value));
+}
+
+function familyStyle(fontValue: string) {
+  return { fontFamily: fontFamilyForBrandingOption(fontValue === "__default__" ? null : fontValue) ?? undefined };
+}
+
+function getBrandingPreviewStyles(
+  colorValues: Record<BrandingColorSettingKey, string>,
+  bodyFont: string,
+  headingFont: string,
+) {
+  return {
+    previewBodyStyle: familyStyle(bodyFont),
+    previewHeadingStyle: familyStyle(headingFont),
+    previewPaletteStyle: {
+      backgroundColor: colorValues.brand_primary_color || undefined,
+      color: colorValues.text_primary_foreground_color || undefined,
+    },
+    previewLinkStyle: { color: colorValues.text_link_color || undefined },
+    previewLinkHoverStyle: {
+      color: colorValues.text_link_hover_color || colorValues.text_link_color || undefined,
+    },
+  };
+}
+
+async function saveBrandingSettings(entries: Array<[string, string]>) {
+  await Promise.all(
+    entries.map(([key, value]) =>
+      apiRequest("PUT", "/api/admin/settings", { key, value, category: "branding", isSecret: false }),
+    ),
+  );
+}
+
+function useBrandingSettingsMutation({
+  save,
+  successTitle,
+  errorTitle,
+}: {
+  save: () => Promise<void>;
+  successTitle: string;
+  errorTitle: string;
+}) {
+  const { toast } = useToast();
+  return useMutation({
+    mutationFn: save,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/settings"] }),
+        queryClient.invalidateQueries({ queryKey: ["/api/branding"] }),
+      ]);
+      toast({ title: successTitle });
+    },
+    onError: (error: Error) => {
+      toast({ title: errorTitle, description: error.message, variant: "destructive" });
+    },
+  });
+}
+
+function BrandingTypographyCard({
+  headingFont,
+  setHeadingFont,
+  bodyFont,
+  setBodyFont,
+  previewHeadingStyle,
+  previewBodyStyle,
+  saveFontsMutation,
+  hasFontChanges,
+}: {
+  headingFont: string;
+  setHeadingFont: React.Dispatch<React.SetStateAction<string>>;
+  bodyFont: string;
+  setBodyFont: React.Dispatch<React.SetStateAction<string>>;
+  previewHeadingStyle: { fontFamily: string | undefined; };
+  previewBodyStyle: { fontFamily: string | undefined; };
+  saveFontsMutation: UseMutationResult<void, Error, void, unknown>;
+  hasFontChanges: boolean;
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Type className="h-4 w-4 text-primary" />
+          Frontend Typography
+        </CardTitle>
+        <CardDescription>
+          Choose one font for headings and another for body copy on the public-facing website.
+          Each option includes an inline sample so editors can compare type directly in the
+          admin.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label>Heading Font</Label>
+            <Select value={headingFont} onValueChange={setHeadingFont}>
+              <SelectTrigger data-testid="select-branding-heading-font">
+                <SelectValue placeholder="Use current theme font" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__default__">Use current theme font</SelectItem>
+                {BRANDING_FONT_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Choose from curated sans serif and serif Google fonts.
+            </p>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Body Font</Label>
+            <Select value={bodyFont} onValueChange={setBodyFont}>
+              <SelectTrigger data-testid="select-branding-body-font">
+                <SelectValue placeholder="Use current theme font" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__default__">Use current theme font</SelectItem>
+                {BRANDING_FONT_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Choose from the same balanced font library for paragraph copy.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid gap-6 xl:grid-cols-2">
+          <Card className="border-dashed">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">Heading Font Picker</CardTitle>
+              <CardDescription>
+                Preview how each font feels in large editorial headings.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Sans Serif Options
+                  </p>
+                </div>
+                <div className="grid gap-3">
+                  {BRANDING_SANS_FONT_OPTIONS.map((option) =>
+                    <FontOptionCard key={option.value} option={option} selectedValue={headingFont} onSelect={setHeadingFont} sampleKind="heading" />,
+                  )}
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Serif Options
+                  </p>
+                </div>
+                <div className="grid gap-3">
+                  {BRANDING_SERIF_FONT_OPTIONS.map((option) =>
+                    <FontOptionCard key={option.value} option={option} selectedValue={headingFont} onSelect={setHeadingFont} sampleKind="heading" />,
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-dashed">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">Body Font Picker</CardTitle>
+              <CardDescription>
+                Preview how each font reads in paragraph-sized content.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Sans Serif Options
+                  </p>
+                </div>
+                <div className="grid gap-3">
+                  {BRANDING_SANS_FONT_OPTIONS.map((option) =>
+                    <FontOptionCard key={option.value} option={option} selectedValue={bodyFont} onSelect={setBodyFont} sampleKind="body" />,
+                  )}
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Serif Options
+                  </p>
+                </div>
+                <div className="grid gap-3">
+                  {BRANDING_SERIF_FONT_OPTIONS.map((option) =>
+                    <FontOptionCard key={option.value} option={option} selectedValue={bodyFont} onSelect={setBodyFont} sampleKind="body" />,
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="rounded-xl border bg-muted/10 p-5">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Preview
+          </p>
+          <h4 className="mt-3 text-2xl font-semibold" style={previewHeadingStyle}>
+            Glass & Door Pro helps Charlotte-area homes and businesses look their best.
+          </h4>
+          <p className="mt-3 text-sm text-muted-foreground" style={previewBodyStyle}>
+            Use this preview to compare heading and body combinations before saving. These
+            font selections only apply to the public-facing website, not the admin dashboard.
+          </p>
+        </div>
+
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            onClick={() => saveFontsMutation.mutate()}
+            disabled={!hasFontChanges || saveFontsMutation.isPending}
+            data-testid="button-save-branding-fonts"
+          >
+            {saveFontsMutation.isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="mr-2 h-4 w-4" />
+            )}
+            Save Typography
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function BrandingColorPreview({
+  previewPaletteStyle,
+  colorValues,
+  previewHeadingStyle,
+  previewBodyStyle,
+  previewLinkStyle,
+  previewLinkHoverStyle,
+}: {
+  previewPaletteStyle: { backgroundColor: string | undefined; color: string | undefined; };
+  colorValues: Record<BrandingColorSettingKey, string>;
+  previewHeadingStyle: { fontFamily: string | undefined; };
+  previewBodyStyle: { fontFamily: string | undefined; };
+  previewLinkStyle: { color: string | undefined; };
+  previewLinkHoverStyle: { color: string | undefined; };
+}) {
+  return (
+    <div className="rounded-xl border bg-muted/10 p-5">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        Palette Preview
+      </p>
+      <div className="mt-4 flex flex-wrap gap-3">
+        <div
+          className="rounded-lg px-4 py-2 text-sm font-medium"
+          style={previewPaletteStyle}
+        >
+          Primary Action
+        </div>
+        <div
+          className="rounded-lg px-4 py-2 text-sm font-medium"
+          style={{
+            backgroundColor: colorValues.brand_secondary_color || undefined,
+            color: colorValues.text_secondary_foreground_color || undefined,
+          }}
+        >
+          Secondary Action
+        </div>
+        <div
+          className="rounded-lg px-4 py-2 text-sm font-medium"
+          style={{
+            backgroundColor: colorValues.brand_tertiary_color || undefined,
+            color: colorValues.text_tertiary_foreground_color || undefined,
+          }}
+        >
+          Tertiary Action
+        </div>
+        <div
+          className="rounded-lg px-4 py-2 text-sm font-medium"
+          style={{
+            backgroundColor: colorValues.brand_quaternary_color || "#A8623A",
+            color:
+              colorValues.text_inverse_color ||
+              colorValues.text_primary_foreground_color ||
+              undefined,
+          }}
+        >
+          Quaternary Action
+        </div>
+      </div>
+      <div className="mt-5 rounded-xl border bg-background p-5 space-y-3">
+        <p
+          className="text-3xl font-semibold"
+          style={{
+            ...previewHeadingStyle,
+            color: colorValues.text_h1_color || colorValues.text_body_color || undefined,
+          }}
+        >
+          H1 headline preview
+        </p>
+        <p
+          className="text-2xl font-semibold"
+          style={{
+            ...previewHeadingStyle,
+            color:
+              colorValues.text_h2_color ||
+              colorValues.text_h1_color ||
+              colorValues.text_body_color ||
+              undefined,
+          }}
+        >
+          H2 section heading preview
+        </p>
+        <p
+          className="text-lg font-semibold"
+          style={{
+            ...previewHeadingStyle,
+            color:
+              colorValues.text_h3_h6_color ||
+              colorValues.text_h2_color ||
+              colorValues.text_body_color ||
+              undefined,
+          }}
+        >
+          H3-H6 card and supporting heading preview
+        </p>
+        <p
+          className="text-sm"
+          style={{
+            ...previewBodyStyle,
+            color: colorValues.text_heading_subtext_color || undefined,
+          }}
+        >
+          Heading sub-text preview directly beneath a hero or section heading.
+        </p>
+        <p
+          className="text-sm"
+          style={{
+            ...previewBodyStyle,
+            color: colorValues.text_supporting_copy_color || undefined,
+          }}
+        >
+          Supporting copy preview for section introductions, lead-ins, and editorial
+          setup.
+        </p>
+        <p
+          className="text-sm"
+          style={{
+            ...previewBodyStyle,
+            color: colorValues.text_helper_text_color || undefined,
+          }}
+        >
+          Helper messaging preview for empty states, guidance text, and interface hints.
+        </p>
+        <p
+          className="text-sm"
+          style={{ ...previewBodyStyle, color: colorValues.text_body_color || undefined }}
+        >
+          Paragraph text preview for reading content, blog excerpts, and general body copy
+          throughout the site.
+        </p>
+        <p
+          className="text-xs uppercase tracking-wide"
+          style={{
+            color:
+              colorValues.text_meta_color ||
+              colorValues.text_helper_text_color ||
+              undefined,
+          }}
+        >
+          Meta text preview for dates, authors, categories, and labels
+        </p>
+        <div className="flex flex-wrap items-center gap-4 text-sm">
+          <a
+            id="branding-preview-link"
+            href="#branding-preview-link"
+            className="underline underline-offset-4"
+            style={previewLinkStyle}
+          >
+            Link color preview
+          </a>
+          <span className="underline underline-offset-4" style={previewLinkHoverStyle}>
+            Link hover preview
+          </span>
+        </div>
+        <div
+          className="rounded-lg px-4 py-3 text-sm font-medium"
+          style={{
+            backgroundColor: colorValues.brand_primary_color || "#1F2A44",
+            color:
+              colorValues.text_inverse_color ||
+              colorValues.text_primary_foreground_color ||
+              undefined,
+          }}
+        >
+          Inverse text preview on dark or branded surfaces
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BrandingColorGroups({ colorValues, updateColorValue }: {
+  colorValues: Record<BrandingColorSettingKey, string>;
+  updateColorValue: (key: BrandingColorSettingKey, value: string) => void;
+}) {
+  return (
+    <>
+      {[
+        {
+          title: "Core Colors",
+          description:
+            "These power the main brand accents, buttons, and highlighted interface states on the public site.",
+          fields: BRANDING_CORE_COLOR_FIELDS,
+        },
+        {
+          title: "Typography Colors",
+          description:
+            "Use these to separate major headings, paragraph copy, section subtext, metadata, and editorial links.",
+          fields: BRANDING_TYPOGRAPHY_COLOR_FIELDS,
+        },
+        {
+          title: "Text on Color Surfaces",
+          description:
+            "These colors are used when text appears on branded buttons, badges, and other colored UI surfaces.",
+          fields: BRANDING_UI_TEXT_COLOR_FIELDS,
+        },
+      ].map((group) => (
+        <div key={group.title} className="space-y-4">
+          <div>
+            <h4 className="text-sm font-semibold">{group.title}</h4>
+            <p className="mt-1 text-xs text-muted-foreground">{group.description}</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {group.fields.map((field) => (
+              <div key={field.key} className="space-y-1.5 rounded-xl border p-4">
+                <div>
+                  <Label>{field.label}</Label>
+                  <p className="mt-1 text-xs text-muted-foreground">{field.description}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="color"
+                    value={normalizeHexColor(colorValues[field.key]) || "#000000"}
+                    onChange={(event) =>
+                      updateColorValue(field.key, event.target.value.toUpperCase())
+                    }
+                    aria-label={`${field.label} color`}
+                    className="h-10 w-12 cursor-pointer rounded-md border bg-background p-1"
+                    data-testid={`input-color-${field.key}`}
+                  />
+                  <Input
+                    value={colorValues[field.key]}
+                    onChange={(event) => updateColorValue(field.key, event.target.value)}
+                    placeholder="#000000"
+                    data-testid={`input-hex-${field.key}`}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
+function BrandingCompanyInfoCard({
+  companyInfo,
+  setCompanyInfo,
+  saveCompanyInfoMutation,
+  hasCompanyInfoChanges,
+}: {
+  companyInfo: Record<BrandingCompanyInfoSettingKey, string>;
+  setCompanyInfo: React.Dispatch<React.SetStateAction<Record<BrandingCompanyInfoSettingKey, string>>>;
+  saveCompanyInfoMutation: UseMutationResult<void, Error, void, unknown>;
+  hasCompanyInfoChanges: boolean;
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <MapPin className="h-4 w-4 text-primary" />
+          Company Information
+        </CardTitle>
+        <CardDescription>
+          These details automatically populate the Location card on the Contact page and the
+          live Contact Form block.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="company-name">Business Name</Label>
+          <Input
+            id="company-name"
+            value={companyInfo.company_name}
+            onChange={(event) =>
+              setCompanyInfo((current) => ({ ...current, company_name: event.target.value }))
+            }
+            placeholder="Glass & Door Pro"
+            data-testid="input-company-name"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="company-google-business-url">Google Business Listing URL</Label>
+          <Input
+            id="company-google-business-url"
+            value={companyInfo.company_google_business_url}
+            onChange={(event) =>
+              setCompanyInfo((current) => ({
+                ...current,
+                company_google_business_url: event.target.value,
+              }))
+            }
+            placeholder="https://maps.google.com/..."
+            autoPrependHttps
+            data-testid="input-company-google-business-url"
+          />
+        </div>
+        <div className="space-y-2 md:col-span-2">
+          <Label htmlFor="company-address">Address</Label>
+          <Textarea
+            id="company-address"
+            value={companyInfo.company_address}
+            onChange={(event) =>
+              setCompanyInfo((current) => ({
+                ...current,
+                company_address: event.target.value,
+              }))
+            }
+            placeholder={"123 Example Street\nSuite 100\nAtlanta, GA 30303"}
+            rows={4}
+            data-testid="textarea-company-address"
+          />
+        </div>
+        <div className="space-y-2 md:col-span-2">
+          <Label htmlFor="company-phone-numbers">Phone Number(s)</Label>
+          <Textarea
+            id="company-phone-numbers"
+            value={companyInfo.company_phone_numbers}
+            onChange={(event) =>
+              setCompanyInfo((current) => ({
+                ...current,
+                company_phone_numbers: event.target.value,
+              }))
+            }
+            placeholder={"(555) 123-4567\n(555) 765-4321"}
+            rows={3}
+            data-testid="textarea-company-phone-numbers"
+          />
+          <p className="text-xs text-muted-foreground">
+            Add one phone number per line to display multiple phone numbers.
+          </p>
+        </div>
+        <div className="md:col-span-2 flex gap-2">
+          <Button
+            type="button"
+            onClick={() => saveCompanyInfoMutation.mutate()}
+            disabled={!hasCompanyInfoChanges || saveCompanyInfoMutation.isPending}
+            data-testid="button-save-company-information"
+          >
+            {saveCompanyInfoMutation.isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="mr-2 h-4 w-4" />
+            )}
+            Save Company Information
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+export function BrandingTab({
+  settings,
+  initialSubtab = "branding",
+  showHeader = true,
+}: {
+  settings: SettingsData;
+  initialSubtab?: BrandingSubview;
+  showHeader?: boolean;
+}) {
+  const brandingSettings = settings.branding || {};
+  const [bodyFont, setBodyFont] = useState(() => readBrandingFont(brandingSettings, "frontend_body_font"));
+  const [headingFont, setHeadingFont] = useState(() => readBrandingFont(brandingSettings, "frontend_heading_font"));
+  const [companyInfo, setCompanyInfo] = useState(() => readCompanyInfo(brandingSettings));
+  const [colorValues, setColorValues] = useState(() => readBrandingColorValues(brandingSettings));
+
+  const brandingSignature = getBrandingSignature(brandingSettings);
+  const [syncedBrandingSignature, setSyncedBrandingSignature] = useState(brandingSignature);
+  if (brandingSignature !== syncedBrandingSignature) {
+    setSyncedBrandingSignature(brandingSignature);
+    setBodyFont(readBrandingFont(brandingSettings, "frontend_body_font"));
+    setHeadingFont(readBrandingFont(brandingSettings, "frontend_heading_font"));
+    setCompanyInfo(readCompanyInfo(brandingSettings));
+    setColorValues(readBrandingColorValues(brandingSettings));
+  }
+
+  const saveFontsMutation = useBrandingSettingsMutation({
+    successTitle: "Branding fonts updated",
+    errorTitle: "Could not save branding fonts",
+    save: () =>
+      saveBrandingSettings([
+        ["frontend_body_font", bodyFont === "__default__" ? "" : bodyFont],
+        ["frontend_heading_font", headingFont === "__default__" ? "" : headingFont],
+      ]),
+  });
+  const saveCompanyInfoMutation = useBrandingSettingsMutation({
+    successTitle: "Company information updated",
+    errorTitle: "Could not save company information",
+    save: () => saveBrandingSettings(COMPANY_INFO_KEYS.map((key) => [key, companyInfo[key].trim()])),
+  });
+  const saveColorsMutation = useBrandingSettingsMutation({
+    successTitle: "Brand color palette updated",
+    errorTitle: "Could not save brand colors",
+    save: () =>
+      saveBrandingSettings(
+        BRANDING_COLOR_FIELDS.map((field) => [field.key, normalizeHexColor(colorValues[field.key]) || ""]),
+      ),
+  });
+
+  const hasFontChanges =
+    bodyFont !== readBrandingFont(brandingSettings, "frontend_body_font") ||
+    headingFont !== readBrandingFont(brandingSettings, "frontend_heading_font");
+  const hasCompanyInfoChanges = COMPANY_INFO_KEYS.some(
+    (key) => companyInfo[key] !== (brandingSettings[key]?.value || ""),
+  );
+  const savedColorValues = readBrandingColorValues(brandingSettings);
+  const hasColorChanges = BRANDING_COLOR_FIELDS.some(
+    (field) => colorValues[field.key] !== savedColorValues[field.key],
+  );
+  const { previewBodyStyle, previewHeadingStyle, previewPaletteStyle, previewLinkStyle, previewLinkHoverStyle } =
+    getBrandingPreviewStyles(colorValues, bodyFont, headingFont);
+
+  const updateColorValue = (key: BrandingColorSettingKey, value: string) => {
+    setColorValues((current) => ({ ...current, [key]: value }));
+  };
 
   return (
     <div className="space-y-6">
@@ -1187,98 +1637,12 @@ export function BrandingTab({
             />
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <MapPin className="h-4 w-4 text-primary" />
-                Company Information
-              </CardTitle>
-              <CardDescription>
-                These details automatically populate the Location card on the Contact page and the
-                live Contact Form block.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="company-name">Business Name</Label>
-                <Input
-                  id="company-name"
-                  value={companyInfo.company_name}
-                  onChange={(event) =>
-                    setCompanyInfo((current) => ({ ...current, company_name: event.target.value }))
-                  }
-                  placeholder="Glass & Door Pro"
-                  data-testid="input-company-name"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="company-google-business-url">Google Business Listing URL</Label>
-                <Input
-                  id="company-google-business-url"
-                  value={companyInfo.company_google_business_url}
-                  onChange={(event) =>
-                    setCompanyInfo((current) => ({
-                      ...current,
-                      company_google_business_url: event.target.value,
-                    }))
-                  }
-                  placeholder="https://maps.google.com/..."
-                  autoPrependHttps
-                  data-testid="input-company-google-business-url"
-                />
-              </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="company-address">Address</Label>
-                <Textarea
-                  id="company-address"
-                  value={companyInfo.company_address}
-                  onChange={(event) =>
-                    setCompanyInfo((current) => ({
-                      ...current,
-                      company_address: event.target.value,
-                    }))
-                  }
-                  placeholder={"123 Example Street\nSuite 100\nAtlanta, GA 30303"}
-                  rows={4}
-                  data-testid="textarea-company-address"
-                />
-              </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="company-phone-numbers">Phone Number(s)</Label>
-                <Textarea
-                  id="company-phone-numbers"
-                  value={companyInfo.company_phone_numbers}
-                  onChange={(event) =>
-                    setCompanyInfo((current) => ({
-                      ...current,
-                      company_phone_numbers: event.target.value,
-                    }))
-                  }
-                  placeholder={"(555) 123-4567\n(555) 765-4321"}
-                  rows={3}
-                  data-testid="textarea-company-phone-numbers"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Add one phone number per line to display multiple phone numbers.
-                </p>
-              </div>
-              <div className="md:col-span-2 flex gap-2">
-                <Button
-                  type="button"
-                  onClick={() => saveCompanyInfoMutation.mutate()}
-                  disabled={!hasCompanyInfoChanges || saveCompanyInfoMutation.isPending}
-                  data-testid="button-save-company-information"
-                >
-                  {saveCompanyInfoMutation.isPending ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Save className="mr-2 h-4 w-4" />
-                  )}
-                  Save Company Information
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <BrandingCompanyInfoCard
+            companyInfo={companyInfo}
+            setCompanyInfo={setCompanyInfo}
+            saveCompanyInfoMutation={saveCompanyInfoMutation}
+            hasCompanyInfoChanges={hasCompanyInfoChanges}
+          />
         </TabsContent>
 
         <TabsContent value="colors" className="space-y-6">
@@ -1295,213 +1659,16 @@ export function BrandingTab({
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
-              {[
-                {
-                  title: "Core Colors",
-                  description:
-                    "These power the main brand accents, buttons, and highlighted interface states on the public site.",
-                  fields: BRANDING_CORE_COLOR_FIELDS,
-                },
-                {
-                  title: "Typography Colors",
-                  description:
-                    "Use these to separate major headings, paragraph copy, section subtext, metadata, and editorial links.",
-                  fields: BRANDING_TYPOGRAPHY_COLOR_FIELDS,
-                },
-                {
-                  title: "Text on Color Surfaces",
-                  description:
-                    "These colors are used when text appears on branded buttons, badges, and other colored UI surfaces.",
-                  fields: BRANDING_UI_TEXT_COLOR_FIELDS,
-                },
-              ].map((group) => (
-                <div key={group.title} className="space-y-4">
-                  <div>
-                    <h4 className="text-sm font-semibold">{group.title}</h4>
-                    <p className="mt-1 text-xs text-muted-foreground">{group.description}</p>
-                  </div>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {group.fields.map((field) => (
-                      <div key={field.key} className="space-y-1.5 rounded-xl border p-4">
-                        <div>
-                          <Label>{field.label}</Label>
-                          <p className="mt-1 text-xs text-muted-foreground">{field.description}</p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="color"
-                            value={normalizeHexColor(colorValues[field.key]) || "#000000"}
-                            onChange={(event) =>
-                              updateColorValue(field.key, event.target.value.toUpperCase())
-                            }
-                            aria-label={`${field.label} color`}
-                            className="h-10 w-12 cursor-pointer rounded-md border bg-background p-1"
-                            data-testid={`input-color-${field.key}`}
-                          />
-                          <Input
-                            value={colorValues[field.key]}
-                            onChange={(event) => updateColorValue(field.key, event.target.value)}
-                            placeholder="#000000"
-                            data-testid={`input-hex-${field.key}`}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+              <BrandingColorGroups colorValues={colorValues} updateColorValue={updateColorValue} />
 
-              <div className="rounded-xl border bg-muted/10 p-5">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Palette Preview
-                </p>
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <div
-                    className="rounded-lg px-4 py-2 text-sm font-medium"
-                    style={previewPaletteStyle}
-                  >
-                    Primary Action
-                  </div>
-                  <div
-                    className="rounded-lg px-4 py-2 text-sm font-medium"
-                    style={{
-                      backgroundColor: colorValues.brand_secondary_color || undefined,
-                      color: colorValues.text_secondary_foreground_color || undefined,
-                    }}
-                  >
-                    Secondary Action
-                  </div>
-                  <div
-                    className="rounded-lg px-4 py-2 text-sm font-medium"
-                    style={{
-                      backgroundColor: colorValues.brand_tertiary_color || undefined,
-                      color: colorValues.text_tertiary_foreground_color || undefined,
-                    }}
-                  >
-                    Tertiary Action
-                  </div>
-                  <div
-                    className="rounded-lg px-4 py-2 text-sm font-medium"
-                    style={{
-                      backgroundColor: colorValues.brand_quaternary_color || "#A8623A",
-                      color:
-                        colorValues.text_inverse_color ||
-                        colorValues.text_primary_foreground_color ||
-                        undefined,
-                    }}
-                  >
-                    Quaternary Action
-                  </div>
-                </div>
-                <div className="mt-5 rounded-xl border bg-background p-5 space-y-3">
-                  <p
-                    className="text-3xl font-semibold"
-                    style={{
-                      ...previewHeadingStyle,
-                      color: colorValues.text_h1_color || colorValues.text_body_color || undefined,
-                    }}
-                  >
-                    H1 headline preview
-                  </p>
-                  <p
-                    className="text-2xl font-semibold"
-                    style={{
-                      ...previewHeadingStyle,
-                      color:
-                        colorValues.text_h2_color ||
-                        colorValues.text_h1_color ||
-                        colorValues.text_body_color ||
-                        undefined,
-                    }}
-                  >
-                    H2 section heading preview
-                  </p>
-                  <p
-                    className="text-lg font-semibold"
-                    style={{
-                      ...previewHeadingStyle,
-                      color:
-                        colorValues.text_h3_h6_color ||
-                        colorValues.text_h2_color ||
-                        colorValues.text_body_color ||
-                        undefined,
-                    }}
-                  >
-                    H3-H6 card and supporting heading preview
-                  </p>
-                  <p
-                    className="text-sm"
-                    style={{
-                      ...previewBodyStyle,
-                      color: colorValues.text_heading_subtext_color || undefined,
-                    }}
-                  >
-                    Heading sub-text preview directly beneath a hero or section heading.
-                  </p>
-                  <p
-                    className="text-sm"
-                    style={{
-                      ...previewBodyStyle,
-                      color: colorValues.text_supporting_copy_color || undefined,
-                    }}
-                  >
-                    Supporting copy preview for section introductions, lead-ins, and editorial
-                    setup.
-                  </p>
-                  <p
-                    className="text-sm"
-                    style={{
-                      ...previewBodyStyle,
-                      color: colorValues.text_helper_text_color || undefined,
-                    }}
-                  >
-                    Helper messaging preview for empty states, guidance text, and interface hints.
-                  </p>
-                  <p
-                    className="text-sm"
-                    style={{ ...previewBodyStyle, color: colorValues.text_body_color || undefined }}
-                  >
-                    Paragraph text preview for reading content, blog excerpts, and general body copy
-                    throughout the site.
-                  </p>
-                  <p
-                    className="text-xs uppercase tracking-wide"
-                    style={{
-                      color:
-                        colorValues.text_meta_color ||
-                        colorValues.text_helper_text_color ||
-                        undefined,
-                    }}
-                  >
-                    Meta text preview for dates, authors, categories, and labels
-                  </p>
-                  <div className="flex flex-wrap items-center gap-4 text-sm">
-                    <a
-                      id="branding-preview-link"
-                      href="#branding-preview-link"
-                      className="underline underline-offset-4"
-                      style={previewLinkStyle}
-                    >
-                      Link color preview
-                    </a>
-                    <span className="underline underline-offset-4" style={previewLinkHoverStyle}>
-                      Link hover preview
-                    </span>
-                  </div>
-                  <div
-                    className="rounded-lg px-4 py-3 text-sm font-medium"
-                    style={{
-                      backgroundColor: colorValues.brand_primary_color || "#1F2A44",
-                      color:
-                        colorValues.text_inverse_color ||
-                        colorValues.text_primary_foreground_color ||
-                        undefined,
-                    }}
-                  >
-                    Inverse text preview on dark or branded surfaces
-                  </div>
-                </div>
-              </div>
+              <BrandingColorPreview
+                previewPaletteStyle={previewPaletteStyle}
+                colorValues={colorValues}
+                previewHeadingStyle={previewHeadingStyle}
+                previewBodyStyle={previewBodyStyle}
+                previewLinkStyle={previewLinkStyle}
+                previewLinkHoverStyle={previewLinkHoverStyle}
+              />
 
               <div className="flex gap-2">
                 <Button
@@ -1523,165 +1690,295 @@ export function BrandingTab({
         </TabsContent>
 
         <TabsContent value="typography" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Type className="h-4 w-4 text-primary" />
-                Frontend Typography
-              </CardTitle>
-              <CardDescription>
-                Choose one font for headings and another for body copy on the public-facing website.
-                Each option includes an inline sample so editors can compare type directly in the
-                admin.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-1.5">
-                  <Label>Heading Font</Label>
-                  <Select value={headingFont} onValueChange={setHeadingFont}>
-                    <SelectTrigger data-testid="select-branding-heading-font">
-                      <SelectValue placeholder="Use current theme font" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__default__">Use current theme font</SelectItem>
-                      {BRANDING_FONT_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground">
-                    Choose from curated sans serif and serif Google fonts.
-                  </p>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label>Body Font</Label>
-                  <Select value={bodyFont} onValueChange={setBodyFont}>
-                    <SelectTrigger data-testid="select-branding-body-font">
-                      <SelectValue placeholder="Use current theme font" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__default__">Use current theme font</SelectItem>
-                      {BRANDING_FONT_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground">
-                    Choose from the same balanced font library for paragraph copy.
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid gap-6 xl:grid-cols-2">
-                <Card className="border-dashed">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm">Heading Font Picker</CardTitle>
-                    <CardDescription>
-                      Preview how each font feels in large editorial headings.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                          Sans Serif Options
-                        </p>
-                      </div>
-                      <div className="grid gap-3">
-                        {BRANDING_SANS_FONT_OPTIONS.map((option) =>
-                          renderFontOptionCard(option, headingFont, setHeadingFont, "heading"),
-                        )}
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                          Serif Options
-                        </p>
-                      </div>
-                      <div className="grid gap-3">
-                        {BRANDING_SERIF_FONT_OPTIONS.map((option) =>
-                          renderFontOptionCard(option, headingFont, setHeadingFont, "heading"),
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-dashed">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm">Body Font Picker</CardTitle>
-                    <CardDescription>
-                      Preview how each font reads in paragraph-sized content.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                          Sans Serif Options
-                        </p>
-                      </div>
-                      <div className="grid gap-3">
-                        {BRANDING_SANS_FONT_OPTIONS.map((option) =>
-                          renderFontOptionCard(option, bodyFont, setBodyFont, "body"),
-                        )}
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                          Serif Options
-                        </p>
-                      </div>
-                      <div className="grid gap-3">
-                        {BRANDING_SERIF_FONT_OPTIONS.map((option) =>
-                          renderFontOptionCard(option, bodyFont, setBodyFont, "body"),
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <div className="rounded-xl border bg-muted/10 p-5">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Preview
-                </p>
-                <h4 className="mt-3 text-2xl font-semibold" style={previewHeadingStyle}>
-                  Glass & Door Pro helps Charlotte-area homes and businesses look their best.
-                </h4>
-                <p className="mt-3 text-sm text-muted-foreground" style={previewBodyStyle}>
-                  Use this preview to compare heading and body combinations before saving. These
-                  font selections only apply to the public-facing website, not the admin dashboard.
-                </p>
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  onClick={() => saveFontsMutation.mutate()}
-                  disabled={!hasFontChanges || saveFontsMutation.isPending}
-                  data-testid="button-save-branding-fonts"
-                >
-                  {saveFontsMutation.isPending ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Save className="mr-2 h-4 w-4" />
-                  )}
-                  Save Typography
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <BrandingTypographyCard
+            headingFont={headingFont}
+            setHeadingFont={setHeadingFont}
+            bodyFont={bodyFont}
+            setBodyFont={setBodyFont}
+            previewHeadingStyle={previewHeadingStyle}
+            previewBodyStyle={previewBodyStyle}
+            saveFontsMutation={saveFontsMutation}
+            hasFontChanges={hasFontChanges}
+          />
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+function TemplateEditorFooter({
+  updateMutation,
+  editorLock,
+  previewMutation,
+  testMutation,
+}: {
+  updateMutation: UseMutationResult<void, Error, void, unknown>;
+  editorLock: ReturnType<typeof useEditorLock>;
+  previewMutation: UseMutationResult<{ subject: string; html: string; }, Error, void, unknown>;
+  testMutation: UseMutationResult<{ success: boolean; message: string; }, Error, void, unknown>;
+}) {
+  return (
+    <SheetFooter>
+      <Button
+        onClick={() => updateMutation.mutate()}
+        disabled={updateMutation.isPending || editorLock.isReadOnly}
+        data-testid="button-save-template"
+      >
+        {updateMutation.isPending ? (
+          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+        ) : (
+          <Save className="h-4 w-4 mr-2" />
+        )}
+        Save Template
+      </Button>
+      <Button
+        variant="outline"
+        onClick={() => previewMutation.mutate()}
+        disabled={previewMutation.isPending}
+        data-testid="button-preview-template"
+      >
+        {previewMutation.isPending ? (
+          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+        ) : (
+          <Eye className="h-4 w-4 mr-2" />
+        )}
+        Refresh Preview
+      </Button>
+      <Button
+        variant="outline"
+        onClick={() => testMutation.mutate()}
+        disabled={testMutation.isPending}
+        data-testid="button-test-email"
+      >
+        {testMutation.isPending ? (
+          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+        ) : (
+          <Send className="h-4 w-4 mr-2" />
+        )}
+        Send Test
+      </Button>
+    </SheetFooter>
+  );
+}
+
+function TemplatePreviewPanel({ previewMutation, previewHtml }: {
+  previewMutation: UseMutationResult<{ subject: string; html: string; }, Error, void, unknown>;
+  previewHtml: string | null;
+}) {
+  return (
+    <div className="mt-4 border rounded-md overflow-hidden">
+      <div className="bg-muted px-3 py-2 text-xs font-medium flex items-center justify-between">
+        <span>Published Preview</span>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => previewMutation.mutate()}
+          disabled={previewMutation.isPending}
+          data-testid="button-refresh-template-preview"
+        >
+          {previewMutation.isPending ? (
+            <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <RefreshCw className="mr-2 h-3.5 w-3.5" />
+          )}
+          Refresh
+        </Button>
+      </div>
+      {previewHtml ? (
+        <iframe
+          srcDoc={previewHtml}
+          sandbox=""
+          className="w-full h-[420px] bg-white"
+          title="Email preview"
+          data-testid="iframe-email-preview"
+        />
+      ) : (
+        <div className="flex h-[220px] items-center justify-center bg-white text-sm text-muted-foreground">
+          {previewMutation.isPending ? (
+            <span className="inline-flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Loading preview…
+            </span>
+          ) : (
+            "Preview unavailable."
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TemplateLinkPanel({
+  showLinkPanel,
+  linkUrl,
+  setLinkUrl,
+  applyLink,
+}: {
+  showLinkPanel: boolean;
+  linkUrl: string;
+  setLinkUrl: React.Dispatch<React.SetStateAction<string>>;
+  applyLink: () => void;
+}) {
+  return (
+    <>
+      {showLinkPanel ? (
+        <div className="border-b bg-muted/15 px-3 py-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+            <div className="flex-1 space-y-1">
+              <Label htmlFor="template-link-url" className="text-xs">
+                Link URL
+              </Label>
+              <Input
+                id="template-link-url"
+                value={linkUrl}
+                onChange={(event) => setLinkUrl(event.target.value)}
+                placeholder="https://example.com"
+                autoPrependHttps
+                className="h-9"
+                data-testid="input-template-link-url"
+              />
+            </div>
+            <Button
+              type="button"
+              onClick={applyLink}
+              data-testid="button-template-apply-link"
+            >
+              Apply Link
+            </Button>
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
+}
+
+function TemplateFormattingToolbar({ applyCommand, focusVisualEditor, setShowLinkPanel }: {
+  applyCommand: (command: string, value?: string) => void;
+  focusVisualEditor: () => void;
+  setShowLinkPanel: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-1 border-b bg-muted/30 px-2 py-2">
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="h-8 px-2"
+        onClick={() => applyCommand("formatBlock", "<p>")}
+      >
+        <Pilcrow className="mr-1.5 h-3.5 w-3.5" />
+        Paragraph
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="h-8 px-2"
+        onClick={() => applyCommand("formatBlock", "<h2>")}
+      >
+        <Heading2 className="mr-1.5 h-3.5 w-3.5" />
+        Heading
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label="Bold"
+        className="h-8 w-8"
+        onClick={() => applyCommand("bold")}
+      >
+        <Bold className="h-3.5 w-3.5" />
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label="Italic"
+        className="h-8 w-8"
+        onClick={() => applyCommand("italic")}
+      >
+        <Italic className="h-3.5 w-3.5" />
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label="Underline"
+        className="h-8 w-8"
+        onClick={() => applyCommand("underline")}
+      >
+        <UnderlineIcon className="h-3.5 w-3.5" />
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label="Bulleted list"
+        className="h-8 w-8"
+        onClick={() => applyCommand("insertUnorderedList")}
+      >
+        <List className="h-3.5 w-3.5" />
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label="Numbered list"
+        className="h-8 w-8"
+        onClick={() => applyCommand("insertOrderedList")}
+      >
+        <ListOrdered className="h-3.5 w-3.5" />
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="h-8 px-2"
+        onClick={() => {
+          focusVisualEditor();
+          setShowLinkPanel((current) => !current);
+        }}
+      >
+        <Link2 className="mr-1.5 h-3.5 w-3.5" />
+        Link
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="h-8 px-2"
+        onClick={() => applyCommand("removeFormat")}
+      >
+        <Eraser className="mr-1.5 h-3.5 w-3.5" />
+        Clear
+      </Button>
+    </div>
+  );
+}
+
+function TemplateVariableChips({ template, insertVariable }: {
+  template: EmailTemplate;
+  insertVariable: (variable: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-1.5 mt-2">
+      <span className="text-xs text-muted-foreground mr-1">Variables:</span>
+      {template.variables.map((v) => (
+        <button
+          key={v}
+          type="button"
+          onClick={() => insertVariable(v)}
+          className="inline-flex"
+          data-testid={`button-template-variable-${v}`}
+        >
+          <Badge
+            variant="secondary"
+            className="cursor-pointer text-xs font-mono hover:bg-secondary/80"
+          >
+            {`{{${v}}}`}
+          </Badge>
+        </button>
+      ))}
     </div>
   );
 }
@@ -1869,25 +2166,7 @@ function TemplateEditor({
           >
             <p className="text-sm text-muted-foreground">{template.description}</p>
 
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              <span className="text-xs text-muted-foreground mr-1">Variables:</span>
-              {template.variables.map((v) => (
-                <button
-                  key={v}
-                  type="button"
-                  onClick={() => insertVariable(v)}
-                  className="inline-flex"
-                  data-testid={`button-template-variable-${v}`}
-                >
-                  <Badge
-                    variant="secondary"
-                    className="cursor-pointer text-xs font-mono hover:bg-secondary/80"
-                  >
-                    {`{{${v}}}`}
-                  </Badge>
-                </button>
-              ))}
-            </div>
+            <TemplateVariableChips template={template} insertVariable={insertVariable} />
 
             <div className="space-y-4 mt-4">
               <div className="space-y-1.5">
@@ -1933,129 +2212,14 @@ function TemplateEditor({
 
                 {editorTab === "visual" ? (
                   <div className="overflow-hidden rounded-xl border bg-background shadow-sm">
-                    <div className="flex flex-wrap items-center gap-1 border-b bg-muted/30 px-2 py-2">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 px-2"
-                        onClick={() => applyCommand("formatBlock", "<p>")}
-                      >
-                        <Pilcrow className="mr-1.5 h-3.5 w-3.5" />
-                        Paragraph
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 px-2"
-                        onClick={() => applyCommand("formatBlock", "<h2>")}
-                      >
-                        <Heading2 className="mr-1.5 h-3.5 w-3.5" />
-                        Heading
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        aria-label="Bold"
-                        className="h-8 w-8"
-                        onClick={() => applyCommand("bold")}
-                      >
-                        <Bold className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        aria-label="Italic"
-                        className="h-8 w-8"
-                        onClick={() => applyCommand("italic")}
-                      >
-                        <Italic className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        aria-label="Underline"
-                        className="h-8 w-8"
-                        onClick={() => applyCommand("underline")}
-                      >
-                        <UnderlineIcon className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        aria-label="Bulleted list"
-                        className="h-8 w-8"
-                        onClick={() => applyCommand("insertUnorderedList")}
-                      >
-                        <List className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        aria-label="Numbered list"
-                        className="h-8 w-8"
-                        onClick={() => applyCommand("insertOrderedList")}
-                      >
-                        <ListOrdered className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 px-2"
-                        onClick={() => {
-                          focusVisualEditor();
-                          setShowLinkPanel((current) => !current);
-                        }}
-                      >
-                        <Link2 className="mr-1.5 h-3.5 w-3.5" />
-                        Link
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 px-2"
-                        onClick={() => applyCommand("removeFormat")}
-                      >
-                        <Eraser className="mr-1.5 h-3.5 w-3.5" />
-                        Clear
-                      </Button>
-                    </div>
+                    <TemplateFormattingToolbar applyCommand={applyCommand} focusVisualEditor={focusVisualEditor} setShowLinkPanel={setShowLinkPanel} />
 
-                    {showLinkPanel ? (
-                      <div className="border-b bg-muted/15 px-3 py-3">
-                        <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
-                          <div className="flex-1 space-y-1">
-                            <Label htmlFor="template-link-url" className="text-xs">
-                              Link URL
-                            </Label>
-                            <Input
-                              id="template-link-url"
-                              value={linkUrl}
-                              onChange={(event) => setLinkUrl(event.target.value)}
-                              placeholder="https://example.com"
-                              autoPrependHttps
-                              className="h-9"
-                              data-testid="input-template-link-url"
-                            />
-                          </div>
-                          <Button
-                            type="button"
-                            onClick={applyLink}
-                            data-testid="button-template-apply-link"
-                          >
-                            Apply Link
-                          </Button>
-                        </div>
-                      </div>
-                    ) : null}
+                    <TemplateLinkPanel
+                      showLinkPanel={showLinkPanel}
+                      linkUrl={linkUrl}
+                      setLinkUrl={setLinkUrl}
+                      applyLink={applyLink}
+                    />
 
                     <div className="bg-muted/20 p-4">
                       <div className="mx-auto max-w-2xl rounded-xl border bg-white shadow-sm">
@@ -2087,87 +2251,15 @@ function TemplateEditor({
               </div>
             </div>
 
-            <div className="mt-4 border rounded-md overflow-hidden">
-              <div className="bg-muted px-3 py-2 text-xs font-medium flex items-center justify-between">
-                <span>Published Preview</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => previewMutation.mutate()}
-                  disabled={previewMutation.isPending}
-                  data-testid="button-refresh-template-preview"
-                >
-                  {previewMutation.isPending ? (
-                    <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <RefreshCw className="mr-2 h-3.5 w-3.5" />
-                  )}
-                  Refresh
-                </Button>
-              </div>
-              {previewHtml ? (
-                <iframe
-                  srcDoc={previewHtml}
-                  sandbox=""
-                  className="w-full h-[420px] bg-white"
-                  title="Email preview"
-                  data-testid="iframe-email-preview"
-                />
-              ) : (
-                <div className="flex h-[220px] items-center justify-center bg-white text-sm text-muted-foreground">
-                  {previewMutation.isPending ? (
-                    <span className="inline-flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Loading preview…
-                    </span>
-                  ) : (
-                    "Preview unavailable."
-                  )}
-                </div>
-              )}
-            </div>
+            <TemplatePreviewPanel previewMutation={previewMutation} previewHtml={previewHtml} />
           </div>
         </SheetBody>
-        <SheetFooter>
-          <Button
-            onClick={() => updateMutation.mutate()}
-            disabled={updateMutation.isPending || editorLock.isReadOnly}
-            data-testid="button-save-template"
-          >
-            {updateMutation.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : (
-              <Save className="h-4 w-4 mr-2" />
-            )}
-            Save Template
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => previewMutation.mutate()}
-            disabled={previewMutation.isPending}
-            data-testid="button-preview-template"
-          >
-            {previewMutation.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : (
-              <Eye className="h-4 w-4 mr-2" />
-            )}
-            Refresh Preview
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => testMutation.mutate()}
-            disabled={testMutation.isPending}
-            data-testid="button-test-email"
-          >
-            {testMutation.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : (
-              <Send className="h-4 w-4 mr-2" />
-            )}
-            Send Test
-          </Button>
-        </SheetFooter>
+        <TemplateEditorFooter
+          updateMutation={updateMutation}
+          editorLock={editorLock}
+          previewMutation={previewMutation}
+          testMutation={testMutation}
+        />
       </SheetContent>
     </Sheet>
   );

@@ -86,6 +86,255 @@ function EntryRow({ entry }: { entry: SitemapEntry }) {
   );
 }
 
+function RobotsTxtDialog({
+  robotsDialogOpen,
+  setRobotsDialogOpen,
+  robotsTxt,
+  handleCopyRobotsUrl,
+  handleResetRobots,
+  robotsLoading,
+  robotsDraft,
+  setRobotsDraft,
+  handleUseGeneratedVersion,
+  isSaveRobotsPending,
+  handleSaveRobots,
+}: {
+  robotsDialogOpen: boolean;
+  setRobotsDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  robotsTxt: RobotsTxtPayload | undefined;
+  handleCopyRobotsUrl: () => Promise<void>;
+  handleResetRobots: () => void;
+  robotsLoading: boolean;
+  robotsDraft: string;
+  setRobotsDraft: React.Dispatch<React.SetStateAction<string>>;
+  handleUseGeneratedVersion: () => void;
+  isSaveRobotsPending: boolean;
+  handleSaveRobots: () => void;
+}) {
+  return (
+    <Dialog open={robotsDialogOpen} onOpenChange={setRobotsDialogOpen}>
+      <DialogContent className="max-w-3xl" data-testid="dialog-robots-txt-editor">
+        <DialogHeader>
+          <DialogTitle>Edit robots.txt</DialogTitle>
+          <DialogDescription>
+            Review the generated default file and customize it when needed. Leave this blank to
+            fall back to the generated version.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div className="rounded-md border bg-muted/30 p-3 text-xs text-muted-foreground">
+            <p className="font-medium text-foreground mb-1">Serving mode</p>
+            <p>
+              {robotsTxt?.customContent
+                ? "A custom robots.txt file is currently live."
+                : "The system-generated robots.txt file is currently live."}
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-medium">Editable robots.txt</p>
+              <div className="flex items-center gap-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={handleCopyRobotsUrl}
+                  aria-label="Copy robots.txt URL"
+                  title="Copy robots.txt URL"
+                  data-testid="button-copy-robots-url"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleResetRobots}
+                  disabled={!robotsTxt || robotsLoading}
+                >
+                  <RotateCcw className="h-3.5 w-3.5 mr-2" />
+                  Reset to Generated Default
+                </Button>
+              </div>
+            </div>
+            <Textarea
+              value={robotsDraft}
+              onChange={(event) => setRobotsDraft(event.target.value)}
+              className="min-h-[320px] font-mono text-xs"
+              placeholder="User-agent: *&#10;Disallow: /admin"
+              data-testid="textarea-robots-txt"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Current generated default</p>
+            <pre
+              className="max-h-48 overflow-auto rounded-md border bg-muted/20 p-3 text-xs whitespace-pre-wrap break-words"
+              data-testid="generated-robots-preview"
+            >
+              {robotsTxt?.generatedContent ?? "Loading generated robots.txt..."}
+            </pre>
+          </div>
+        </div>
+
+        <DialogFooter className="gap-2 sm:gap-0">
+          <Button type="button" variant="outline" onClick={() => setRobotsDialogOpen(false)}>
+            Close
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleUseGeneratedVersion}
+            disabled={isSaveRobotsPending || robotsLoading || !robotsTxt?.customContent}
+          >
+            Use Generated Version
+          </Button>
+          <Button
+            type="button"
+            onClick={handleSaveRobots}
+            disabled={isSaveRobotsPending || robotsLoading}
+          >
+            <Save className="h-3.5 w-3.5 mr-2" />
+            Save robots.txt
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function SitemapRulesCard() {
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base">Exclusion Rules</CardTitle>
+        <CardDescription className="text-xs">
+          How content is filtered from the sitemap
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2.5">
+          {[
+            {
+              icon: EyeOff,
+              text: "Pages with noindex = true are excluded from the sitemap.",
+            },
+            { icon: ShieldOff, text: "Draft CMS pages (status ≠ published) are excluded." },
+            {
+              icon: CheckCircle2,
+              text: "The home route is always included.",
+            },
+          ].map(({ icon: Icon, text }) => (
+            <div key={text} className="flex items-start gap-2 text-xs text-muted-foreground">
+              <Icon className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
+              <span>{text}</span>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function SitemapOverviewCard({
+  setRobotsDialogOpen,
+  siteUrl,
+  handleCopySitemapUrl,
+  includedCount,
+  excludedCount,
+  cmsEntries,
+  staticEntries,
+}: {
+  setRobotsDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  siteUrl: string;
+  handleCopySitemapUrl: () => Promise<void>;
+  includedCount: number;
+  excludedCount: number;
+  cmsEntries: SitemapEntry[];
+  staticEntries: SitemapEntry[];
+}) {
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center gap-2">
+          <FileCode2 className="h-4 w-4 text-violet-500" />
+          <CardTitle className="text-base">Sitemap Overview</CardTitle>
+        </div>
+        <CardDescription className="text-xs">
+          The sitemap is auto-generated at{" "}
+          <code className="text-xs bg-muted px-1 py-0.5 rounded">/sitemap.xml</code> from
+          published content. Draft, noindex, and non-public content is automatically excluded.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center gap-3 flex-wrap">
+          <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer">
+            <Button size="sm" variant="outline" data-testid="button-view-sitemap">
+              <ExternalLink className="h-3.5 w-3.5 mr-2" />
+              View sitemap.xml
+            </Button>
+          </a>
+          <Button
+            size="sm"
+            variant="outline"
+            data-testid="button-view-robots"
+            onClick={() => setRobotsDialogOpen(true)}
+          >
+            <FileText className="h-3.5 w-3.5 mr-2" />
+            View robots.txt
+          </Button>
+          {siteUrl && (
+            <div className="flex items-center gap-1">
+              <code className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground">
+                {siteUrl}/sitemap.xml
+              </code>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={handleCopySitemapUrl}
+                aria-label="Copy sitemap URL"
+                title="Copy sitemap URL"
+                data-testid="button-copy-sitemap-url"
+              >
+                <Copy className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="rounded-md bg-muted/50 px-3 py-2 text-center">
+            <p className="text-lg font-semibold">{includedCount}</p>
+            <p className="text-xs text-muted-foreground">Indexed URLs</p>
+          </div>
+          <div className="rounded-md bg-muted/50 px-3 py-2 text-center">
+            <p className="text-lg font-semibold">{excludedCount}</p>
+            <p className="text-xs text-muted-foreground">Excluded URLs</p>
+          </div>
+          <div className="rounded-md bg-muted/50 px-3 py-2 text-center">
+            <p className="text-lg font-semibold">
+              {cmsEntries.filter((e) => !e.excluded).length + staticEntries.length}
+            </p>
+            <p className="text-xs text-muted-foreground">Pages</p>
+          </div>
+        </div>
+
+        {!siteUrl && (
+          <div className="rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-3 py-2.5 text-xs text-amber-700 dark:text-amber-400">
+            <strong>Tip:</strong> Set your Canonical Site URL in Global Settings so the sitemap
+            uses absolute URLs.
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export function CmsSitemapTab() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -201,81 +450,15 @@ export function CmsSitemapTab() {
 
   return (
     <div className="space-y-5 mt-5">
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <FileCode2 className="h-4 w-4 text-violet-500" />
-            <CardTitle className="text-base">Sitemap Overview</CardTitle>
-          </div>
-          <CardDescription className="text-xs">
-            The sitemap is auto-generated at{" "}
-            <code className="text-xs bg-muted px-1 py-0.5 rounded">/sitemap.xml</code> from
-            published content. Draft, noindex, and non-public content is automatically excluded.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-3 flex-wrap">
-            <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer">
-              <Button size="sm" variant="outline" data-testid="button-view-sitemap">
-                <ExternalLink className="h-3.5 w-3.5 mr-2" />
-                View sitemap.xml
-              </Button>
-            </a>
-            <Button
-              size="sm"
-              variant="outline"
-              data-testid="button-view-robots"
-              onClick={() => setRobotsDialogOpen(true)}
-            >
-              <FileText className="h-3.5 w-3.5 mr-2" />
-              View robots.txt
-            </Button>
-            {siteUrl && (
-              <div className="flex items-center gap-1">
-                <code className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground">
-                  {siteUrl}/sitemap.xml
-                </code>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={handleCopySitemapUrl}
-                  aria-label="Copy sitemap URL"
-                  title="Copy sitemap URL"
-                  data-testid="button-copy-sitemap-url"
-                >
-                  <Copy className="h-3.5 w-3.5" />
-                </Button>
-              </div>
-            )}
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <div className="rounded-md bg-muted/50 px-3 py-2 text-center">
-              <p className="text-lg font-semibold">{includedCount}</p>
-              <p className="text-xs text-muted-foreground">Indexed URLs</p>
-            </div>
-            <div className="rounded-md bg-muted/50 px-3 py-2 text-center">
-              <p className="text-lg font-semibold">{excludedCount}</p>
-              <p className="text-xs text-muted-foreground">Excluded URLs</p>
-            </div>
-            <div className="rounded-md bg-muted/50 px-3 py-2 text-center">
-              <p className="text-lg font-semibold">
-                {cmsEntries.filter((e) => !e.excluded).length + staticEntries.length}
-              </p>
-              <p className="text-xs text-muted-foreground">Pages</p>
-            </div>
-          </div>
-
-          {!siteUrl && (
-            <div className="rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-3 py-2.5 text-xs text-amber-700 dark:text-amber-400">
-              <strong>Tip:</strong> Set your Canonical Site URL in Global Settings so the sitemap
-              uses absolute URLs.
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <SitemapOverviewCard
+        setRobotsDialogOpen={setRobotsDialogOpen}
+        siteUrl={siteUrl}
+        handleCopySitemapUrl={handleCopySitemapUrl}
+        includedCount={includedCount}
+        excludedCount={excludedCount}
+        cmsEntries={cmsEntries}
+        staticEntries={staticEntries}
+      />
 
       {isLoading ? (
         <Card>
@@ -307,126 +490,21 @@ export function CmsSitemapTab() {
         </>
       )}
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">Exclusion Rules</CardTitle>
-          <CardDescription className="text-xs">
-            How content is filtered from the sitemap
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2.5">
-            {[
-              {
-                icon: EyeOff,
-                text: "Pages with noindex = true are excluded from the sitemap.",
-              },
-              { icon: ShieldOff, text: "Draft CMS pages (status ≠ published) are excluded." },
-              {
-                icon: CheckCircle2,
-                text: "The home route is always included.",
-              },
-            ].map(({ icon: Icon, text }) => (
-              <div key={text} className="flex items-start gap-2 text-xs text-muted-foreground">
-                <Icon className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
-                <span>{text}</span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <SitemapRulesCard />
 
-      <Dialog open={robotsDialogOpen} onOpenChange={setRobotsDialogOpen}>
-        <DialogContent className="max-w-3xl" data-testid="dialog-robots-txt-editor">
-          <DialogHeader>
-            <DialogTitle>Edit robots.txt</DialogTitle>
-            <DialogDescription>
-              Review the generated default file and customize it when needed. Leave this blank to
-              fall back to the generated version.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <div className="rounded-md border bg-muted/30 p-3 text-xs text-muted-foreground">
-              <p className="font-medium text-foreground mb-1">Serving mode</p>
-              <p>
-                {robotsTxt?.customContent
-                  ? "A custom robots.txt file is currently live."
-                  : "The system-generated robots.txt file is currently live."}
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-medium">Editable robots.txt</p>
-                <div className="flex items-center gap-1">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={handleCopyRobotsUrl}
-                    aria-label="Copy robots.txt URL"
-                    title="Copy robots.txt URL"
-                    data-testid="button-copy-robots-url"
-                  >
-                    <Copy className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleResetRobots}
-                    disabled={!robotsTxt || robotsLoading}
-                  >
-                    <RotateCcw className="h-3.5 w-3.5 mr-2" />
-                    Reset to Generated Default
-                  </Button>
-                </div>
-              </div>
-              <Textarea
-                value={robotsDraft}
-                onChange={(event) => setRobotsDraft(event.target.value)}
-                className="min-h-[320px] font-mono text-xs"
-                placeholder="User-agent: *&#10;Disallow: /admin"
-                data-testid="textarea-robots-txt"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-sm font-medium">Current generated default</p>
-              <pre
-                className="max-h-48 overflow-auto rounded-md border bg-muted/20 p-3 text-xs whitespace-pre-wrap break-words"
-                data-testid="generated-robots-preview"
-              >
-                {robotsTxt?.generatedContent ?? "Loading generated robots.txt..."}
-              </pre>
-            </div>
-          </div>
-
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button type="button" variant="outline" onClick={() => setRobotsDialogOpen(false)}>
-              Close
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleUseGeneratedVersion}
-              disabled={saveRobotsMutation.isPending || robotsLoading || !robotsTxt?.customContent}
-            >
-              Use Generated Version
-            </Button>
-            <Button
-              type="button"
-              onClick={handleSaveRobots}
-              disabled={saveRobotsMutation.isPending || robotsLoading}
-            >
-              <Save className="h-3.5 w-3.5 mr-2" />
-              Save robots.txt
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <RobotsTxtDialog
+        robotsDialogOpen={robotsDialogOpen}
+        setRobotsDialogOpen={setRobotsDialogOpen}
+        robotsTxt={robotsTxt}
+        handleCopyRobotsUrl={handleCopyRobotsUrl}
+        handleResetRobots={handleResetRobots}
+        robotsLoading={robotsLoading}
+        robotsDraft={robotsDraft}
+        setRobotsDraft={setRobotsDraft}
+        handleUseGeneratedVersion={handleUseGeneratedVersion}
+        isSaveRobotsPending={saveRobotsMutation.isPending}
+        handleSaveRobots={handleSaveRobots}
+      />
     </div>
   );
 }
