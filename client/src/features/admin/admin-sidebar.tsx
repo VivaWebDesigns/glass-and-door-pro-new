@@ -292,7 +292,7 @@ function AdminSidebarUserPanel({
   logout,
 }: {
   collapsed: boolean;
-  user: { id: string; email: string; password: string; firstName: string | null; lastName: string | null; role: string; adminPermissions: string[]; formNotificationFormIds: string[]; profileImageUrl: string | null; isSuspended: boolean; lastLoginAt: Date | null; createdAt: Date | null; updatedAt: Date | null; };
+  user: AppUser;
   setProfileOpen: React.Dispatch<React.SetStateAction<boolean>>;
   logout: UseMutationResult<void, Error, void, unknown>;
 }) {

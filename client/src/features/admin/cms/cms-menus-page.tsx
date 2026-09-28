@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { AdminSidebar } from "@/features/admin/admin-sidebar";
-import { EditorLockBanner } from "@/components/shared/editor-lock-banner";
+import { EditorLockNotice } from "@/components/shared/editor-lock-banner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -395,15 +395,7 @@ function MenuEditor({
 
   return (
     <div className="space-y-6">
-      {editorLock.summary ? (
-        <EditorLockBanner
-          variant={editorLock.summary.variant}
-          title={editorLock.summary.title}
-          description={editorLock.summary.description}
-          isLoading={editorLock.isLoading}
-          onRefresh={editorLock.acquire}
-        />
-      ) : null}
+      <EditorLockNotice editorLock={editorLock} />
 
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold" data-testid="text-menu-editor-title">

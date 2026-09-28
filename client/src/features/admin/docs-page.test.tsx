@@ -55,6 +55,10 @@ vi.mock("@/features/admin/admin-sidebar", () => ({
 vi.mock("@/components/shared/editor-lock-banner", () => ({
   EditorLockBanner: ({ title }: { title: string }) =>
     React.createElement("div", { "data-testid": "editor-lock-banner" }, title),
+  EditorLockNotice: ({ editorLock }: { editorLock: { summary: { title: string } | null } }) =>
+    editorLock.summary
+      ? React.createElement("div", { "data-testid": "editor-lock-banner" }, editorLock.summary.title)
+      : null,
 }));
 
 vi.mock("@/components/shared/loading-spinner", () => ({

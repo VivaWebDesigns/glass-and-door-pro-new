@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { AdminSidebar } from "@/features/admin/admin-sidebar";
 import { EditorSaveIndicator } from "@/components/shared/editor-save-indicator";
-import { EditorLockBanner } from "@/components/shared/editor-lock-banner";
+import { EditorLockNotice } from "@/components/shared/editor-lock-banner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -34,8 +34,8 @@ import type { CmsSection } from "@shared/schema";
 import { PageBuilder } from "./builder/page-builder";
 import type { BuilderContent } from "./builder/block-registry";
 import { cn } from "@/lib/utils";
-import { useEditorLock } from "@/hooks/use-editor-lock";
-import { useLockConflictGuard } from "@/hooks/use-lock-conflict-guard";
+import type { useEditorLock } from "@/hooks/use-editor-lock";
+import { useLockedResourceEditor } from "@/hooks/use-locked-resource-editor";
 import { useEditorSaveState } from "@/hooks/use-editor-save-state";
 import { useUnsavedChangesGuard } from "@/hooks/use-unsaved-changes-guard";
 
@@ -186,6 +186,18 @@ function SectionEditorHeader({
   );
 }
 
+function sectionToForm(section: CmsSection): SectionForm {
+  return {
+    name: section.name,
+    description: section.description ?? "",
+    category: section.category ?? "general",
+  };
+}
+
+function sectionToContent(section: CmsSection): BuilderContent {
+  return { blocks: (Array.isArray(section.blocks) ? section.blocks : []) as BuilderContent["blocks"] };
+}
+
 export default function CmsSectionEditorPage() {
   const { id } = useParams<{ id: string }>();
   const [, navigate] = useLocation();
@@ -209,10 +221,11 @@ export default function CmsSectionEditorPage() {
     enabled: !isNew,
   });
 
-  const editorLock = useEditorLock({
+  const { editorLock, lockedClass } = useLockedResourceEditor({
     resourceType: "cms_section",
     resourceId: isNew ? null : (section?.id ?? id ?? null),
-    enabled: !isNew,
+    resourceLabel: "saved section",
+    onConflict: () => navigate("/admin/cms/sections"),
   });
 
   const form = useForm<SectionForm>({
@@ -222,25 +235,13 @@ export default function CmsSectionEditorPage() {
 
   useEffect(() => {
     if (section && !initializedRef.current) {
-      form.reset({
-        name: section.name,
-        description: section.description ?? "",
-        category: section.category ?? "general",
-      });
-      const blocks = Array.isArray(section.blocks) ? section.blocks : [];
-      setBuilderContent({ blocks: blocks as any });
-      setSavedBuilderSnapshot(JSON.stringify({ blocks }));
+      form.reset(sectionToForm(section));
+      const content = sectionToContent(section);
+      setBuilderContent(content);
+      setSavedBuilderSnapshot(JSON.stringify(content));
       initializedRef.current = true;
     }
   }, [section, form]);
-
-  useLockConflictGuard({
-    active: !isNew,
-    resourceId: isNew ? null : (section?.id ?? id ?? null),
-    resourceLabel: "saved section",
-    editorLock,
-    onConflict: () => navigate("/admin/cms/sections"),
-  });
 
   const applySavedState = (data: SectionForm, content: BuilderContent) => {
     form.reset(data);
@@ -303,15 +304,7 @@ export default function CmsSectionEditorPage() {
   return (
     <AdminSidebar>
       <div className="p-6 max-w-5xl mx-auto space-y-6">
-        {editorLock.summary ? (
-          <EditorLockBanner
-            variant={editorLock.summary.variant}
-            title={editorLock.summary.title}
-            description={editorLock.summary.description}
-            isLoading={editorLock.isLoading}
-            onRefresh={editorLock.acquire}
-          />
-        ) : null}
+        <EditorLockNotice editorLock={editorLock} />
 
         <SectionEditorHeader
           unsavedChangesGuard={unsavedChangesGuard}
@@ -328,7 +321,7 @@ export default function CmsSectionEditorPage() {
 
         <div className="space-y-2">
           <h2 className="text-sm font-medium text-muted-foreground">Blocks</h2>
-          <Card className={cn(editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
+          <Card className={cn(lockedClass)}>
             <CardContent className="pt-4">
               <PageBuilder
                 content={builderContent}

@@ -836,9 +836,11 @@ export default function CmsMediaPage() {
     queryKey: ["/api/admin/cms/media"],
   });
 
-  useEffect(() => {
+  const [metadataFormAsset, setMetadataFormAsset] = useState(selectedAsset);
+  if (metadataFormAsset !== selectedAsset) {
+    setMetadataFormAsset(selectedAsset);
     setMetadataForm(buildMetadataForm(selectedAsset));
-  }, [selectedAsset]);
+  }
 
   useEffect(() => {
     return () => {

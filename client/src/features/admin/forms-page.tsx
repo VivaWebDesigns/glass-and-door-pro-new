@@ -1,5 +1,5 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ElementType } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ElementType, type ReactElement } from "react";
+import { useMutation, useQuery, type UseMutationResult } from "@tanstack/react-query";
 import {
   type CmsForm,
   type CmsFormField,
@@ -12,7 +12,7 @@ import {
   cmsFormFieldConfigSchema,
 } from "@shared/schema";
 import { ProtectedRoute } from "@/components/shared/protected-route";
-import { EditorLockBanner } from "@/components/shared/editor-lock-banner";
+import { EditorLockNotice } from "@/components/shared/editor-lock-banner";
 import { EditorSaveIndicator } from "@/components/shared/editor-save-indicator";
 import { AdminSidebar } from "./admin-sidebar";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -66,8 +66,8 @@ import {
   ArrowLeft,
   Download,
   Inbox } from "lucide-react";
-import { useEditorLock } from "@/hooks/use-editor-lock";
-import { useLockConflictGuard } from "@/hooks/use-lock-conflict-guard";
+import { useLockedResourceEditor } from "@/hooks/use-locked-resource-editor";
+import type { useEditorLock } from "@/hooks/use-editor-lock";
 import { useEditorSaveState } from "@/hooks/use-editor-save-state";
 import { useUnsavedChangesGuard } from "@/hooks/use-unsaved-changes-guard";
 import { onActivateKey } from "@/lib/a11y";
@@ -545,266 +545,1365 @@ export default function AdminFormsPage() {
   );
 }
 
-function FormsPageContent() {
-  const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<"builder" | "entries">("builder");
-  const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
-  const [requestedEntriesFormId, setRequestedEntriesFormId] = useState<string | null>(null);
-  const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
-  const [draft, setDraft] = useState<EditableForm | null>(null);
-  const [savedDraftSnapshot, setSavedDraftSnapshot] = useState("");
-  const saveFeedbackRef = useRef({
-    markSaved: () => {},
-    markError: () => {},
-    clearFeedback: () => {},
-  });
-  const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
-  const draggingFieldTypeRef = useRef<CmsFormFieldType | null>(null);
-  const draggingFieldIdRef = useRef<string | null>(null);
-  const [dropIndex, setDropIndex] = useState<number | null>(null);
-  const [formSettingsOpen, setFormSettingsOpen] = useState(true);
-  const [openGroups, setOpenGroups] = useState<Record<"standard" | "advanced", boolean>>({
-    standard: true,
-    advanced: true,
-  });
-
-  const { data: forms = [], isLoading } = useQuery<CmsForm[]>({
-    queryKey: ["/api/admin/forms"],
-    staleTime: 60_000,
-  });
-
-  const activeForms = useMemo(
-    () => forms.filter((form) => form.isActive),
-    [forms]
+function SubmissionListButton({ submission, setSelectedEntryId }: {
+  submission: { id: string; data: Record<string, unknown>; createdAt: Date | null; formId: string; source: string | null; };
+  setSelectedEntryId: React.Dispatch<React.SetStateAction<string | null>>;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => setSelectedEntryId(submission.id)}
+      className="w-full rounded-xl border p-4 text-left transition-colors hover:border-primary hover:bg-primary/5"
+      data-testid={`card-form-entry-${submission.id}`}
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="font-medium">{getSubmissionDisplayName(submission)}</p>
+            <Badge variant="outline">{formatSubmissionDate(submission.createdAt)}</Badge>
+            {submission.source ? <Badge variant="secondary">{submission.source}</Badge> : null}
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">{getSubmissionEmail(submission)}</p>
+          <p className="mt-3 text-sm text-foreground/85">{getSubmissionMessageExcerpt(submission)}</p>
+        </div>
+        <span className="text-xs font-medium text-primary">Open</span>
+      </div>
+    </button>
   );
-  const selectedEntriesFormId = activeForms.some((form) => form.id === requestedEntriesFormId)
-    ? requestedEntriesFormId
-    : activeForms[0]?.id ?? null;
+}
 
-  const { data: submissions = [], isLoading: isSubmissionsLoading } = useQuery<CmsFormSubmission[]>({
-    queryKey: ["/api/admin/forms", selectedEntriesFormId, "submissions"],
-    enabled: Boolean(selectedEntriesFormId),
-    queryFn: async () => {
-      const response = await fetch(`/api/admin/forms/${selectedEntriesFormId}/submissions`, {
-        credentials: "include",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to load form entries.");
-      }
-      return response.json();
-    },
-  });
+function SelectedSubmissionDetail({
+  setSelectedEntryId,
+  selectedSubmission,
+  deleteSubmissionMutation,
+  selectedEntriesFormId,
+}: {
+  setSelectedEntryId: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedSubmission: { id: string; data: Record<string, unknown>; createdAt: Date | null; formId: string; source: string | null; };
+  deleteSubmissionMutation: UseMutationResult<void, Error, { formId: string; submissionId: string; }, unknown>;
+  selectedEntriesFormId: string;
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-muted/10 p-4">
+        <div className="space-y-1">
+          <Button
+            type="button"
+            variant="ghost"
+            className="h-auto px-0 py-0 text-sm font-medium text-primary hover:bg-transparent hover:text-primary/80"
+            onClick={() => setSelectedEntryId(null)}
+            data-testid="button-back-to-form-entries"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Form Entries
+          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="font-semibold">{getSubmissionDisplayName(selectedSubmission)}</p>
+            <Badge variant="outline">{formatSubmissionDate(selectedSubmission.createdAt)}</Badge>
+            {selectedSubmission.source ? <Badge variant="secondary">{selectedSubmission.source}</Badge> : null}
+          </div>
+          <p className="text-sm text-muted-foreground">{getSubmissionEmail(selectedSubmission)}</p>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="text-destructive hover:text-destructive"
+          onClick={() => deleteSubmissionMutation.mutate({ formId: selectedEntriesFormId, submissionId: selectedSubmission.id })}
+          disabled={deleteSubmissionMutation.isPending}
+          data-testid={`button-delete-form-entry-${selectedSubmission.id}`}
+        >
+          <Trash2 className="mr-1.5 h-4 w-4" />
+          Delete
+        </Button>
+      </div>
 
-  useEffect(() => {
-    if (draft) return;
-    if (!selectedFormId && forms.length > 0) {
-      const normalized = normalizeEditableForm(forms[0]);
-      setSelectedFormId(forms[0].id);
-      setFormSettingsOpen(true);
-      setDraft(normalized);
-      setSavedDraftSnapshot(serializeEditableForm(normalized));
-      return;
-    }
-
-    if (selectedFormId) {
-      const match = forms.find((form) => form.id === selectedFormId);
-      if (match) {
-        const normalized = normalizeEditableForm(match);
-        setDraft(normalized);
-        setSavedDraftSnapshot(serializeEditableForm(normalized));
-      }
-    }
-  }, [forms, selectedFormId, draft]);
-
-  useEffect(() => {
-    if (selectedEntryId && !submissions.some((submission) => submission.id === selectedEntryId)) {
-      setSelectedEntryId(null);
-    }
-  }, [selectedEntryId, submissions]);
-
-  const saveMutation = useMutation({
-    mutationFn: async (form: EditableForm) => {
-      const payload = {
-        name: form.name,
-        slug: form.slug,
-        description: form.description,
-        kind: form.kind,
-        isSystem: form.isSystem,
-        isActive: form.isActive,
-        fields: form.fields,
-        settings: form.settings,
-      };
-
-      if (form.id.startsWith("draft-")) {
-        const response = await apiRequest("POST", "/api/admin/forms", payload);
-        return (await response.json()) as CmsForm;
-      }
-
-      const response = await apiRequest("PUT", `/api/admin/forms/${form.id}`, payload);
-      return (await response.json()) as CmsForm;
-    },
-    onSuccess: (saved) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/forms"] });
-      const normalized = normalizeEditableForm(saved);
-      setSelectedFormId(saved.id);
-      setDraft(normalized);
-      setSavedDraftSnapshot(serializeEditableForm(normalized));
-      saveFeedbackRef.current.markSaved();
-      toast({ title: "Form saved" });
-    },
-    onError: (error: Error) => {
-      saveFeedbackRef.current.markError();
-      toast({
-        title: "Unable to save form",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const isSaving = saveMutation.isPending;
-  const isDirty = !!draft && serializeEditableForm(draft) !== savedDraftSnapshot;
-  const saveState = useEditorSaveState({
-    isDirty,
-    isSaving,
-  });
-  const unsavedChangesGuard = useUnsavedChangesGuard({
-    isDirty: activeTab === "builder" && isDirty,
-    message: "You have unsaved changes to this form. Leave without saving?",
-  });
-  useLayoutEffect(() => {
-    saveFeedbackRef.current = saveState;
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      await apiRequest("DELETE", `/api/admin/forms/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/forms"] });
-      setSelectedFieldId(null);
-      setSelectedFormId(null);
-      setDraft(null);
-      setSavedDraftSnapshot("");
-      toast({ title: "Form deleted" });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Unable to delete form",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const deleteSubmissionMutation = useMutation({
-    mutationFn: async ({ formId, submissionId }: { formId: string; submissionId: string }) => {
-      await apiRequest("DELETE", `/api/admin/forms/${formId}/submissions/${submissionId}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/forms", selectedEntriesFormId, "submissions"] });
-      toast({ title: "Entry deleted" });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Unable to delete entry",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const selectedField = useMemo(
-    () => draft?.fields.find((field) => field.id === selectedFieldId) ?? null,
-    [draft?.fields, selectedFieldId]
+      <div className="grid gap-3 md:grid-cols-2">
+        {Object.entries((selectedSubmission.data ?? {}) as Record<string, unknown>).map(([key, value]) => (
+          <div key={key} className="rounded-lg border bg-muted/10 p-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{key}</p>
+            <p className="mt-2 whitespace-pre-wrap text-sm text-foreground/90">{stringifySubmissionValue(value) || "—"}</p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
-  const { keys: choiceKeys, removeKey: removeChoiceKey } = useListKeys(selectedField?.options?.length ?? 0);
+}
 
-  const groupedFieldLibrary = useMemo(
-    () =>
-      FIELD_LIBRARY_GROUPS.map((group) => ({
-        ...group,
-        items: FIELD_LIBRARY.filter((item) => item.group === group.key),
-      })),
-    []
+function EntriesFormButton({
+  form,
+  setRequestedEntriesFormId,
+  setSelectedEntryId,
+  selectedEntriesFormId,
+}: {
+  form: CmsForm;
+  setRequestedEntriesFormId: React.Dispatch<React.SetStateAction<string | null>>;
+  setSelectedEntryId: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedEntriesFormId: string | null;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        setRequestedEntriesFormId(form.id);
+        setSelectedEntryId(null);
+      }}
+      className={cn(
+        "w-full rounded-lg border px-3 py-3 text-left transition-colors",
+        selectedEntriesFormId === form.id ? "border-primary bg-primary/5" : "hover:bg-muted/40"
+      )}
+      data-testid={`button-select-form-entries-${form.id}`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm font-medium">{form.name}</p>
+          <p className="mt-1 truncate text-xs text-muted-foreground">{form.slug}</p>
+        </div>
+        <Badge variant="outline">{form.kind}</Badge>
+      </div>
+    </button>
   );
+}
 
-  const selectedFieldLibraryItem = selectedField ? getFieldLibraryItem(selectedField.type) : null;
-  const selectedSubmission = useMemo(
-    () => submissions.find((submission) => submission.id === selectedEntryId) ?? null,
-    [selectedEntryId, submissions]
+function FieldLibraryPanel({
+  groupedFieldLibrary,
+  openGroups,
+  setOpenGroups,
+  addField,
+  draggingFieldTypeRef,
+  setDropIndex,
+}: {
+  groupedFieldLibrary: { items: FieldLibraryItem[]; key: "standard" | "advanced"; label: string; }[];
+  openGroups: Record<"standard" | "advanced", boolean>;
+  setOpenGroups: React.Dispatch<React.SetStateAction<Record<"standard" | "advanced", boolean>>>;
+  addField: (type: CmsFormFieldType, index?: number) => void;
+  draggingFieldTypeRef: ReturnType<typeof useRef<CmsFormFieldType | null>>;
+  setDropIndex: React.Dispatch<React.SetStateAction<number | null>>;
+}) {
+  return (
+    <div className="space-y-5">
+      {groupedFieldLibrary.map((group) => (
+        <ToggleCardGroup
+          key={group.key}
+          title={group.label}
+          open={openGroups[group.key]}
+          onToggle={() => setOpenGroups((current) => ({ ...current, [group.key]: !current[group.key] }))}
+        >
+          <div className="space-y-2">
+            {group.items.map((item) => (
+              <FieldLibraryCard
+                key={item.type}
+                item={item}
+                onAdd={addField}
+                onDragStart={(type) => {
+                  draggingFieldTypeRef.current = type;
+                }}
+                onDragEnd={() => {
+                  draggingFieldTypeRef.current = null;
+                  setDropIndex(null);
+                }}
+              />
+            ))}
+          </div>
+        </ToggleCardGroup>
+      ))}
+    </div>
   );
+}
 
-  const publicFormLink =
-    typeof window !== "undefined" && draft?.slug
-      ? `${window.location.origin}/forms/${draft.slug}`
-      : "";
+function ChoiceFieldSettings({
+  addChoice,
+  selectedField,
+  updateFieldConfig,
+  choiceKeys,
+  updateChoice,
+  removeChoiceKey,
+  removeChoice,
+}: {
+  addChoice: (fieldId: string) => void;
+  selectedField: CmsFormField;
+  updateFieldConfig: (fieldId: string, updates: Partial<CmsFormFieldConfig>) => void;
+  choiceKeys: ReturnType<typeof useListKeys>["keys"];
+  updateChoice: (fieldId: string, optionId: string, updates: Partial<CmsFormFieldOption>) => void;
+  removeChoiceKey: ReturnType<typeof useListKeys>["removeKey"];
+  removeChoice: (fieldId: string, optionId: string) => void;
+}) {
+  return (
+    <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
+      <div className="flex items-center justify-between">
+        <Label>Choices</Label>
+        <Button type="button" size="sm" variant="outline" onClick={() => addChoice(selectedField.id)}>
+          <Plus className="mr-1.5 h-3.5 w-3.5" />
+          Add Choice
+        </Button>
+      </div>
 
-  const editorLock = useEditorLock({
-    resourceType: "form",
-    resourceId: activeTab === "builder" && draft && !draft.id.startsWith("draft-") ? draft.id : null,
-    enabled: activeTab === "builder" && Boolean(draft) && !(draft?.id.startsWith("draft-")),
-  });
+      {selectedField.type === "image-choice" ? (
+        <div className="space-y-1.5">
+          <Label>Selection Mode</Label>
+          <Select
+            value={selectedField.config?.selectionMode === "multiple" ? "multiple" : "single"}
+            onValueChange={(value: "single" | "multiple") => updateFieldConfig(selectedField.id, { selectionMode: value })}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="single">Single Choice</SelectItem>
+              <SelectItem value="multiple">Multiple Choice</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      ) : null}
 
-  useLockConflictGuard({
-    active: activeTab === "builder" && Boolean(draft?.id) && !(draft?.id?.startsWith("draft-")),
-    resourceId: activeTab === "builder" && draft && !draft.id.startsWith("draft-") ? draft.id : null,
-    resourceLabel: "form",
-    editorLock,
-    onConflict: () => {
-      setActiveTab("entries");
-      setSelectedFormId(null);
-      setSelectedFieldId(null);
-      setFormSettingsOpen(false);
-      setDraft(null);
-      setSavedDraftSnapshot("");
-    },
-  });
+      {selectedField.type !== "select" && selectedField.type !== "multiselect" ? (
+        <div className="space-y-1.5">
+          <Label>Choice Layout</Label>
+          <Select
+            value={selectedField.config?.choiceLayout === "grid" ? "grid" : selectedField.config?.choiceLayout === "inline" ? "inline" : "stacked"}
+            onValueChange={(value: "stacked" | "inline" | "grid") => updateFieldConfig(selectedField.id, { choiceLayout: value })}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CHOICE_LAYOUT_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      ) : null}
 
+      <div className="space-y-3">
+        {pairWithKeys(selectedField.options ?? [], choiceKeys).map(({ item: option, key: choiceKey }, index) => (
+          <div key={choiceKey} className="rounded-lg border bg-background p-3">
+            <div className="grid gap-3">
+              <div className="space-y-1.5">
+                <Label>Choice Label</Label>
+                <Input
+                  value={option.label}
+                  onChange={(event) => updateChoice(selectedField.id, option.value, { label: event.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Stored Value</Label>
+                <Input
+                  value={option.value}
+                  onChange={(event) => updateChoice(selectedField.id, option.value, { value: slugify(event.target.value) || option.value })}
+                />
+              </div>
+              {selectedField.type === "image-choice" ? (
+                <div className="space-y-1.5">
+                  <Label>Choice Image</Label>
+                  <CmsImageUpload
+                    value={option.imageUrl ?? ""}
+                    onChange={(value) => updateChoice(selectedField.id, option.value, { imageUrl: value ?? "" })}
+                    label="Choice image"
+                  />
+                </div>
+              ) : null}
+              <Button type="button" variant="ghost" size="sm" className="justify-start text-destructive" onClick={() => {
+                removeChoiceKey(index);
+                removeChoice(selectedField.id, option.value);
+              }}>
+                <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                Remove Choice
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ListFieldSettings({
+  addListColumn,
+  selectedField,
+  updateListColumn,
+  removeListColumn,
+  updateFieldConfig,
+}: {
+  addListColumn: (fieldId: string) => void;
+  selectedField: CmsFormField;
+  updateListColumn: (fieldId: string, columnId: string, updates: Partial<CmsFormListColumn>) => void;
+  removeListColumn: (fieldId: string, columnId: string) => void;
+  updateFieldConfig: (fieldId: string, updates: Partial<CmsFormFieldConfig>) => void;
+}) {
+  return (
+    <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
+      <div className="flex items-center justify-between">
+        <Label>List Columns</Label>
+        <Button type="button" size="sm" variant="outline" onClick={() => addListColumn(selectedField.id)}>
+          <Plus className="mr-1.5 h-3.5 w-3.5" />
+          Add Column
+        </Button>
+      </div>
+      <div className="space-y-3">
+        {(selectedField.config?.listColumns ?? []).map((column) => (
+          <div key={column.id} className="rounded-lg border bg-background p-3">
+            <div className="grid gap-3">
+              <div className="space-y-1.5">
+                <Label>Column Label</Label>
+                <Input
+                  value={column.label}
+                  onChange={(event) => updateListColumn(selectedField.id, column.id, { label: event.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Placeholder</Label>
+                <Input
+                  value={column.placeholder ?? ""}
+                  onChange={(event) => updateListColumn(selectedField.id, column.id, { placeholder: event.target.value })}
+                />
+              </div>
+              <Button type="button" variant="ghost" size="sm" className="justify-start text-destructive" onClick={() => removeListColumn(selectedField.id, column.id)}>
+                <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                Remove Column
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="space-y-1.5">
+        <Label>Max Rows</Label>
+        <Input
+          type="number"
+          min={1}
+          value={String(selectedField.config?.maxRows ?? 10)}
+          onChange={(event) => updateFieldConfig(selectedField.id, { maxRows: Number(event.target.value) || 10 })}
+        />
+      </div>
+    </div>
+  );
+}
+
+function AddressFieldSettings({ selectedField, updateFieldConfig }: {
+  selectedField: CmsFormField;
+  updateFieldConfig: (fieldId: string, updates: Partial<CmsFormFieldConfig>) => void;
+}) {
+  return (
+    <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
+      <div className="flex h-10 items-center rounded-md border px-3">
+        <Switch
+          checked={Boolean(selectedField.config?.showStreet2)}
+          onCheckedChange={(checked) => updateFieldConfig(selectedField.id, { showStreet2: checked })}
+        />
+        <span className="ml-3 text-sm text-muted-foreground">Include Street Address 2</span>
+      </div>
+      <div className="flex h-10 items-center rounded-md border px-3">
+        <Switch
+          checked={Boolean(selectedField.config?.showCountry)}
+          onCheckedChange={(checked) => updateFieldConfig(selectedField.id, { showCountry: checked })}
+        />
+        <span className="ml-3 text-sm text-muted-foreground">Include Country field</span>
+      </div>
+      <div className="space-y-1.5">
+        <Label>Address Layout</Label>
+        <Select
+          value={selectedField.config?.addressLayout === "compact" ? "compact" : "stacked"}
+          onValueChange={(value: "stacked" | "compact") => updateFieldConfig(selectedField.id, { addressLayout: value })}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="stacked">Stacked</SelectItem>
+            <SelectItem value="compact">Compact Grid</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+}
+
+function TimeFieldSettings({ selectedField, updateFieldConfig }: {
+  selectedField: CmsFormField;
+  updateFieldConfig: (fieldId: string, updates: Partial<CmsFormFieldConfig>) => void;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label>Time Format</Label>
+      <Select
+        value={selectedField.config?.timeFormat === "24" ? "24" : "12"}
+        onValueChange={(value: "12" | "24") => updateFieldConfig(selectedField.id, { timeFormat: value })}
+      >
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="12">12-hour</SelectItem>
+          <SelectItem value="24">24-hour</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+function ConsentFieldSettings({ selectedField, updateFieldConfig }: {
+  selectedField: CmsFormField;
+  updateFieldConfig: (fieldId: string, updates: Partial<CmsFormFieldConfig>) => void;
+}) {
+  return (
+    <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
+      <div className="space-y-1.5">
+        <Label>Consent Label</Label>
+        <Input
+          value={String(selectedField.config?.consentCheckboxLabel ?? "")}
+          onChange={(event) => updateFieldConfig(selectedField.id, { consentCheckboxLabel: event.target.value })}
+        />
+      </div>
+      <div className="space-y-1.5">
+        <Label>Consent Description</Label>
+        <Textarea
+          rows={3}
+          value={String(selectedField.config?.consentDescription ?? "")}
+          onChange={(event) => updateFieldConfig(selectedField.id, { consentDescription: event.target.value })}
+        />
+      </div>
+    </div>
+  );
+}
+
+function PageBreakFieldSettings({ selectedField, updateFieldConfig }: {
+  selectedField: CmsFormField;
+  updateFieldConfig: (fieldId: string, updates: Partial<CmsFormFieldConfig>) => void;
+}) {
+  return (
+    <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
+      <div className="space-y-1.5">
+        <Label>Page Title</Label>
+        <Input
+          value={String(selectedField.config?.pageTitle ?? "")}
+          onChange={(event) => updateFieldConfig(selectedField.id, { pageTitle: event.target.value })}
+        />
+      </div>
+      <div className="space-y-1.5">
+        <Label>Page Description</Label>
+        <Textarea
+          rows={2}
+          value={String(selectedField.config?.pageDescription ?? "")}
+          onChange={(event) => updateFieldConfig(selectedField.id, { pageDescription: event.target.value })}
+        />
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-1.5">
+          <Label>Next Button Text</Label>
+          <Input
+            value={String(selectedField.config?.nextButtonText ?? "Next")}
+            onChange={(event) => updateFieldConfig(selectedField.id, { nextButtonText: event.target.value })}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label>Previous Button Text</Label>
+          <Input
+            value={String(selectedField.config?.previousButtonText ?? "Previous")}
+            onChange={(event) => updateFieldConfig(selectedField.id, { previousButtonText: event.target.value })}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HtmlFieldSettings({ selectedField, updateFieldConfig }: {
+  selectedField: CmsFormField;
+  updateFieldConfig: (fieldId: string, updates: Partial<CmsFormFieldConfig>) => void;
+}) {
+  return (
+    <div className="space-y-1.5 rounded-xl border bg-muted/20 p-4">
+      <Label>HTML / Embed Code</Label>
+      <Textarea
+        rows={8}
+        value={String(selectedField.config?.htmlContent ?? "")}
+        onChange={(event) => updateFieldConfig(selectedField.id, { htmlContent: event.target.value })}
+        placeholder="<iframe ...></iframe>"
+      />
+      <p className="text-xs text-muted-foreground">
+        Use this for custom instructions, trusted 3rd-party embeds, or raw HTML snippets inside a form.
+      </p>
+    </div>
+  );
+}
+
+function SectionFieldSettings({ selectedField, updateFieldConfig }: {
+  selectedField: CmsFormField;
+  updateFieldConfig: (fieldId: string, updates: Partial<CmsFormFieldConfig>) => void;
+}) {
+  return (
+    <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
+      <div className="space-y-1.5">
+        <Label>Section Title</Label>
+        <Input
+          value={String(selectedField.config?.sectionTitle ?? "")}
+          onChange={(event) => updateFieldConfig(selectedField.id, { sectionTitle: event.target.value })}
+        />
+      </div>
+      <div className="space-y-1.5">
+        <Label>Section Subtitle</Label>
+        <Textarea
+          rows={2}
+          value={String(selectedField.config?.sectionSubtitle ?? "")}
+          onChange={(event) => updateFieldConfig(selectedField.id, { sectionSubtitle: event.target.value })}
+        />
+      </div>
+      <div className="flex h-10 items-center rounded-md border px-3">
+        <Switch
+          checked={Boolean(selectedField.config?.showDivider)}
+          onCheckedChange={(checked) => updateFieldConfig(selectedField.id, { showDivider: checked })}
+        />
+        <span className="ml-3 text-sm text-muted-foreground">Show horizontal rule</span>
+      </div>
+      <div className="space-y-1.5">
+        <Label>Divider Color</Label>
+        <Input
+          type="color"
+          value={String(selectedField.config?.dividerColor ?? "#e2e8f0")}
+          onChange={(event) => updateFieldConfig(selectedField.id, { dividerColor: event.target.value })}
+        />
+      </div>
+    </div>
+  );
+}
+
+function NameFieldSettings({ selectedField, updateFieldConfig }: {
+  selectedField: CmsFormField;
+  updateFieldConfig: (fieldId: string, updates: Partial<CmsFormFieldConfig>) => void;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label>Name Format</Label>
+      <Select
+        value={selectedField.config?.nameFormat === "split" ? "split" : "full"}
+        onValueChange={(value: "full" | "split") => updateFieldConfig(selectedField.id, { nameFormat: value })}
+      >
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="full">Full Name</SelectItem>
+          <SelectItem value="split">First + Last Name</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+function FormFieldCanvas({
+  draft,
+  dropIndex,
+  setDropIndex,
+  onDropFieldAtIndex,
+  draggingFieldIdRef,
+  setSelectedFieldId,
+  selectedFieldId,
+  removeField,
+}: {
+  draft: EditableForm;
+  dropIndex: number | null;
+  setDropIndex: React.Dispatch<React.SetStateAction<number | null>>;
+  onDropFieldAtIndex: (index: number) => void;
+  draggingFieldIdRef: ReturnType<typeof useRef<string | null>>;
+  setSelectedFieldId: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedFieldId: string | null;
+  removeField: (fieldId: string) => void;
+}) {
+  return (
+    <div
+      className="rounded-xl border bg-muted/10 p-4"
+      onDragOver={(event) => {
+        event.preventDefault();
+        if (draft.fields.length > 0 && dropIndex === null) {
+          setDropIndex(draft.fields.length);
+        }
+      }}
+      onDrop={(event) => {
+        event.preventDefault();
+        onDropFieldAtIndex(dropIndex ?? draft.fields.length);
+      }}
+    >
+      {draft.fields.length === 0 ? (
+        <div
+          className="rounded-lg border border-dashed px-6 py-12 text-center text-sm text-muted-foreground"
+          onDragOver={(event) => {
+            event.preventDefault();
+            setDropIndex(0);
+          }}
+          onDrop={(event) => {
+            event.preventDefault();
+            onDropFieldAtIndex(0);
+          }}
+        >
+          Drag a field from the right sidebar or click one there to start building this form.
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {draft.fields.map((field, index) => {
+            const libraryItem = getFieldLibraryItem(field.type);
+            const Icon = libraryItem?.icon ?? PanelTopOpen;
+
+            return (
+              <div key={field.id} className="space-y-3">
+                <div
+                  className={cn("h-2 rounded-full transition-colors", dropIndex === index ? "bg-primary/40" : "bg-transparent")}
+                  onDragOver={(event) => {
+                    event.preventDefault();
+                    setDropIndex(index);
+                  }}
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    onDropFieldAtIndex(index);
+                  }}
+                />
+                <div
+                  draggable
+                  onDragStart={(event) => {
+                    event.dataTransfer.effectAllowed = "move";
+                    event.dataTransfer.setData("text/plain", field.id);
+                    draggingFieldIdRef.current = field.id;
+                  }}
+                  onDragEnd={() => {
+                    draggingFieldIdRef.current = null;
+                    setDropIndex(null);
+                  }}
+                  onDragOver={(event) => {
+                    event.preventDefault();
+                    setDropIndex(index);
+                  }}
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    onDropFieldAtIndex(index);
+                  }}
+                  onClick={() => setSelectedFieldId(field.id)}
+                  onKeyDown={onActivateKey(() => setSelectedFieldId(field.id))}
+                  role="button"
+                  tabIndex={0}
+                  aria-pressed={selectedFieldId === field.id}
+                  className={cn(
+                    "rounded-xl border bg-background p-4 transition-colors",
+                    selectedFieldId === field.id ? "border-primary ring-2 ring-primary/10" : "hover:bg-muted/20"
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                      <GripVertical className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        <Icon className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="text-sm font-semibold">{field.label || "Untitled Field"}</p>
+                          <Badge variant="outline" className="text-[10px] uppercase">{field.type}</Badge>
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {fieldSubtitle(field)} • {field.width === "half" ? "Half width" : "Full width"}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Remove field"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        removeField(field.id);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          <div
+            className={cn(
+              "h-2 rounded-full transition-colors",
+              dropIndex === draft.fields.length ? "bg-primary/40" : "bg-transparent"
+            )}
+            onDragOver={(event) => {
+              event.preventDefault();
+              setDropIndex(draft.fields.length);
+            }}
+            onDrop={(event) => {
+              event.preventDefault();
+              onDropFieldAtIndex(draft.fields.length);
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FormSettingsHeader({
+  draft,
+  publicFormLink,
+  toast,
+  deleteMutation,
+  editorLock,
+  formSettingsOpen,
+  setFormSettingsOpen,
+}: {
+  draft: EditableForm;
+  publicFormLink: string;
+  toast: ReturnType<typeof useToast>["toast"];
+  deleteMutation: UseMutationResult<void, Error, string, unknown>;
+  editorLock: ReturnType<typeof useEditorLock>;
+  formSettingsOpen: boolean;
+  setFormSettingsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  return (
+    <CardHeader className="flex flex-row items-start justify-between gap-4">
+      <div>
+        <CardTitle className="text-base">Form Settings</CardTitle>
+        <CardDescription>Control the form identity, success behavior, and Mailchimp mapping.</CardDescription>
+      </div>
+      <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={async () => {
+            if (!draft.isActive || !publicFormLink) return;
+            try {
+              await navigator.clipboard.writeText(publicFormLink);
+              toast({ title: "Form link copied" });
+            } catch {
+              toast({
+                title: "Unable to copy link",
+                description: "Please copy the public form URL manually.",
+                variant: "destructive",
+              });
+            }
+          }}
+          disabled={!draft.isActive || !publicFormLink}
+        >
+          <Copy className="mr-2 h-4 w-4" />
+          Copy Form Link
+        </Button>
+        {!draft.isSystem ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="text-destructive"
+            onClick={() => deleteMutation.mutate(draft.id)}
+            disabled={deleteMutation.isPending || draft.id.startsWith("draft-") || editorLock.isReadOnly}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete
+          </Button>
+        ) : null}
+        <Button type="button" variant="outline" size="icon" aria-label={formSettingsOpen ? "Collapse form settings" : "Expand form settings"} onClick={() => setFormSettingsOpen((current) => !current)}>
+          {formSettingsOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </Button>
+      </div>
+    </CardHeader>
+  );
+}
+
+function FormListButton({ form, handleSelectForm, active }: {
+  form: CmsForm;
+  handleSelectForm: (form: CmsForm) => void;
+  active: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => handleSelectForm(form)}
+      className={cn(
+        "w-full rounded-lg border px-3 py-3 text-left transition-colors",
+        active ? "border-primary bg-primary/5" : "hover:bg-muted/40"
+      )}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-medium">{form.name}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{form.slug}</p>
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          {form.isSystem ? <Badge variant="secondary">System</Badge> : null}
+          <Badge variant={form.isActive ? "default" : "outline"}>{form.isActive ? "Active" : "Inactive"}</Badge>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+function FormEntriesTab({
+  activeForms,
+  setRequestedEntriesFormId,
+  setSelectedEntryId,
+  selectedEntriesFormId,
+  submissions,
+  isSubmissionsLoading,
+  selectedSubmission,
+  deleteSubmissionMutation,
+}: {
+  activeForms: CmsForm[];
+  setRequestedEntriesFormId: React.Dispatch<React.SetStateAction<string | null>>;
+  setSelectedEntryId: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedEntriesFormId: string | null;
+  submissions: CmsFormSubmission[];
+  isSubmissionsLoading: ReturnType<typeof useQuery<CmsFormSubmission[]>>["isLoading"];
+  selectedSubmission: { id: string; data: Record<string, unknown>; createdAt: Date | null; formId: string; source: string | null; } | null;
+  deleteSubmissionMutation: UseMutationResult<void, Error, { formId: string; submissionId: string; }, unknown>;
+}) {
+  return (
+    <TabsContent value="entries" className="mt-0">
+      <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
+        <Card className="h-fit">
+          <CardHeader>
+            <CardTitle className="text-base">Active Forms</CardTitle>
+            <CardDescription>
+              Choose a live form to review everything submitted through the site.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {activeForms.length === 0 ? (
+              <div className="rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
+                No active forms are available yet.
+              </div>
+            ) : (
+              activeForms.map((form) => (
+                <EntriesFormButton key={form.id}
+                  form={form}
+                  setRequestedEntriesFormId={setRequestedEntriesFormId}
+                  setSelectedEntryId={setSelectedEntryId}
+                  selectedEntriesFormId={selectedEntriesFormId}
+                />
+              ))
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row flex-wrap items-start justify-between gap-4">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Inbox className="h-4 w-4 text-primary" />
+                Form Entries
+              </CardTitle>
+              <CardDescription>
+                Stored submissions remain here even after notification emails are sent.
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  if (!selectedEntriesFormId || submissions.length === 0) return;
+                  const selectedForm = activeForms.find((form) => form.id === selectedEntriesFormId);
+                  const csv = buildSubmissionCsv(submissions);
+                  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+                  const url = URL.createObjectURL(blob);
+                  const anchor = document.createElement("a");
+                  anchor.href = url;
+                  anchor.download = `${selectedForm?.slug ?? "form"}-entries.csv`;
+                  anchor.click();
+                  URL.revokeObjectURL(url);
+                }}
+                disabled={!selectedEntriesFormId || submissions.length === 0}
+                data-testid="button-export-form-entries"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Export CSV
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {!selectedEntriesFormId ? (
+              <div className="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
+                Select an active form to view its entries.
+              </div>
+            ) : isSubmissionsLoading ? (
+              <div className="space-y-3">
+                <Card className="border-dashed"><CardContent className="py-8 text-center text-sm text-muted-foreground">Loading form entries…</CardContent></Card>
+              </div>
+            ) : submissions.length === 0 ? (
+              <div className="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
+                No entries have been submitted for this form yet.
+              </div>
+            ) : selectedSubmission ? (
+              <SelectedSubmissionDetail
+                setSelectedEntryId={setSelectedEntryId}
+                selectedSubmission={selectedSubmission}
+                deleteSubmissionMutation={deleteSubmissionMutation}
+                selectedEntriesFormId={selectedEntriesFormId}
+              />
+            ) : (
+              <div className="space-y-3">
+                {submissions.map((submission) => (
+                  <SubmissionListButton key={submission.id} submission={submission} setSelectedEntryId={setSelectedEntryId} />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </TabsContent>
+  );
+}
+
+const NO_PLACEHOLDER_TYPES = new Set<CmsFormFieldType>([
+  "section", "page", "html", "consent", "hidden", "checkbox", "radio", "select", "multiselect", "image-choice", "list",
+]);
+const NO_HELP_TEXT_TYPES = new Set<CmsFormFieldType>(["html", "section", "page", "hidden"]);
+
+function supportsPlaceholder(type: CmsFormFieldType) {
+  return !NO_PLACEHOLDER_TYPES.has(type);
+}
+
+function supportsHelpText(type: CmsFormFieldType) {
+  return !NO_HELP_TEXT_TYPES.has(type);
+}
+
+function supportsRequiredAndWidth(type: CmsFormFieldType) {
+  return !isStructuralField(type) && type !== "hidden";
+}
+
+function FieldBasicsSettings({
+  selectedField,
+  updateField,
+  replaceFieldType,
+}: {
+  selectedField: CmsFormField;
+  updateField: (fieldId: string, updates: Partial<CmsFormField>) => void;
+  replaceFieldType: (fieldId: string, type: CmsFormFieldType) => void;
+}) {
+  return (
+    <>
+    <div className="space-y-1.5">
+      <Label>Label</Label>
+      <Input value={selectedField.label} onChange={(event) => updateField(selectedField.id, { label: event.target.value })} />
+    </div>
+
+    <div className="space-y-1.5">
+      <Label>Field Key</Label>
+      <Input
+        value={selectedField.key}
+        onChange={(event) => updateField(selectedField.id, { key: slugify(event.target.value) || selectedField.key })}
+      />
+    </div>
+
+    <div className="grid gap-4 md:grid-cols-2">
+      <div className="space-y-1.5">
+        <Label>Field Type</Label>
+        <Select value={selectedField.type} onValueChange={(value: CmsFormFieldType) => replaceFieldType(selectedField.id, value)}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {FIELD_TYPE_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      {supportsRequiredAndWidth(selectedField.type) ? (
+        <div className="space-y-1.5">
+          <Label>Width</Label>
+          <Select value={selectedField.width} onValueChange={(value: "full" | "half") => updateField(selectedField.id, { width: value })}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="full">Full Width</SelectItem>
+              <SelectItem value="half">Half Width</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      ) : null}
+    </div>
+
+    {supportsPlaceholder(selectedField.type) ? (
+      <div className="space-y-1.5">
+        <Label>Placeholder</Label>
+        <Input
+          value={selectedField.placeholder ?? ""}
+          onChange={(event) => updateField(selectedField.id, { placeholder: event.target.value })}
+        />
+      </div>
+    ) : null}
+
+    {supportsHelpText(selectedField.type) ? (
+      <div className="space-y-1.5">
+        <Label>Help Text</Label>
+        <Textarea
+          rows={2}
+          value={selectedField.helpText ?? ""}
+          onChange={(event) => updateField(selectedField.id, { helpText: event.target.value })}
+        />
+      </div>
+    ) : null}
+
+    {supportsRequiredAndWidth(selectedField.type) ? (
+      <div className="flex h-10 items-center rounded-md border px-3">
+        <Switch
+          checked={Boolean(selectedField.required)}
+          onCheckedChange={(checked) => updateField(selectedField.id, { required: checked })}
+        />
+        <span className="ml-3 text-sm text-muted-foreground">Required field</span>
+      </div>
+    ) : null}
+    </>
+  );
+}
+
+type FieldConfigSettingsProps = {
+  selectedField: CmsFormField;
+  updateFieldConfig: (fieldId: string, updates: Partial<CmsFormFieldConfig>) => void;
+};
+
+function HiddenFieldSettings({ selectedField, updateFieldConfig }: FieldConfigSettingsProps) {
+  return (
+      <div className="space-y-1.5 rounded-xl border bg-muted/20 p-4">
+        <Label>Default Value</Label>
+        <Input
+          value={String(selectedField.config?.defaultValue ?? "")}
+          onChange={(event) => updateFieldConfig(selectedField.id, { defaultValue: event.target.value })}
+        />
+      </div>
+  );
+}
+
+const SIMPLE_FIELD_TYPE_SETTINGS: Partial<Record<CmsFormFieldType, (props: FieldConfigSettingsProps) => ReactElement>> = {
+  name: NameFieldSettings,
+  section: SectionFieldSettings,
+  html: HtmlFieldSettings,
+  page: PageBreakFieldSettings,
+  hidden: HiddenFieldSettings,
+  consent: ConsentFieldSettings,
+  time: TimeFieldSettings,
+  address: AddressFieldSettings,
+};
+
+function SelectedFieldInspector({
+  setSelectedFieldId,
+  selectedFieldLibraryItem,
+  selectedField,
+  updateField,
+  replaceFieldType,
+  updateFieldConfig,
+  addListColumn,
+  updateListColumn,
+  removeListColumn,
+  addChoice,
+  choiceKeys,
+  updateChoice,
+  removeChoiceKey,
+  removeChoice,
+}: {
+  setSelectedFieldId: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedFieldLibraryItem: FieldLibraryItem | null | undefined;
+  selectedField: CmsFormField;
+  updateField: (fieldId: string, updates: Partial<CmsFormField>) => void;
+  replaceFieldType: (fieldId: string, type: CmsFormFieldType) => void;
+  updateFieldConfig: (fieldId: string, updates: Partial<CmsFormFieldConfig>) => void;
+  addListColumn: (fieldId: string) => void;
+  updateListColumn: (fieldId: string, columnId: string, updates: Partial<CmsFormListColumn>) => void;
+  removeListColumn: (fieldId: string, columnId: string) => void;
+  addChoice: (fieldId: string) => void;
+  choiceKeys: ReturnType<typeof useListKeys>["keys"];
+  updateChoice: (fieldId: string, optionId: string, updates: Partial<CmsFormFieldOption>) => void;
+  removeChoiceKey: ReturnType<typeof useListKeys>["removeKey"];
+  removeChoice: (fieldId: string, optionId: string) => void;
+}) {
+  const TypeSettings = SIMPLE_FIELD_TYPE_SETTINGS[selectedField.type];
+
+  return (
+    <>
+      <Button type="button" variant="outline" className="w-full justify-center" onClick={() => setSelectedFieldId(null)}>
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Back to Fields
+      </Button>
+      <div className="flex items-start gap-3 rounded-xl border bg-muted/20 p-3">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            {selectedFieldLibraryItem ? <selectedFieldLibraryItem.icon className="h-4.5 w-4.5" /> : <PanelTopOpen className="h-4.5 w-4.5" />}
+          </div>
+          <div>
+            <p className="text-sm font-semibold leading-tight">{selectedField.label || "Untitled Field"}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{selectedFieldLibraryItem?.label ?? selectedField.type}</p>
+          </div>
+        </div>
+      </div>
+      <FieldBasicsSettings selectedField={selectedField} updateField={updateField} replaceFieldType={replaceFieldType} />
+
+      {TypeSettings ? <TypeSettings selectedField={selectedField} updateFieldConfig={updateFieldConfig} /> : null}
+
+      {selectedField.type === "list" ? (
+        <ListFieldSettings
+          addListColumn={addListColumn}
+          selectedField={selectedField}
+          updateListColumn={updateListColumn}
+          removeListColumn={removeListColumn}
+          updateFieldConfig={updateFieldConfig}
+        />
+      ) : null}
+
+      {supportsChoices(selectedField.type) ? (
+        <ChoiceFieldSettings
+          addChoice={addChoice}
+          selectedField={selectedField}
+          updateFieldConfig={updateFieldConfig}
+          choiceKeys={choiceKeys}
+          updateChoice={updateChoice}
+          removeChoiceKey={removeChoiceKey}
+          removeChoice={removeChoice}
+        />
+      ) : null}
+    </>
+  );
+}
+
+function FormSettingsFields({ draft, updateDraft, publicFormLink }: {
+  draft: EditableForm;
+  updateDraft: (updater: (current: EditableForm) => EditableForm) => void;
+  publicFormLink: string;
+}) {
+  return (
+    <CardContent className="space-y-5">
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-1.5">
+          <Label>Name</Label>
+          <Input
+            value={draft.name}
+            onChange={(event) =>
+              updateDraft((current) => ({
+                ...current,
+                name: event.target.value,
+                slug:
+                  current.id.startsWith("draft-") && (!current.slug || current.slug.startsWith("form-"))
+                    ? slugify(event.target.value)
+                    : current.slug,
+              }))
+            }
+          />
+        </div>
+      <div className="space-y-1.5">
+        <Label>Slug</Label>
+        <Input
+          value={draft.slug}
+          onChange={(event) => updateDraft((current) => ({ ...current, slug: slugify(event.target.value) }))}
+        />
+      </div>
+    </div>
+
+      <div className="space-y-1.5">
+        <Label>Public Form Link</Label>
+        <Input
+          value={draft.isActive ? publicFormLink : "Activate this form to generate a shareable public link."}
+          readOnly
+        />
+        <p className="text-xs text-muted-foreground">
+          Shared links open a minimal standalone form page with the company logo and no site navigation.
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-1.5">
+          <Label>Form Type</Label>
+          <Select value={draft.kind} onValueChange={(value: CmsFormKind) => updateDraft((current) => ({ ...current, kind: value }))}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {KIND_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1.5">
+          <Label>Active</Label>
+          <div className="flex h-10 items-center rounded-md border px-3">
+            <Switch
+              checked={draft.isActive}
+              onCheckedChange={(checked) => updateDraft((current) => ({ ...current, isActive: checked }))}
+            />
+            <span className="ml-3 text-sm text-muted-foreground">
+              {draft.isActive ? "Form is live and embeddable" : "Form is hidden from public usage"}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label>Description</Label>
+        <Textarea
+          rows={3}
+          value={draft.description ?? ""}
+          onChange={(event) => updateDraft((current) => ({ ...current, description: event.target.value }))}
+        />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-1.5">
+          <Label>Submit Button Text</Label>
+          <Input
+            value={String(draft.settings.submitButtonText ?? "Submit")}
+            onChange={(event) =>
+              updateDraft((current) => ({
+                ...current,
+                settings: { ...current.settings, submitButtonText: event.target.value },
+              }))
+            }
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label>Success Message</Label>
+          <Textarea
+            rows={2}
+            value={String(draft.settings.successMessage ?? "")}
+            onChange={(event) =>
+              updateDraft((current) => ({
+                ...current,
+                settings: { ...current.settings, successMessage: event.target.value },
+              }))
+            }
+          />
+        </div>
+      </div>
+
+      <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
+        <div className="flex items-center gap-2">
+          <Mail className="h-4 w-4 text-primary" />
+          <div>
+            <p className="text-sm font-semibold">Mailchimp Routing</p>
+            <p className="text-xs text-muted-foreground">Each form owns its own Mailchimp tag. Credentials stay in Integrations.</p>
+          </div>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label>Mailchimp Enabled</Label>
+            <div className="flex h-10 items-center rounded-md border px-3">
+              <Switch
+                checked={Boolean(draft.settings.mailchimpEnabled)}
+                onCheckedChange={(checked) =>
+                  updateDraft((current) => ({
+                    ...current,
+                    settings: { ...current.settings, mailchimpEnabled: checked },
+                  }))
+                }
+              />
+              <span className="ml-3 text-sm text-muted-foreground">Sync submissions to Mailchimp</span>
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label>Mailchimp Tag</Label>
+            <Input
+              value={String(draft.settings.mailchimpTag ?? "")}
+              onChange={(event) =>
+                updateDraft((current) => ({
+                  ...current,
+                  settings: { ...current.settings, mailchimpTag: event.target.value },
+                }))
+              }
+              placeholder="Glass & Door Pro Newsletter"
+            />
+          </div>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="flex h-10 items-center rounded-md border px-3">
+            <Switch
+              checked={Boolean(draft.settings.notifyAdmins)}
+              onCheckedChange={(checked) =>
+                updateDraft((current) => ({
+                  ...current,
+                  settings: { ...current.settings, notifyAdmins: checked },
+                }))
+              }
+            />
+            <span className="ml-3 text-sm text-muted-foreground">Email admins on submission</span>
+          </div>
+          <div className="flex h-10 items-center rounded-md border px-3">
+            <Switch
+              checked={Boolean(draft.settings.storeAsContactMessage)}
+              onCheckedChange={(checked) =>
+                updateDraft((current) => ({
+                  ...current,
+                  settings: { ...current.settings, storeAsContactMessage: checked },
+                }))
+              }
+            />
+            <span className="ml-3 text-sm text-muted-foreground">Store in contact inbox</span>
+          </div>
+        </div>
+      </div>
+    </CardContent>
+  );
+}
+
+function updateFormField(
+  form: EditableForm,
+  fieldId: string,
+  transform: (field: CmsFormField) => CmsFormField,
+): EditableForm {
+  return {
+    ...form,
+    fields: form.fields.map((field) => (field.id === fieldId ? normalizeField(transform(field)) : field)),
+  };
+}
+
+function withFieldType(field: CmsFormField, type: CmsFormFieldType): CmsFormField {
+  return {
+    ...field,
+    type,
+    options: createDefaultOptions(type),
+    config: cmsFormFieldConfigSchema.parse(createDefaultConfig(type)),
+    width: isFullWidthField(type) ? "full" : "half",
+    required: !isStructuralField(type) && type !== "hidden" ? field.required : false,
+  };
+}
+
+function listColumnsOf(field: CmsFormField | null) {
+  return Array.isArray(field?.config?.listColumns) ? field.config.listColumns : [];
+}
+
+/** Draft-editing operations for the form builder's fields, choices, and list columns. */
+function useFormFieldEditing({
+  draft,
+  setDraft,
+  selectedField,
+  selectedFieldId,
+  setSelectedFieldId,
+  setDropIndex,
+  draggingFieldTypeRef,
+  draggingFieldIdRef,
+}: {
+  draft: EditableForm | null;
+  setDraft: React.Dispatch<React.SetStateAction<EditableForm | null>>;
+  selectedField: CmsFormField | null;
+  selectedFieldId: string | null;
+  setSelectedFieldId: (id: string | null) => void;
+  setDropIndex: (index: number | null) => void;
+  draggingFieldTypeRef: React.MutableRefObject<CmsFormFieldType | null>;
+  draggingFieldIdRef: React.MutableRefObject<string | null>;
+}) {
   const updateDraft = (updater: (current: EditableForm) => EditableForm) => {
     setDraft((current) => (current ? updater(current) : current));
   };
-
-  const updateField = (fieldId: string, updates: Partial<CmsFormField>) => {
-    updateDraft((current) => ({
-      ...current,
-      fields: current.fields.map((field) =>
-        field.id === fieldId ? normalizeField({ ...field, ...updates }) : field
-      ),
-    }));
+  const editField = (fieldId: string, transform: (field: CmsFormField) => CmsFormField) => {
+    updateDraft((current) => updateFormField(current, fieldId, transform));
   };
 
-  const updateFieldConfig = (fieldId: string, updates: Partial<CmsFormFieldConfig>) => {
-    updateDraft((current) => ({
-      ...current,
-      fields: current.fields.map((field) =>
-        field.id === fieldId
-          ? normalizeField({
-              ...field,
-              config: { ...(field.config ?? {}), ...updates },
-            })
-          : field
-      ),
-    }));
-  };
+  const updateField = (fieldId: string, updates: Partial<CmsFormField>) =>
+    editField(fieldId, (field) => ({ ...field, ...updates }));
 
-  const replaceFieldType = (fieldId: string, type: CmsFormFieldType) => {
-    updateDraft((current) => ({
-      ...current,
-      fields: current.fields.map((field) =>
-        field.id === fieldId
-          ? normalizeField({
-              ...field,
-              type,
-              options: createDefaultOptions(type),
-              config: cmsFormFieldConfigSchema.parse(createDefaultConfig(type)),
-              width: isFullWidthField(type) ? "full" : "half",
-              required: !isStructuralField(type) && type !== "hidden" ? field.required : false,
-            })
-          : field
-      ),
-    }));
-  };
+  const updateFieldConfig = (fieldId: string, updates: Partial<CmsFormFieldConfig>) =>
+    editField(fieldId, (field) => ({ ...field, config: { ...(field.config ?? {}), ...updates } }));
+
+  const replaceFieldType = (fieldId: string, type: CmsFormFieldType) =>
+    editField(fieldId, (field) => withFieldType(field, type));
 
   const addField = (type: CmsFormFieldType, index?: number) => {
     if (!draft) return;
@@ -828,95 +1927,592 @@ function FormsPageContent() {
     }
   };
 
-  const updateChoice = (fieldId: string, optionId: string, updates: Partial<CmsFormFieldOption>) => {
-    updateDraft((current) => ({
-      ...current,
-      fields: current.fields.map((field) =>
-        field.id === fieldId
-          ? normalizeField({
-              ...field,
-              options: (field.options ?? []).map((option) =>
-                option.value === optionId ? { ...option, ...updates } : option
-              ),
-            })
-          : field
-      ),
+  const updateChoice = (fieldId: string, optionId: string, updates: Partial<CmsFormFieldOption>) =>
+    editField(fieldId, (field) => ({
+      ...field,
+      options: (field.options ?? []).map((option) => (option.value === optionId ? { ...option, ...updates } : option)),
     }));
-  };
 
-  const addChoice = (fieldId: string) => {
-    updateDraft((current) => ({
-      ...current,
-      fields: current.fields.map((field) =>
-        field.id === fieldId
-          ? normalizeField({
-              ...field,
-              options: [
-                ...(field.options ?? []),
-                { label: "New Option", value: slugify(`new-option-${generateId().slice(0, 4)}`), imageUrl: "" },
-              ],
-            })
-          : field
-      ),
+  const addChoice = (fieldId: string) =>
+    editField(fieldId, (field) => ({
+      ...field,
+      options: [
+        ...(field.options ?? []),
+        { label: "New Option", value: slugify(`new-option-${generateId().slice(0, 4)}`), imageUrl: "" },
+      ],
     }));
-  };
 
-  const removeChoice = (fieldId: string, optionId: string) => {
-    updateDraft((current) => ({
-      ...current,
-      fields: current.fields.map((field) =>
-        field.id === fieldId
-          ? normalizeField({
-              ...field,
-              options: (field.options ?? []).filter((option) => option.value !== optionId),
-            })
-          : field
-      ),
+  const removeChoice = (fieldId: string, optionId: string) =>
+    editField(fieldId, (field) => ({
+      ...field,
+      options: (field.options ?? []).filter((option) => option.value !== optionId),
     }));
-  };
 
   const addListColumn = (fieldId: string) => {
-    const nextColumn: CmsFormListColumn = {
-      id: generateId(),
-      label: "Column",
-      placeholder: "",
-    };
-    const listColumns = Array.isArray(selectedField?.config?.listColumns) ? selectedField.config.listColumns : [];
-    updateFieldConfig(fieldId, { listColumns: [...listColumns, nextColumn] });
+    const nextColumn: CmsFormListColumn = { id: generateId(), label: "Column", placeholder: "" };
+    updateFieldConfig(fieldId, { listColumns: [...listColumnsOf(selectedField), nextColumn] });
   };
 
-  const updateListColumn = (fieldId: string, columnId: string, updates: Partial<CmsFormListColumn>) => {
-    const listColumns = Array.isArray(selectedField?.config?.listColumns) ? selectedField.config.listColumns : [];
+  const updateListColumn = (fieldId: string, columnId: string, updates: Partial<CmsFormListColumn>) =>
     updateFieldConfig(fieldId, {
-      listColumns: listColumns.map((column) => (column.id === columnId ? { ...column, ...updates } : column)),
+      listColumns: listColumnsOf(selectedField).map((column) => (column.id === columnId ? { ...column, ...updates } : column)),
     });
-  };
 
-  const removeListColumn = (fieldId: string, columnId: string) => {
-    const listColumns = Array.isArray(selectedField?.config?.listColumns) ? selectedField.config.listColumns : [];
+  const removeListColumn = (fieldId: string, columnId: string) =>
     updateFieldConfig(fieldId, {
-      listColumns: listColumns.filter((column) => column.id !== columnId),
+      listColumns: listColumnsOf(selectedField).filter((column) => column.id !== columnId),
     });
+
+  const moveDraggedField = (fieldId: string, index: number) => {
+    const currentIndex = draft?.fields.findIndex((field) => field.id === fieldId) ?? -1;
+    if (currentIndex === -1) return;
+    updateDraft((current) => ({ ...current, fields: moveItem(current.fields, currentIndex, index) }));
+    setSelectedFieldId(fieldId);
   };
 
   const onDropFieldAtIndex = (index: number) => {
-    if (draggingFieldTypeRef.current) {
-      addField(draggingFieldTypeRef.current, index);
-    } else if (draggingFieldIdRef.current && draft) {
-      const currentIndex = draft.fields.findIndex((field) => field.id === draggingFieldIdRef.current);
-      if (currentIndex !== -1) {
-        updateDraft((current) => ({
-          ...current,
-          fields: moveItem(current.fields, currentIndex, index),
-        }));
-        setSelectedFieldId(draggingFieldIdRef.current);
-      }
+    const draggedType = draggingFieldTypeRef.current;
+    const draggedFieldId = draggingFieldIdRef.current;
+    if (draggedType) {
+      addField(draggedType, index);
+    } else if (draggedFieldId) {
+      moveDraggedField(draggedFieldId, index);
     }
 
     draggingFieldTypeRef.current = null;
     draggingFieldIdRef.current = null;
     setDropIndex(null);
   };
+
+  return {
+    updateDraft,
+    updateField,
+    updateFieldConfig,
+    replaceFieldType,
+    addField,
+    removeField,
+    updateChoice,
+    addChoice,
+    removeChoice,
+    addListColumn,
+    updateListColumn,
+    removeListColumn,
+    onDropFieldAtIndex,
+  };
+}
+
+function toFormSavePayload(form: EditableForm) {
+  return {
+    name: form.name,
+    slug: form.slug,
+    description: form.description,
+    kind: form.kind,
+    isSystem: form.isSystem,
+    isActive: form.isActive,
+    fields: form.fields,
+    settings: form.settings,
+  };
+}
+
+/** Entries tab state: which active form's submissions are shown and the selected entry. */
+function useFormEntries(forms: CmsForm[]) {
+  const { toast } = useToast();
+  const [requestedEntriesFormId, setRequestedEntriesFormId] = useState<string | null>(null);
+  const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
+
+  const activeForms = useMemo(() => forms.filter((form) => form.isActive), [forms]);
+  const selectedEntriesFormId = activeForms.some((form) => form.id === requestedEntriesFormId)
+    ? requestedEntriesFormId
+    : activeForms[0]?.id ?? null;
+
+  const { data: submissions = [], isLoading: isSubmissionsLoading } = useQuery<CmsFormSubmission[]>({
+    queryKey: ["/api/admin/forms", selectedEntriesFormId, "submissions"],
+    enabled: Boolean(selectedEntriesFormId),
+    queryFn: async () => {
+      const response = await fetch(`/api/admin/forms/${selectedEntriesFormId}/submissions`, {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to load form entries.");
+      }
+      return response.json();
+    },
+  });
+
+  const selectedSubmission = useMemo(
+    () => submissions.find((submission) => submission.id === selectedEntryId) ?? null,
+    [selectedEntryId, submissions]
+  );
+
+  const deleteSubmissionMutation = useMutation({
+    mutationFn: async ({ formId, submissionId }: { formId: string; submissionId: string }) => {
+      await apiRequest("DELETE", `/api/admin/forms/${formId}/submissions/${submissionId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/forms", selectedEntriesFormId, "submissions"] });
+      toast({ title: "Entry deleted" });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Unable to delete entry",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  return {
+    activeForms,
+    selectedEntriesFormId,
+    setRequestedEntriesFormId,
+    setSelectedEntryId,
+    submissions,
+    isSubmissionsLoading,
+    selectedSubmission,
+    deleteSubmissionMutation,
+  };
+}
+
+function FieldInspectorCard({
+  selectedField,
+  setSelectedFieldId,
+  selectedFieldLibraryItem,
+  updateField,
+  replaceFieldType,
+  updateFieldConfig,
+  addListColumn,
+  updateListColumn,
+  removeListColumn,
+  addChoice,
+  choiceKeys,
+  updateChoice,
+  removeChoiceKey,
+  removeChoice,
+  groupedFieldLibrary,
+  openGroups,
+  setOpenGroups,
+  addField,
+  draggingFieldTypeRef,
+  setDropIndex,
+}: {
+  selectedField: CmsFormField | null;
+  setSelectedFieldId: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedFieldLibraryItem: FieldLibraryItem | null | undefined;
+  updateField: ReturnType<typeof useFormFieldEditing>["updateField"];
+  replaceFieldType: ReturnType<typeof useFormFieldEditing>["replaceFieldType"];
+  updateFieldConfig: ReturnType<typeof useFormFieldEditing>["updateFieldConfig"];
+  addListColumn: ReturnType<typeof useFormFieldEditing>["addListColumn"];
+  updateListColumn: ReturnType<typeof useFormFieldEditing>["updateListColumn"];
+  removeListColumn: ReturnType<typeof useFormFieldEditing>["removeListColumn"];
+  addChoice: ReturnType<typeof useFormFieldEditing>["addChoice"];
+  choiceKeys: ReturnType<typeof useListKeys>["keys"];
+  updateChoice: ReturnType<typeof useFormFieldEditing>["updateChoice"];
+  removeChoiceKey: ReturnType<typeof useListKeys>["removeKey"];
+  removeChoice: ReturnType<typeof useFormFieldEditing>["removeChoice"];
+  groupedFieldLibrary: { items: FieldLibraryItem[]; key: "standard" | "advanced"; label: string; }[];
+  openGroups: Record<"standard" | "advanced", boolean>;
+  setOpenGroups: React.Dispatch<React.SetStateAction<Record<"standard" | "advanced", boolean>>>;
+  addField: ReturnType<typeof useFormFieldEditing>["addField"];
+  draggingFieldTypeRef: ReturnType<typeof useRef<CmsFormFieldType | null>>;
+  setDropIndex: React.Dispatch<React.SetStateAction<number | null>>;
+}) {
+  return (
+    <Card className="h-fit 2xl:sticky 2xl:top-24">
+      <CardHeader>
+        <CardTitle className="text-base">{selectedField ? "Field Settings" : "Add Fields"}</CardTitle>
+        <CardDescription>
+          {selectedField
+            ? "Update the selected field’s labels, behavior, and advanced configuration here."
+            : "Standard and advanced fields live here. Click or drag them into the form canvas."}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {selectedField ? (
+          <SelectedFieldInspector
+            setSelectedFieldId={setSelectedFieldId}
+            selectedFieldLibraryItem={selectedFieldLibraryItem}
+            selectedField={selectedField}
+            updateField={updateField}
+            replaceFieldType={replaceFieldType}
+            updateFieldConfig={updateFieldConfig}
+            addListColumn={addListColumn}
+            updateListColumn={updateListColumn}
+            removeListColumn={removeListColumn}
+            addChoice={addChoice}
+            choiceKeys={choiceKeys}
+            updateChoice={updateChoice}
+            removeChoiceKey={removeChoiceKey}
+            removeChoice={removeChoice}
+          />
+        ) : (
+          <FieldLibraryPanel
+            groupedFieldLibrary={groupedFieldLibrary}
+            openGroups={openGroups}
+            setOpenGroups={setOpenGroups}
+            addField={addField}
+            draggingFieldTypeRef={draggingFieldTypeRef}
+            setDropIndex={setDropIndex}
+          />
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function FormFieldsCard({
+  draft,
+  dropIndex,
+  setDropIndex,
+  onDropFieldAtIndex,
+  draggingFieldIdRef,
+  setSelectedFieldId,
+  selectedFieldId,
+  removeField,
+}: {
+  draft: EditableForm;
+  dropIndex: number | null;
+  setDropIndex: React.Dispatch<React.SetStateAction<number | null>>;
+  onDropFieldAtIndex: ReturnType<typeof useFormFieldEditing>["onDropFieldAtIndex"];
+  draggingFieldIdRef: ReturnType<typeof useRef<string | null>>;
+  setSelectedFieldId: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedFieldId: string | null;
+  removeField: ReturnType<typeof useFormFieldEditing>["removeField"];
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Form Canvas</CardTitle>
+        <CardDescription>
+          Drag fields into order here. Select a field to edit its settings in the right sidebar.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <FormFieldCanvas
+          draft={draft}
+          dropIndex={dropIndex}
+          setDropIndex={setDropIndex}
+          onDropFieldAtIndex={onDropFieldAtIndex}
+          draggingFieldIdRef={draggingFieldIdRef}
+          setSelectedFieldId={setSelectedFieldId}
+          selectedFieldId={selectedFieldId}
+          removeField={removeField}
+        />
+      </CardContent>
+    </Card>
+  );
+}
+
+function FormSettingsCard({
+  draft,
+  publicFormLink,
+  toast,
+  deleteMutation,
+  editorLock,
+  formSettingsOpen,
+  setFormSettingsOpen,
+  updateDraft,
+}: {
+  draft: EditableForm;
+  publicFormLink: string;
+  toast: ReturnType<typeof useToast>["toast"];
+  deleteMutation: UseMutationResult<void, Error, string, unknown>;
+  editorLock: ReturnType<typeof useLockedResourceEditor>["editorLock"];
+  formSettingsOpen: boolean;
+  setFormSettingsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  updateDraft: ReturnType<typeof useFormFieldEditing>["updateDraft"];
+}) {
+  return (
+    <Card>
+      <FormSettingsHeader
+        draft={draft}
+        publicFormLink={publicFormLink}
+        toast={toast}
+        deleteMutation={deleteMutation}
+        editorLock={editorLock}
+        formSettingsOpen={formSettingsOpen}
+        setFormSettingsOpen={setFormSettingsOpen}
+      />
+      {formSettingsOpen ? (
+      <FormSettingsFields draft={draft} updateDraft={updateDraft} publicFormLink={publicFormLink} />
+      ) : null}
+    </Card>
+  );
+}
+
+function FormsListCard({
+  isLoading,
+  forms,
+  selectedFormId,
+  handleSelectForm,
+}: {
+  isLoading: ReturnType<typeof useQuery<CmsForm[]>>["isLoading"];
+  forms: CmsForm[];
+  selectedFormId: string | null;
+  handleSelectForm: (form: CmsForm) => void;
+}) {
+  return (
+    <Card className="h-fit">
+      <CardHeader>
+        <CardTitle className="text-base">Form Library</CardTitle>
+        <CardDescription>Quote forms, contact forms, and reusable embeds all live here.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {isLoading ? (
+          <p className="text-sm text-muted-foreground">Loading forms…</p>
+        ) : (
+          forms.map((form) => {
+            const active = selectedFormId === form.id;
+            return (
+              <FormListButton key={form.id} form={form} handleSelectForm={handleSelectForm} active={active} />
+            );
+          })
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function FormsPageHeader({
+  activeTab,
+  draft,
+  saveState,
+  saveMutation,
+  editorLock,
+  handleCreateForm,
+}: {
+  activeTab: "builder" | "entries";
+  draft: EditableForm | null;
+  saveState: ReturnType<typeof useEditorSaveState>;
+  saveMutation: UseMutationResult<CmsForm, Error, EditableForm, unknown>;
+  editorLock: ReturnType<typeof useLockedResourceEditor>["editorLock"];
+  handleCreateForm: () => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 className="text-2xl font-heading font-semibold" data-testid="text-admin-forms-title">
+          Forms
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Build reusable forms, wire them to Mailchimp tags, and assign them to blocks, widgets, and system workflows.
+        </p>
+      </div>
+      <div className="flex items-center gap-2">
+        {activeTab === "builder" && draft ? (
+          <>
+            <EditorSaveIndicator state={saveState.state} />
+            <Button onClick={() => saveMutation.mutate(draft)} disabled={saveMutation.isPending || editorLock.isReadOnly}>
+              <Save className="mr-2 h-4 w-4" />
+              {saveMutation.isPending ? "Saving…" : "Save Form"}
+            </Button>
+          </>
+        ) : null}
+        <Button
+          onClick={handleCreateForm}
+          data-testid="button-create-form"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          New Form
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function useFormMutations({
+  onSaved,
+  onSaveError,
+  onDeleted,
+}: {
+  onSaved: (saved: CmsForm) => void;
+  onSaveError: () => void;
+  onDeleted: () => void;
+}) {
+  const { toast } = useToast();
+
+  const saveMutation = useMutation({
+    mutationFn: async (form: EditableForm) => {
+      const payload = toFormSavePayload(form);
+      const response = form.id.startsWith("draft-")
+        ? await apiRequest("POST", "/api/admin/forms", payload)
+        : await apiRequest("PUT", `/api/admin/forms/${form.id}`, payload);
+      return (await response.json()) as CmsForm;
+    },
+    onSuccess: (saved) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/forms"] });
+      onSaved(saved);
+      toast({ title: "Form saved" });
+    },
+    onError: (error: Error) => {
+      onSaveError();
+      toast({ title: "Unable to save form", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiRequest("DELETE", `/api/admin/forms/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/forms"] });
+      onDeleted();
+      toast({ title: "Form deleted" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Unable to delete form", description: error.message, variant: "destructive" });
+    },
+  });
+
+  return { saveMutation, deleteMutation };
+}
+
+function FormsPageContent() {
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState<"builder" | "entries">("builder");
+  const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
+  const [draft, setDraft] = useState<EditableForm | null>(null);
+  const [savedDraftSnapshot, setSavedDraftSnapshot] = useState("");
+  const saveFeedbackRef = useRef({
+    markSaved: () => {},
+    markError: () => {},
+    clearFeedback: () => {},
+  });
+  const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
+  const draggingFieldTypeRef = useRef<CmsFormFieldType | null>(null);
+  const draggingFieldIdRef = useRef<string | null>(null);
+  const [dropIndex, setDropIndex] = useState<number | null>(null);
+  const [formSettingsOpen, setFormSettingsOpen] = useState(true);
+  const [openGroups, setOpenGroups] = useState<Record<"standard" | "advanced", boolean>>({
+    standard: true,
+    advanced: true,
+  });
+
+  const { data: forms = [], isLoading } = useQuery<CmsForm[]>({
+    queryKey: ["/api/admin/forms"],
+    staleTime: 60_000,
+  });
+  const {
+    activeForms,
+    selectedEntriesFormId,
+    setRequestedEntriesFormId,
+    setSelectedEntryId,
+    submissions,
+    isSubmissionsLoading,
+    selectedSubmission,
+    deleteSubmissionMutation,
+  } = useFormEntries(forms);
+
+  useEffect(() => {
+    if (draft) return;
+    if (!selectedFormId && forms.length > 0) {
+      const normalized = normalizeEditableForm(forms[0]);
+      setSelectedFormId(forms[0].id);
+      setFormSettingsOpen(true);
+      setDraft(normalized);
+      setSavedDraftSnapshot(serializeEditableForm(normalized));
+      return;
+    }
+
+    if (selectedFormId) {
+      const match = forms.find((form) => form.id === selectedFormId);
+      if (match) {
+        const normalized = normalizeEditableForm(match);
+        setDraft(normalized);
+        setSavedDraftSnapshot(serializeEditableForm(normalized));
+      }
+    }
+  }, [forms, selectedFormId, draft]);
+
+  const { saveMutation, deleteMutation } = useFormMutations({
+    onSaved: (saved) => {
+      const normalized = normalizeEditableForm(saved);
+      setSelectedFormId(saved.id);
+      setDraft(normalized);
+      setSavedDraftSnapshot(serializeEditableForm(normalized));
+      saveFeedbackRef.current.markSaved();
+    },
+    onSaveError: () => saveFeedbackRef.current.markError(),
+    onDeleted: () => {
+      setSelectedFieldId(null);
+      setSelectedFormId(null);
+      setDraft(null);
+      setSavedDraftSnapshot("");
+    },
+  });
+
+  const isSaving = saveMutation.isPending;
+  const isDirty = !!draft && serializeEditableForm(draft) !== savedDraftSnapshot;
+  const saveState = useEditorSaveState({
+    isDirty,
+    isSaving,
+  });
+  const unsavedChangesGuard = useUnsavedChangesGuard({
+    isDirty: activeTab === "builder" && isDirty,
+    message: "You have unsaved changes to this form. Leave without saving?",
+  });
+  useLayoutEffect(() => {
+    saveFeedbackRef.current = saveState;
+  });
+
+  const selectedField = useMemo(
+    () => draft?.fields.find((field) => field.id === selectedFieldId) ?? null,
+    [draft?.fields, selectedFieldId]
+  );
+  const { keys: choiceKeys, removeKey: removeChoiceKey } = useListKeys(selectedField?.options?.length ?? 0);
+
+  const groupedFieldLibrary = useMemo(
+    () =>
+      FIELD_LIBRARY_GROUPS.map((group) => ({
+        ...group,
+        items: FIELD_LIBRARY.filter((item) => item.group === group.key),
+      })),
+    []
+  );
+
+  const selectedFieldLibraryItem = selectedField ? getFieldLibraryItem(selectedField.type) : null;
+  const publicFormLink =
+    typeof window !== "undefined" && draft?.slug
+      ? `${window.location.origin}/forms/${draft.slug}`
+      : "";
+
+  const { editorLock } = useLockedResourceEditor({
+    resourceType: "form",
+    resourceId: activeTab === "builder" && draft && !draft.id.startsWith("draft-") ? draft.id : null,
+    resourceLabel: "form",
+    onConflict: () => {
+      setActiveTab("entries");
+      setSelectedFormId(null);
+      setSelectedFieldId(null);
+      setFormSettingsOpen(false);
+      setDraft(null);
+      setSavedDraftSnapshot("");
+    },
+  });
+
+  const {
+    updateDraft,
+    updateField,
+    updateFieldConfig,
+    replaceFieldType,
+    addField,
+    removeField,
+    updateChoice,
+    addChoice,
+    removeChoice,
+    addListColumn,
+    updateListColumn,
+    removeListColumn,
+    onDropFieldAtIndex,
+  } = useFormFieldEditing({
+    draft,
+    setDraft,
+    selectedField,
+    selectedFieldId,
+    setSelectedFieldId,
+    setDropIndex,
+    draggingFieldTypeRef,
+    draggingFieldIdRef,
+  });
 
   const switchToDraft = (nextDraft: EditableForm) => {
     setSelectedFormId(nextDraft.id);
@@ -955,44 +2551,16 @@ function FormsPageContent() {
 
   return (
     <div className="space-y-6 p-6">
-      {activeTab === "builder" && editorLock.summary ? (
-        <EditorLockBanner
-          variant={editorLock.summary.variant}
-          title={editorLock.summary.title}
-          description={editorLock.summary.description}
-          isLoading={editorLock.isLoading}
-          onRefresh={editorLock.acquire}
-        />
-      ) : null}
+      {activeTab === "builder" ? <EditorLockNotice editorLock={editorLock} /> : null}
 
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-heading font-semibold" data-testid="text-admin-forms-title">
-            Forms
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Build reusable forms, wire them to Mailchimp tags, and assign them to blocks, widgets, and system workflows.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {activeTab === "builder" && draft ? (
-            <>
-              <EditorSaveIndicator state={saveState.state} />
-              <Button onClick={() => saveMutation.mutate(draft)} disabled={saveMutation.isPending || editorLock.isReadOnly}>
-                <Save className="mr-2 h-4 w-4" />
-                {saveMutation.isPending ? "Saving…" : "Save Form"}
-              </Button>
-            </>
-          ) : null}
-          <Button
-            onClick={handleCreateForm}
-            data-testid="button-create-form"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            New Form
-          </Button>
-        </div>
-      </div>
+      <FormsPageHeader
+        activeTab={activeTab}
+        draft={draft}
+        saveState={saveState}
+        saveMutation={saveMutation}
+        editorLock={editorLock}
+        handleCreateForm={handleCreateForm}
+      />
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
         <TabsList>
@@ -1006,859 +2574,60 @@ function FormsPageContent() {
 
         <TabsContent value="builder" className="mt-0">
           <div className={cn("grid gap-6 xl:grid-cols-[280px_minmax(0,1fr)]", editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
-        <Card className="h-fit">
-          <CardHeader>
-            <CardTitle className="text-base">Form Library</CardTitle>
-            <CardDescription>Quote forms, contact forms, and reusable embeds all live here.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {isLoading ? (
-              <p className="text-sm text-muted-foreground">Loading forms…</p>
-            ) : (
-              forms.map((form) => {
-                const active = selectedFormId === form.id;
-                return (
-                  <button
-                    key={form.id}
-                    type="button"
-                    onClick={() => handleSelectForm(form)}
-                    className={cn(
-                      "w-full rounded-lg border px-3 py-3 text-left transition-colors",
-                      active ? "border-primary bg-primary/5" : "hover:bg-muted/40"
-                    )}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-medium">{form.name}</p>
-                        <p className="mt-1 text-xs text-muted-foreground">{form.slug}</p>
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        {form.isSystem ? <Badge variant="secondary">System</Badge> : null}
-                        <Badge variant={form.isActive ? "default" : "outline"}>{form.isActive ? "Active" : "Inactive"}</Badge>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })
-            )}
-          </CardContent>
-        </Card>
+        <FormsListCard
+          isLoading={isLoading}
+          forms={forms}
+          selectedFormId={selectedFormId}
+          handleSelectForm={handleSelectForm}
+        />
 
         {draft ? (
           <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_380px]">
             <div className="space-y-6">
-              <Card>
-                <CardHeader className="flex flex-row items-start justify-between gap-4">
-                  <div>
-                    <CardTitle className="text-base">Form Settings</CardTitle>
-                    <CardDescription>Control the form identity, success behavior, and Mailchimp mapping.</CardDescription>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={async () => {
-                        if (!draft.isActive || !publicFormLink) return;
-                        try {
-                          await navigator.clipboard.writeText(publicFormLink);
-                          toast({ title: "Form link copied" });
-                        } catch {
-                          toast({
-                            title: "Unable to copy link",
-                            description: "Please copy the public form URL manually.",
-                            variant: "destructive",
-                          });
-                        }
-                      }}
-                      disabled={!draft.isActive || !publicFormLink}
-                    >
-                      <Copy className="mr-2 h-4 w-4" />
-                      Copy Form Link
-                    </Button>
-                    {!draft.isSystem ? (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="text-destructive"
-                        onClick={() => deleteMutation.mutate(draft.id)}
-                        disabled={deleteMutation.isPending || draft.id.startsWith("draft-") || editorLock.isReadOnly}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
-                      </Button>
-                    ) : null}
-                    <Button type="button" variant="outline" size="icon" aria-label={formSettingsOpen ? "Collapse form settings" : "Expand form settings"} onClick={() => setFormSettingsOpen((current) => !current)}>
-                      {formSettingsOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                    </Button>
-                  </div>
-                </CardHeader>
-                {formSettingsOpen ? <CardContent className="space-y-5">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-1.5">
-                      <Label>Name</Label>
-                      <Input
-                        value={draft.name}
-                        onChange={(event) =>
-                          updateDraft((current) => ({
-                            ...current,
-                            name: event.target.value,
-                            slug:
-                              current.id.startsWith("draft-") && (!current.slug || current.slug.startsWith("form-"))
-                                ? slugify(event.target.value)
-                                : current.slug,
-                          }))
-                        }
-                      />
-                    </div>
-                  <div className="space-y-1.5">
-                    <Label>Slug</Label>
-                    <Input
-                      value={draft.slug}
-                      onChange={(event) => updateDraft((current) => ({ ...current, slug: slugify(event.target.value) }))}
-                    />
-                  </div>
-                </div>
-
-                  <div className="space-y-1.5">
-                    <Label>Public Form Link</Label>
-                    <Input
-                      value={draft.isActive ? publicFormLink : "Activate this form to generate a shareable public link."}
-                      readOnly
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Shared links open a minimal standalone form page with the company logo and no site navigation.
-                    </p>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-1.5">
-                      <Label>Form Type</Label>
-                      <Select value={draft.kind} onValueChange={(value: CmsFormKind) => updateDraft((current) => ({ ...current, kind: value }))}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {KIND_OPTIONS.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label>Active</Label>
-                      <div className="flex h-10 items-center rounded-md border px-3">
-                        <Switch
-                          checked={draft.isActive}
-                          onCheckedChange={(checked) => updateDraft((current) => ({ ...current, isActive: checked }))}
-                        />
-                        <span className="ml-3 text-sm text-muted-foreground">
-                          {draft.isActive ? "Form is live and embeddable" : "Form is hidden from public usage"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label>Description</Label>
-                    <Textarea
-                      rows={3}
-                      value={draft.description ?? ""}
-                      onChange={(event) => updateDraft((current) => ({ ...current, description: event.target.value }))}
-                    />
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-1.5">
-                      <Label>Submit Button Text</Label>
-                      <Input
-                        value={String(draft.settings.submitButtonText ?? "Submit")}
-                        onChange={(event) =>
-                          updateDraft((current) => ({
-                            ...current,
-                            settings: { ...current.settings, submitButtonText: event.target.value },
-                          }))
-                        }
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label>Success Message</Label>
-                      <Textarea
-                        rows={2}
-                        value={String(draft.settings.successMessage ?? "")}
-                        onChange={(event) =>
-                          updateDraft((current) => ({
-                            ...current,
-                            settings: { ...current.settings, successMessage: event.target.value },
-                          }))
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
-                    <div className="flex items-center gap-2">
-                      <Mail className="h-4 w-4 text-primary" />
-                      <div>
-                        <p className="text-sm font-semibold">Mailchimp Routing</p>
-                        <p className="text-xs text-muted-foreground">Each form owns its own Mailchimp tag. Credentials stay in Integrations.</p>
-                      </div>
-                    </div>
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div className="space-y-1.5">
-                        <Label>Mailchimp Enabled</Label>
-                        <div className="flex h-10 items-center rounded-md border px-3">
-                          <Switch
-                            checked={Boolean(draft.settings.mailchimpEnabled)}
-                            onCheckedChange={(checked) =>
-                              updateDraft((current) => ({
-                                ...current,
-                                settings: { ...current.settings, mailchimpEnabled: checked },
-                              }))
-                            }
-                          />
-                          <span className="ml-3 text-sm text-muted-foreground">Sync submissions to Mailchimp</span>
-                        </div>
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label>Mailchimp Tag</Label>
-                        <Input
-                          value={String(draft.settings.mailchimpTag ?? "")}
-                          onChange={(event) =>
-                            updateDraft((current) => ({
-                              ...current,
-                              settings: { ...current.settings, mailchimpTag: event.target.value },
-                            }))
-                          }
-                          placeholder="Glass & Door Pro Newsletter"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div className="flex h-10 items-center rounded-md border px-3">
-                        <Switch
-                          checked={Boolean(draft.settings.notifyAdmins)}
-                          onCheckedChange={(checked) =>
-                            updateDraft((current) => ({
-                              ...current,
-                              settings: { ...current.settings, notifyAdmins: checked },
-                            }))
-                          }
-                        />
-                        <span className="ml-3 text-sm text-muted-foreground">Email admins on submission</span>
-                      </div>
-                      <div className="flex h-10 items-center rounded-md border px-3">
-                        <Switch
-                          checked={Boolean(draft.settings.storeAsContactMessage)}
-                          onCheckedChange={(checked) =>
-                            updateDraft((current) => ({
-                              ...current,
-                              settings: { ...current.settings, storeAsContactMessage: checked },
-                            }))
-                          }
-                        />
-                        <span className="ml-3 text-sm text-muted-foreground">Store in contact inbox</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent> : null}
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Form Canvas</CardTitle>
-                  <CardDescription>
-                    Drag fields into order here. Select a field to edit its settings in the right sidebar.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div
-                    className="rounded-xl border bg-muted/10 p-4"
-                    onDragOver={(event) => {
-                      event.preventDefault();
-                      if (draft.fields.length > 0 && dropIndex === null) {
-                        setDropIndex(draft.fields.length);
-                      }
-                    }}
-                    onDrop={(event) => {
-                      event.preventDefault();
-                      onDropFieldAtIndex(dropIndex ?? draft.fields.length);
-                    }}
-                  >
-                    {draft.fields.length === 0 ? (
-                      <div
-                        className="rounded-lg border border-dashed px-6 py-12 text-center text-sm text-muted-foreground"
-                        onDragOver={(event) => {
-                          event.preventDefault();
-                          setDropIndex(0);
-                        }}
-                        onDrop={(event) => {
-                          event.preventDefault();
-                          onDropFieldAtIndex(0);
-                        }}
-                      >
-                        Drag a field from the right sidebar or click one there to start building this form.
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {draft.fields.map((field, index) => {
-                          const libraryItem = getFieldLibraryItem(field.type);
-                          const Icon = libraryItem?.icon ?? PanelTopOpen;
-
-                          return (
-                            <div key={field.id} className="space-y-3">
-                              <div
-                                className={cn("h-2 rounded-full transition-colors", dropIndex === index ? "bg-primary/40" : "bg-transparent")}
-                                onDragOver={(event) => {
-                                  event.preventDefault();
-                                  setDropIndex(index);
-                                }}
-                                onDrop={(event) => {
-                                  event.preventDefault();
-                                  onDropFieldAtIndex(index);
-                                }}
-                              />
-                              <div
-                                draggable
-                                onDragStart={(event) => {
-                                  event.dataTransfer.effectAllowed = "move";
-                                  event.dataTransfer.setData("text/plain", field.id);
-                                  draggingFieldIdRef.current = field.id;
-                                }}
-                                onDragEnd={() => {
-                                  draggingFieldIdRef.current = null;
-                                  setDropIndex(null);
-                                }}
-                                onDragOver={(event) => {
-                                  event.preventDefault();
-                                  setDropIndex(index);
-                                }}
-                                onDrop={(event) => {
-                                  event.preventDefault();
-                                  onDropFieldAtIndex(index);
-                                }}
-                                onClick={() => setSelectedFieldId(field.id)}
-                                onKeyDown={onActivateKey(() => setSelectedFieldId(field.id))}
-                                role="button"
-                                tabIndex={0}
-                                aria-pressed={selectedFieldId === field.id}
-                                className={cn(
-                                  "rounded-xl border bg-background p-4 transition-colors",
-                                  selectedFieldId === field.id ? "border-primary ring-2 ring-primary/10" : "hover:bg-muted/20"
-                                )}
-                              >
-                                <div className="flex items-start justify-between gap-3">
-                                  <div className="flex items-start gap-3">
-                                    <GripVertical className="mt-0.5 h-4 w-4 text-muted-foreground" />
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                      <Icon className="h-4 w-4" />
-                                    </div>
-                                    <div>
-                                      <div className="flex flex-wrap items-center gap-2">
-                                        <p className="text-sm font-semibold">{field.label || "Untitled Field"}</p>
-                                        <Badge variant="outline" className="text-[10px] uppercase">{field.type}</Badge>
-                                      </div>
-                                      <p className="mt-1 text-xs text-muted-foreground">
-                                        {fieldSubtitle(field)} • {field.width === "half" ? "Half width" : "Full width"}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    aria-label="Remove field"
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                      removeField(field.id);
-                                    }}
-                                  >
-                                    <Trash2 className="h-4 w-4 text-destructive" />
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                        <div
-                          className={cn(
-                            "h-2 rounded-full transition-colors",
-                            dropIndex === draft.fields.length ? "bg-primary/40" : "bg-transparent"
-                          )}
-                          onDragOver={(event) => {
-                            event.preventDefault();
-                            setDropIndex(draft.fields.length);
-                          }}
-                          onDrop={(event) => {
-                            event.preventDefault();
-                            onDropFieldAtIndex(draft.fields.length);
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+              <FormSettingsCard
+                draft={draft}
+                publicFormLink={publicFormLink}
+                toast={toast}
+                deleteMutation={deleteMutation}
+                editorLock={editorLock}
+                formSettingsOpen={formSettingsOpen}
+                setFormSettingsOpen={setFormSettingsOpen}
+                updateDraft={updateDraft}
+              />
+              <FormFieldsCard
+                draft={draft}
+                dropIndex={dropIndex}
+                setDropIndex={setDropIndex}
+                onDropFieldAtIndex={onDropFieldAtIndex}
+                draggingFieldIdRef={draggingFieldIdRef}
+                setSelectedFieldId={setSelectedFieldId}
+                selectedFieldId={selectedFieldId}
+                removeField={removeField}
+              />
             </div>
 
-            <Card className="h-fit 2xl:sticky 2xl:top-24">
-              <CardHeader>
-                <CardTitle className="text-base">{selectedField ? "Field Settings" : "Add Fields"}</CardTitle>
-                <CardDescription>
-                  {selectedField
-                    ? "Update the selected field’s labels, behavior, and advanced configuration here."
-                    : "Standard and advanced fields live here. Click or drag them into the form canvas."}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {selectedField ? (
-                  <>
-                    <Button type="button" variant="outline" className="w-full justify-center" onClick={() => setSelectedFieldId(null)}>
-                      <ArrowLeft className="mr-2 h-4 w-4" />
-                      Back to Fields
-                    </Button>
-                    <div className="flex items-start gap-3 rounded-xl border bg-muted/20 p-3">
-                      <div className="flex items-start gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                          {selectedFieldLibraryItem ? <selectedFieldLibraryItem.icon className="h-4.5 w-4.5" /> : <PanelTopOpen className="h-4.5 w-4.5" />}
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold leading-tight">{selectedField.label || "Untitled Field"}</p>
-                          <p className="mt-1 text-xs text-muted-foreground">{selectedFieldLibraryItem?.label ?? selectedField.type}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label>Label</Label>
-                      <Input value={selectedField.label} onChange={(event) => updateField(selectedField.id, { label: event.target.value })} />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label>Field Key</Label>
-                      <Input
-                        value={selectedField.key}
-                        onChange={(event) => updateField(selectedField.id, { key: slugify(event.target.value) || selectedField.key })}
-                      />
-                    </div>
-
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div className="space-y-1.5">
-                        <Label>Field Type</Label>
-                        <Select value={selectedField.type} onValueChange={(value: CmsFormFieldType) => replaceFieldType(selectedField.id, value)}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {FIELD_TYPE_OPTIONS.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      {!isStructuralField(selectedField.type) && selectedField.type !== "hidden" ? (
-                        <div className="space-y-1.5">
-                          <Label>Width</Label>
-                          <Select value={selectedField.width} onValueChange={(value: "full" | "half") => updateField(selectedField.id, { width: value })}>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="full">Full Width</SelectItem>
-                              <SelectItem value="half">Half Width</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      ) : null}
-                    </div>
-
-                    {!["section", "page", "html", "consent", "hidden", "checkbox", "radio", "select", "multiselect", "image-choice", "list"].includes(selectedField.type) ? (
-                      <div className="space-y-1.5">
-                        <Label>Placeholder</Label>
-                        <Input
-                          value={selectedField.placeholder ?? ""}
-                          onChange={(event) => updateField(selectedField.id, { placeholder: event.target.value })}
-                        />
-                      </div>
-                    ) : null}
-
-                    {!["html", "section", "page", "hidden"].includes(selectedField.type) ? (
-                      <div className="space-y-1.5">
-                        <Label>Help Text</Label>
-                        <Textarea
-                          rows={2}
-                          value={selectedField.helpText ?? ""}
-                          onChange={(event) => updateField(selectedField.id, { helpText: event.target.value })}
-                        />
-                      </div>
-                    ) : null}
-
-                    {!isStructuralField(selectedField.type) && selectedField.type !== "hidden" ? (
-                      <div className="flex h-10 items-center rounded-md border px-3">
-                        <Switch
-                          checked={Boolean(selectedField.required)}
-                          onCheckedChange={(checked) => updateField(selectedField.id, { required: checked })}
-                        />
-                        <span className="ml-3 text-sm text-muted-foreground">Required field</span>
-                      </div>
-                    ) : null}
-
-                    {selectedField.type === "name" ? (
-                      <div className="space-y-1.5">
-                        <Label>Name Format</Label>
-                        <Select
-                          value={selectedField.config?.nameFormat === "split" ? "split" : "full"}
-                          onValueChange={(value: "full" | "split") => updateFieldConfig(selectedField.id, { nameFormat: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="full">Full Name</SelectItem>
-                            <SelectItem value="split">First + Last Name</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    ) : null}
-
-                    {selectedField.type === "section" ? (
-                      <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
-                        <div className="space-y-1.5">
-                          <Label>Section Title</Label>
-                          <Input
-                            value={String(selectedField.config?.sectionTitle ?? "")}
-                            onChange={(event) => updateFieldConfig(selectedField.id, { sectionTitle: event.target.value })}
-                          />
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label>Section Subtitle</Label>
-                          <Textarea
-                            rows={2}
-                            value={String(selectedField.config?.sectionSubtitle ?? "")}
-                            onChange={(event) => updateFieldConfig(selectedField.id, { sectionSubtitle: event.target.value })}
-                          />
-                        </div>
-                        <div className="flex h-10 items-center rounded-md border px-3">
-                          <Switch
-                            checked={Boolean(selectedField.config?.showDivider)}
-                            onCheckedChange={(checked) => updateFieldConfig(selectedField.id, { showDivider: checked })}
-                          />
-                          <span className="ml-3 text-sm text-muted-foreground">Show horizontal rule</span>
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label>Divider Color</Label>
-                          <Input
-                            type="color"
-                            value={String(selectedField.config?.dividerColor ?? "#e2e8f0")}
-                            onChange={(event) => updateFieldConfig(selectedField.id, { dividerColor: event.target.value })}
-                          />
-                        </div>
-                      </div>
-                    ) : null}
-
-                    {selectedField.type === "html" ? (
-                      <div className="space-y-1.5 rounded-xl border bg-muted/20 p-4">
-                        <Label>HTML / Embed Code</Label>
-                        <Textarea
-                          rows={8}
-                          value={String(selectedField.config?.htmlContent ?? "")}
-                          onChange={(event) => updateFieldConfig(selectedField.id, { htmlContent: event.target.value })}
-                          placeholder="<iframe ...></iframe>"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          Use this for custom instructions, trusted 3rd-party embeds, or raw HTML snippets inside a form.
-                        </p>
-                      </div>
-                    ) : null}
-
-                    {selectedField.type === "page" ? (
-                      <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
-                        <div className="space-y-1.5">
-                          <Label>Page Title</Label>
-                          <Input
-                            value={String(selectedField.config?.pageTitle ?? "")}
-                            onChange={(event) => updateFieldConfig(selectedField.id, { pageTitle: event.target.value })}
-                          />
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label>Page Description</Label>
-                          <Textarea
-                            rows={2}
-                            value={String(selectedField.config?.pageDescription ?? "")}
-                            onChange={(event) => updateFieldConfig(selectedField.id, { pageDescription: event.target.value })}
-                          />
-                        </div>
-                        <div className="grid gap-4 md:grid-cols-2">
-                          <div className="space-y-1.5">
-                            <Label>Next Button Text</Label>
-                            <Input
-                              value={String(selectedField.config?.nextButtonText ?? "Next")}
-                              onChange={(event) => updateFieldConfig(selectedField.id, { nextButtonText: event.target.value })}
-                            />
-                          </div>
-                          <div className="space-y-1.5">
-                            <Label>Previous Button Text</Label>
-                            <Input
-                              value={String(selectedField.config?.previousButtonText ?? "Previous")}
-                              onChange={(event) => updateFieldConfig(selectedField.id, { previousButtonText: event.target.value })}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ) : null}
-
-                    {selectedField.type === "hidden" ? (
-                      <div className="space-y-1.5 rounded-xl border bg-muted/20 p-4">
-                        <Label>Default Value</Label>
-                        <Input
-                          value={String(selectedField.config?.defaultValue ?? "")}
-                          onChange={(event) => updateFieldConfig(selectedField.id, { defaultValue: event.target.value })}
-                        />
-                      </div>
-                    ) : null}
-
-                    {selectedField.type === "consent" ? (
-                      <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
-                        <div className="space-y-1.5">
-                          <Label>Consent Label</Label>
-                          <Input
-                            value={String(selectedField.config?.consentCheckboxLabel ?? "")}
-                            onChange={(event) => updateFieldConfig(selectedField.id, { consentCheckboxLabel: event.target.value })}
-                          />
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label>Consent Description</Label>
-                          <Textarea
-                            rows={3}
-                            value={String(selectedField.config?.consentDescription ?? "")}
-                            onChange={(event) => updateFieldConfig(selectedField.id, { consentDescription: event.target.value })}
-                          />
-                        </div>
-                      </div>
-                    ) : null}
-
-                    {selectedField.type === "time" ? (
-                      <div className="space-y-1.5">
-                        <Label>Time Format</Label>
-                        <Select
-                          value={selectedField.config?.timeFormat === "24" ? "24" : "12"}
-                          onValueChange={(value: "12" | "24") => updateFieldConfig(selectedField.id, { timeFormat: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="12">12-hour</SelectItem>
-                            <SelectItem value="24">24-hour</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    ) : null}
-
-                    {selectedField.type === "address" ? (
-                      <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
-                        <div className="flex h-10 items-center rounded-md border px-3">
-                          <Switch
-                            checked={Boolean(selectedField.config?.showStreet2)}
-                            onCheckedChange={(checked) => updateFieldConfig(selectedField.id, { showStreet2: checked })}
-                          />
-                          <span className="ml-3 text-sm text-muted-foreground">Include Street Address 2</span>
-                        </div>
-                        <div className="flex h-10 items-center rounded-md border px-3">
-                          <Switch
-                            checked={Boolean(selectedField.config?.showCountry)}
-                            onCheckedChange={(checked) => updateFieldConfig(selectedField.id, { showCountry: checked })}
-                          />
-                          <span className="ml-3 text-sm text-muted-foreground">Include Country field</span>
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label>Address Layout</Label>
-                          <Select
-                            value={selectedField.config?.addressLayout === "compact" ? "compact" : "stacked"}
-                            onValueChange={(value: "stacked" | "compact") => updateFieldConfig(selectedField.id, { addressLayout: value })}
-                          >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="stacked">Stacked</SelectItem>
-                              <SelectItem value="compact">Compact Grid</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    ) : null}
-
-                    {selectedField.type === "list" ? (
-                      <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
-                        <div className="flex items-center justify-between">
-                          <Label>List Columns</Label>
-                          <Button type="button" size="sm" variant="outline" onClick={() => addListColumn(selectedField.id)}>
-                            <Plus className="mr-1.5 h-3.5 w-3.5" />
-                            Add Column
-                          </Button>
-                        </div>
-                        <div className="space-y-3">
-                          {(selectedField.config?.listColumns ?? []).map((column) => (
-                            <div key={column.id} className="rounded-lg border bg-background p-3">
-                              <div className="grid gap-3">
-                                <div className="space-y-1.5">
-                                  <Label>Column Label</Label>
-                                  <Input
-                                    value={column.label}
-                                    onChange={(event) => updateListColumn(selectedField.id, column.id, { label: event.target.value })}
-                                  />
-                                </div>
-                                <div className="space-y-1.5">
-                                  <Label>Placeholder</Label>
-                                  <Input
-                                    value={column.placeholder ?? ""}
-                                    onChange={(event) => updateListColumn(selectedField.id, column.id, { placeholder: event.target.value })}
-                                  />
-                                </div>
-                                <Button type="button" variant="ghost" size="sm" className="justify-start text-destructive" onClick={() => removeListColumn(selectedField.id, column.id)}>
-                                  <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-                                  Remove Column
-                                </Button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label>Max Rows</Label>
-                          <Input
-                            type="number"
-                            min={1}
-                            value={String(selectedField.config?.maxRows ?? 10)}
-                            onChange={(event) => updateFieldConfig(selectedField.id, { maxRows: Number(event.target.value) || 10 })}
-                          />
-                        </div>
-                      </div>
-                    ) : null}
-
-                    {supportsChoices(selectedField.type) ? (
-                      <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
-                        <div className="flex items-center justify-between">
-                          <Label>Choices</Label>
-                          <Button type="button" size="sm" variant="outline" onClick={() => addChoice(selectedField.id)}>
-                            <Plus className="mr-1.5 h-3.5 w-3.5" />
-                            Add Choice
-                          </Button>
-                        </div>
-
-                        {selectedField.type === "image-choice" ? (
-                          <div className="space-y-1.5">
-                            <Label>Selection Mode</Label>
-                            <Select
-                              value={selectedField.config?.selectionMode === "multiple" ? "multiple" : "single"}
-                              onValueChange={(value: "single" | "multiple") => updateFieldConfig(selectedField.id, { selectionMode: value })}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="single">Single Choice</SelectItem>
-                                <SelectItem value="multiple">Multiple Choice</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        ) : null}
-
-                        {selectedField.type !== "select" && selectedField.type !== "multiselect" ? (
-                          <div className="space-y-1.5">
-                            <Label>Choice Layout</Label>
-                            <Select
-                              value={selectedField.config?.choiceLayout === "grid" ? "grid" : selectedField.config?.choiceLayout === "inline" ? "inline" : "stacked"}
-                              onValueChange={(value: "stacked" | "inline" | "grid") => updateFieldConfig(selectedField.id, { choiceLayout: value })}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {CHOICE_LAYOUT_OPTIONS.map((option) => (
-                                  <SelectItem key={option.value} value={option.value}>
-                                    {option.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        ) : null}
-
-                        <div className="space-y-3">
-                          {pairWithKeys(selectedField.options ?? [], choiceKeys).map(({ item: option, key: choiceKey }, index) => (
-                            <div key={choiceKey} className="rounded-lg border bg-background p-3">
-                              <div className="grid gap-3">
-                                <div className="space-y-1.5">
-                                  <Label>Choice Label</Label>
-                                  <Input
-                                    value={option.label}
-                                    onChange={(event) => updateChoice(selectedField.id, option.value, { label: event.target.value })}
-                                  />
-                                </div>
-                                <div className="space-y-1.5">
-                                  <Label>Stored Value</Label>
-                                  <Input
-                                    value={option.value}
-                                    onChange={(event) => updateChoice(selectedField.id, option.value, { value: slugify(event.target.value) || option.value })}
-                                  />
-                                </div>
-                                {selectedField.type === "image-choice" ? (
-                                  <div className="space-y-1.5">
-                                    <Label>Choice Image</Label>
-                                    <CmsImageUpload
-                                      value={option.imageUrl ?? ""}
-                                      onChange={(value) => updateChoice(selectedField.id, option.value, { imageUrl: value ?? "" })}
-                                      label="Choice image"
-                                    />
-                                  </div>
-                                ) : null}
-                                <Button type="button" variant="ghost" size="sm" className="justify-start text-destructive" onClick={() => {
-                                  removeChoiceKey(index);
-                                  removeChoice(selectedField.id, option.value);
-                                }}>
-                                  <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-                                  Remove Choice
-                                </Button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ) : null}
-                  </>
-                ) : (
-                  <div className="space-y-5">
-                    {groupedFieldLibrary.map((group) => (
-                      <ToggleCardGroup
-                        key={group.key}
-                        title={group.label}
-                        open={openGroups[group.key]}
-                        onToggle={() => setOpenGroups((current) => ({ ...current, [group.key]: !current[group.key] }))}
-                      >
-                        <div className="space-y-2">
-                          {group.items.map((item) => (
-                            <FieldLibraryCard
-                              key={item.type}
-                              item={item}
-                              onAdd={addField}
-                              onDragStart={(type) => {
-                                draggingFieldTypeRef.current = type;
-                              }}
-                              onDragEnd={() => {
-                                draggingFieldTypeRef.current = null;
-                                setDropIndex(null);
-                              }}
-                            />
-                          ))}
-                        </div>
-                      </ToggleCardGroup>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <FieldInspectorCard
+              selectedField={selectedField}
+              setSelectedFieldId={setSelectedFieldId}
+              selectedFieldLibraryItem={selectedFieldLibraryItem}
+              updateField={updateField}
+              replaceFieldType={replaceFieldType}
+              updateFieldConfig={updateFieldConfig}
+              addListColumn={addListColumn}
+              updateListColumn={updateListColumn}
+              removeListColumn={removeListColumn}
+              addChoice={addChoice}
+              choiceKeys={choiceKeys}
+              updateChoice={updateChoice}
+              removeChoiceKey={removeChoiceKey}
+              removeChoice={removeChoice}
+              groupedFieldLibrary={groupedFieldLibrary}
+              openGroups={openGroups}
+              setOpenGroups={setOpenGroups}
+              addField={addField}
+              draggingFieldTypeRef={draggingFieldTypeRef}
+              setDropIndex={setDropIndex}
+            />
           </div>
         ) : (
           <Card>
@@ -1870,170 +2639,16 @@ function FormsPageContent() {
           </div>
         </TabsContent>
 
-        <TabsContent value="entries" className="mt-0">
-          <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
-            <Card className="h-fit">
-              <CardHeader>
-                <CardTitle className="text-base">Active Forms</CardTitle>
-                <CardDescription>
-                  Choose a live form to review everything submitted through the site.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {activeForms.length === 0 ? (
-                  <div className="rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
-                    No active forms are available yet.
-                  </div>
-                ) : (
-                  activeForms.map((form) => (
-                    <button
-                      key={form.id}
-                      type="button"
-                      onClick={() => {
-                        setRequestedEntriesFormId(form.id);
-                        setSelectedEntryId(null);
-                      }}
-                      className={cn(
-                        "w-full rounded-lg border px-3 py-3 text-left transition-colors",
-                        selectedEntriesFormId === form.id ? "border-primary bg-primary/5" : "hover:bg-muted/40"
-                      )}
-                      data-testid={`button-select-form-entries-${form.id}`}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium">{form.name}</p>
-                          <p className="mt-1 truncate text-xs text-muted-foreground">{form.slug}</p>
-                        </div>
-                        <Badge variant="outline">{form.kind}</Badge>
-                      </div>
-                    </button>
-                  ))
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row flex-wrap items-start justify-between gap-4">
-                <div>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Inbox className="h-4 w-4 text-primary" />
-                    Form Entries
-                  </CardTitle>
-                  <CardDescription>
-                    Stored submissions remain here even after notification emails are sent.
-                  </CardDescription>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      if (!selectedEntriesFormId || submissions.length === 0) return;
-                      const selectedForm = activeForms.find((form) => form.id === selectedEntriesFormId);
-                      const csv = buildSubmissionCsv(submissions);
-                      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-                      const url = URL.createObjectURL(blob);
-                      const anchor = document.createElement("a");
-                      anchor.href = url;
-                      anchor.download = `${selectedForm?.slug ?? "form"}-entries.csv`;
-                      anchor.click();
-                      URL.revokeObjectURL(url);
-                    }}
-                    disabled={!selectedEntriesFormId || submissions.length === 0}
-                    data-testid="button-export-form-entries"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Export CSV
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {!selectedEntriesFormId ? (
-                  <div className="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
-                    Select an active form to view its entries.
-                  </div>
-                ) : isSubmissionsLoading ? (
-                  <div className="space-y-3">
-                    <Card className="border-dashed"><CardContent className="py-8 text-center text-sm text-muted-foreground">Loading form entries…</CardContent></Card>
-                  </div>
-                ) : submissions.length === 0 ? (
-                  <div className="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
-                    No entries have been submitted for this form yet.
-                  </div>
-                ) : selectedSubmission ? (
-                  <div className="space-y-4">
-                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-muted/10 p-4">
-                      <div className="space-y-1">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          className="h-auto px-0 py-0 text-sm font-medium text-primary hover:bg-transparent hover:text-primary/80"
-                          onClick={() => setSelectedEntryId(null)}
-                          data-testid="button-back-to-form-entries"
-                        >
-                          <ArrowLeft className="mr-2 h-4 w-4" />
-                          Back to Form Entries
-                        </Button>
-                        <div className="flex flex-wrap items-center gap-2">
-                          <p className="font-semibold">{getSubmissionDisplayName(selectedSubmission)}</p>
-                          <Badge variant="outline">{formatSubmissionDate(selectedSubmission.createdAt)}</Badge>
-                          {selectedSubmission.source ? <Badge variant="secondary">{selectedSubmission.source}</Badge> : null}
-                        </div>
-                        <p className="text-sm text-muted-foreground">{getSubmissionEmail(selectedSubmission)}</p>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="text-destructive hover:text-destructive"
-                        onClick={() => deleteSubmissionMutation.mutate({ formId: selectedEntriesFormId, submissionId: selectedSubmission.id })}
-                        disabled={deleteSubmissionMutation.isPending}
-                        data-testid={`button-delete-form-entry-${selectedSubmission.id}`}
-                      >
-                        <Trash2 className="mr-1.5 h-4 w-4" />
-                        Delete
-                      </Button>
-                    </div>
-
-                    <div className="grid gap-3 md:grid-cols-2">
-                      {Object.entries((selectedSubmission.data ?? {}) as Record<string, unknown>).map(([key, value]) => (
-                        <div key={key} className="rounded-lg border bg-muted/10 p-3">
-                          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{key}</p>
-                          <p className="mt-2 whitespace-pre-wrap text-sm text-foreground/90">{stringifySubmissionValue(value) || "—"}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {submissions.map((submission) => (
-                      <button
-                        key={submission.id}
-                        type="button"
-                        onClick={() => setSelectedEntryId(submission.id)}
-                        className="w-full rounded-xl border p-4 text-left transition-colors hover:border-primary hover:bg-primary/5"
-                        data-testid={`card-form-entry-${submission.id}`}
-                      >
-                        <div className="flex flex-wrap items-start justify-between gap-3">
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <p className="font-medium">{getSubmissionDisplayName(submission)}</p>
-                              <Badge variant="outline">{formatSubmissionDate(submission.createdAt)}</Badge>
-                              {submission.source ? <Badge variant="secondary">{submission.source}</Badge> : null}
-                            </div>
-                            <p className="mt-1 text-sm text-muted-foreground">{getSubmissionEmail(submission)}</p>
-                            <p className="mt-3 text-sm text-foreground/85">{getSubmissionMessageExcerpt(submission)}</p>
-                          </div>
-                          <span className="text-xs font-medium text-primary">Open</span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
+        <FormEntriesTab
+          activeForms={activeForms}
+          setRequestedEntriesFormId={setRequestedEntriesFormId}
+          setSelectedEntryId={setSelectedEntryId}
+          selectedEntriesFormId={selectedEntriesFormId}
+          submissions={submissions}
+          isSubmissionsLoading={isSubmissionsLoading}
+          selectedSubmission={selectedSubmission}
+          deleteSubmissionMutation={deleteSubmissionMutation}
+        />
       </Tabs>
     </div>
   );

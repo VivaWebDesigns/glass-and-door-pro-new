@@ -7,7 +7,6 @@ import { AdminSidebar } from "@/features/admin/admin-sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -41,6 +40,7 @@ import type { SeoSettings } from "@shared/schema";
 import { CmsSeoAuditTab } from "./cms-seo-audit-tab";
 import { CmsRedirectsTab } from "./cms-redirects-tab";
 import { CmsSitemapTab } from "./cms-sitemap-tab";
+import { SwitchFieldRow } from "@/components/shared/switch-field-row";
 
 const seoFormSchema = z.object({
   siteName: z.string().min(1, "Site name is required"),
@@ -442,23 +442,13 @@ function SeoDefaultMetaCard({ form, descValue }: {
           name="defaultRobotsNoindex"
           render={({ field }) => (
             <FormItem>
-              <div className="flex items-center justify-between rounded-lg border px-4 py-3">
-                <div>
-                  <FormLabel className="text-sm font-medium cursor-pointer">
-                    Disable Indexing Globally
-                  </FormLabel>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Sets noindex,nofollow on all pages. Use only during development.
-                  </p>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    data-testid="switch-noindex"
-                  />
-                </FormControl>
-              </div>
+              <SwitchFieldRow
+                label="Disable Indexing Globally"
+                description="Sets noindex,nofollow on all pages. Use only during development."
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                testId="switch-noindex"
+              />
               <FormMessage />
             </FormItem>
           )}

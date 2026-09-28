@@ -3,7 +3,7 @@ import { useQuery, useMutation, type UseMutationResult } from "@tanstack/react-q
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLockConflictGuard } from "@/hooks/use-lock-conflict-guard";
-import { EditorLockBanner } from "@/components/shared/editor-lock-banner";
+import { EditorLockNotice } from "@/components/shared/editor-lock-banner";
 import { AdminSidebar } from "./admin-sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1187,6 +1187,16 @@ function BrandingTypographyCard({
   );
 }
 
+/** Empty palette values fall back to the browser default instead of an invalid color. */
+function cssColor(value: string | undefined) {
+  return value || undefined;
+}
+
+/** First non-empty color in a fallback chain. */
+function firstColor(...values: Array<string | undefined>) {
+  return values.find(Boolean);
+}
+
 function BrandingColorPreview({
   previewPaletteStyle,
   colorValues,
@@ -1217,8 +1227,8 @@ function BrandingColorPreview({
         <div
           className="rounded-lg px-4 py-2 text-sm font-medium"
           style={{
-            backgroundColor: colorValues.brand_secondary_color || undefined,
-            color: colorValues.text_secondary_foreground_color || undefined,
+            backgroundColor: cssColor(colorValues.brand_secondary_color),
+            color: cssColor(colorValues.text_secondary_foreground_color),
           }}
         >
           Secondary Action
@@ -1226,8 +1236,8 @@ function BrandingColorPreview({
         <div
           className="rounded-lg px-4 py-2 text-sm font-medium"
           style={{
-            backgroundColor: colorValues.brand_tertiary_color || undefined,
-            color: colorValues.text_tertiary_foreground_color || undefined,
+            backgroundColor: cssColor(colorValues.brand_tertiary_color),
+            color: cssColor(colorValues.text_tertiary_foreground_color),
           }}
         >
           Tertiary Action
@@ -1235,11 +1245,9 @@ function BrandingColorPreview({
         <div
           className="rounded-lg px-4 py-2 text-sm font-medium"
           style={{
-            backgroundColor: colorValues.brand_quaternary_color || "#A8623A",
+            backgroundColor: firstColor(colorValues.brand_quaternary_color, "#A8623A"),
             color:
-              colorValues.text_inverse_color ||
-              colorValues.text_primary_foreground_color ||
-              undefined,
+              firstColor(colorValues.text_inverse_color, colorValues.text_primary_foreground_color),
           }}
         >
           Quaternary Action
@@ -1250,7 +1258,7 @@ function BrandingColorPreview({
           className="text-3xl font-semibold"
           style={{
             ...previewHeadingStyle,
-            color: colorValues.text_h1_color || colorValues.text_body_color || undefined,
+            color: firstColor(colorValues.text_h1_color, colorValues.text_body_color),
           }}
         >
           H1 headline preview
@@ -1260,10 +1268,7 @@ function BrandingColorPreview({
           style={{
             ...previewHeadingStyle,
             color:
-              colorValues.text_h2_color ||
-              colorValues.text_h1_color ||
-              colorValues.text_body_color ||
-              undefined,
+              firstColor(colorValues.text_h2_color, colorValues.text_h1_color, colorValues.text_body_color),
           }}
         >
           H2 section heading preview
@@ -1273,10 +1278,7 @@ function BrandingColorPreview({
           style={{
             ...previewHeadingStyle,
             color:
-              colorValues.text_h3_h6_color ||
-              colorValues.text_h2_color ||
-              colorValues.text_body_color ||
-              undefined,
+              firstColor(colorValues.text_h3_h6_color, colorValues.text_h2_color, colorValues.text_body_color),
           }}
         >
           H3-H6 card and supporting heading preview
@@ -1285,7 +1287,7 @@ function BrandingColorPreview({
           className="text-sm"
           style={{
             ...previewBodyStyle,
-            color: colorValues.text_heading_subtext_color || undefined,
+            color: cssColor(colorValues.text_heading_subtext_color),
           }}
         >
           Heading sub-text preview directly beneath a hero or section heading.
@@ -1294,7 +1296,7 @@ function BrandingColorPreview({
           className="text-sm"
           style={{
             ...previewBodyStyle,
-            color: colorValues.text_supporting_copy_color || undefined,
+            color: cssColor(colorValues.text_supporting_copy_color),
           }}
         >
           Supporting copy preview for section introductions, lead-ins, and editorial
@@ -1304,14 +1306,14 @@ function BrandingColorPreview({
           className="text-sm"
           style={{
             ...previewBodyStyle,
-            color: colorValues.text_helper_text_color || undefined,
+            color: cssColor(colorValues.text_helper_text_color),
           }}
         >
           Helper messaging preview for empty states, guidance text, and interface hints.
         </p>
         <p
           className="text-sm"
-          style={{ ...previewBodyStyle, color: colorValues.text_body_color || undefined }}
+          style={{ ...previewBodyStyle, color: cssColor(colorValues.text_body_color) }}
         >
           Paragraph text preview for reading content, blog excerpts, and general body copy
           throughout the site.
@@ -1320,9 +1322,7 @@ function BrandingColorPreview({
           className="text-xs uppercase tracking-wide"
           style={{
             color:
-              colorValues.text_meta_color ||
-              colorValues.text_helper_text_color ||
-              undefined,
+              firstColor(colorValues.text_meta_color, colorValues.text_helper_text_color),
           }}
         >
           Meta text preview for dates, authors, categories, and labels
@@ -1343,11 +1343,9 @@ function BrandingColorPreview({
         <div
           className="rounded-lg px-4 py-3 text-sm font-medium"
           style={{
-            backgroundColor: colorValues.brand_primary_color || "#1F2A44",
+            backgroundColor: firstColor(colorValues.brand_primary_color, "#1F2A44"),
             color:
-              colorValues.text_inverse_color ||
-              colorValues.text_primary_foreground_color ||
-              undefined,
+              firstColor(colorValues.text_inverse_color, colorValues.text_primary_foreground_color),
           }}
         >
           Inverse text preview on dark or branded surfaces
@@ -2146,17 +2144,7 @@ function TemplateEditor({
           <SheetDescription className="sr-only">Edit email template</SheetDescription>
         </SheetHeader>
         <SheetBody>
-          {editorLock.summary ? (
-            <div className="mb-4">
-              <EditorLockBanner
-                variant={editorLock.summary.variant}
-                title={editorLock.summary.title}
-                description={editorLock.summary.description}
-                isLoading={editorLock.isLoading}
-                onRefresh={editorLock.acquire}
-              />
-            </div>
-          ) : null}
+          <EditorLockNotice editorLock={editorLock} className="mb-4" />
           <div
             className={cn(
               editorLock.hasLocking &&

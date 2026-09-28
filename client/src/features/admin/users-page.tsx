@@ -872,6 +872,22 @@ function UserSheetHeader({ fullName, user }: {
   );
 }
 
+function readUserProfile(user: SafeUser) {
+  return {
+    firstName: user.firstName ?? "",
+    lastName: user.lastName ?? "",
+    email: user.email,
+    role: (user.role === "admin" ? "admin" : "editor") as "admin" | "editor",
+    adminPermissions: Array.isArray(user.adminPermissions) ? user.adminPermissions : [],
+    formNotificationFormIds: Array.isArray(user.formNotificationFormIds) ? user.formNotificationFormIds : [],
+  };
+}
+
+function userDisplayName(user: SafeUser | null) {
+  if (!user) return "";
+  return `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || user.email;
+}
+
 function UserDetailSheet({
   user,
   onClose,
@@ -897,13 +913,14 @@ function UserDetailSheet({
 
   const [syncedUser, setSyncedUser] = useState<typeof user>(null);
   if (user && user !== syncedUser) {
+    const profile = readUserProfile(user);
     setSyncedUser(user);
-    setFirstName(user.firstName ?? "");
-    setLastName(user.lastName ?? "");
-    setEmail(user.email);
-    setRole((user.role === "admin" ? "admin" : "editor"));
-    setAdminPermissions(Array.isArray(user.adminPermissions) ? user.adminPermissions : []);
-    setFormNotificationFormIds(Array.isArray(user.formNotificationFormIds) ? user.formNotificationFormIds : []);
+    setFirstName(profile.firstName);
+    setLastName(profile.lastName);
+    setEmail(profile.email);
+    setRole(profile.role);
+    setAdminPermissions(profile.adminPermissions);
+    setFormNotificationFormIds(profile.formNotificationFormIds);
     setNewPassword("");
     setShowPassword(false);
     setActiveTab("profile");
@@ -989,7 +1006,7 @@ function UserDetailSheet({
     },
   });
 
-  const fullName = user ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || user.email : "";
+  const fullName = userDisplayName(user);
 
   return (
     <>

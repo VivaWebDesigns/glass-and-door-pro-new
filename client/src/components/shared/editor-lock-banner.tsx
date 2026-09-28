@@ -56,3 +56,24 @@ export function EditorLockBanner({
     </div>
   );
 }
+
+type EditorLockSummaryState = {
+  summary: { variant: EditorLockBannerProps["variant"]; title: string; description: string } | null;
+  isLoading: boolean;
+  acquire: () => unknown;
+};
+
+/** Renders the editor lock banner when the lock has something to report. */
+export function EditorLockNotice({ editorLock, className }: { editorLock: EditorLockSummaryState; className?: string }) {
+  if (!editorLock.summary) return null;
+  const banner = (
+    <EditorLockBanner
+      variant={editorLock.summary.variant}
+      title={editorLock.summary.title}
+      description={editorLock.summary.description}
+      isLoading={editorLock.isLoading}
+      onRefresh={editorLock.acquire}
+    />
+  );
+  return className ? <div className={className}>{banner}</div> : banner;
+}

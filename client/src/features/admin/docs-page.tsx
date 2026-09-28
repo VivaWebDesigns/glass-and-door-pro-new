@@ -21,7 +21,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
-import { EditorLockBanner } from "@/components/shared/editor-lock-banner";
+import { EditorLockNotice } from "@/components/shared/editor-lock-banner";
 import { EditorSaveIndicator } from "@/components/shared/editor-save-indicator";
 import { MarkdownDocument } from "@/components/shared/markdown-document";
 import { useToast } from "@/hooks/use-toast";
@@ -79,6 +79,121 @@ function sortCategories(categories: string[]) {
   });
 }
 
+function DocEditorFields({
+  editorLock,
+  editingDoc,
+  setEditingDoc,
+  categoryOptions,
+  setShowPreview,
+  showPreview,
+}: {
+  editorLock: ReturnType<typeof useEditorLock>;
+  editingDoc: Partial<Doc>;
+  setEditingDoc: React.Dispatch<React.SetStateAction<Partial<Doc> | null>>;
+  categoryOptions: string[];
+  setShowPreview: React.Dispatch<React.SetStateAction<boolean>>;
+  showPreview: boolean;
+}) {
+  return (
+    <div className={cn("space-y-4", editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Title</Label>
+          <Input
+            value={editingDoc.title || ""}
+            onChange={(e) => setEditingDoc({ ...editingDoc, title: e.target.value })}
+            data-testid="input-doc-title"
+          />
+        </div>
+        <div>
+          <Label>Slug</Label>
+          <Input
+            value={editingDoc.slug || ""}
+            onChange={(e) => setEditingDoc({ ...editingDoc, slug: e.target.value })}
+            data-testid="input-doc-slug"
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Category</Label>
+          <Select
+            value={editingDoc.category || ""}
+            onValueChange={(value) => setEditingDoc({ ...editingDoc, category: value })}
+          >
+            <SelectTrigger data-testid="select-doc-category">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {categoryOptions.map((category) => (
+                <SelectItem key={category} value={category}>
+                  {category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-end gap-4">
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={editingDoc.isPublished ?? true}
+              onCheckedChange={(value) => setEditingDoc({ ...editingDoc, isPublished: value })}
+              data-testid="switch-doc-published"
+            />
+            <Label>{editingDoc.isPublished ? "Published" : "Draft"}</Label>
+          </div>
+          <div>
+            <Label>Sort Order</Label>
+            <Input
+              type="number"
+              value={editingDoc.sortOrder || 0}
+              onChange={(e) =>
+                setEditingDoc({
+                  ...editingDoc,
+                  sortOrder: Number.parseInt(e.target.value, 10) || 0,
+                })
+              }
+              className="w-20"
+              data-testid="input-doc-sort"
+            />
+          </div>
+        </div>
+      </div>
+      <div>
+        <div className="mb-2 flex items-center justify-between">
+          <Label>Content (Markdown)</Label>
+          <Button variant="ghost" size="sm" onClick={() => setShowPreview(!showPreview)}>
+            {showPreview ? (
+              <>
+                <EyeOff className="mr-1 h-4 w-4" />
+                Edit
+              </>
+            ) : (
+              <>
+                <Eye className="mr-1 h-4 w-4" />
+                Preview
+              </>
+            )}
+          </Button>
+        </div>
+        {showPreview ? (
+          <div className="min-h-[300px] rounded-md border p-4">
+            <MarkdownDocument content={editingDoc.content || ""} />
+          </div>
+        ) : (
+          <Textarea
+            value={editingDoc.content || ""}
+            onChange={(e) => setEditingDoc({ ...editingDoc, content: e.target.value })}
+            rows={18}
+            className="font-mono text-sm"
+            data-testid="textarea-doc-content"
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
 function DocEditorSheet({
   sheetOpen,
   handleSheetOpenChange,
@@ -96,9 +211,9 @@ function DocEditorSheet({
 }: {
   sheetOpen: boolean;
   handleSheetOpenChange: (open: boolean) => void;
-  editingDoc: Partial<{ id: string; title: string; slug: string; category: string; content: string; sortOrder: number | null; isPublished: boolean | null; createdAt: Date | null; updatedAt: Date | null; createdBy: string | null; }> | null;
+  editingDoc: Partial<Doc> | null;
   editorLock: ReturnType<typeof useEditorLock>;
-  setEditingDoc: React.Dispatch<React.SetStateAction<Partial<{ id: string; title: string; slug: string; category: string; content: string; sortOrder: number | null; isPublished: boolean | null; createdAt: Date | null; updatedAt: Date | null; createdBy: string | null; }> | null>>;
+  setEditingDoc: React.Dispatch<React.SetStateAction<Partial<Doc> | null>>;
   categoryOptions: string[];
   setShowPreview: React.Dispatch<React.SetStateAction<boolean>>;
   showPreview: boolean;
@@ -118,115 +233,17 @@ function DocEditorSheet({
           </SheetDescription>
         </SheetHeader>
         <SheetBody>
-          {editorLock.summary ? (
-            <div className="mb-4">
-              <EditorLockBanner
-                variant={editorLock.summary.variant}
-                title={editorLock.summary.title}
-                description={editorLock.summary.description}
-                isLoading={editorLock.isLoading}
-                onRefresh={editorLock.acquire}
-              />
-            </div>
-          ) : null}
+          <EditorLockNotice editorLock={editorLock} className="mb-4" />
 
           {editingDoc && (
-            <div className={cn("space-y-4", editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Title</Label>
-                  <Input
-                    value={editingDoc.title || ""}
-                    onChange={(e) => setEditingDoc({ ...editingDoc, title: e.target.value })}
-                    data-testid="input-doc-title"
-                  />
-                </div>
-                <div>
-                  <Label>Slug</Label>
-                  <Input
-                    value={editingDoc.slug || ""}
-                    onChange={(e) => setEditingDoc({ ...editingDoc, slug: e.target.value })}
-                    data-testid="input-doc-slug"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Category</Label>
-                  <Select
-                    value={editingDoc.category || ""}
-                    onValueChange={(value) => setEditingDoc({ ...editingDoc, category: value })}
-                  >
-                    <SelectTrigger data-testid="select-doc-category">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categoryOptions.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-end gap-4">
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      checked={editingDoc.isPublished ?? true}
-                      onCheckedChange={(value) => setEditingDoc({ ...editingDoc, isPublished: value })}
-                      data-testid="switch-doc-published"
-                    />
-                    <Label>{editingDoc.isPublished ? "Published" : "Draft"}</Label>
-                  </div>
-                  <div>
-                    <Label>Sort Order</Label>
-                    <Input
-                      type="number"
-                      value={editingDoc.sortOrder || 0}
-                      onChange={(e) =>
-                        setEditingDoc({
-                          ...editingDoc,
-                          sortOrder: Number.parseInt(e.target.value, 10) || 0,
-                        })
-                      }
-                      className="w-20"
-                      data-testid="input-doc-sort"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div className="mb-2 flex items-center justify-between">
-                  <Label>Content (Markdown)</Label>
-                  <Button variant="ghost" size="sm" onClick={() => setShowPreview(!showPreview)}>
-                    {showPreview ? (
-                      <>
-                        <EyeOff className="mr-1 h-4 w-4" />
-                        Edit
-                      </>
-                    ) : (
-                      <>
-                        <Eye className="mr-1 h-4 w-4" />
-                        Preview
-                      </>
-                    )}
-                  </Button>
-                </div>
-                {showPreview ? (
-                  <div className="min-h-[300px] rounded-md border p-4">
-                    <MarkdownDocument content={editingDoc.content || ""} />
-                  </div>
-                ) : (
-                  <Textarea
-                    value={editingDoc.content || ""}
-                    onChange={(e) => setEditingDoc({ ...editingDoc, content: e.target.value })}
-                    rows={18}
-                    className="font-mono text-sm"
-                    data-testid="textarea-doc-content"
-                  />
-                )}
-              </div>
-            </div>
+            <DocEditorFields
+              editorLock={editorLock}
+              editingDoc={editingDoc}
+              setEditingDoc={setEditingDoc}
+              categoryOptions={categoryOptions}
+              setShowPreview={setShowPreview}
+              showPreview={showPreview}
+            />
           )}
         </SheetBody>
         <SheetFooter>
@@ -256,7 +273,7 @@ function DocEditorSheet({
 }
 
 function DocViewerCard({ selectedDoc, openEdit, deleteMutation }: {
-  selectedDoc: { id: string; title: string; slug: string; category: string; content: string; sortOrder: number | null; isPublished: boolean | null; createdAt: Date | null; updatedAt: Date | null; createdBy: string | null; } | null;
+  selectedDoc: Doc | null;
   openEdit: (doc: Doc) => void;
   deleteMutation: UseMutationResult<void, Error, string, unknown>;
 }) {
@@ -321,8 +338,8 @@ function DocViewerCard({ selectedDoc, openEdit, deleteMutation }: {
 }
 
 function DocListCard({ filteredDocs, selectedDoc, setSelectedDocId }: {
-  filteredDocs: { id: string; title: string; slug: string; category: string; content: string; sortOrder: number | null; isPublished: boolean | null; createdAt: Date | null; updatedAt: Date | null; createdBy: string | null; }[];
-  selectedDoc: { id: string; title: string; slug: string; category: string; content: string; sortOrder: number | null; isPublished: boolean | null; createdAt: Date | null; updatedAt: Date | null; createdBy: string | null; } | null;
+  filteredDocs: Doc[];
+  selectedDoc: Doc | null;
   setSelectedDocId: React.Dispatch<React.SetStateAction<string | null>>;
 }) {
   return (
@@ -390,7 +407,7 @@ function DocCategoriesCard({
   setSelectedCategory: React.Dispatch<React.SetStateAction<string | null>>;
   selectedCategory: string | null;
   categories: string[];
-  allDocs: { id: string; title: string; slug: string; category: string; content: string; sortOrder: number | null; isPublished: boolean | null; createdAt: Date | null; updatedAt: Date | null; createdBy: string | null; }[];
+  allDocs: Doc[];
 }) {
   return (
     <Card className="flex min-h-0 flex-col overflow-hidden">
@@ -439,9 +456,9 @@ function DocCategoriesCard({
 }
 
 function DocsStats({ allDocs, categories, filteredDocs }: {
-  allDocs: { id: string; title: string; slug: string; category: string; content: string; sortOrder: number | null; isPublished: boolean | null; createdAt: Date | null; updatedAt: Date | null; createdBy: string | null; }[];
+  allDocs: Doc[];
   categories: string[];
-  filteredDocs: { id: string; title: string; slug: string; category: string; content: string; sortOrder: number | null; isPublished: boolean | null; createdAt: Date | null; updatedAt: Date | null; createdBy: string | null; }[];
+  filteredDocs: Doc[];
 }) {
   return (
     <div className="grid gap-4 md:grid-cols-3">

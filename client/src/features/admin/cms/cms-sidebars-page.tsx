@@ -3,7 +3,7 @@ import type { ElementType } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { AdminSidebar } from "@/features/admin/admin-sidebar";
-import { EditorLockBanner } from "@/components/shared/editor-lock-banner";
+import { EditorLockNotice } from "@/components/shared/editor-lock-banner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -412,15 +412,7 @@ function SidebarEditor({ sidebar, onClose }: { sidebar: CmsSidebar | null; onClo
 
   return (
     <div className="space-y-6">
-      {editorLock.summary ? (
-        <EditorLockBanner
-          variant={editorLock.summary.variant}
-          title={editorLock.summary.title}
-          description={editorLock.summary.description}
-          isLoading={editorLock.isLoading}
-          onRefresh={editorLock.acquire}
-        />
-      ) : null}
+      <EditorLockNotice editorLock={editorLock} />
 
       <div className="flex items-center justify-between gap-3">
         <div>

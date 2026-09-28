@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { CmsImageUpload } from "./components/cms-image-upload";
 import { useLocation, useParams } from "wouter";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, type UseMutationResult } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -31,12 +31,11 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Switch } from "@/components/ui/switch";
 import { SeoPreview } from "@/components/shared/seo-preview";
 import { StructuredDataStatus } from "@/components/shared/structured-data-status";
 import { ErrorBoundary } from "@/components/shared/error-boundary";
 import { EditorSaveIndicator } from "@/components/shared/editor-save-indicator";
-import { EditorLockBanner } from "@/components/shared/editor-lock-banner";
+import { EditorLockNotice } from "@/components/shared/editor-lock-banner";
 import { useToast } from "@/hooks/use-toast";
 import {
   ArrowLeft,
@@ -69,11 +68,12 @@ import type { BuilderContent } from "./builder/block-registry";
 import { reportBuilderRenderError } from "./builder/builder-diagnostics";
 import { TemplatePicker } from "./components/template-picker";
 import { LandingPageWizard } from "./components/landing-page-wizard";
-import { analyzeCmsPageQuality } from "@/lib/cms-page-quality";
-import { useEditorLock } from "@/hooks/use-editor-lock";
-import { useLockConflictGuard } from "@/hooks/use-lock-conflict-guard";
+import { analyzeCmsPageQuality, type CmsPageQualityIssue } from "@/lib/cms-page-quality";
+import type { useEditorLock } from "@/hooks/use-editor-lock";
+import { useLockedResourceEditor } from "@/hooks/use-locked-resource-editor";
 import { useEditorSaveState } from "@/hooks/use-editor-save-state";
 import { useUnsavedChangesGuard } from "@/hooks/use-unsaved-changes-guard";
+import { SwitchFieldRow } from "@/components/shared/switch-field-row";
 
 const editorSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -112,19 +112,1354 @@ function parseBuilderContent(raw: unknown): BuilderContent {
   return EMPTY_CONTENT;
 }
 
+function NewPageStarterDialogs({
+  templatePickerOpen,
+  setTemplatePickerOpen,
+  setBuilderContent,
+  toast,
+  setWizardOpen,
+  wizardOpen,
+  form,
+  slugManuallyEdited,
+}: {
+  templatePickerOpen: boolean;
+  setTemplatePickerOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setBuilderContent: React.Dispatch<React.SetStateAction<BuilderContent>>;
+  toast: ReturnType<typeof useToast>["toast"];
+  setWizardOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  wizardOpen: boolean;
+  form: ReturnType<typeof useForm<EditorForm>>;
+  slugManuallyEdited: React.MutableRefObject<boolean>;
+}) {
+  return (
+    <>
+      <TemplatePicker
+        open={templatePickerOpen}
+        onClose={() => setTemplatePickerOpen(false)}
+        onSelect={(content, templateName) => {
+          setBuilderContent(content);
+          setTemplatePickerOpen(false);
+          if (templateName !== "Blank Page") {
+            toast({ title: `Template "${templateName}" applied` });
+          }
+        }}
+        onOpenWizard={() => setWizardOpen(true)}
+      />
+      <LandingPageWizard
+        open={wizardOpen}
+        onClose={() => setWizardOpen(false)}
+        onCreate={(content, title) => {
+          setBuilderContent(content);
+          form.setValue("title", title);
+          form.setValue("pageType", "landing");
+          if (!slugManuallyEdited.current) {
+            form.setValue("slug", slugify(title));
+          }
+          setWizardOpen(false);
+          toast({ title: "Landing page generated — customize it below" });
+        }}
+      />
+    </>
+  );
+}
+
+function PageReadinessCard({
+  qualitySummary,
+  openDraftPreview,
+  isPreviewLinkPending,
+  isNew,
+  copyDraftPreview,
+}: {
+  qualitySummary: { errors: number; warnings: number; info: number; };
+  openDraftPreview: () => Promise<void>;
+  isPreviewLinkPending: boolean;
+  isNew: boolean;
+  copyDraftPreview: () => Promise<void>;
+}) {
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm">Preview & Readiness</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4 pt-0">
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="rounded-lg border bg-background p-3">
+            <p className="text-lg font-semibold">{qualitySummary.errors}</p>
+            <p className="text-xs text-muted-foreground">Errors</p>
+          </div>
+          <div className="rounded-lg border bg-background p-3">
+            <p className="text-lg font-semibold">{qualitySummary.warnings}</p>
+            <p className="text-xs text-muted-foreground">Warnings</p>
+          </div>
+          <div className="rounded-lg border bg-background p-3">
+            <p className="text-lg font-semibold">{qualitySummary.info}</p>
+            <p className="text-xs text-muted-foreground">Notes</p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Button
+            type="button"
+            className="w-full"
+            variant="outline"
+            onClick={() => openDraftPreview()}
+            disabled={isPreviewLinkPending || isNew}
+          >
+            {isPreviewLinkPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <ExternalLink className="mr-2 h-4 w-4" />
+            )}
+            Open Draft Preview
+          </Button>
+          <Button
+            type="button"
+            className="w-full"
+            variant="outline"
+            onClick={() => copyDraftPreview()}
+            disabled={isPreviewLinkPending || isNew}
+          >
+            {isPreviewLinkPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Copy className="mr-2 h-4 w-4" />
+            )}
+            Copy Draft Preview Link
+          </Button>
+        </div>
+
+        <p className="text-xs text-muted-foreground">
+          Preview links open the real frontend renderer with the current saved draft, so editors can review layout and content before publishing.
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function PagePublicationChecklist({ qualityIssues, setActiveTab }: {
+  qualityIssues: CmsPageQualityIssue[];
+  setActiveTab: React.Dispatch<React.SetStateAction<string>>;
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Publication Checklist</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {qualityIssues.length === 0 ? (
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">
+            <div className="flex items-center gap-2 font-medium">
+              <Check className="h-4 w-4" />
+              This page looks ready for publishing
+            </div>
+            <p className="mt-2 text-sm">
+              We did not detect any obvious content, SEO, or structural issues in the current draft.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3" data-testid="list-page-quality-issues">
+            {qualityIssues.map((issue) => (
+              <div
+                key={issue.id}
+                className={cn(
+                  "rounded-xl border p-4",
+                  issue.severity === "error" && "border-red-200 bg-red-50",
+                  issue.severity === "warning" && "border-amber-200 bg-amber-50",
+                  issue.severity === "info" && "border-blue-200 bg-blue-50"
+                )}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-medium text-sm">{issue.title}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{issue.description}</p>
+                  </div>
+                  <Badge variant="outline" className="capitalize">{issue.severity}</Badge>
+                </div>
+                <div className="mt-3">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => setActiveTab(issue.tab)}
+                  >
+                    Open {issue.tab === "builder" ? "Builder" : issue.tab === "seo" ? "SEO" : "Settings"}
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function PageSeoForm({ form }: {
+  form: ReturnType<typeof useForm<EditorForm>>;
+}) {
+  return (
+    <Form {...form}>
+      <form className="space-y-5">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Globe className="h-4 w-4 text-muted-foreground" />
+              Search Engine
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FormField
+              control={form.control}
+              name="seoTitle"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-center justify-between">
+                    <FormLabel>SEO Title <span className="text-muted-foreground font-normal text-xs">(optional)</span></FormLabel>
+                    {(field.value ?? "").length > 0 && (
+                      <span className={`text-xs ${(field.value ?? "").length > 60 ? "text-amber-500" : (field.value ?? "").length < 20 ? "text-amber-500" : "text-emerald-600 dark:text-emerald-400"}`}>
+                        {(field.value ?? "").length}/60
+                      </span>
+                    )}
+                  </div>
+                  <FormControl>
+                    <Input placeholder="Overrides page title in search results" {...field} data-testid="input-seo-title" />
+                  </FormControl>
+                  <FormDescription className="text-xs">If blank, the page title is used. Aim for 30–60 characters.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="seoDescription"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Meta Description
+                    <span className={`ml-2 text-xs font-normal ${(field.value ?? "").length > 160 ? "text-amber-500" : (field.value ?? "").length > 130 ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}>
+                      ({(field.value ?? "").length}/160)
+                    </span>
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Brief description for search engine results"
+                      rows={3}
+                      {...field}
+                      data-testid="textarea-seo-description"
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs">Aim for 130-160 characters. Longer descriptions can still be saved.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="seoKeywords"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Keywords <span className="text-muted-foreground font-normal text-xs">(optional)</span></FormLabel>
+                  <FormControl>
+                    <Input placeholder="comma, separated, keywords" {...field} data-testid="input-seo-keywords" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="canonicalUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Canonical URL <span className="text-muted-foreground font-normal text-xs">(optional)</span></FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://coreplatform.com/about" autoPrependHttps {...field} data-testid="input-canonical-url" />
+                  </FormControl>
+                  <FormDescription className="text-xs">
+                    Override the canonical link tag. Leave blank to auto-generate from the page slug.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="noindex"
+              render={({ field }) => (
+                <FormItem>
+                  <SwitchFieldRow
+                    label="Hide from search engines"
+                    description="Sets noindex,nofollow. Use for private or staging pages."
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    testId="switch-noindex"
+                  />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Globe className="h-4 w-4 text-muted-foreground" />
+              Social / Open Graph
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <FormField
+              control={form.control}
+              name="ogImageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Open Graph Image <span className="text-muted-foreground font-normal text-xs">(optional)</span></FormLabel>
+                  <CmsImageUpload
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    helpText="Recommended: 1200 × 630 px. Shown when the page is shared on social media. Falls back to global default OG image."
+                    data-testid="og-image-upload"
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
+      </form>
+    </Form>
+  );
+}
+
+function PageRevisionHistory({
+  revisions,
+  restoringId,
+  restoreMutation,
+  setRestoringId,
+}: {
+  revisions: CmsPageRevision[];
+  restoringId: string | null;
+  restoreMutation: UseMutationResult<Response, Error, string, unknown>;
+  setRestoringId: React.Dispatch<React.SetStateAction<string | null>>;
+}) {
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            Revision History
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          {revisions.length === 0 ? (
+            <p className="text-xs text-muted-foreground">No revisions yet</p>
+          ) : (
+            <div className="space-y-2" data-testid="list-revisions">
+              {revisions.slice(0, 8).map((rev, idx) => (
+                <div key={rev.id} className="text-xs border-b last:border-0 pb-2 last:pb-0" data-testid={`item-revision-${rev.id}`}>
+                  <div className="flex items-center justify-between gap-1 flex-wrap">
+                    <div>
+                      <span className="font-medium">{idx === 0 ? "Current" : `v${revisions.length - idx}`}</span>
+                      <span className="text-muted-foreground ml-1.5">
+                        {rev.createdAt ? format(new Date(rev.createdAt), "MMM d 'at' h:mm a") : "—"}
+                      </span>
+                    </div>
+                    {idx > 0 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-5 px-1.5 text-[10px] text-muted-foreground hover:text-foreground"
+                        disabled={restoringId === rev.id || restoreMutation.isPending}
+                        onClick={() => {
+                          setRestoringId(rev.id);
+                          restoreMutation.mutate(rev.id);
+                        }}
+                        data-testid={`button-restore-revision-${rev.id}`}
+                      >
+                        {restoringId === rev.id ? (
+                          <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                        ) : (
+                          <RotateCcw className="h-2.5 w-2.5" />
+                        )}
+                        <span className="ml-1">Restore</span>
+                      </Button>
+                    )}
+                  </div>
+                  {rev.changeNote && (
+                    <p className="text-muted-foreground italic mt-0.5">{rev.changeNote}</p>
+                  )}
+                </div>
+              ))}
+              {revisions.length > 8 && (
+                <p className="text-xs text-muted-foreground">+{revisions.length - 8} older revisions</p>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      <Card>
+        <CardContent className="pt-4">
+          <div className="flex items-start gap-1.5 text-xs text-muted-foreground">
+            <Info className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
+            <p>Each save creates a revision snapshot for future rollback support.</p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function PageDetailsForm({
+  form,
+  slugManuallyEdited,
+  watchTemplate,
+  sidebars,
+}: {
+  form: ReturnType<typeof useForm<EditorForm>>;
+  slugManuallyEdited: React.MutableRefObject<boolean>;
+  watchTemplate: "full-width" | "with-sidebar";
+  sidebars: CmsSidebar[];
+}) {
+  return (
+    <Form {...form}>
+      <form className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Page Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Page title" {...field} data-testid="input-title" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="slug"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Slug</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="page-slug"
+                      {...field}
+                      onChange={(e) => {
+                        slugManuallyEdited.current = true;
+                        field.onChange(e);
+                      }}
+                      className="font-mono text-sm"
+                      data-testid="input-slug"
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs">
+                    Lowercase letters, numbers, and hyphens. Used in the URL.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="pageType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Page Type</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-page-type">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="home">Home</SelectItem>
+                        <SelectItem value="about">About</SelectItem>
+                        <SelectItem value="contact">Contact</SelectItem>
+                        <SelectItem value="landing">Landing</SelectItem>
+                        <SelectItem value="service">Service</SelectItem>
+                        <SelectItem value="area">Service Area</SelectItem>
+                        <SelectItem value="custom">Custom</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="template"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Layout Template</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-page-template">
+                          <SelectValue placeholder="Select layout" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="full-width">Full Width</SelectItem>
+                        <SelectItem value="with-sidebar">Right Sidebar</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription className="text-xs">
+                      The sidebar appears on the right below the hero section.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            {watchTemplate === "with-sidebar" && (
+              <FormField
+                control={form.control}
+                name="sidebarId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Assigned Sidebar</FormLabel>
+                    <Select onValueChange={(value) => field.onChange(value === "none" ? "" : value)} value={field.value || "none"}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-page-sidebar">
+                          <SelectValue placeholder="Select sidebar" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="none">No sidebar selected</SelectItem>
+                        {sidebars.map((sidebar) => (
+                          <SelectItem key={sidebar.id} value={sidebar.id}>
+                            {sidebar.name}
+                            {sidebar.isDefault ? " (Default)" : ""}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription className="text-xs">
+                      Manage reusable sidebars in Sidebars & Widgets.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-status">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="draft">Draft</SelectItem>
+                        <SelectItem value="published">Published</SelectItem>
+                        {field.value === "scheduled" && (
+                          <SelectItem value="scheduled" disabled>Scheduled</SelectItem>
+                        )}
+                        <SelectItem value="archived">Archived</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </form>
+    </Form>
+  );
+}
+
+function PageBuilderCanvas({
+  editorLock,
+  page,
+  id,
+  form,
+  builderContent,
+  handleBuilderChange,
+}: {
+  editorLock: ReturnType<typeof useEditorLock>;
+  page: CmsPage | undefined;
+  id: string;
+  form: ReturnType<typeof useForm<EditorForm>>;
+  builderContent: BuilderContent;
+  handleBuilderChange: (content: BuilderContent) => void;
+}) {
+  return (
+    <div className={cn(editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
+      <ErrorBoundary
+        name="page-builder-shell"
+        onError={(error, errorInfo) =>
+          reportBuilderRenderError({
+            surface: "page-builder-shell",
+            error,
+            errorInfo,
+            context: {
+              pageId: page?.id ?? id ?? null,
+              slug: page?.slug ?? form.getValues("slug") ?? null,
+              title: page?.title ?? form.getValues("title") ?? null,
+            },
+          })
+        }
+        fallback={
+          <div className="rounded-2xl border border-dashed border-amber-300 bg-amber-50/80 p-6 text-left dark:border-amber-700 dark:bg-amber-950/20">
+            <h3 className="text-sm font-semibold text-amber-900 dark:text-amber-200">
+              The visual page builder hit a rendering problem.
+            </h3>
+            <p className="mt-2 text-sm text-amber-800/90 dark:text-amber-300/90">
+              The page content is still loaded, but one builder surface failed to render. Reload after deploying this patch. If a single section preview is the issue, the builder will now isolate that section instead of blanking the whole editor.
+            </p>
+          </div>
+        }
+      >
+        <PageBuilder content={builderContent} onChange={handleBuilderChange} />
+      </ErrorBoundary>
+    </div>
+  );
+}
+
+function DraftPageActions({
+  confirmPageStatusAction,
+  publishMutation,
+  editorLock,
+  schedulePopoverOpen,
+  setSchedulePopoverOpen,
+  scheduleDate,
+  setScheduleDate,
+  scheduleMutation,
+}: {
+  confirmPageStatusAction: (actionLabel: string, onProceed: () => void) => boolean;
+  publishMutation: UseMutationResult<Response, Error, void, unknown>;
+  editorLock: ReturnType<typeof useEditorLock>;
+  schedulePopoverOpen: boolean;
+  setSchedulePopoverOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  scheduleDate: string;
+  setScheduleDate: React.Dispatch<React.SetStateAction<string>>;
+  scheduleMutation: UseMutationResult<Response, Error, string, unknown>;
+}) {
+  return (
+    <>
+      <Button
+        variant="outline"
+        onClick={() =>
+          confirmPageStatusAction("Publishing", () => publishMutation.mutate())
+        }
+        disabled={publishMutation.isPending || editorLock.isReadOnly}
+        data-testid="button-publish"
+      >
+        {publishMutation.isPending ? (
+          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+        ) : (
+          <Eye className="h-4 w-4 mr-2" />
+        )}
+        Publish
+      </Button>
+      <Popover open={schedulePopoverOpen} onOpenChange={setSchedulePopoverOpen}>
+        <PopoverTrigger asChild>
+          <Button variant="outline" size="sm" data-testid="button-open-schedule">
+            <CalendarClock className="h-4 w-4 mr-1.5" />
+            Schedule
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-72" align="end">
+          <div className="space-y-3">
+            <p className="text-sm font-medium">Schedule Publishing</p>
+            <p className="text-xs text-muted-foreground">
+              Choose a future date and time for this page to go live automatically.
+            </p>
+            <input
+              type="datetime-local"
+              value={scheduleDate}
+              onChange={(e) => setScheduleDate(e.target.value)}
+              aria-label="Scheduled publish date"
+              min={new Date().toISOString().slice(0, 16)}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              data-testid="input-schedule-date"
+            />
+            <Button
+              className="w-full"
+              size="sm"
+              disabled={!scheduleDate || scheduleMutation.isPending || editorLock.isReadOnly}
+              onClick={() =>
+                confirmPageStatusAction("Scheduling this page", () =>
+                  scheduleMutation.mutate(new Date(scheduleDate).toISOString())
+                )
+              }
+              data-testid="button-confirm-schedule"
+            >
+              {scheduleMutation.isPending ? (
+                <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+              ) : (
+                <CalendarClock className="h-4 w-4 mr-1.5" />
+              )}
+              Confirm Schedule
+            </Button>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </>
+  );
+}
+
+function ScheduledPageActions({
+  page,
+  confirmPageStatusAction,
+  unpublishMutation,
+  editorLock,
+}: {
+  page: CmsPage;
+  confirmPageStatusAction: (actionLabel: string, onProceed: () => void) => boolean;
+  unpublishMutation: UseMutationResult<Response, Error, void, unknown>;
+  editorLock: ReturnType<typeof useEditorLock>;
+}) {
+  return (
+    <>
+      <Badge className="bg-blue-600 text-white" data-testid="badge-scheduled">
+        <CalendarClock className="h-3 w-3 mr-1" />
+        Scheduled
+        {page.scheduledAt && (
+          <span className="ml-1 font-normal">
+            {format(new Date(page.scheduledAt), "MMM d, h:mm a")}
+          </span>
+        )}
+      </Badge>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() =>
+          confirmPageStatusAction("Canceling this schedule", () => unpublishMutation.mutate())
+        }
+        disabled={unpublishMutation.isPending || editorLock.isReadOnly}
+        data-testid="button-cancel-schedule"
+      >
+        {unpublishMutation.isPending ? (
+          <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+        ) : (
+          <EyeOff className="h-4 w-4 mr-1.5" />
+        )}
+        Cancel Schedule
+      </Button>
+    </>
+  );
+}
+
+function PublishedPageActions({ confirmPageStatusAction, unpublishMutation, editorLock }: {
+  confirmPageStatusAction: (actionLabel: string, onProceed: () => void) => boolean;
+  unpublishMutation: UseMutationResult<Response, Error, void, unknown>;
+  editorLock: ReturnType<typeof useEditorLock>;
+}) {
+  return (
+    <>
+      <Badge className="bg-green-600 text-white" data-testid="badge-published">
+        <Globe className="h-3 w-3 mr-1" />
+        Published
+      </Badge>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() =>
+          confirmPageStatusAction("Unpublishing", () => unpublishMutation.mutate())
+        }
+        disabled={unpublishMutation.isPending || editorLock.isReadOnly}
+        data-testid="button-unpublish"
+      >
+        {unpublishMutation.isPending ? (
+          <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+        ) : (
+          <EyeOff className="h-4 w-4 mr-1.5" />
+        )}
+        Unpublish
+      </Button>
+    </>
+  );
+}
+
+function ExistingPageActions({ copyDraftPreview, isPreviewLinkPending, openDraftPreview }: {
+  copyDraftPreview: () => Promise<void>;
+  isPreviewLinkPending: boolean;
+  openDraftPreview: () => Promise<void>;
+}) {
+  return (
+    <>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => copyDraftPreview()}
+        disabled={isPreviewLinkPending}
+        data-testid="button-copy-draft-preview"
+      >
+        {isPreviewLinkPending ? (
+          <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+        ) : (
+          <Copy className="h-4 w-4 mr-1.5" />
+        )}
+        Copy Preview Link
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => openDraftPreview()}
+        disabled={isPreviewLinkPending}
+        data-testid="button-open-draft-preview"
+      >
+        {isPreviewLinkPending ? (
+          <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+        ) : (
+          <ExternalLink className="h-4 w-4 mr-1.5" />
+        )}
+        Draft Preview
+      </Button>
+    </>
+  );
+}
+
+function pageToEditorForm(page: CmsPage): EditorForm {
+  return {
+    title: page.title,
+    slug: page.slug,
+    pageType: (page.pageType as EditorForm["pageType"]) ?? "custom",
+    template: (page.template as EditorForm["template"]) ?? "full-width",
+    sidebarId: page.sidebarId ?? "",
+    status: (page.status as EditorForm["status"]) ?? "draft",
+    seoTitle: page.seoTitle ?? "",
+    seoDescription: page.seoDescription ?? "",
+    seoKeywords: page.seoKeywords ?? "",
+    ogImageUrl: page.ogImageUrl ?? "",
+    canonicalUrl: page.canonicalUrl ?? "",
+    noindex: page.noindex ?? false,
+  };
+}
+
+function normalizeEditorForm(values: EditorForm): EditorForm {
+  return {
+    ...values,
+    sidebarId: values.sidebarId ?? "",
+    seoTitle: values.seoTitle ?? "",
+    seoDescription: values.seoDescription ?? "",
+    seoKeywords: values.seoKeywords ?? "",
+    ogImageUrl: values.ogImageUrl ?? "",
+    canonicalUrl: values.canonicalUrl ?? "",
+    noindex: values.noindex ?? false,
+  };
+}
+
+function usePageStatusMutations(id: string | undefined, onScheduled: () => void) {
+  const { toast } = useToast();
+  const invalidatePage = () => {
+    queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages", id] });
+  };
+
+  const publishMutation = useMutation({
+    mutationFn: () => apiRequest("POST", `/api/admin/cms/pages/${id}/publish`),
+    onSuccess: () => {
+      invalidatePage();
+      toast({ title: "Page published" });
+    },
+    onError: () => toast({ title: "Failed to publish page", variant: "destructive" }),
+  });
+
+  const unpublishMutation = useMutation({
+    mutationFn: () => apiRequest("POST", `/api/admin/cms/pages/${id}/unpublish`),
+    onSuccess: () => {
+      invalidatePage();
+      toast({ title: "Page unpublished — reverted to draft" });
+    },
+    onError: () => toast({ title: "Failed to unpublish page", variant: "destructive" }),
+  });
+
+  const scheduleMutation = useMutation({
+    mutationFn: (scheduledAt: string) =>
+      apiRequest("POST", `/api/admin/cms/pages/${id}/schedule`, { scheduledAt }),
+    onSuccess: () => {
+      invalidatePage();
+      onScheduled();
+      toast({ title: "Page scheduled for publishing" });
+    },
+    onError: () => toast({ title: "Failed to schedule page", variant: "destructive" }),
+  });
+
+  return { publishMutation, unpublishMutation, scheduleMutation };
+}
+
+/** Generates (and caches until the next save) a signed draft preview link. */
+function useDraftPreviewLink(id: string | undefined) {
+  const { toast } = useToast();
+  const previewUrlRef = useRef("");
+
+  const previewLinkMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("GET", `/api/admin/cms/pages/${id}/preview-link`);
+      return response.json() as Promise<{ previewUrl: string; previewPath: string; expiresInHours: number }>;
+    },
+    onSuccess: (result) => {
+      previewUrlRef.current = result.previewUrl;
+      toast({
+        title: "Draft preview link ready",
+        description: `This preview link is ready to use and will expire in ${result.expiresInHours} hours.`,
+      });
+    },
+    onError: () => {
+      toast({ title: "Could not generate preview link", variant: "destructive" });
+    },
+  });
+
+  const resolvePreviewUrl = async () =>
+    previewUrlRef.current || (await previewLinkMutation.mutateAsync()).previewUrl;
+
+  const open = async () => {
+    try {
+      window.open(await resolvePreviewUrl(), "_blank", "noopener,noreferrer");
+    } catch {
+      toast({ title: "Could not open draft preview", variant: "destructive" });
+    }
+  };
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(await resolvePreviewUrl());
+      toast({ title: "Draft preview link copied" });
+    } catch {
+      toast({ title: "Could not copy preview link", variant: "destructive" });
+    }
+  };
+
+  const reset = () => {
+    previewUrlRef.current = "";
+  };
+
+  return { open, copy, reset, isPending: previewLinkMutation.isPending };
+}
+
+function usePageQuality(form: ReturnType<typeof useForm<EditorForm>>, builderContent: BuilderContent) {
+  const [title, slug, status, template, sidebarId, seoTitle, seoDescription, ogImageUrl, noindex] = form.watch([
+    "title",
+    "slug",
+    "status",
+    "template",
+    "sidebarId",
+    "seoTitle",
+    "seoDescription",
+    "ogImageUrl",
+    "noindex",
+  ]);
+
+  const qualityIssues = useMemo(
+    () =>
+      analyzeCmsPageQuality({
+        title,
+        slug,
+        status,
+        template,
+        sidebarId,
+        seoTitle,
+        seoDescription,
+        ogImageUrl,
+        noindex,
+        blocks: builderContent.blocks,
+      }),
+    [builderContent.blocks, noindex, ogImageUrl, seoDescription, seoTitle, sidebarId, slug, status, template, title],
+  );
+
+  const qualitySummary = useMemo(
+    () => ({
+      errors: qualityIssues.filter((issue) => issue.severity === "error").length,
+      warnings: qualityIssues.filter((issue) => issue.severity === "warning").length,
+      info: qualityIssues.filter((issue) => issue.severity === "info").length,
+    }),
+    [qualityIssues],
+  );
+
+  return { qualityIssues, qualitySummary };
+}
+
+function PageSeoTab({
+  editorLock,
+  form,
+  watchSeoTitle,
+  watchTitle,
+  watchSeoDescription,
+  watchSlug,
+  watchOgImageUrl,
+  watchNoindex,
+  watchStatus,
+  hasFaqBlocks,
+}: {
+  editorLock: ReturnType<typeof useEditorLock>;
+  form: ReturnType<typeof useForm<EditorForm>>;
+  watchSeoTitle: string | undefined;
+  watchTitle: string;
+  watchSeoDescription: string | undefined;
+  watchSlug: string;
+  watchOgImageUrl: string | undefined;
+  watchNoindex: boolean;
+  watchStatus: "draft" | "published" | "scheduled" | "archived";
+  hasFaqBlocks: boolean;
+}) {
+  return (
+    <div className={cn("max-w-2xl space-y-5", editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
+      <PageSeoForm form={form} />
+
+      <SeoPreview
+        title={watchSeoTitle || watchTitle || ""}
+        description={watchSeoDescription || ""}
+        url={`${typeof window !== "undefined" ? window.location.origin : ""}/${watchSlug || ""}`}
+        ogImage={watchOgImageUrl || ""}
+        source="page"
+        data-testid="seo-preview-panel"
+      />
+
+      <StructuredDataStatus
+        contentType="page"
+        fields={{
+          hasTitle: !!(watchSeoTitle || watchTitle),
+          hasDescription: !!watchSeoDescription,
+          hasImage: !!watchOgImageUrl,
+          noindex: !!watchNoindex,
+          isPublished: watchStatus === "published",
+          hasFaqBlocks,
+        }}
+        data-testid="structured-data-status"
+      />
+    </div>
+  );
+}
+
+function PageEditorTitle({ title, page }: { title: string; page: CmsPage | undefined }) {
+  return (
+    <div>
+      <h1 className="text-xl font-heading font-semibold" data-testid="text-editor-title">
+        {title}
+      </h1>
+      {page && (
+        <p className="text-xs text-muted-foreground mt-0.5">
+          Last saved {page.updatedAt ? format(new Date(page.updatedAt), "MMM d, yyyy 'at' h:mm a") : "—"}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function PageQualityBadge({ hasIssues, issueCount }: { hasIssues: boolean; issueCount: number }) {
+  if (!hasIssues) {
+    return (
+      <Badge className="bg-emerald-600 text-white" data-testid="badge-quality-ready">
+        <Check className="mr-1 h-3 w-3" />
+        Ready to publish
+      </Badge>
+    );
+  }
+  return (
+    <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-800" data-testid="badge-quality-issues">
+      <AlertTriangle className="mr-1 h-3 w-3" />
+      {issueCount} quality issue{issueCount === 1 ? "" : "s"}
+    </Badge>
+  );
+}
+
+type PageStatusActionsProps = Parameters<typeof DraftPageActions>[0] &
+  Omit<Parameters<typeof ScheduledPageActions>[0], "page"> & { page: CmsPage | undefined };
+
+function PageStatusActions({ page, ...props }: PageStatusActionsProps) {
+  if (page?.status === "published") {
+    return (
+      <PublishedPageActions
+        confirmPageStatusAction={props.confirmPageStatusAction}
+        unpublishMutation={props.unpublishMutation}
+        editorLock={props.editorLock}
+      />
+    );
+  }
+  if (page?.status === "scheduled") {
+    return (
+      <ScheduledPageActions
+        page={page}
+        confirmPageStatusAction={props.confirmPageStatusAction}
+        unpublishMutation={props.unpublishMutation}
+        editorLock={props.editorLock}
+      />
+    );
+  }
+  return (
+    <DraftPageActions
+      confirmPageStatusAction={props.confirmPageStatusAction}
+      publishMutation={props.publishMutation}
+      editorLock={props.editorLock}
+      schedulePopoverOpen={props.schedulePopoverOpen}
+      setSchedulePopoverOpen={props.setSchedulePopoverOpen}
+      scheduleDate={props.scheduleDate}
+      setScheduleDate={props.setScheduleDate}
+      scheduleMutation={props.scheduleMutation}
+    />
+  );
+}
+
+function PageEditorHeader({
+  unsavedChangesGuard,
+  navigate,
+  isNew,
+  form,
+  page,
+  copyDraftPreview,
+  isDraftPreviewPending,
+  openDraftPreview,
+  qualityIssues,
+  qualitySummary,
+  saveState,
+  setTemplatePickerOpen,
+  confirmPageStatusAction,
+  unpublishMutation,
+  editorLock,
+  publishMutation,
+  schedulePopoverOpen,
+  setSchedulePopoverOpen,
+  scheduleDate,
+  setScheduleDate,
+  scheduleMutation,
+  onSave,
+  isPending,
+}: {
+  unsavedChangesGuard: ReturnType<typeof useUnsavedChangesGuard>;
+  navigate: <S = any>(to: string | URL, options?: { replace?: boolean; state?: S; }) => void;
+  isNew: boolean;
+  form: ReturnType<typeof useForm<EditorForm>>;
+  page: CmsPage | undefined;
+  copyDraftPreview: () => Promise<void>;
+  isDraftPreviewPending: boolean;
+  openDraftPreview: () => Promise<void>;
+  qualityIssues: ReturnType<typeof usePageQuality>["qualityIssues"];
+  qualitySummary: ReturnType<typeof usePageQuality>["qualitySummary"];
+  saveState: ReturnType<typeof useEditorSaveState>;
+  setTemplatePickerOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  confirmPageStatusAction: (actionLabel: string, onProceed: () => void) => boolean;
+  unpublishMutation: ReturnType<typeof usePageStatusMutations>["unpublishMutation"];
+  editorLock: ReturnType<typeof useEditorLock>;
+  publishMutation: ReturnType<typeof usePageStatusMutations>["publishMutation"];
+  schedulePopoverOpen: boolean;
+  setSchedulePopoverOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  scheduleDate: string;
+  setScheduleDate: React.Dispatch<React.SetStateAction<string>>;
+  scheduleMutation: ReturnType<typeof usePageStatusMutations>["scheduleMutation"];
+  onSave: () => void;
+  isPending: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Back to pages"
+          onClick={() =>
+            unsavedChangesGuard.confirmDiscardChanges(() => navigate("/admin/cms/pages"))
+          }
+          data-testid="button-back"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <PageEditorTitle title={isNew ? "Create Page" : form.watch("title") || "Edit Page"} page={isNew ? undefined : page} />
+      </div>
+      <div className="flex items-center gap-2">
+        {!isNew && (
+          <ExistingPageActions copyDraftPreview={copyDraftPreview} isPreviewLinkPending={isDraftPreviewPending} openDraftPreview={openDraftPreview} />
+        )}
+        <PageQualityBadge hasIssues={qualityIssues.length > 0} issueCount={qualitySummary.errors + qualitySummary.warnings} />
+        <EditorSaveIndicator state={saveState.state} />
+        {isNew && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setTemplatePickerOpen(true)}
+            data-testid="button-reopen-templates"
+          >
+            <LayoutTemplate className="h-4 w-4 mr-1.5" />
+            Templates
+          </Button>
+        )}
+        {!isNew && (
+          <PageStatusActions
+            page={page}
+            confirmPageStatusAction={confirmPageStatusAction}
+            publishMutation={publishMutation}
+            unpublishMutation={unpublishMutation}
+            scheduleMutation={scheduleMutation}
+            editorLock={editorLock}
+            schedulePopoverOpen={schedulePopoverOpen}
+            setSchedulePopoverOpen={setSchedulePopoverOpen}
+            scheduleDate={scheduleDate}
+            setScheduleDate={setScheduleDate}
+          />
+        )}
+        <Button
+          onClick={onSave}
+          disabled={isPending || editorLock.isReadOnly}
+          data-testid="button-save"
+        >
+          {isPending ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Saving…
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4 mr-2" />
+              Save Page
+            </>
+          )}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+const EDITOR_FORM_DEFAULTS: EditorForm = {
+  title: "",
+  slug: "",
+  pageType: "custom",
+  template: "full-width",
+  sidebarId: "",
+  status: "draft",
+  seoTitle: "",
+  seoDescription: "",
+  seoKeywords: "",
+  ogImageUrl: "",
+  canonicalUrl: "",
+  noindex: false,
+};
+
+/** Form + builder content state for the page editor, loaded from the saved page. */
+function usePageEditorState(page: CmsPage | undefined, isNew: boolean) {
+  const titleRef = useRef<string>("");
+  const slugManuallyEdited = useRef(false);
+  const [builderContent, setBuilderContent] = useState<BuilderContent>(EMPTY_CONTENT);
+  const [savedBuilderSnapshot, setSavedBuilderSnapshot] = useState(() => JSON.stringify(EMPTY_CONTENT));
+  const form = useForm<EditorForm>({
+    resolver: zodResolver(editorSchema),
+    defaultValues: EDITOR_FORM_DEFAULTS,
+  });
+
+  useEffect(() => {
+    if (page) {
+      form.reset(pageToEditorForm(page));
+      const parsedContent = parseBuilderContent(page.content);
+      setBuilderContent(parsedContent);
+      setSavedBuilderSnapshot(JSON.stringify(parsedContent));
+    }
+  }, [page, form]);
+
+  const watchTitle = form.watch("title");
+  useEffect(() => {
+    if (isNew && !slugManuallyEdited.current && watchTitle !== titleRef.current) {
+      titleRef.current = watchTitle;
+      form.setValue("slug", slugify(watchTitle), { shouldValidate: false });
+    }
+  }, [watchTitle, isNew, form]);
+
+  const applySavedState = useCallback(
+    (data: EditorForm, content: BuilderContent) => {
+      form.reset(data);
+      setBuilderContent(content);
+      setSavedBuilderSnapshot(JSON.stringify(content));
+    },
+    [form]
+  );
+
+  const builderDirty = useMemo(
+    () => JSON.stringify(builderContent) !== savedBuilderSnapshot,
+    [builderContent, savedBuilderSnapshot]
+  );
+
+  return { form, slugManuallyEdited, builderContent, setBuilderContent, builderDirty, applySavedState };
+}
+
+function usePageRevisionRestore(
+  id: string | undefined,
+  onRestored: (restored: { content?: unknown; title?: string } | null) => void,
+) {
+  const { toast } = useToast();
+  const [restoringId, setRestoringId] = useState<string | null>(null);
+  const restoreMutation = useMutation({
+    mutationFn: (revisionId: string) =>
+      apiRequest("POST", `/api/admin/cms/pages/${id}/revisions/${revisionId}/restore`),
+    onSuccess: async (res) => {
+      const restored = await res.json();
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages", id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages", id, "revisions"] });
+      onRestored(restored);
+      setRestoringId(null);
+      toast({ title: "Revision restored successfully" });
+    },
+    onError: () => {
+      setRestoringId(null);
+      toast({ title: "Failed to restore revision", variant: "destructive" });
+    },
+  });
+  return { restoringId, setRestoringId, restoreMutation };
+}
+
+type PageSavePayload = EditorForm & { content: BuilderContent };
+
+function usePageSaveMutation({
+  id,
+  isNew,
+  onSaved,
+  onError,
+}: {
+  id: string | undefined;
+  isNew: boolean;
+  onSaved: (created: CmsPage | null, variables: PageSavePayload) => void;
+  onError: () => void;
+}) {
+  const { toast } = useToast();
+  return useMutation({
+    mutationFn: async (data: PageSavePayload) => {
+      if (isNew) {
+        const res = await apiRequest("POST", "/api/admin/cms/pages", data);
+        return (await res.json()) as CmsPage;
+      }
+      await apiRequest("PUT", `/api/admin/cms/pages/${id}`, data);
+      return null;
+    },
+    onSuccess: (created, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages"] });
+      if (!isNew) {
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages", id] });
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages", id, "revisions"] });
+      }
+      toast({ title: isNew ? "Page created successfully" : "Page saved" });
+      onSaved(created, variables);
+    },
+    onError: async (err: any) => {
+      const msg = await err?.response?.json?.().catch(() => null);
+      toast({ title: msg?.error || (isNew ? "Failed to create page" : "Failed to save page"), variant: "destructive" });
+      onError();
+    },
+  });
+}
+
 export default function CmsPageEditorPage() {
   const params = useParams<{ id: string }>();
   const id = params?.id;
   const isNew = !id || id === "new";
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  const titleRef = useRef<string>("");
   const navTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const slugManuallyEdited = useRef(false);
-  const [builderContent, setBuilderContent] = useState<BuilderContent>(EMPTY_CONTENT);
-  const [savedBuilderSnapshot, setSavedBuilderSnapshot] = useState(() =>
-    JSON.stringify(EMPTY_CONTENT)
-  );
   const [activeTab, setActiveTab] = useState("builder");
   const [templatePickerOpen, setTemplatePickerOpen] = useState(isNew);
   const [wizardOpen, setWizardOpen] = useState(false);
@@ -143,59 +1478,16 @@ export default function CmsPageEditorPage() {
     queryKey: ["/api/admin/cms/sidebars"],
   });
 
-  const editorLock = useEditorLock({
+  const { editorLock, lockedClass } = useLockedResourceEditor({
     resourceType: "cms_page",
     resourceId: isNew ? null : (page?.id ?? id ?? null),
-    enabled: !isNew,
-  });
-
-  const form = useForm<EditorForm>({
-    resolver: zodResolver(editorSchema),
-    defaultValues: {
-      title: "",
-      slug: "",
-      pageType: "custom",
-      template: "full-width",
-      sidebarId: "",
-      status: "draft",
-      seoTitle: "",
-      seoDescription: "",
-      seoKeywords: "",
-      ogImageUrl: "",
-      canonicalUrl: "",
-      noindex: false,
-    },
-  });
-
-  useEffect(() => {
-    if (page) {
-      form.reset({
-        title: page.title,
-        slug: page.slug,
-        pageType: (page.pageType as EditorForm["pageType"]) ?? "custom",
-        template: (page.template as EditorForm["template"]) ?? "full-width",
-        sidebarId: page.sidebarId ?? "",
-        status: (page.status as EditorForm["status"]) ?? "draft",
-        seoTitle: page.seoTitle ?? "",
-        seoDescription: page.seoDescription ?? "",
-        seoKeywords: page.seoKeywords ?? "",
-        ogImageUrl: page.ogImageUrl ?? "",
-        canonicalUrl: page.canonicalUrl ?? "",
-        noindex: page.noindex ?? false,
-      });
-      const parsedContent = parseBuilderContent(page.content);
-      setBuilderContent(parsedContent);
-      setSavedBuilderSnapshot(JSON.stringify(parsedContent));
-    }
-  }, [page, form]);
-
-  useLockConflictGuard({
-    active: !isNew,
-    resourceId: isNew ? null : (page?.id ?? id ?? null),
     resourceLabel: "page",
-    editorLock,
     onConflict: () => navigate("/admin/cms/pages"),
   });
+
+  const { form, slugManuallyEdited, builderContent, setBuilderContent, builderDirty, applySavedState } =
+    usePageEditorState(page, isNew);
+
 
   const watchTitle = form.watch("title");
   const watchSlug = form.watch("slug");
@@ -205,195 +1497,39 @@ export default function CmsPageEditorPage() {
   const watchNoindex = form.watch("noindex");
   const watchStatus = form.watch("status");
   const watchTemplate = form.watch("template");
-  const watchSidebarId = form.watch("sidebarId");
   const hasFaqBlocks = (builderContent?.blocks ?? []).some((b: any) => b.type === "faq");
 
-  useEffect(() => {
-    if (isNew && !slugManuallyEdited.current && watchTitle !== titleRef.current) {
-      titleRef.current = watchTitle;
-      form.setValue("slug", slugify(watchTitle), { shouldValidate: false });
-    }
-  }, [watchTitle, isNew, form]);
+  const handleBuilderChange = setBuilderContent;
 
-  const handleBuilderChange = useCallback((content: BuilderContent) => {
-    setBuilderContent(content);
-  }, []);
-
-  const applySavedState = useCallback(
-    (data: EditorForm, content: BuilderContent) => {
-      form.reset(data);
-      setBuilderContent(content);
-      setSavedBuilderSnapshot(JSON.stringify(content));
-    },
-    [form]
-  );
-
-  const createMutation = useMutation({
-    mutationFn: (data: EditorForm & { content: BuilderContent }) =>
-      apiRequest("POST", "/api/admin/cms/pages", data),
-    onSuccess: async (res, variables) => {
-      const created: CmsPage = await res.json();
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages"] });
-      toast({ title: "Page created successfully" });
-      draftPreviewUrlRef.current = "";
-      applySavedState(
-        {
-          title: variables.title,
-          slug: variables.slug,
-          pageType: variables.pageType,
-          template: variables.template,
-          sidebarId: variables.sidebarId ?? "",
-          status: variables.status,
-          seoTitle: variables.seoTitle ?? "",
-          seoDescription: variables.seoDescription ?? "",
-          seoKeywords: variables.seoKeywords ?? "",
-          ogImageUrl: variables.ogImageUrl ?? "",
-          canonicalUrl: variables.canonicalUrl ?? "",
-          noindex: variables.noindex ?? false,
-        },
-        variables.content
-      );
+  const saveMutation = usePageSaveMutation({
+    id,
+    isNew,
+    onSaved: (created, variables) => {
+      draftPreview.reset();
+      const { content, ...formValues } = variables;
+      applySavedState(normalizeEditorForm(formValues), content);
       saveState.markSaved();
-      navTimerRef.current = setTimeout(() => navigate(`/admin/cms/pages/${created.id}`), 1500);
+      if (created) {
+        navTimerRef.current = setTimeout(() => navigate(`/admin/cms/pages/${created.id}`), 1500);
+      }
     },
-    onError: async (err: any) => {
-      const msg = await err?.response?.json?.().catch(() => null);
-      toast({ title: msg?.error || "Failed to create page", variant: "destructive" });
-      saveState.markError();
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: (data: EditorForm & { content: BuilderContent }) =>
-      apiRequest("PUT", `/api/admin/cms/pages/${id}`, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages", id] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages", id, "revisions"] });
-      toast({ title: "Page saved" });
-      draftPreviewUrlRef.current = "";
-      applySavedState(
-        {
-          title: variables.title,
-          slug: variables.slug,
-          pageType: variables.pageType,
-          template: variables.template,
-          sidebarId: variables.sidebarId ?? "",
-          status: variables.status,
-          seoTitle: variables.seoTitle ?? "",
-          seoDescription: variables.seoDescription ?? "",
-          seoKeywords: variables.seoKeywords ?? "",
-          ogImageUrl: variables.ogImageUrl ?? "",
-          canonicalUrl: variables.canonicalUrl ?? "",
-          noindex: variables.noindex ?? false,
-        },
-        variables.content
-      );
-      saveState.markSaved();
-    },
-    onError: async (err: any) => {
-      const msg = await err?.response?.json?.().catch(() => null);
-      toast({ title: msg?.error || "Failed to save page", variant: "destructive" });
-      saveState.markError();
-    },
-  });
-
-  const publishMutation = useMutation({
-    mutationFn: () => apiRequest("POST", `/api/admin/cms/pages/${id}/publish`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages", id] });
-      toast({ title: "Page published" });
-    },
-    onError: () => toast({ title: "Failed to publish page", variant: "destructive" }),
-  });
-
-  const unpublishMutation = useMutation({
-    mutationFn: () => apiRequest("POST", `/api/admin/cms/pages/${id}/unpublish`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages", id] });
-      toast({ title: "Page unpublished — reverted to draft" });
-    },
-    onError: () => toast({ title: "Failed to unpublish page", variant: "destructive" }),
+    onError: () => saveState.markError(),
   });
 
   const [scheduleDate, setScheduleDate] = useState("");
   const [schedulePopoverOpen, setSchedulePopoverOpen] = useState(false);
-  const draftPreviewUrlRef = useRef("");
-
-  const scheduleMutation = useMutation({
-    mutationFn: (scheduledAt: string) =>
-      apiRequest("POST", `/api/admin/cms/pages/${id}/schedule`, { scheduledAt }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages", id] });
-      setSchedulePopoverOpen(false);
-      setScheduleDate("");
-      toast({ title: "Page scheduled for publishing" });
-    },
-    onError: () => toast({ title: "Failed to schedule page", variant: "destructive" }),
+  const { publishMutation, unpublishMutation, scheduleMutation } = usePageStatusMutations(id, () => {
+    setSchedulePopoverOpen(false);
+    setScheduleDate("");
   });
 
-  const [restoringId, setRestoringId] = useState<string | null>(null);
-  const restoreMutation = useMutation({
-    mutationFn: (revisionId: string) =>
-      apiRequest("POST", `/api/admin/cms/pages/${id}/revisions/${revisionId}/restore`),
-    onSuccess: async (res) => {
-      const restored = await res.json();
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages", id] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/cms/pages", id, "revisions"] });
-      setBuilderContent(parseBuilderContent(restored?.content));
-      form.setValue("title", restored?.title ?? form.getValues("title"));
-      setRestoringId(null);
-      toast({ title: "Revision restored successfully" });
-    },
-    onError: () => {
-      setRestoringId(null);
-      toast({ title: "Failed to restore revision", variant: "destructive" });
-    },
+  const { restoringId, setRestoringId, restoreMutation } = usePageRevisionRestore(id, (restored) => {
+    setBuilderContent(parseBuilderContent(restored?.content));
+    form.setValue("title", restored?.title ?? form.getValues("title"));
   });
 
-  const previewLinkMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest("GET", `/api/admin/cms/pages/${id}/preview-link`);
-      return response.json() as Promise<{ previewUrl: string; previewPath: string; expiresInHours: number }>;
-    },
-    onSuccess: (result) => {
-      draftPreviewUrlRef.current = result.previewUrl;
-      toast({
-        title: "Draft preview link ready",
-        description: `This preview link is ready to use and will expire in ${result.expiresInHours} hours.`,
-      });
-    },
-    onError: () => {
-      toast({ title: "Could not generate preview link", variant: "destructive" });
-    },
-  });
-
-  const openDraftPreview = async () => {
-    try {
-      const result = draftPreviewUrlRef.current
-        ? { previewUrl: draftPreviewUrlRef.current }
-        : await previewLinkMutation.mutateAsync();
-      window.open(result.previewUrl, "_blank", "noopener,noreferrer");
-    } catch {
-      toast({ title: "Could not open draft preview", variant: "destructive" });
-    }
-  };
-
-  const copyDraftPreview = async () => {
-    try {
-      const result = draftPreviewUrlRef.current
-        ? { previewUrl: draftPreviewUrlRef.current }
-        : await previewLinkMutation.mutateAsync();
-      await navigator.clipboard.writeText(result.previewUrl);
-      toast({ title: "Draft preview link copied" });
-    } catch {
-      toast({ title: "Could not copy preview link", variant: "destructive" });
-    }
-  };
+  const draftPreview = useDraftPreviewLink(id);
+  const { open: openDraftPreview, copy: copyDraftPreview } = draftPreview;
 
   const onSave = () => {
     form.handleSubmit((formData) => {
@@ -402,25 +1538,18 @@ export default function CmsPageEditorPage() {
         sidebarId: formData.template === "with-sidebar" ? formData.sidebarId || "" : "",
         content: builderContent,
       };
-      if (isNew) {
-        createMutation.mutate(payload);
-      } else {
-        updateMutation.mutate(payload);
-      }
+      saveMutation.mutate(payload);
     })();
   };
 
-  const isPending = createMutation.isPending || updateMutation.isPending;
-  const builderDirty = useMemo(
-    () => JSON.stringify(builderContent) !== savedBuilderSnapshot,
-    [builderContent, savedBuilderSnapshot]
-  );
+  const isPending = saveMutation.isPending;
+  const isDirty = form.formState.isDirty || builderDirty;
   const saveState = useEditorSaveState({
-    isDirty: form.formState.isDirty || builderDirty,
+    isDirty,
     isSaving: isPending,
   });
   const unsavedChangesGuard = useUnsavedChangesGuard({
-    isDirty: form.formState.isDirty || builderDirty,
+    isDirty,
     message: "You have unsaved changes to this page. Leave without saving?",
   });
 
@@ -439,41 +1568,7 @@ export default function CmsPageEditorPage() {
     };
   }, []);
 
-  const qualityIssues = useMemo(
-    () =>
-      analyzeCmsPageQuality({
-        title: form.getValues("title"),
-        slug: form.getValues("slug"),
-        status: watchStatus,
-        template: watchTemplate,
-        sidebarId: watchSidebarId,
-        seoTitle: watchSeoTitle,
-        seoDescription: watchSeoDescription,
-        ogImageUrl: watchOgImageUrl,
-        noindex: watchNoindex,
-        blocks: builderContent.blocks,
-      }),
-    [
-      builderContent.blocks,
-      form,
-      watchSidebarId,
-      watchSlug,
-      watchTitle,
-      watchNoindex,
-      watchOgImageUrl,
-      watchSeoDescription,
-      watchSeoTitle,
-      watchStatus,
-      watchTemplate,
-    ]
-  );
-
-  const qualitySummary = useMemo(() => {
-    const errors = qualityIssues.filter((issue) => issue.severity === "error").length;
-    const warnings = qualityIssues.filter((issue) => issue.severity === "warning").length;
-    const info = qualityIssues.filter((issue) => issue.severity === "info").length;
-    return { errors, warnings, info };
-  }, [qualityIssues]);
+  const { qualityIssues, qualitySummary } = usePageQuality(form, builderContent);
 
   if (!isNew && pageLoading) {
     return (
@@ -495,230 +1590,33 @@ export default function CmsPageEditorPage() {
           activeTab === "builder" ? "max-w-[1800px]" : "max-w-6xl"
         )}
       >
-        {editorLock.summary ? (
-          <EditorLockBanner
-            variant={editorLock.summary.variant}
-            title={editorLock.summary.title}
-            description={editorLock.summary.description}
-            isLoading={editorLock.isLoading}
-            onRefresh={editorLock.acquire}
-          />
-        ) : null}
+        <EditorLockNotice editorLock={editorLock} />
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Back to pages"
-              onClick={() =>
-                unsavedChangesGuard.confirmDiscardChanges(() => navigate("/admin/cms/pages"))
-              }
-              data-testid="button-back"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div>
-              <h1 className="text-xl font-heading font-semibold" data-testid="text-editor-title">
-                {isNew ? "Create Page" : (form.watch("title") || "Edit Page")}
-              </h1>
-              {!isNew && page && (
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Last saved {page.updatedAt ? format(new Date(page.updatedAt), "MMM d, yyyy 'at' h:mm a") : "—"}
-                </p>
-              )}
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            {!isNew && (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => copyDraftPreview()}
-                  disabled={previewLinkMutation.isPending}
-                  data-testid="button-copy-draft-preview"
-                >
-                  {previewLinkMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
-                  ) : (
-                    <Copy className="h-4 w-4 mr-1.5" />
-                  )}
-                  Copy Preview Link
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => openDraftPreview()}
-                  disabled={previewLinkMutation.isPending}
-                  data-testid="button-open-draft-preview"
-                >
-                  {previewLinkMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
-                  ) : (
-                    <ExternalLink className="h-4 w-4 mr-1.5" />
-                  )}
-                  Draft Preview
-                </Button>
-              </>
-            )}
-            {qualityIssues.length > 0 ? (
-              <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-800" data-testid="badge-quality-issues">
-                <AlertTriangle className="mr-1 h-3 w-3" />
-                {qualitySummary.errors + qualitySummary.warnings} quality issue{qualitySummary.errors + qualitySummary.warnings === 1 ? "" : "s"}
-              </Badge>
-            ) : (
-              <Badge className="bg-emerald-600 text-white" data-testid="badge-quality-ready">
-                <Check className="mr-1 h-3 w-3" />
-                Ready to publish
-              </Badge>
-            )}
-            <EditorSaveIndicator state={saveState.state} />
-            {isNew && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setTemplatePickerOpen(true)}
-                data-testid="button-reopen-templates"
-              >
-                <LayoutTemplate className="h-4 w-4 mr-1.5" />
-                Templates
-              </Button>
-            )}
-            {!isNew && page?.status === "published" && (
-              <>
-                <Badge className="bg-green-600 text-white" data-testid="badge-published">
-                  <Globe className="h-3 w-3 mr-1" />
-                  Published
-                </Badge>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    confirmPageStatusAction("Unpublishing", () => unpublishMutation.mutate())
-                  }
-                  disabled={unpublishMutation.isPending || editorLock.isReadOnly}
-                  data-testid="button-unpublish"
-                >
-                  {unpublishMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
-                  ) : (
-                    <EyeOff className="h-4 w-4 mr-1.5" />
-                  )}
-                  Unpublish
-                </Button>
-              </>
-            )}
-            {!isNew && page?.status === "scheduled" && (
-              <>
-                <Badge className="bg-blue-600 text-white" data-testid="badge-scheduled">
-                  <CalendarClock className="h-3 w-3 mr-1" />
-                  Scheduled
-                  {page.scheduledAt && (
-                    <span className="ml-1 font-normal">
-                      {format(new Date(page.scheduledAt), "MMM d, h:mm a")}
-                    </span>
-                  )}
-                </Badge>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    confirmPageStatusAction("Canceling this schedule", () => unpublishMutation.mutate())
-                  }
-                  disabled={unpublishMutation.isPending || editorLock.isReadOnly}
-                  data-testid="button-cancel-schedule"
-                >
-                  {unpublishMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
-                  ) : (
-                    <EyeOff className="h-4 w-4 mr-1.5" />
-                  )}
-                  Cancel Schedule
-                </Button>
-              </>
-            )}
-            {!isNew && page?.status !== "published" && page?.status !== "scheduled" && (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() =>
-                    confirmPageStatusAction("Publishing", () => publishMutation.mutate())
-                  }
-                  disabled={publishMutation.isPending || editorLock.isReadOnly}
-                  data-testid="button-publish"
-                >
-                  {publishMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Eye className="h-4 w-4 mr-2" />
-                  )}
-                  Publish
-                </Button>
-                <Popover open={schedulePopoverOpen} onOpenChange={setSchedulePopoverOpen}>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm" data-testid="button-open-schedule">
-                      <CalendarClock className="h-4 w-4 mr-1.5" />
-                      Schedule
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-72" align="end">
-                    <div className="space-y-3">
-                      <p className="text-sm font-medium">Schedule Publishing</p>
-                      <p className="text-xs text-muted-foreground">
-                        Choose a future date and time for this page to go live automatically.
-                      </p>
-                      <input
-                        type="datetime-local"
-                        value={scheduleDate}
-                        onChange={(e) => setScheduleDate(e.target.value)}
-                        aria-label="Scheduled publish date"
-                        min={new Date().toISOString().slice(0, 16)}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                        data-testid="input-schedule-date"
-                      />
-                      <Button
-                        className="w-full"
-                        size="sm"
-                        disabled={!scheduleDate || scheduleMutation.isPending || editorLock.isReadOnly}
-                        onClick={() =>
-                          confirmPageStatusAction("Scheduling this page", () =>
-                            scheduleMutation.mutate(new Date(scheduleDate).toISOString())
-                          )
-                        }
-                        data-testid="button-confirm-schedule"
-                      >
-                        {scheduleMutation.isPending ? (
-                          <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
-                        ) : (
-                          <CalendarClock className="h-4 w-4 mr-1.5" />
-                        )}
-                        Confirm Schedule
-                      </Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </>
-            )}
-            <Button
-              onClick={onSave}
-              disabled={isPending || editorLock.isReadOnly}
-              data-testid="button-save"
-            >
-              {isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Saving…
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Page
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
+        <PageEditorHeader
+          unsavedChangesGuard={unsavedChangesGuard}
+          navigate={navigate}
+          isNew={isNew}
+          form={form}
+          page={page}
+          copyDraftPreview={copyDraftPreview}
+          isDraftPreviewPending={draftPreview.isPending}
+          openDraftPreview={openDraftPreview}
+          qualityIssues={qualityIssues}
+          qualitySummary={qualitySummary}
+          saveState={saveState}
+          setTemplatePickerOpen={setTemplatePickerOpen}
+          confirmPageStatusAction={confirmPageStatusAction}
+          unpublishMutation={unpublishMutation}
+          editorLock={editorLock}
+          publishMutation={publishMutation}
+          schedulePopoverOpen={schedulePopoverOpen}
+          setSchedulePopoverOpen={setSchedulePopoverOpen}
+          scheduleDate={scheduleDate}
+          setScheduleDate={setScheduleDate}
+          scheduleMutation={scheduleMutation}
+          onSave={onSave}
+          isPending={isPending}
+        />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-4">
@@ -740,548 +1638,65 @@ export default function CmsPageEditorPage() {
           </TabsList>
 
           <TabsContent value="builder" className="mt-0">
-            <div className={cn(editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
-              <ErrorBoundary
-                name="page-builder-shell"
-                onError={(error, errorInfo) =>
-                  reportBuilderRenderError({
-                    surface: "page-builder-shell",
-                    error,
-                    errorInfo,
-                    context: {
-                      pageId: page?.id ?? id ?? null,
-                      slug: page?.slug ?? form.getValues("slug") ?? null,
-                      title: page?.title ?? form.getValues("title") ?? null,
-                    },
-                  })
-                }
-                fallback={
-                  <div className="rounded-2xl border border-dashed border-amber-300 bg-amber-50/80 p-6 text-left dark:border-amber-700 dark:bg-amber-950/20">
-                    <h3 className="text-sm font-semibold text-amber-900 dark:text-amber-200">
-                      The visual page builder hit a rendering problem.
-                    </h3>
-                    <p className="mt-2 text-sm text-amber-800/90 dark:text-amber-300/90">
-                      The page content is still loaded, but one builder surface failed to render. Reload after deploying this patch. If a single section preview is the issue, the builder will now isolate that section instead of blanking the whole editor.
-                    </p>
-                  </div>
-                }
-              >
-                <PageBuilder content={builderContent} onChange={handleBuilderChange} />
-              </ErrorBoundary>
-            </div>
+            <PageBuilderCanvas
+              editorLock={editorLock}
+              page={page}
+              id={id}
+              form={form}
+              builderContent={builderContent}
+              handleBuilderChange={handleBuilderChange}
+            />
           </TabsContent>
 
           <TabsContent value="settings" className="mt-0">
-            <div className={cn("grid grid-cols-1 lg:grid-cols-3 gap-6", editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
+            <div className={cn("grid grid-cols-1 lg:grid-cols-3 gap-6", lockedClass)}>
               <div className="lg:col-span-2">
-                <Form {...form}>
-                  <form className="space-y-6">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base">Page Details</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <FormField
-                          control={form.control}
-                          name="title"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Title</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Page title" {...field} data-testid="input-title" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="slug"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Slug</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="page-slug"
-                                  {...field}
-                                  onChange={(e) => {
-                                    slugManuallyEdited.current = true;
-                                    field.onChange(e);
-                                  }}
-                                  className="font-mono text-sm"
-                                  data-testid="input-slug"
-                                />
-                              </FormControl>
-                              <FormDescription className="text-xs">
-                                Lowercase letters, numbers, and hyphens. Used in the URL.
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <div className="grid grid-cols-2 gap-4">
-                          <FormField
-                            control={form.control}
-                            name="pageType"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Page Type</FormLabel>
-                                <Select onValueChange={field.onChange} value={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger data-testid="select-page-type">
-                                      <SelectValue placeholder="Select type" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="home">Home</SelectItem>
-                                    <SelectItem value="about">About</SelectItem>
-                                    <SelectItem value="contact">Contact</SelectItem>
-                                    <SelectItem value="landing">Landing</SelectItem>
-                                    <SelectItem value="service">Service</SelectItem>
-                                    <SelectItem value="area">Service Area</SelectItem>
-                                    <SelectItem value="custom">Custom</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={form.control}
-                            name="template"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Layout Template</FormLabel>
-                                <Select onValueChange={field.onChange} value={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger data-testid="select-page-template">
-                                      <SelectValue placeholder="Select layout" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="full-width">Full Width</SelectItem>
-                                    <SelectItem value="with-sidebar">Right Sidebar</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormDescription className="text-xs">
-                                  The sidebar appears on the right below the hero section.
-                                </FormDescription>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                        {watchTemplate === "with-sidebar" && (
-                          <FormField
-                            control={form.control}
-                            name="sidebarId"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Assigned Sidebar</FormLabel>
-                                <Select onValueChange={(value) => field.onChange(value === "none" ? "" : value)} value={field.value || "none"}>
-                                  <FormControl>
-                                    <SelectTrigger data-testid="select-page-sidebar">
-                                      <SelectValue placeholder="Select sidebar" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="none">No sidebar selected</SelectItem>
-                                    {sidebars.map((sidebar) => (
-                                      <SelectItem key={sidebar.id} value={sidebar.id}>
-                                        {sidebar.name}
-                                        {sidebar.isDefault ? " (Default)" : ""}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                <FormDescription className="text-xs">
-                                  Manage reusable sidebars in Sidebars & Widgets.
-                                </FormDescription>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        )}
-                        <div className="grid grid-cols-2 gap-4">
-                          <FormField
-                            control={form.control}
-                            name="status"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Status</FormLabel>
-                                <Select onValueChange={field.onChange} value={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger data-testid="select-status">
-                                      <SelectValue placeholder="Select status" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="draft">Draft</SelectItem>
-                                    <SelectItem value="published">Published</SelectItem>
-                                    {field.value === "scheduled" && (
-                                      <SelectItem value="scheduled" disabled>Scheduled</SelectItem>
-                                    )}
-                                    <SelectItem value="archived">Archived</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </form>
-                </Form>
+                <PageDetailsForm
+                  form={form}
+                  slugManuallyEdited={slugManuallyEdited}
+                  watchTemplate={watchTemplate}
+                  sidebars={sidebars}
+                />
               </div>
 
               {!isNew && (
-                <div className="space-y-4">
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        Revision History
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      {revisions.length === 0 ? (
-                        <p className="text-xs text-muted-foreground">No revisions yet</p>
-                      ) : (
-                        <div className="space-y-2" data-testid="list-revisions">
-                          {revisions.slice(0, 8).map((rev, idx) => (
-                            <div key={rev.id} className="text-xs border-b last:border-0 pb-2 last:pb-0" data-testid={`item-revision-${rev.id}`}>
-                              <div className="flex items-center justify-between gap-1 flex-wrap">
-                                <div>
-                                  <span className="font-medium">{idx === 0 ? "Current" : `v${revisions.length - idx}`}</span>
-                                  <span className="text-muted-foreground ml-1.5">
-                                    {rev.createdAt ? format(new Date(rev.createdAt), "MMM d 'at' h:mm a") : "—"}
-                                  </span>
-                                </div>
-                                {idx > 0 && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-5 px-1.5 text-[10px] text-muted-foreground hover:text-foreground"
-                                    disabled={restoringId === rev.id || restoreMutation.isPending}
-                                    onClick={() => {
-                                      setRestoringId(rev.id);
-                                      restoreMutation.mutate(rev.id);
-                                    }}
-                                    data-testid={`button-restore-revision-${rev.id}`}
-                                  >
-                                    {restoringId === rev.id ? (
-                                      <Loader2 className="h-2.5 w-2.5 animate-spin" />
-                                    ) : (
-                                      <RotateCcw className="h-2.5 w-2.5" />
-                                    )}
-                                    <span className="ml-1">Restore</span>
-                                  </Button>
-                                )}
-                              </div>
-                              {rev.changeNote && (
-                                <p className="text-muted-foreground italic mt-0.5">{rev.changeNote}</p>
-                              )}
-                            </div>
-                          ))}
-                          {revisions.length > 8 && (
-                            <p className="text-xs text-muted-foreground">+{revisions.length - 8} older revisions</p>
-                          )}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="pt-4">
-                      <div className="flex items-start gap-1.5 text-xs text-muted-foreground">
-                        <Info className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
-                        <p>Each save creates a revision snapshot for future rollback support.</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                <PageRevisionHistory
+                  revisions={revisions}
+                  restoringId={restoringId}
+                  restoreMutation={restoreMutation}
+                  setRestoringId={setRestoringId}
+                />
               )}
             </div>
           </TabsContent>
 
           <TabsContent value="seo" className="mt-0">
-            <div className={cn("max-w-2xl space-y-5", editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
-              <Form {...form}>
-                <form className="space-y-5">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <Globe className="h-4 w-4 text-muted-foreground" />
-                        Search Engine
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <FormField
-                        control={form.control}
-                        name="seoTitle"
-                        render={({ field }) => (
-                          <FormItem>
-                            <div className="flex items-center justify-between">
-                              <FormLabel>SEO Title <span className="text-muted-foreground font-normal text-xs">(optional)</span></FormLabel>
-                              {(field.value ?? "").length > 0 && (
-                                <span className={`text-xs ${(field.value ?? "").length > 60 ? "text-amber-500" : (field.value ?? "").length < 20 ? "text-amber-500" : "text-emerald-600 dark:text-emerald-400"}`}>
-                                  {(field.value ?? "").length}/60
-                                </span>
-                              )}
-                            </div>
-                            <FormControl>
-                              <Input placeholder="Overrides page title in search results" {...field} data-testid="input-seo-title" />
-                            </FormControl>
-                            <FormDescription className="text-xs">If blank, the page title is used. Aim for 30–60 characters.</FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="seoDescription"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              Meta Description
-                              <span className={`ml-2 text-xs font-normal ${(field.value ?? "").length > 160 ? "text-amber-500" : (field.value ?? "").length > 130 ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}>
-                                ({(field.value ?? "").length}/160)
-                              </span>
-                            </FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder="Brief description for search engine results"
-                                rows={3}
-                                {...field}
-                                data-testid="textarea-seo-description"
-                              />
-                            </FormControl>
-                            <FormDescription className="text-xs">Aim for 130-160 characters. Longer descriptions can still be saved.</FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="seoKeywords"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Keywords <span className="text-muted-foreground font-normal text-xs">(optional)</span></FormLabel>
-                            <FormControl>
-                              <Input placeholder="comma, separated, keywords" {...field} data-testid="input-seo-keywords" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="canonicalUrl"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Canonical URL <span className="text-muted-foreground font-normal text-xs">(optional)</span></FormLabel>
-                            <FormControl>
-                              <Input placeholder="https://coreplatform.com/about" autoPrependHttps {...field} data-testid="input-canonical-url" />
-                            </FormControl>
-                            <FormDescription className="text-xs">
-                              Override the canonical link tag. Leave blank to auto-generate from the page slug.
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="noindex"
-                        render={({ field }) => (
-                          <FormItem>
-                            <div className="flex items-center justify-between rounded-lg border px-4 py-3">
-                              <div>
-                                <FormLabel className="text-sm font-medium cursor-pointer">
-                                  Hide from search engines
-                                </FormLabel>
-                                <p className="text-xs text-muted-foreground mt-0.5">
-                                  Sets noindex,nofollow. Use for private or staging pages.
-                                </p>
-                              </div>
-                              <FormControl>
-                                <Switch
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                  data-testid="switch-noindex"
-                                />
-                              </FormControl>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <Globe className="h-4 w-4 text-muted-foreground" />
-                        Social / Open Graph
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <FormField
-                        control={form.control}
-                        name="ogImageUrl"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Open Graph Image <span className="text-muted-foreground font-normal text-xs">(optional)</span></FormLabel>
-                            <CmsImageUpload
-                              value={field.value ?? ""}
-                              onChange={field.onChange}
-                              helpText="Recommended: 1200 × 630 px. Shown when the page is shared on social media. Falls back to global default OG image."
-                              data-testid="og-image-upload"
-                            />
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </CardContent>
-                  </Card>
-                </form>
-              </Form>
-
-              <SeoPreview
-                title={watchSeoTitle || watchTitle || ""}
-                description={watchSeoDescription || ""}
-                url={`${typeof window !== "undefined" ? window.location.origin : ""}/${watchSlug || ""}`}
-                ogImage={watchOgImageUrl || ""}
-                source="page"
-                data-testid="seo-preview-panel"
-              />
-
-              <StructuredDataStatus
-                contentType="page"
-                fields={{
-                  hasTitle: !!(watchSeoTitle || watchTitle),
-                  hasDescription: !!watchSeoDescription,
-                  hasImage: !!watchOgImageUrl,
-                  noindex: !!watchNoindex,
-                  isPublished: watchStatus === "published",
-                  hasFaqBlocks,
-                }}
-                data-testid="structured-data-status"
-              />
-            </div>
+            <PageSeoTab
+              editorLock={editorLock}
+              form={form}
+              watchSeoTitle={watchSeoTitle}
+              watchTitle={watchTitle}
+              watchSeoDescription={watchSeoDescription}
+              watchSlug={watchSlug}
+              watchOgImageUrl={watchOgImageUrl}
+              watchNoindex={watchNoindex}
+              watchStatus={watchStatus}
+              hasFaqBlocks={hasFaqBlocks}
+            />
           </TabsContent>
 
           <TabsContent value="quality" className="mt-0">
-            <div className={cn("grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]", editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Publication Checklist</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {qualityIssues.length === 0 ? (
-                    <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">
-                      <div className="flex items-center gap-2 font-medium">
-                        <Check className="h-4 w-4" />
-                        This page looks ready for publishing
-                      </div>
-                      <p className="mt-2 text-sm">
-                        We did not detect any obvious content, SEO, or structural issues in the current draft.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3" data-testid="list-page-quality-issues">
-                      {qualityIssues.map((issue) => (
-                        <div
-                          key={issue.id}
-                          className={cn(
-                            "rounded-xl border p-4",
-                            issue.severity === "error" && "border-red-200 bg-red-50",
-                            issue.severity === "warning" && "border-amber-200 bg-amber-50",
-                            issue.severity === "info" && "border-blue-200 bg-blue-50"
-                          )}
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <p className="font-medium text-sm">{issue.title}</p>
-                              <p className="mt-1 text-sm text-muted-foreground">{issue.description}</p>
-                            </div>
-                            <Badge variant="outline" className="capitalize">{issue.severity}</Badge>
-                          </div>
-                          <div className="mt-3">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 px-2 text-xs"
-                              onClick={() => setActiveTab(issue.tab)}
-                            >
-                              Open {issue.tab === "builder" ? "Builder" : issue.tab === "seo" ? "SEO" : "Settings"}
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+            <div className={cn("grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]", lockedClass)}>
+              <PagePublicationChecklist qualityIssues={qualityIssues} setActiveTab={setActiveTab} />
 
               <div className="space-y-4">
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm">Preview & Readiness</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4 pt-0">
-                    <div className="grid grid-cols-3 gap-2 text-center">
-                      <div className="rounded-lg border bg-background p-3">
-                        <p className="text-lg font-semibold">{qualitySummary.errors}</p>
-                        <p className="text-xs text-muted-foreground">Errors</p>
-                      </div>
-                      <div className="rounded-lg border bg-background p-3">
-                        <p className="text-lg font-semibold">{qualitySummary.warnings}</p>
-                        <p className="text-xs text-muted-foreground">Warnings</p>
-                      </div>
-                      <div className="rounded-lg border bg-background p-3">
-                        <p className="text-lg font-semibold">{qualitySummary.info}</p>
-                        <p className="text-xs text-muted-foreground">Notes</p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Button
-                        type="button"
-                        className="w-full"
-                        variant="outline"
-                        onClick={() => openDraftPreview()}
-                        disabled={previewLinkMutation.isPending || isNew}
-                      >
-                        {previewLinkMutation.isPending ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                          <ExternalLink className="mr-2 h-4 w-4" />
-                        )}
-                        Open Draft Preview
-                      </Button>
-                      <Button
-                        type="button"
-                        className="w-full"
-                        variant="outline"
-                        onClick={() => copyDraftPreview()}
-                        disabled={previewLinkMutation.isPending || isNew}
-                      >
-                        {previewLinkMutation.isPending ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                          <Copy className="mr-2 h-4 w-4" />
-                        )}
-                        Copy Draft Preview Link
-                      </Button>
-                    </div>
-
-                    <p className="text-xs text-muted-foreground">
-                      Preview links open the real frontend renderer with the current saved draft, so editors can review layout and content before publishing.
-                    </p>
-                  </CardContent>
-                </Card>
+                <PageReadinessCard
+                  qualitySummary={qualitySummary}
+                  openDraftPreview={openDraftPreview}
+                  isPreviewLinkPending={draftPreview.isPending}
+                  isNew={isNew}
+                  copyDraftPreview={copyDraftPreview}
+                />
               </div>
             </div>
           </TabsContent>
@@ -1289,34 +1704,16 @@ export default function CmsPageEditorPage() {
       </div>
 
       {isNew && (
-        <>
-          <TemplatePicker
-            open={templatePickerOpen}
-            onClose={() => setTemplatePickerOpen(false)}
-            onSelect={(content, templateName) => {
-              setBuilderContent(content);
-              setTemplatePickerOpen(false);
-              if (templateName !== "Blank Page") {
-                toast({ title: `Template "${templateName}" applied` });
-              }
-            }}
-            onOpenWizard={() => setWizardOpen(true)}
-          />
-          <LandingPageWizard
-            open={wizardOpen}
-            onClose={() => setWizardOpen(false)}
-            onCreate={(content, title) => {
-              setBuilderContent(content);
-              form.setValue("title", title);
-              form.setValue("pageType", "landing");
-              if (!slugManuallyEdited.current) {
-                form.setValue("slug", slugify(title));
-              }
-              setWizardOpen(false);
-              toast({ title: "Landing page generated — customize it below" });
-            }}
-          />
-        </>
+        <NewPageStarterDialogs
+          templatePickerOpen={templatePickerOpen}
+          setTemplatePickerOpen={setTemplatePickerOpen}
+          setBuilderContent={setBuilderContent}
+          toast={toast}
+          setWizardOpen={setWizardOpen}
+          wizardOpen={wizardOpen}
+          form={form}
+          slugManuallyEdited={slugManuallyEdited}
+        />
       )}
     </AdminSidebar>
   );
