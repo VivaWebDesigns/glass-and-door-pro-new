@@ -1,6 +1,6 @@
-import { eq, desc, sql, and, gte } from "drizzle-orm";
-import { db } from "../db";
 import { activityLogs, type ActivityLog } from "@shared/schema";
+import { and, desc, eq, sql } from "drizzle-orm";
+import { db } from "../db";
 
 export class ActivityStorage {
   async log(userId: string, action: string, details?: string): Promise<void> {

@@ -1,3 +1,6 @@
+export const GLASS_SERVICE_AREAS_HERO_IMAGE =
+  "/images/glass-door-pro/charming-suburban-home-hero-1920x1080.webp";
+
 export const GLASS_PRIMARY_SERVICE_AREAS = [
   { label: "Charlotte", href: "/service-areas/charlotte" },
   { label: "Pineville", href: "/service-areas/pineville" },

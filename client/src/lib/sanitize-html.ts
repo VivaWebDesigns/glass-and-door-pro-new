@@ -1,33 +1,28 @@
 import DOMPurify from "dompurify";
 
-const EMBED_TAGS = ["iframe"];
-const EMBED_ATTRIBUTES = ["allow", "allowfullscreen", "frameborder", "scrolling", "loading", "referrerpolicy"];
-
-let hooksInstalled = false;
-
-function ensureHooks() {
-  if (hooksInstalled) return;
-  hooksInstalled = true;
-  DOMPurify.addHook("afterSanitizeAttributes", (node) => {
-    if (node.tagName === "A" && node.getAttribute("target") === "_blank") {
-      node.setAttribute("rel", "noopener noreferrer");
+// CMS markup may contain embedded media, but embedded code must not inherit
+// the application's origin or access its authenticated parent document.
+DOMPurify.addHook?.("afterSanitizeAttributes", (node) => {
+  if (node.tagName === "IFRAME") {
+    if (!/^https:\/\//i.test(node.getAttribute("src") || "")) {
+      node.remove();
+      return;
     }
-  });
-}
+    node.setAttribute("sandbox", "allow-scripts allow-forms allow-popups");
+    node.removeAttribute("srcdoc");
+    if (!node.getAttribute("title")) node.setAttribute("title", "Embedded content");
+  }
+  if (node.tagName === "A" && node.getAttribute("target") === "_blank") {
+    node.setAttribute("rel", "noopener noreferrer");
+  }
+});
 
-/** Sanitize CMS rich text (headings, paragraphs, lists, links, inline formatting). */
-export function sanitizeRichHtml(value: string): string {
-  if (!value) return "";
-  ensureHooks();
-  return DOMPurify.sanitize(value, { ADD_ATTR: ["target"] });
-}
-
-/** Sanitize admin-authored embed code: rich text plus iframes (maps, video). */
-export function sanitizeEmbedHtml(value: string): string {
-  if (!value) return "";
-  ensureHooks();
-  return DOMPurify.sanitize(value, {
-    ADD_TAGS: EMBED_TAGS,
-    ADD_ATTR: ["target", ...EMBED_ATTRIBUTES],
+export function sanitizeHtml(html: string): string {
+  if (typeof DOMPurify.sanitize !== "function") return "";
+  return DOMPurify.sanitize(html, {
+    USE_PROFILES: { html: true },
+    ADD_TAGS: ["iframe"],
+    ADD_ATTR: ["target", "allow", "allowfullscreen", "frameborder", "scrolling", "sandbox"],
+    FORBID_ATTR: ["srcdoc"],
   });
 }

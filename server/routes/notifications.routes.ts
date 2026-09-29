@@ -10,46 +10,46 @@ router.use(authenticateToken);
 router.get(
   "/",
   asyncHandler(async (req, res) => {
-    const userId = (req as any).user.id;
+    const userId = req.user!.id;
     const notifs = await storage.notifications.getForUser(userId);
     res.json(notifs);
-  })
+  }),
 );
 
 router.get(
   "/unread-count",
   asyncHandler(async (req, res) => {
-    const userId = (req as any).user.id;
+    const userId = req.user!.id;
     const count = await storage.notifications.getUnreadCount(userId);
     res.json({ count });
-  })
+  }),
 );
 
 router.post(
   "/read-all",
   asyncHandler(async (req, res) => {
-    const userId = (req as any).user.id;
+    const userId = req.user!.id;
     await storage.notifications.markAllRead(userId);
     res.json({ ok: true });
-  })
+  }),
 );
 
 router.post(
   "/:id/read",
   asyncHandler(async (req, res) => {
-    const userId = (req as any).user.id;
+    const userId = req.user!.id;
     await storage.notifications.markRead(Number(req.params.id), userId);
     res.json({ ok: true });
-  })
+  }),
 );
 
 router.get(
   "/preferences",
   asyncHandler(async (req, res) => {
-    const userId = (req as any).user.id;
+    const userId = req.user!.id;
     const prefs = await storage.notifications.getPreferences(userId);
     res.json(prefs);
-  })
+  }),
 );
 
 const prefsSchema = z.object({
@@ -60,11 +60,11 @@ const prefsSchema = z.object({
 router.put(
   "/preferences",
   asyncHandler(async (req, res) => {
-    const userId = (req as any).user.id;
+    const userId = req.user!.id;
     const body = prefsSchema.parse(req.body);
     const prefs = await storage.notifications.updatePreferences(userId, body);
     res.json(prefs);
-  })
+  }),
 );
 
 export default router;

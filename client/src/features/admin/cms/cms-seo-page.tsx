@@ -138,8 +138,8 @@ function SeoRoadmapTab() {
         <CardHeader className="pb-3">
           <CardTitle className="text-base">SEO Architecture</CardTitle>
           <CardDescription className="text-xs">
-            Current capabilities and the planned roadmap for per-page SEO, structured data,
-            and technical SEO tooling
+            Current capabilities and the planned roadmap for per-page SEO, structured data, and
+            technical SEO tooling
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-1">
@@ -187,9 +187,8 @@ function SeoRoadmapTab() {
           </div>
           <p className="text-xs text-muted-foreground">
             Returns the current global SEO settings. Used by the{" "}
-            <code className="text-xs bg-muted px-1 py-0.5 rounded">useSeo</code> hook and
-            public pages to apply site-wide defaults for title suffix, OG image, and robots
-            preferences.
+            <code className="text-xs bg-muted px-1 py-0.5 rounded">useSeo</code> hook and public
+            pages to apply site-wide defaults for title suffix, OG image, and robots preferences.
           </p>
         </CardContent>
       </Card>
@@ -197,9 +196,7 @@ function SeoRoadmapTab() {
   );
 }
 
-function SeoSocialProfilesCard({ form }: {
-  form: SeoForm;
-}) {
+function SeoSocialProfilesCard({ form }: { form: SeoForm }) {
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -297,9 +294,7 @@ function SeoSocialProfilesCard({ form }: {
   );
 }
 
-function SeoOrganizationLogoCard({ form }: {
-  form: SeoForm;
-}) {
+function SeoOrganizationLogoCard({ form }: { form: SeoForm }) {
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -308,8 +303,8 @@ function SeoOrganizationLogoCard({ form }: {
           <CardTitle className="text-base">Organization Logo</CardTitle>
         </div>
         <CardDescription className="text-xs">
-          Used in Organization structured data and as a fallback brand image.
-          Recommended: square PNG or SVG.
+          Used in Organization structured data and as a fallback brand image. Recommended: square
+          PNG or SVG.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -335,9 +330,7 @@ function SeoOrganizationLogoCard({ form }: {
   );
 }
 
-function SeoDefaultOgImageCard({ form }: {
-  form: SeoForm;
-}) {
+function SeoDefaultOgImageCard({ form }: { form: SeoForm }) {
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -346,8 +339,8 @@ function SeoDefaultOgImageCard({ form }: {
           <CardTitle className="text-base">Default Open Graph Image</CardTitle>
         </div>
         <CardDescription className="text-xs">
-          Fallback image for social sharing when a page has no custom OG image.
-          Recommended: 1200×630 px.
+          Fallback image for social sharing when a page has no custom OG image. Recommended:
+          1200×630 px.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -373,10 +366,7 @@ function SeoDefaultOgImageCard({ form }: {
   );
 }
 
-function SeoDefaultMetaCard({ form, descValue }: {
-  form: SeoForm;
-  descValue: string;
-}) {
+function SeoDefaultMetaCard({ form, descValue }: { form: SeoForm; descValue: string }) {
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -403,8 +393,7 @@ function SeoDefaultMetaCard({ form, descValue }: {
                 />
               </FormControl>
               <FormDescription className="text-xs">
-                Appended to page titles — e.g. "Window Repair Charlotte NC | Glass and
-                Door Pro"
+                Appended to page titles — e.g. "Window Repair Charlotte NC | Glass and Door Pro"
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -458,9 +447,7 @@ function SeoDefaultMetaCard({ form, descValue }: {
   );
 }
 
-function SeoSiteIdentityCard({ form }: {
-  form: SeoForm;
-}) {
+function SeoSiteIdentityCard({ form }: { form: SeoForm }) {
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -480,11 +467,7 @@ function SeoSiteIdentityCard({ form }: {
             <FormItem>
               <FormLabel>Site Name</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  placeholder="Glass and Door Pro"
-                  data-testid="input-site-name"
-                />
+                <Input {...field} placeholder="Glass and Door Pro" data-testid="input-site-name" />
               </FormControl>
               <FormDescription className="text-xs">
                 Used in title patterns and structured data

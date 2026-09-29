@@ -8,20 +8,7 @@ Organized by priority tier based on risk, impact, and effort.
 
 Items that should be addressed in the next development cycle.
 
-### TD-001: Eliminate `any` Types
-
-- **Impact**: Type safety, maintainability
-- **Scope**: ~120 ESLint warnings for `@typescript-eslint/no-explicit-any`
-- **Files**: Across client components, server routes, storage classes, webhook handler
-- **Effort**: Medium (systematic but straightforward replacement with proper types)
-- **Recommendation**: Replace `any` with proper types, starting with server-side code where type safety matters most
-
-### TD-002: Clean Up Unused Imports and Variables
-
-- **Impact**: Code cleanliness
-- **Scope**: ~30 ESLint warnings for `@typescript-eslint/no-unused-vars`
-- **Files**: Various client and server files
-- **Effort**: Small (can be auto-fixed with `eslint --fix` for some cases)
+> TD-001 (`any` types) and TD-002 (unused imports/variables) were removed: as of 2026-09-29, `eslint client/src server shared` reports no warnings.
 
 ### TD-003: Token Revocation Strategy
 
@@ -46,39 +33,26 @@ Items that should be scheduled but are not urgent.
 ### TD-005: Block Renderer / Registry Size
 
 - **Impact**: Maintainability
-- **Current**: `block-renderer.tsx` (1481 lines), `block-registry.ts` (1108 lines)
+- **Current**: `block-renderer.tsx` (~2,020 lines), `block-registry.ts` (~2,280 lines)
 - **Recommendation**: Split into individual block component files, create a plugin-style block registration system
-
-### TD-006: Application Routes Size
-
-- **Impact**: Maintainability
-- **Current**: `application.routes.ts` (551 lines), `applications.routes.ts` (479 lines)
-- **Recommendation**: Extract into sub-routers or move business logic to dedicated service classes
-
-### TD-007: Service Layer Extraction
-
-- **Impact**: Architecture, testability
-- **Current**: Some business logic lives in route handlers (e.g., application workflow coordinating emails, user updates, status changes)
-- **Recommendation**: Extract cross-domain logic into service classes (e.g., `application.service.ts`, `stripe.service.ts`)
 
 ### TD-008: Query Freshness Differentiation
 
 - **Impact**: Performance, UX
-- **Current**: All queries share the same 5-minute stale time
-- **Recommendation**: Categorize queries (STATIC, SESSION, LIVE) and apply appropriate stale times. Add optimistic updates for common mutations.
+- **Current**: `STALE_TIMES` (STATIC, SESSION, OPERATIONAL, LIVE) exists in `client/src/lib/queryClient.ts`, but most queries still use the 5-minute SESSION default; only a few admin/auth queries opt into other tiers
+- **Recommendation**: Apply appropriate stale times to remaining queries. Add optimistic updates for common mutations.
 
 ### TD-009: Server-Side Caching
 
 - **Impact**: Performance
-- **Current**: No server-side caching; every request hits the database
-- **Recommendation**: Add in-memory or Redis cache for frequently-read, rarely-changed data (specializations, theme settings, membership tiers, CMS pages)
+- **Current**: A small in-memory `MemoryCache` (`server/lib/cache.ts`) is used for dashboard analytics; most other reads hit the database
+- **Recommendation**: Extend caching to frequently-read, rarely-changed data (branding/theme settings, SEO settings, menus, CMS pages)
 
 ### TD-010: Test Coverage Expansion
 
 - **Impact**: Reliability
-- **Current**: 65 tests covering auth, directory, validation, logging, route helpers
-- **Gaps**: No tests for CMS routes, Stripe integration, email service, admin routes, storage classes
-- **Recommendation**: Add integration tests for critical paths (application workflow, subscription management, CMS page publishing)
+- **Current**: Vitest unit/component tests across server, client, and shared code (auth, validation, logging, CMS builder/editor, forms, backups, prerendering, and more)
+- **Recommendation**: Add integration tests for critical paths (CMS page publishing, form submission and notification email, backups/restore)
 
 ---
 
@@ -86,23 +60,10 @@ Items that should be scheduled but are not urgent.
 
 Strategic improvements for scale and maintainability.
 
-### TD-011: Full-Text Search
-
-- **Impact**: Scalability
-- **Current**: Text search uses `ilike('%term%')` — adequate for <5k profiles
-- **Recommendation**: Add PostgreSQL `tsvector` column with GIN index, or integrate external search service (e.g., Typesense, Meilisearch)
-
-### TD-012: Cursor-Based Pagination
-
-- **Impact**: Scalability, reliability
-- **Current**: Offset-based pagination (`LIMIT`/`OFFSET`)
-- **Risk**: Performance degrades with large offsets; inconsistent results during concurrent writes
-- **Recommendation**: Add cursor-based pagination option for directory API
-
 ### TD-013: Background Job Queue
 
 - **Impact**: Reliability, UX
-- **Current**: Email sending, background checks, and scheduled publishing run synchronously or via simple intervals
+- **Current**: Email sending runs synchronously; scheduled publishing and system backups run via in-process timers
 - **Recommendation**: Adopt a job queue (e.g., BullMQ, pg-boss) for async processing with retry logic, dead-letter queues, and job monitoring
 
 ### TD-014: Database Migration Cleanup
@@ -121,5 +82,5 @@ Strategic improvements for scale and maintainability.
 ### TD-016: E2E Testing
 
 - **Impact**: Reliability
-- **Current**: No end-to-end tests
-- **Recommendation**: Add Playwright or Cypress tests for critical user flows (registration, directory search, application submission, payment)
+- **Current**: Playwright specs exist in `e2e/` (rendered pages, local interactions) plus local mobile/bundle measurement scripts
+- **Recommendation**: Extend coverage to admin flows (login, CMS page edit/publish, form builder) and public form submission

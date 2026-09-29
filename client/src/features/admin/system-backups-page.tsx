@@ -86,9 +86,18 @@ function reasonLabel(reason: BackupManifest["reason"]) {
   return "Manual";
 }
 
-function RestoreBackupDialog({ restoreTarget, restoreBackupMutation, setRestoreTarget }: {
+function RestoreBackupDialog({
+  restoreTarget,
+  restoreBackupMutation,
+  setRestoreTarget,
+}: {
   restoreTarget: BackupManifest | null;
-  restoreBackupMutation: UseMutationResult<{ restored: true; message: string; manifest: BackupManifest; }, Error, string, unknown>;
+  restoreBackupMutation: UseMutationResult<
+    { restored: true; message: string; manifest: BackupManifest },
+    Error,
+    string,
+    unknown
+  >;
   setRestoreTarget: React.Dispatch<React.SetStateAction<BackupManifest | null>>;
 }) {
   return (
@@ -105,9 +114,11 @@ function RestoreBackupDialog({ restoreTarget, restoreBackupMutation, setRestoreT
           <AlertDialogTitle>Restore this backup?</AlertDialogTitle>
           <AlertDialogDescription>
             This will replace the live database with the snapshot from{" "}
-            <strong>{restoreTarget ? formatDateTime(restoreTarget.createdAt) : "the selected backup"}</strong>.
-            Any content changes made after that point will be lost. Creating a fresh manual backup first
-            is strongly recommended.
+            <strong>
+              {restoreTarget ? formatDateTime(restoreTarget.createdAt) : "the selected backup"}
+            </strong>
+            . Any content changes made after that point will be lost. Creating a fresh manual backup
+            first is strongly recommended.
           </AlertDialogDescription>
         </AlertDialogHeader>
         {restoreTarget && (
@@ -116,9 +127,12 @@ function RestoreBackupDialog({ restoreTarget, restoreBackupMutation, setRestoreT
               <span className="font-medium">Reason:</span> {reasonLabel(restoreTarget.reason)}
             </p>
             <p className="mt-1">
-              <span className="font-medium">Rows:</span> {restoreTarget.totalRowCount.toLocaleString()}
+              <span className="font-medium">Rows:</span>{" "}
+              {restoreTarget.totalRowCount.toLocaleString()}
             </p>
-            <p className="mt-1 break-all font-mono text-xs text-muted-foreground">{restoreTarget.key}</p>
+            <p className="mt-1 break-all font-mono text-xs text-muted-foreground">
+              {restoreTarget.key}
+            </p>
           </div>
         )}
         <AlertDialogFooter>
@@ -238,7 +252,10 @@ function RecentBackupsCard({
   );
 }
 
-function BackupPolicyCard({ isLoading, data }: {
+function BackupPolicyCard({
+  isLoading,
+  data,
+}: {
   isLoading: boolean;
   data: BackupStatusResponse | undefined;
 }) {
@@ -246,9 +263,7 @@ function BackupPolicyCard({ isLoading, data }: {
     <Card data-testid="card-backup-policy">
       <CardHeader>
         <CardTitle>Policy</CardTitle>
-        <CardDescription>
-          Current automatic backup settings for this environment.
-        </CardDescription>
+        <CardDescription>Current automatic backup settings for this environment.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {isLoading ? (
@@ -260,20 +275,26 @@ function BackupPolicyCard({ isLoading, data }: {
         ) : (
           <>
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Bucket</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Bucket
+              </p>
               <p className="mt-1 text-sm">{data?.storage?.bucketName || "Not configured"}</p>
             </div>
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Prefix</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Prefix
+              </p>
               <p className="mt-1 break-all rounded-lg bg-muted/40 px-3 py-2 font-mono text-xs">
                 {data?.storage?.prefix || "Not configured"}
               </p>
             </div>
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Retention Rule</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Retention Rule
+              </p>
               <p className="mt-1 text-sm">
-                Keep newest <strong>{data?.maxSnapshots ?? 0}</strong> snapshots and prune anything older than{" "}
-                <strong>{data?.retentionDays ?? 0}</strong> days.
+                Keep newest <strong>{data?.maxSnapshots ?? 0}</strong> snapshots and prune anything
+                older than <strong>{data?.retentionDays ?? 0}</strong> days.
               </p>
             </div>
             <Alert>
@@ -291,7 +312,10 @@ function BackupPolicyCard({ isLoading, data }: {
   );
 }
 
-function LatestBackupCard({ isLoading, latest }: {
+function LatestBackupCard({
+  isLoading,
+  latest,
+}: {
   isLoading: boolean;
   latest: BackupManifest | null;
 }) {
@@ -299,9 +323,7 @@ function LatestBackupCard({ isLoading, latest }: {
     <Card data-testid="card-latest-backup-details">
       <CardHeader>
         <CardTitle>Latest Backup</CardTitle>
-        <CardDescription>
-          The most recent snapshot created by the backup system.
-        </CardDescription>
+        <CardDescription>The most recent snapshot created by the backup system.</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -315,37 +337,55 @@ function LatestBackupCard({ isLoading, latest }: {
             <div className="flex flex-wrap items-center gap-2">
               <Badge>{reasonLabel(latest.reason)}</Badge>
               <Badge variant="outline">{latest.environment}</Badge>
-              {latest.railwayEnvironment && <Badge variant="outline">{latest.railwayEnvironment}</Badge>}
+              {latest.railwayEnvironment && (
+                <Badge variant="outline">{latest.railwayEnvironment}</Badge>
+              )}
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Created</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Created
+                </p>
                 <p className="mt-1 text-sm">{formatDateTime(latest.createdAt)}</p>
               </div>
               <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">App Version</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  App Version
+                </p>
                 <p className="mt-1 text-sm">{latest.appVersion}</p>
               </div>
               <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Tables</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Tables
+                </p>
                 <p className="mt-1 text-sm">{latest.tableCount}</p>
               </div>
               <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Rows</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Rows
+                </p>
                 <p className="mt-1 text-sm">{latest.totalRowCount.toLocaleString()}</p>
               </div>
               <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Media Rows</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Media Rows
+                </p>
                 <p className="mt-1 text-sm">{latest.mediaAssetCount.toLocaleString()}</p>
               </div>
               <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Storage Source</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Storage Source
+                </p>
                 <p className="mt-1 text-sm capitalize">{latest.storageSource}</p>
               </div>
             </div>
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Backup Object Key</p>
-              <p className="mt-1 break-all rounded-lg bg-muted/40 px-3 py-2 font-mono text-xs">{latest.key}</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Backup Object Key
+              </p>
+              <p className="mt-1 break-all rounded-lg bg-muted/40 px-3 py-2 font-mono text-xs">
+                {latest.key}
+              </p>
             </div>
           </div>
         ) : (
@@ -362,7 +402,11 @@ function LatestBackupCard({ isLoading, latest }: {
   );
 }
 
-function BackupStatsGrid({ isLoading, data, latest }: {
+function BackupStatsGrid({
+  isLoading,
+  data,
+  latest,
+}: {
   isLoading: boolean;
   data: BackupStatusResponse | undefined;
   latest: BackupManifest | null;
@@ -381,7 +425,9 @@ function BackupStatsGrid({ isLoading, data, latest }: {
               <div>
                 <p className="text-sm text-muted-foreground">Backup Service</p>
                 <div className="mt-1">
-                  <Badge variant={data?.enabled ? "default" : "outline"}>{data?.enabled ? "Enabled" : "Disabled"}</Badge>
+                  <Badge variant={data?.enabled ? "default" : "outline"}>
+                    {data?.enabled ? "Enabled" : "Disabled"}
+                  </Badge>
                 </div>
               </div>
             </div>
@@ -437,7 +483,9 @@ function BackupStatsGrid({ isLoading, data, latest }: {
               <div>
                 <p className="text-sm text-muted-foreground">Latest Backup</p>
                 <p className="text-sm font-semibold">
-                  {latest ? formatDistanceToNow(new Date(latest.createdAt), { addSuffix: true }) : "No backups yet"}
+                  {latest
+                    ? formatDistanceToNow(new Date(latest.createdAt), { addSuffix: true })
+                    : "No backups yet"}
                 </p>
               </div>
             </div>
@@ -468,7 +516,8 @@ function BackupsHeader({
           System Backups
         </h1>
         <p className="mt-1 text-muted-foreground">
-          Monitor automated snapshots, verify retention, and run a manual backup before risky changes.
+          Monitor automated snapshots, verify retention, and run a manual backup before risky
+          changes.
         </p>
       </div>
       <div className="flex flex-wrap gap-2">
@@ -479,7 +528,11 @@ function BackupsHeader({
           disabled={isFetching || runBackupMutation.isPending || isRestoreBackupPending}
           data-testid="button-refresh-backup-status"
         >
-          {isFetching ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+          {isFetching ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <RefreshCw className="mr-2 h-4 w-4" />
+          )}
           Refresh
         </Button>
         <Button
@@ -488,7 +541,11 @@ function BackupsHeader({
           disabled={!data?.configured || runBackupMutation.isPending || isRestoreBackupPending}
           data-testid="button-run-backup-now"
         >
-          {runBackupMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Database className="mr-2 h-4 w-4" />}
+          {runBackupMutation.isPending ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Database className="mr-2 h-4 w-4" />
+          )}
           Run Backup Now
         </Button>
       </div>
@@ -610,7 +667,11 @@ export default function SystemBackupsPage() {
         />
       </div>
 
-      <RestoreBackupDialog restoreTarget={restoreTarget} restoreBackupMutation={restoreBackupMutation} setRestoreTarget={setRestoreTarget} />
+      <RestoreBackupDialog
+        restoreTarget={restoreTarget}
+        restoreBackupMutation={restoreBackupMutation}
+        setRestoreTarget={setRestoreTarget}
+      />
     </AdminSidebar>
   );
 }

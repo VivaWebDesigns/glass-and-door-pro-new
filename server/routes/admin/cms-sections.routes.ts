@@ -22,7 +22,7 @@ router.get(
   asyncHandler(async (_req, res) => {
     const sections = await storage.cmsSections.getAllSections();
     res.json(sections);
-  })
+  }),
 );
 
 router.post(
@@ -30,7 +30,7 @@ router.post(
   asyncHandler(async (_req, res) => {
     const result = await ensureSystemCmsSections({ refreshExisting: true });
     res.json({ success: true, ...result });
-  })
+  }),
 );
 
 router.get(
@@ -40,7 +40,7 @@ router.get(
     const section = await storage.cmsSections.getSection(id);
     if (!section) return res.status(404).json({ error: "Section not found" });
     res.json(section);
-  })
+  }),
 );
 
 router.post(
@@ -50,14 +50,14 @@ router.post(
     if (!parsed.success) {
       return res.status(400).json({ error: "Validation failed", issues: parsed.error.issues });
     }
-    const adminId = (req as any).user?.id;
+    const adminId = req.user?.id;
     const section = await storage.cmsSections.createSection({
       ...parsed.data,
-      blocks: parsed.data.blocks as any,
+      blocks: parsed.data.blocks,
       createdBy: adminId,
     });
     res.status(201).json(section);
-  })
+  }),
 );
 
 router.put(
@@ -73,10 +73,10 @@ router.put(
     }
     const updated = await storage.cmsSections.updateSection(id, {
       ...parsed.data,
-      blocks: parsed.data.blocks as any,
+      blocks: parsed.data.blocks,
     });
     res.json(updated);
-  })
+  }),
 );
 
 router.delete(
@@ -86,7 +86,7 @@ router.delete(
     const ok = await storage.cmsSections.deleteSection(id);
     if (!ok) return res.status(404).json({ error: "Section not found" });
     res.json({ success: true });
-  })
+  }),
 );
 
 export default router;

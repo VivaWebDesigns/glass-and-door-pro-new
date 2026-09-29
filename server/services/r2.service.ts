@@ -1,3 +1,4 @@
+import { errorMessage } from "@shared/errors";
 import {
   S3Client,
   PutObjectCommand,
@@ -241,8 +242,8 @@ export async function testConnection(): Promise<{
   try {
     await r2.client.send(new HeadBucketCommand({ Bucket: r2.bucketName }));
     return { success: true, message: "R2 connection successful" };
-  } catch (err: any) {
-    return { success: false, message: err.message || "Connection failed" };
+  } catch (err: unknown) {
+    return { success: false, message: errorMessage(err, "Connection failed") };
   }
 }
 

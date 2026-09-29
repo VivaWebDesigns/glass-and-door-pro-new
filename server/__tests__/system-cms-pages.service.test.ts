@@ -2,7 +2,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   GLASS_PRIMARY_SERVICE_AREA_LINKS_HTML,
   GLASS_PRIMARY_SERVICE_AREA_NAMES,
+  GLASS_PRIMARY_SERVICE_AREAS,
 } from "@shared/glass-service-areas";
+import { getCmsSlugForPublicPath } from "@shared/glass-seo";
+import { getGlassLocationSearchCopy } from "@shared/glass-location-search";
 
 const mockGetPageBySlug = vi.fn();
 const mockGetAllPages = vi.fn();
@@ -31,6 +34,69 @@ vi.mock("../utils/logger", () => ({
 }));
 
 describe("ensureSystemCmsPages", () => {
+  it("updates all location CMS records once without replacing their other blocks", async () => {
+    const pages = GLASS_PRIMARY_SERVICE_AREAS.map(({ href }) => {
+      const slug = getCmsSlugForPublicPath(href);
+      return {
+        id: slug,
+        slug,
+        seoTitle: "Glass and Door Services",
+        seoDescription: "Old description",
+        updatedBy: "editor",
+        content: {
+          blocks: [
+            { id: "hero", type: "hero", props: { heading: "Glass & Door Services" } },
+            { id: "intro", type: "rich-text", props: { content: "<p>Keep this local copy.</p>" } },
+            { id: "services", type: "cards-grid", props: { title: "Existing services" } },
+          ],
+        },
+      };
+    });
+    mockGetAllPages.mockResolvedValue(pages);
+    mockGetPageBySlug.mockResolvedValue(null);
+
+    const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
+    await ensureSystemCmsPages();
+
+    expect(mockUpdatePage).toHaveBeenCalledTimes(11);
+    for (const page of pages) {
+      const update = mockUpdatePage.mock.calls.find(([id]) => id === page.id)?.[1];
+      const copy = getGlassLocationSearchCopy(page.slug);
+      expect(update).toMatchObject({
+        seoTitle: copy?.title,
+        seoDescription: copy?.description,
+        updatedBy: "editor",
+        content: {
+          _system: { showerSearchPositioning2026: true },
+          blocks: [
+            { props: { heading: copy?.heading } },
+            { props: { content: expect.stringContaining("<p>Keep this local copy.</p>") } },
+            { props: { title: "Existing services" } },
+          ],
+        },
+      });
+    }
+  });
+
+  it("preserves later CMS edits after the location copy has been applied", async () => {
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "waxhaw-id",
+        slug: "service-areas-waxhaw",
+        seoTitle: "Editor title",
+        seoDescription: "Editor description",
+        content: { _system: { showerSearchPositioning2026: true }, blocks: [] },
+        updatedBy: "editor",
+      },
+    ]);
+    mockGetPageBySlug.mockResolvedValue(null);
+
+    const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
+    await ensureSystemCmsPages();
+
+    expect(mockUpdatePage).not.toHaveBeenCalled();
+  });
+
   it("migrates only requested search titles and preserves descriptions", async () => {
     const slugs = [
       "services",
@@ -641,11 +707,15 @@ describe("ensureSystemCmsPages", () => {
     const monroeContent = JSON.stringify(monroeUpdate.content);
     const charlotteContent = JSON.stringify(charlotteUpdate.content);
 
-    expect(monroeUpdate.seoDescription).toContain("Charlotte-based");
+    expect(monroeUpdate.seoDescription).toBe(
+      getGlassLocationSearchCopy("areas-served-monroe-nc")?.description,
+    );
     expect(monroeContent).toContain("Charlotte-Based Glass & Door Service for Monroe");
     expect(monroeContent).toContain("Do you still serve Monroe, NC?");
     expect(monroeContent).not.toContain("based right here in Monroe");
-    expect(charlotteUpdate.seoDescription).toContain("Charlotte-based");
+    expect(charlotteUpdate.seoDescription).toBe(
+      getGlassLocationSearchCopy("areas-served-charlotte-nc")?.description,
+    );
     expect(charlotteContent).toContain("Your Charlotte-Based Glass & Door Company");
     expect(charlotteContent).toContain("6135 Park South Drive");
     expect(charlotteContent).toContain("Where is Glass and Door Pro based?");

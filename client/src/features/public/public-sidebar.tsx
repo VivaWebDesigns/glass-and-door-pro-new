@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { PublicFormRenderer } from "@/components/forms/public-form-renderer";
 import { Button } from "@/components/ui/button";
 import type { CmsSidebar, SidebarWidget } from "@shared/schema";
-import { sanitizeEmbedHtml } from "@/lib/sanitize-html";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 function text(value: unknown, fallback = "") {
   return typeof value === "string" ? value : fallback;
@@ -45,7 +45,10 @@ function FormWidget({ widget }: { widget: SidebarWidget }) {
 }
 
 function CalloutWidget({ widget }: { widget: SidebarWidget }) {
-  const body = text(widget.settings.body, "Add a short message, promotion, or supporting note here.");
+  const body = text(
+    widget.settings.body,
+    "Add a short message, promotion, or supporting note here.",
+  );
   const buttonText = text(widget.settings.buttonText);
   const buttonUrl = text(widget.settings.buttonUrl, "#");
 
@@ -71,7 +74,7 @@ function HtmlWidget({ widget }: { widget: SidebarWidget }) {
     <WidgetCard title={widget.title}>
       <div
         className="prose prose-sm prose-neutral max-w-none"
-        dangerouslySetInnerHTML={{ __html: sanitizeEmbedHtml(text(widget.settings.html, "")) }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(text(widget.settings.html, "")) }}
       />
     </WidgetCard>
   );

@@ -72,9 +72,7 @@ const previousPrimaryServiceAreaUrls = [
   "/service-areas/indian-land",
 ] as const;
 
-const primaryServiceAreaUrls = new Set<string>(
-  GLASS_PRIMARY_SERVICE_AREAS.map(({ href }) => href),
-);
+const primaryServiceAreaUrls = new Set<string>(GLASS_PRIMARY_SERVICE_AREAS.map(({ href }) => href));
 const previousPrimaryServiceAreaUrlSet = new Set<string>(previousPrimaryServiceAreaUrls);
 
 // This targets only the former complete nine-location list or the current complete list.
@@ -96,8 +94,7 @@ export function migrateServiceAreaMenuOrder(items: MenuItem[]): MenuItem[] {
     byUrl.size === previousPrimaryServiceAreaUrlSet.size &&
     previousPrimaryServiceAreaUrls.every((url) => byUrl.has(url));
   const isCurrentCompleteList =
-    areaItems.length === primaryServiceAreaUrls.size &&
-    byUrl.size === primaryServiceAreaUrls.size;
+    areaItems.length === primaryServiceAreaUrls.size && byUrl.size === primaryServiceAreaUrls.size;
 
   if (isPreviousCompleteList || isCurrentCompleteList) {
     const alreadyOrdered = areaItems.every(

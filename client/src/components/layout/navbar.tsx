@@ -331,8 +331,8 @@ export function Navbar() {
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button
+                aria-label="Open navigation menu"
                 size="icon"
-                aria-label="Open menu"
                 variant="ghost"
                 className="rounded-full border border-border/70 bg-background/70"
                 data-testid="button-mobile-menu"

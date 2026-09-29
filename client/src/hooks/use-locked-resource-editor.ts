@@ -29,7 +29,9 @@ export function useLockedResourceEditor({
   });
 
   const lockedClass: string | false =
-    editorLock.hasLocking && editorLock.isReadOnly ? "pointer-events-none select-none opacity-70" : false;
+    editorLock.hasLocking && editorLock.isReadOnly
+      ? "pointer-events-none select-none opacity-70"
+      : false;
 
   return { editorLock, lockedClass };
 }

@@ -1,4 +1,12 @@
-import { Fragment, useState, useEffect, lazy, Suspense, type MouseEvent, type ReactElement } from "react";
+import {
+  Fragment,
+  useState,
+  useEffect,
+  lazy,
+  Suspense,
+  type MouseEvent,
+  type ReactElement,
+} from "react";
 import { useLocation } from "wouter";
 import { excludeServiceUtilitySnippets } from "@shared/glass-search-snippets";
 import { Button } from "@/components/ui/button";
@@ -38,7 +46,7 @@ import {
   str,
 } from "@/features/admin/cms/builder/block-renderer.shared";
 import { SectionHeading } from "@/features/admin/cms/builder/section-heading";
-import { renderPublicDisplayText } from "@/features/admin/cms/builder/public-display-text";
+import { renderPublicDisplayText } from "@/features/admin/cms/builder/display-text";
 import {
   Globe,
   Heart,
@@ -74,9 +82,11 @@ import {
 } from "lucide-react";
 import type { BlockInstance, BuilderContent } from "@/features/admin/cms/builder/block-registry";
 import { FULL_WIDTH_BLOCK_TYPES } from "@/features/admin/cms/builder/page-builder-constants";
-import { sanitizeEmbedHtml, sanitizeRichHtml } from "@/lib/sanitize-html";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 import { ReviewSourceBadge } from "@/components/shared/review-source-badge";
 import { withContentKeys } from "@/lib/content-keys";
+import { getMobileHeroImageUrl } from "@shared/glass-hero-images";
+import { useMobileHeroViewport } from "@/hooks/use-mobile-hero-viewport";
 
 export type { BlockInstance, BuilderContent };
 
@@ -155,6 +165,7 @@ function getHeroConfig(props: Record<string, unknown>) {
     usesGlassCtas: isGlassService || variant === "glass-reviews",
     isSplit: str(props.layout) === "split" || isGlassService,
     background: resolveCmsAssetUrl(str(props.backgroundImageUrl)),
+    mobileBackground: getMobileHeroImageUrl(resolveCmsAssetUrl(str(props.backgroundImageUrl))),
     backgroundAlt: str(props.backgroundImageAlt) || str(props.imageAlt),
     backgroundWidth: num(props.backgroundImageWidth as number, 0) || undefined,
     backgroundHeight: num(props.backgroundImageHeight as number, 0) || undefined,
@@ -162,18 +173,22 @@ function getHeroConfig(props: Record<string, unknown>) {
     videoBackground: str(props.videoBackgroundUrl),
     minHeightStyle: minHeight === "100vh" ? "100vh" : `${minHeight}px`,
     overlayStyle: { backgroundColor: hexToRgba(overlayColor, overlayStrength) },
-    sectionBackgroundColor: getSectionStyleConfig(props, { resolveAssetUrl: resolveCmsAssetUrl }).backgroundColor,
+    sectionBackgroundColor: getSectionStyleConfig(props, { resolveAssetUrl: resolveCmsAssetUrl })
+      .backgroundColor,
   };
 }
 
 type HeroConfig = ReturnType<typeof getHeroConfig>;
 
 function HeroBackdrop({ config }: { config: HeroConfig }) {
+  const isMobileHeroViewport = useMobileHeroViewport();
+  const background =
+    isMobileHeroViewport && config.mobileBackground ? config.mobileBackground : config.background;
   return (
     <>
-      {config.background && (
+      {background && (
         <img
-          src={config.background}
+          src={background}
           alt={config.backgroundAlt}
           width={config.backgroundWidth}
           height={config.backgroundHeight}
@@ -184,13 +199,13 @@ function HeroBackdrop({ config }: { config: HeroConfig }) {
           style={{ objectPosition: config.objectPosition }}
         />
       )}
-      {config.videoBackground && (
+      {config.videoBackground && !isMobileHeroViewport && (
         <video
           autoPlay
           muted
           loop
           playsInline
-          poster={config.background || undefined}
+          poster={background || undefined}
           className="absolute inset-0 w-full h-full object-cover"
         >
           <source src={config.videoBackground} type="video/mp4" />
@@ -288,7 +303,9 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
       className={`public-hero-pattern relative flex items-center overflow-hidden ${config.isSplit ? "justify-start text-left" : "justify-center text-center"}`}
       style={{
         minHeight: config.minHeightStyle,
-        ...(config.sectionBackgroundColor ? { backgroundColor: config.sectionBackgroundColor } : {}),
+        ...(config.sectionBackgroundColor
+          ? { backgroundColor: config.sectionBackgroundColor }
+          : {}),
       }}
     >
       <HeroBackdrop config={config} />
@@ -305,7 +322,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
           <div
             className={`mb-9 text-base leading-8 text-white/85 sm:text-lg [&_a]:text-white [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-white/80 [&_p]:m-0 ${config.isSplit ? "max-w-2xl" : "max-w-2xl mx-auto"}`}
             style={colorStyle(props.subheadingColor)}
-            dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(subheading) }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(subheading) }}
           />
         )}
         <HeroCtas props={props} config={config} />
@@ -344,29 +361,31 @@ function TwoColumnTextBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-4">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
       <div className="grid gap-8 md:grid-cols-2">
-        {columns.map(withContentKeys((column, index, itemKey) => (
-          <div key={itemKey} className="space-y-4">
-            {column.heading && (
-              <h3 className="text-xl font-heading font-semibold">{column.heading}</h3>
-            )}
-            {column.body && (
-              <div
-                className="prose prose-sm max-w-none text-foreground"
-                dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(column.body) }}
-              />
-            )}
-            {column.items.length > 0 && (
-              <ul className="space-y-2 pl-5 list-disc text-sm text-muted-foreground">
-                {column.items.map((item, itemIndex) => (
-                  <li key={itemIndex}>{item.text}</li>
-                ))}
-              </ul>
-            )}
-            {!column.heading && !column.body && column.items.length === 0 && (
-              <p className="text-sm text-muted-foreground">Add content for this column.</p>
-            )}
-          </div>
-        )))}
+        {columns.map(
+          withContentKeys((column, index, itemKey) => (
+            <div key={itemKey} className="space-y-4">
+              {column.heading && (
+                <h3 className="text-xl font-heading font-semibold">{column.heading}</h3>
+              )}
+              {column.body && (
+                <div
+                  className="prose prose-sm max-w-none text-foreground"
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(column.body) }}
+                />
+              )}
+              {column.items.length > 0 && (
+                <ul className="space-y-2 pl-5 list-disc text-sm text-muted-foreground">
+                  {column.items.map((item, itemIndex) => (
+                    <li key={itemIndex}>{item.text}</li>
+                  ))}
+                </ul>
+              )}
+              {!column.heading && !column.body && column.items.length === 0 && (
+                <p className="text-sm text-muted-foreground">Add content for this column.</p>
+              )}
+            </div>
+          )),
+        )}
       </div>
     </div>
   );
@@ -387,7 +406,9 @@ function CalloutBoxBlock({ props }: { props: Record<string, unknown> }) {
       <div className={`public-section-card rounded-lg p-5 sm:p-8 ${variantClass}`}>
         <div
           className="public-prose prose prose-sm max-w-none break-words"
-          dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(str(props.content) || "<p>Add callout content.</p>") }}
+          dangerouslySetInnerHTML={{
+            __html: sanitizeHtml(str(props.content) || "<p>Add callout content.</p>"),
+          }}
         />
         {str(props.ctaText) && (
           <div className="mt-6">
@@ -419,28 +440,30 @@ function LinkListBlock({ props }: { props: Record<string, unknown> }) {
         {links.length === 0 ? (
           <div className="text-sm text-muted-foreground">Add links to display here.</div>
         ) : (
-          links.map(withContentKeys((link, index, itemKey) => (
-            <a
-              key={itemKey}
-              href={link.url || "#"}
-              className="public-section-card public-section-card-hover group rounded-lg p-4 sm:p-5"
-              data-testid={`link-list-item-${index}`}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <h3 className="font-semibold break-words transition-colors group-hover:text-accent">
-                    {link.label || "Untitled link"}
-                  </h3>
-                  {link.description && (
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      {link.description}
-                    </p>
-                  )}
+          links.map(
+            withContentKeys((link, index, itemKey) => (
+              <a
+                key={itemKey}
+                href={link.url || "#"}
+                className="public-section-card public-section-card-hover group rounded-lg p-4 sm:p-5"
+                data-testid={`link-list-item-${index}`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="font-semibold break-words transition-colors group-hover:text-accent">
+                      {link.label || "Untitled link"}
+                    </h3>
+                    {link.description && (
+                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                        {link.description}
+                      </p>
+                    )}
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-accent transition-colors flex-shrink-0 mt-1" />
                 </div>
-                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-accent transition-colors flex-shrink-0 mt-1" />
-              </div>
-            </a>
-          )))
+              </a>
+            )),
+          )
         )}
       </div>
     </div>
@@ -505,7 +528,9 @@ function RichTextBlock({ props }: { props: Record<string, unknown> }) {
         className={`public-prose prose prose-sm max-w-none ${textAlign}`}
         role="presentation"
         onClick={handleContentClick}
-        dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(str(props.content) || "<p>No content.</p>") }}
+        dangerouslySetInnerHTML={{
+          __html: sanitizeHtml(str(props.content) || "<p>No content.</p>"),
+        }}
       />
     </div>
   );
@@ -533,7 +558,7 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
         {str(props.body) && (
           <div
             className={`public-prose prose prose-sm max-w-none ${bodyAlign}`}
-            dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(str(props.body)) }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(str(props.body)) }}
           />
         )}
       </div>
@@ -593,11 +618,17 @@ function getCtaStyle(props: Record<string, unknown>) {
     variant,
     isGlassService,
     containerClass: `${isGlassService ? "" : "rounded-lg shadow-xl"} ${backgroundClass}`,
-    primaryVariant: (!isGlassService && variant === "dark" ? "secondary" : "default") as "secondary" | "default",
+    primaryVariant: (!isGlassService && variant === "dark" ? "secondary" : "default") as
+      | "secondary"
+      | "default",
   };
 }
 
-function CtaButtons({ props, isGlassService, primaryVariant }: {
+function CtaButtons({
+  props,
+  isGlassService,
+  primaryVariant,
+}: {
   props: Record<string, unknown>;
   isGlassService: boolean;
   primaryVariant: "secondary" | "default";
@@ -656,7 +687,7 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
       {subheading && (
         <div
           className={`mb-8 mx-auto max-w-xl text-sm leading-relaxed sm:text-base [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:opacity-80 [&_p]:m-0 ${variant === "light" ? "text-muted-foreground [&_a]:text-primary" : "opacity-80 [&_a]:text-current"}`}
-          dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(subheading) }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(subheading) }}
         />
       )}
       <CtaButtons props={props} isGlassService={isGlassService} primaryVariant={primaryVariant} />
@@ -692,42 +723,46 @@ function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
             Add cards to display here
           </div>
         ) : (
-          cards.map(withContentKeys((card, i, itemKey) => (
-            <Card
-              key={itemKey}
-              className={`public-section-card-hover h-full overflow-hidden rounded-lg border-border/70 text-center shadow-sm ${variant === "service-links" ? "border-none bg-white" : ""}`}
-            >
-              <CardContent className="public-service-card-content flex h-full flex-col px-4 pb-5 pt-6 sm:px-6 sm:pb-6 sm:pt-8">
-                <div
-                  className={`mx-auto mb-4 flex items-center justify-center rounded-full bg-accent/10 ring-1 ring-accent/20 ${variant === "service-links" ? "h-16 w-16" : "h-12 w-12"}`}
-                >
-                  <LucideIcon
-                    name={card.icon || "Globe"}
-                    className={
-                      variant === "service-links" ? "h-8 w-8 text-primary" : "h-6 w-6 text-accent"
-                    }
-                  />
-                </div>
-                <h3 className="mb-2 text-base font-semibold leading-snug break-words">
-                  {card.title}
-                </h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">{card.description}</p>
-                {card.link && (
-                  <div className="mt-auto pt-5">
-                    <a
-                      href={card.link}
-                      target={card.openInNewTab ? "_blank" : undefined}
-                      rel={card.openInNewTab ? "noopener noreferrer" : undefined}
-                      className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
-                    >
-                      {card.buttonText || "Learn More"}
-                      <ArrowRight className="ml-1.5 h-4 w-4" />
-                    </a>
+          cards.map(
+            withContentKeys((card, i, itemKey) => (
+              <Card
+                key={itemKey}
+                className={`public-section-card-hover h-full overflow-hidden rounded-lg border-border/70 text-center shadow-sm ${variant === "service-links" ? "border-none bg-white" : ""}`}
+              >
+                <CardContent className="public-service-card-content flex h-full flex-col px-4 pb-5 pt-6 sm:px-6 sm:pb-6 sm:pt-8">
+                  <div
+                    className={`mx-auto mb-4 flex items-center justify-center rounded-full bg-accent/10 ring-1 ring-accent/20 ${variant === "service-links" ? "h-16 w-16" : "h-12 w-12"}`}
+                  >
+                    <LucideIcon
+                      name={card.icon || "Globe"}
+                      className={
+                        variant === "service-links" ? "h-8 w-8 text-primary" : "h-6 w-6 text-accent"
+                      }
+                    />
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          )))
+                  <h3 className="mb-2 text-base font-semibold leading-snug break-words">
+                    {card.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {card.description}
+                  </p>
+                  {card.link && (
+                    <div className="mt-auto pt-5">
+                      <a
+                        href={card.link}
+                        target={card.openInNewTab ? "_blank" : undefined}
+                        rel={card.openInNewTab ? "noopener noreferrer" : undefined}
+                        className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                      >
+                        {card.buttonText || "Learn More"}
+                        <ArrowRight className="ml-1.5 h-4 w-4" />
+                      </a>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )),
+          )
         )}
       </div>
     </div>
@@ -743,21 +778,25 @@ function FaqBlock({ props }: { props: Record<string, unknown> }) {
         {items.length === 0 ? (
           <p className="text-muted-foreground">Add FAQ items to display here.</p>
         ) : (
-          items.map(withContentKeys((item, i, itemKey) => (
-            <AccordionItem
-              key={itemKey}
-              value={`faq-${i}`}
-              className="public-section-card rounded-lg px-4"
-            >
-              <AccordionTrigger className="font-medium text-left">{item.question}</AccordionTrigger>
-              <AccordionContent>
-                <div
-                  className="text-muted-foreground [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-primary/80 [&_p]:m-0"
-                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(item.answer) }}
-                />
-              </AccordionContent>
-            </AccordionItem>
-          )))
+          items.map(
+            withContentKeys((item, i, itemKey) => (
+              <AccordionItem
+                key={itemKey}
+                value={`faq-${i}`}
+                className="public-section-card rounded-lg px-4"
+              >
+                <AccordionTrigger className="font-medium text-left">
+                  {item.question}
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div
+                    className="text-muted-foreground [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-primary/80 [&_p]:m-0"
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.answer) }}
+                  />
+                </AccordionContent>
+              </AccordionItem>
+            )),
+          )
         )}
       </Accordion>
     </div>
@@ -781,20 +820,17 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
   }>(props.items);
   const shouldCarousel = items.length > 2;
 
-
-  const renderCard = (
-    item: {
-      quote: string;
-      name: string;
-      role: string;
-      location: string;
-      rating?: number;
-      source?: string;
-      sourceIcon?: string;
-      date?: string;
-      reviewDate?: string;
-    },
-  ) => (
+  const renderCard = (item: {
+    quote: string;
+    name: string;
+    role: string;
+    location: string;
+    rating?: number;
+    source?: string;
+    sourceIcon?: string;
+    date?: string;
+    reviewDate?: string;
+  }) => (
     <Card
       className={`public-section-card h-full rounded-lg ${variant === "google-carousel" ? "border-none bg-white shadow-lg" : ""}`}
     >
@@ -845,11 +881,13 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
             className="w-full"
           >
             <CarouselContent className="-ml-6">
-              {items.map(withContentKeys((item, i, itemKey) => (
-                <CarouselItem key={itemKey} className="pl-6 basis-full md:basis-1/2">
-                  {renderCard(item)}
-                </CarouselItem>
-              )))}
+              {items.map(
+                withContentKeys((item, i, itemKey) => (
+                  <CarouselItem key={itemKey} className="pl-6 basis-full md:basis-1/2">
+                    {renderCard(item)}
+                  </CarouselItem>
+                )),
+              )}
             </CarouselContent>
             <div className="mt-6 flex items-center justify-center gap-3">
               <CarouselPrevious className="static h-9 w-9 translate-x-0 translate-y-0 border-border/70 bg-background/95" />
@@ -873,7 +911,11 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {items.map(withContentKeys((item, _index, itemKey) => <Fragment key={itemKey}>{renderCard(item)}</Fragment>))}
+          {items.map(
+            withContentKeys((item, _index, itemKey) => (
+              <Fragment key={itemKey}>{renderCard(item)}</Fragment>
+            )),
+          )}
         </div>
       )}
       {!shouldCarousel && ctaText && ctaLink ? (
@@ -919,28 +961,30 @@ function ButtonGroupBlock({ props }: { props: Record<string, unknown> }) {
         {buttons.length === 0 ? (
           <p className="text-muted-foreground text-sm">Add buttons to display here</p>
         ) : (
-          buttons.map(withContentKeys((btn, i, itemKey) => (
-            <FormModalButton
-              key={itemKey}
-              label={btn.text}
-              action={btn.action}
-              href={btn.link}
-              openInNewTab={btn.openInNewTab}
-              formSlug={btn.formSlug}
-              modalTitle={btn.modalTitle}
-              modalDescription={btn.modalDescription}
-              variant={
-                btn.variant === "outline" ||
-                btn.variant === "secondary" ||
-                btn.variant === "ghost" ||
-                btn.variant === "destructive"
-                  ? btn.variant
-                  : "default"
-              }
-              size="lg"
-              testId={`button-group-${i}`}
-            />
-          )))
+          buttons.map(
+            withContentKeys((btn, i, itemKey) => (
+              <FormModalButton
+                key={itemKey}
+                label={btn.text}
+                action={btn.action}
+                href={btn.link}
+                openInNewTab={btn.openInNewTab}
+                formSlug={btn.formSlug}
+                modalTitle={btn.modalTitle}
+                modalDescription={btn.modalDescription}
+                variant={
+                  btn.variant === "outline" ||
+                  btn.variant === "secondary" ||
+                  btn.variant === "ghost" ||
+                  btn.variant === "destructive"
+                    ? btn.variant
+                    : "default"
+                }
+                size="lg"
+                testId={`button-group-${i}`}
+              />
+            )),
+          )
         )}
       </div>
     </div>
@@ -953,7 +997,7 @@ function RawHtmlBlock({ props }: { props: Record<string, unknown> }) {
       <SectionHeading props={props} defaultAlignment="center" className="mb-6" />
       <div
         className="prose prose-sm max-w-none text-foreground"
-        dangerouslySetInnerHTML={{ __html: sanitizeEmbedHtml(str(props.html) || "") }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(str(props.html) || "") }}
       />
     </div>
   );
@@ -1079,17 +1123,19 @@ function ContactInfoBlock({ props }: { props: Record<string, unknown> }) {
         {items.length === 0 ? (
           <p className="text-muted-foreground text-sm">Add contact items to display here.</p>
         ) : (
-          items.map(withContentKeys((item, i, itemKey) => (
-            <div key={itemKey} className="flex items-start gap-3">
-              <div className="h-9 w-9 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                <LucideIcon name={item.icon || "Globe"} className="h-4 w-4 text-accent" />
+          items.map(
+            withContentKeys((item, i, itemKey) => (
+              <div key={itemKey} className="flex items-start gap-3">
+                <div className="h-9 w-9 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <LucideIcon name={item.icon || "Globe"} className="h-4 w-4 text-accent" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">{item.label}</p>
+                  <p className="break-words font-medium text-sm">{item.value}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground">{item.label}</p>
-                <p className="break-words font-medium text-sm">{item.value}</p>
-              </div>
-            </div>
-          )))
+            )),
+          )
         )}
       </div>
     </div>
@@ -1121,17 +1167,19 @@ function FeatureListBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-4" data-testid="block-feature-list">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
       <div className={`grid grid-cols-1 ${colsClass} gap-6 sm:gap-8`}>
-        {features.map(withContentKeys((f, i, itemKey) => (
-          <div key={itemKey} className="flex items-start gap-4" data-testid={`feature-item-${i}`}>
-            <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-              <LucideIcon name={f.icon || "CheckCircle"} className="h-5 w-5 text-accent" />
+        {features.map(
+          withContentKeys((f, i, itemKey) => (
+            <div key={itemKey} className="flex items-start gap-4" data-testid={`feature-item-${i}`}>
+              <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                <LucideIcon name={f.icon || "CheckCircle"} className="h-5 w-5 text-accent" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm mb-1">{f.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{f.description}</p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-semibold text-sm mb-1">{f.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{f.description}</p>
-            </div>
-          </div>
-        )))}
+          )),
+        )}
       </div>
     </div>
   );
@@ -1143,18 +1191,24 @@ function ObjectionBustersBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-4" data-testid="block-objection-busters">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
       <div className="space-y-6 max-w-3xl mx-auto">
-        {items.map(withContentKeys((item, i, itemKey) => (
-          <div key={itemKey} className="rounded-xl border p-6" data-testid={`objection-item-${i}`}>
-            <div className="flex items-start gap-3 mb-3">
-              <XCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
-              <p className="font-medium text-sm">{item.concern}</p>
+        {items.map(
+          withContentKeys((item, i, itemKey) => (
+            <div
+              key={itemKey}
+              className="rounded-xl border p-6"
+              data-testid={`objection-item-${i}`}
+            >
+              <div className="flex items-start gap-3 mb-3">
+                <XCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+                <p className="font-medium text-sm">{item.concern}</p>
+              </div>
+              <div className="flex items-start gap-3 pl-8">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-muted-foreground leading-relaxed">{item.response}</p>
+              </div>
             </div>
-            <div className="flex items-start gap-3 pl-8">
-              <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-muted-foreground leading-relaxed">{item.response}</p>
-            </div>
-          </div>
-        )))}
+          )),
+        )}
       </div>
     </div>
   );
@@ -1168,25 +1222,31 @@ function BeforeAfterBlock({ props }: { props: Record<string, unknown> }) {
       <div className="relative max-w-3xl mx-auto">
         <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border hidden sm:block" />
         <div className="space-y-8">
-          {items.map(withContentKeys((item, i, itemKey) => (
-            <div key={itemKey} className="flex gap-4 sm:gap-6" data-testid={`milestone-item-${i}`}>
-              <div className="relative z-10 flex-shrink-0 w-12 h-12 rounded-full bg-accent text-accent-foreground flex items-center justify-center font-bold text-xs">
-                {item.milestone}
-              </div>
-              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="rounded-lg bg-destructive/5 border border-destructive/20 p-3">
-                  <p className="text-xs font-medium text-destructive mb-1">Before</p>
-                  <p className="text-sm text-muted-foreground">{item.before}</p>
+          {items.map(
+            withContentKeys((item, i, itemKey) => (
+              <div
+                key={itemKey}
+                className="flex gap-4 sm:gap-6"
+                data-testid={`milestone-item-${i}`}
+              >
+                <div className="relative z-10 flex-shrink-0 w-12 h-12 rounded-full bg-accent text-accent-foreground flex items-center justify-center font-bold text-xs">
+                  {item.milestone}
                 </div>
-                <div className="rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 p-3">
-                  <p className="text-xs font-medium text-green-700 dark:text-green-400 mb-1">
-                    After
-                  </p>
-                  <p className="text-sm text-muted-foreground">{item.after}</p>
+                <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="rounded-lg bg-destructive/5 border border-destructive/20 p-3">
+                    <p className="text-xs font-medium text-destructive mb-1">Before</p>
+                    <p className="text-sm text-muted-foreground">{item.before}</p>
+                  </div>
+                  <div className="rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 p-3">
+                    <p className="text-xs font-medium text-green-700 dark:text-green-400 mb-1">
+                      After
+                    </p>
+                    <p className="text-sm text-muted-foreground">{item.after}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          )))}
+            )),
+          )}
         </div>
       </div>
     </div>
@@ -1199,16 +1259,18 @@ function TrustBarBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-4 border-y bg-muted/20" data-testid="block-trust-bar">
       <SectionHeading props={props} defaultAlignment="center" className="mb-6" />
       <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
-        {items.map(withContentKeys((item, i, itemKey) => (
-          <div
-            key={itemKey}
-            className="flex items-center gap-2 text-muted-foreground"
-            data-testid={`trust-signal-${i}`}
-          >
-            <LucideIcon name={item.icon || "CheckCircle"} className="h-4 w-4 text-accent" />
-            <span className="text-sm font-medium">{item.label}</span>
-          </div>
-        )))}
+        {items.map(
+          withContentKeys((item, i, itemKey) => (
+            <div
+              key={itemKey}
+              className="flex items-center gap-2 text-muted-foreground"
+              data-testid={`trust-signal-${i}`}
+            >
+              <LucideIcon name={item.icon || "CheckCircle"} className="h-4 w-4 text-accent" />
+              <span className="text-sm font-medium">{item.label}</span>
+            </div>
+          )),
+        )}
       </div>
     </div>
   );
@@ -1220,36 +1282,38 @@ function PressMentionsBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-4" data-testid="block-press-mentions">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
       <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12">
-        {items.map(withContentKeys((item, i, itemKey) => {
-          const content = item.logoUrl ? (
-            <img
-              src={item.logoUrl}
-              alt={item.name}
-              className="h-8 sm:h-10 object-contain opacity-60 hover:opacity-100 transition-opacity"
-            />
-          ) : (
-            <span className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
-              {item.name}
-            </span>
-          );
-          return item.link ? (
-            <a
-              key={itemKey}
-              href={item.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1"
-              data-testid={`press-item-${i}`}
-            >
-              {content}
-              <ExternalLink className="h-3 w-3 text-muted-foreground" />
-            </a>
-          ) : (
-            <div key={itemKey} data-testid={`press-item-${i}`}>
-              {content}
-            </div>
-          );
-        }))}
+        {items.map(
+          withContentKeys((item, i, itemKey) => {
+            const content = item.logoUrl ? (
+              <img
+                src={item.logoUrl}
+                alt={item.name}
+                className="h-8 sm:h-10 object-contain opacity-60 hover:opacity-100 transition-opacity"
+              />
+            ) : (
+              <span className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
+                {item.name}
+              </span>
+            );
+            return item.link ? (
+              <a
+                key={itemKey}
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1"
+                data-testid={`press-item-${i}`}
+              >
+                {content}
+                <ExternalLink className="h-3 w-3 text-muted-foreground" />
+              </a>
+            ) : (
+              <div key={itemKey} data-testid={`press-item-${i}`}>
+                {content}
+              </div>
+            );
+          }),
+        )}
       </div>
     </div>
   );
@@ -1261,12 +1325,14 @@ function SocialProofStatsBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-4" data-testid="block-social-proof-stats">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
       <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
-        {stats.map(withContentKeys((stat, i, itemKey) => (
-          <div key={itemKey} className="text-center" data-testid={`stat-item-${i}`}>
-            <p className="text-3xl md:text-4xl font-bold text-accent">{stat.value}</p>
-            <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
-          </div>
-        )))}
+        {stats.map(
+          withContentKeys((stat, i, itemKey) => (
+            <div key={itemKey} className="text-center" data-testid={`stat-item-${i}`}>
+              <p className="text-3xl md:text-4xl font-bold text-accent">{stat.value}</p>
+              <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
+            </div>
+          )),
+        )}
       </div>
       {str(props.disclaimer) && (
         <p className="text-xs text-muted-foreground text-center mt-6 italic">
@@ -1302,40 +1368,42 @@ function ImageGridBlock({ props }: { props: Record<string, unknown> }) {
               : `grid grid-cols-1 ${colsClass} ${gapClass}`
           }
         >
-          {images.map(withContentKeys((img, i, itemKey) => (
-            <div
-              key={itemKey}
-              className={
-                variant === "gallery-strip"
-                  ? "aspect-square overflow-hidden rounded-lg shadow-md"
-                  : isProjectGallery
-                    ? "group overflow-hidden rounded-lg bg-white shadow-md"
-                    : ""
-              }
-              data-testid={`grid-image-${i}`}
-            >
-              <img
-                src={img.url}
-                alt={img.alt}
-                className={`w-full rounded-lg object-cover ${
-                  isProjectGallery
-                    ? "aspect-[4/3] transition-transform duration-300 group-hover:scale-105"
-                    : "aspect-square"
-                } ${variant === "gallery-strip" ? "h-full transition-transform duration-300 hover:scale-105" : ""}`}
-              />
-              {img.caption && (
-                <p
-                  className={
+          {images.map(
+            withContentKeys((img, i, itemKey) => (
+              <div
+                key={itemKey}
+                className={
+                  variant === "gallery-strip"
+                    ? "aspect-square overflow-hidden rounded-lg shadow-md"
+                    : isProjectGallery
+                      ? "group overflow-hidden rounded-lg bg-white shadow-md"
+                      : ""
+                }
+                data-testid={`grid-image-${i}`}
+              >
+                <img
+                  src={img.url}
+                  alt={img.alt}
+                  className={`w-full rounded-lg object-cover ${
                     isProjectGallery
-                      ? "px-3 py-3 text-center text-sm font-medium text-slate-700"
-                      : "text-xs text-muted-foreground text-center mt-1"
-                  }
-                >
-                  {img.caption}
-                </p>
-              )}
-            </div>
-          )))}
+                      ? "aspect-[4/3] transition-transform duration-300 group-hover:scale-105"
+                      : "aspect-square"
+                  } ${variant === "gallery-strip" ? "h-full transition-transform duration-300 hover:scale-105" : ""}`}
+                />
+                {img.caption && (
+                  <p
+                    className={
+                      isProjectGallery
+                        ? "px-3 py-3 text-center text-sm font-medium text-slate-700"
+                        : "text-xs text-muted-foreground text-center mt-1"
+                    }
+                  >
+                    {img.caption}
+                  </p>
+                )}
+              </div>
+            )),
+          )}
         </div>
       )}
     </div>
@@ -1397,17 +1465,19 @@ function SliderBlock({ props }: { props: Record<string, unknown> }) {
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <div className="flex gap-1.5">
-            {slides.map(withContentKeys((_slide, i, itemKey) => (
-              <button
-                key={itemKey}
-                type="button"
-                aria-label={`Go to slide ${i + 1}`}
-                aria-current={i === current}
-                className={`w-2 h-2 rounded-full transition-colors ${i === current ? "bg-accent" : "bg-muted-foreground/30"}`}
-                onClick={() => setCurrent(i)}
-                data-testid={`button-slider-dot-${i}`}
-              />
-            )))}
+            {slides.map(
+              withContentKeys((_slide, i, itemKey) => (
+                <button
+                  key={itemKey}
+                  type="button"
+                  aria-label={`Go to slide ${i + 1}`}
+                  aria-current={i === current}
+                  className={`w-2 h-2 rounded-full transition-colors ${i === current ? "bg-accent" : "bg-muted-foreground/30"}`}
+                  onClick={() => setCurrent(i)}
+                  data-testid={`button-slider-dot-${i}`}
+                />
+              )),
+            )}
           </div>
           <Button
             variant="outline"
@@ -1431,21 +1501,23 @@ function StatsBarBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-6 bg-muted/30 rounded-xl" data-testid="block-stats-bar">
       <SectionHeading props={props} defaultAlignment="center" className="mb-6 px-4" />
       <div className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
-        {items.map(withContentKeys((item, i, itemKey) => (
-          <div
-            key={itemKey}
-            className="flex items-center justify-center gap-3 rounded-xl border border-border/50 bg-background/70 px-4 py-4 text-center sm:justify-start"
-            data-testid={`stats-bar-item-${i}`}
-          >
-            <div className="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center">
-              <LucideIcon name={item.icon || "Star"} className="h-5 w-5 text-accent" />
+        {items.map(
+          withContentKeys((item, i, itemKey) => (
+            <div
+              key={itemKey}
+              className="flex items-center justify-center gap-3 rounded-xl border border-border/50 bg-background/70 px-4 py-4 text-center sm:justify-start"
+              data-testid={`stats-bar-item-${i}`}
+            >
+              <div className="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center">
+                <LucideIcon name={item.icon || "Star"} className="h-5 w-5 text-accent" />
+              </div>
+              <div>
+                <p className="text-lg font-bold">{item.value}</p>
+                <p className="text-xs text-muted-foreground">{item.label}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-lg font-bold">{item.value}</p>
-              <p className="text-xs text-muted-foreground">{item.label}</p>
-            </div>
-          </div>
-        )))}
+          )),
+        )}
       </div>
     </div>
   );
@@ -1466,18 +1538,20 @@ function IconGridBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-4" data-testid="block-icon-grid">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
       <div className={`grid grid-cols-1 ${colsClass} gap-4`}>
-        {items.map(withContentKeys((item, i, itemKey) => (
-          <div
-            key={itemKey}
-            className="flex min-w-0 flex-col items-center gap-3 rounded-xl border p-4 text-center transition-shadow hover:shadow-sm sm:p-5"
-            data-testid={`icon-grid-item-${i}`}
-          >
-            <div className="flex h-12 w-12 rounded-xl bg-accent/10 items-center justify-center">
-              <LucideIcon name={item.icon || "Globe"} className="h-6 w-6 text-accent" />
+        {items.map(
+          withContentKeys((item, i, itemKey) => (
+            <div
+              key={itemKey}
+              className="flex min-w-0 flex-col items-center gap-3 rounded-xl border p-4 text-center transition-shadow hover:shadow-sm sm:p-5"
+              data-testid={`icon-grid-item-${i}`}
+            >
+              <div className="flex h-12 w-12 rounded-xl bg-accent/10 items-center justify-center">
+                <LucideIcon name={item.icon || "Globe"} className="h-6 w-6 text-accent" />
+              </div>
+              <p className="text-sm font-medium leading-snug break-words">{item.title}</p>
             </div>
-            <p className="text-sm font-medium leading-snug break-words">{item.title}</p>
-          </div>
-        )))}
+          )),
+        )}
       </div>
     </div>
   );
@@ -1493,26 +1567,28 @@ function BenefitStackBlock({ props }: { props: Record<string, unknown> }) {
       <div className={`relative ${isTimeline ? "pl-8" : ""}`}>
         {isTimeline && <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-accent/20" />}
         <div className={isTimeline ? "space-y-6" : "space-y-4"}>
-          {items.map(withContentKeys((item, i, itemKey) => (
-            <div
-              key={itemKey}
-              className={`flex items-start gap-4 ${isTimeline ? "relative" : "p-4 rounded-lg border"}`}
-              data-testid={`benefit-item-${i}`}
-            >
-              {isTimeline && (
-                <div className="absolute -left-5 top-1 h-4 w-4 rounded-full bg-accent border-2 border-background" />
-              )}
+          {items.map(
+            withContentKeys((item, i, itemKey) => (
               <div
-                className={`h-9 w-9 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0`}
+                key={itemKey}
+                className={`flex items-start gap-4 ${isTimeline ? "relative" : "p-4 rounded-lg border"}`}
+                data-testid={`benefit-item-${i}`}
               >
-                <LucideIcon name={item.icon || "CheckCircle"} className="h-4 w-4 text-accent" />
+                {isTimeline && (
+                  <div className="absolute -left-5 top-1 h-4 w-4 rounded-full bg-accent border-2 border-background" />
+                )}
+                <div
+                  className={`h-9 w-9 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0`}
+                >
+                  <LucideIcon name={item.icon || "CheckCircle"} className="h-4 w-4 text-accent" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-sm">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground mt-0.5">{item.description}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-sm">{item.title}</h3>
-                <p className="text-sm text-muted-foreground mt-0.5">{item.description}</p>
-              </div>
-            </div>
-          )))}
+            )),
+          )}
         </div>
       </div>
     </div>
@@ -1527,7 +1603,7 @@ function ScienceExplainerBlock({ props }: { props: Record<string, unknown> }) {
       {str(props.body) && (
         <div
           className="prose prose-sm max-w-none text-foreground mb-6"
-          dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(str(props.body)) }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(str(props.body)) }}
         />
       )}
       {citations.length > 0 && (
@@ -1536,22 +1612,28 @@ function ScienceExplainerBlock({ props }: { props: Record<string, unknown> }) {
             Sources
           </p>
           <ol className="space-y-1">
-            {citations.map(withContentKeys((c, i, itemKey) => (
-              <li key={itemKey} className="text-xs text-muted-foreground" data-testid={`citation-${i}`}>
-                {c.url ? (
-                  <a
-                    href={c.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-accent underline underline-offset-2 hover:text-accent/80"
-                  >
-                    {c.text}
-                  </a>
-                ) : (
-                  c.text
-                )}
-              </li>
-            )))}
+            {citations.map(
+              withContentKeys((c, i, itemKey) => (
+                <li
+                  key={itemKey}
+                  className="text-xs text-muted-foreground"
+                  data-testid={`citation-${i}`}
+                >
+                  {c.url ? (
+                    <a
+                      href={c.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-accent underline underline-offset-2 hover:text-accent/80"
+                    >
+                      {c.text}
+                    </a>
+                  ) : (
+                    c.text
+                  )}
+                </li>
+              )),
+            )}
           </ol>
         </div>
       )}
@@ -1565,21 +1647,27 @@ function SafetyChecklistBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-4" data-testid="block-safety-checklist">
       <SectionHeading props={props} defaultAlignment="left" className="mb-6" />
       <div className="space-y-3 max-w-2xl">
-        {items.map(withContentKeys((item, i, itemKey) => (
-          <div key={itemKey} className="flex items-start gap-3" data-testid={`checklist-item-${i}`}>
-            <CheckCircle
-              className={`h-5 w-5 flex-shrink-0 mt-0.5 ${item.required ? "text-accent" : "text-muted-foreground/50"}`}
-            />
-            <div className="flex items-center gap-2">
-              <span className="text-sm">{item.text}</span>
-              {item.required && (
-                <span className="text-[10px] font-medium text-accent bg-accent/10 px-1.5 py-0.5 rounded">
-                  Required
-                </span>
-              )}
+        {items.map(
+          withContentKeys((item, i, itemKey) => (
+            <div
+              key={itemKey}
+              className="flex items-start gap-3"
+              data-testid={`checklist-item-${i}`}
+            >
+              <CheckCircle
+                className={`h-5 w-5 flex-shrink-0 mt-0.5 ${item.required ? "text-accent" : "text-muted-foreground/50"}`}
+              />
+              <div className="flex items-center gap-2">
+                <span className="text-sm">{item.text}</span>
+                {item.required && (
+                  <span className="text-[10px] font-medium text-accent bg-accent/10 px-1.5 py-0.5 rounded">
+                    Required
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
-        )))}
+          )),
+        )}
       </div>
       {str(props.disclaimer) && (
         <p className="text-xs text-muted-foreground mt-6 italic border-t pt-4">
@@ -1598,15 +1686,21 @@ function GuaranteeWarrantyBlock({ props }: { props: Record<string, unknown> }) {
         <BadgeCheck className="h-10 w-10 text-accent mx-auto mb-4" />
         <SectionHeading props={props} defaultAlignment="center" className="mb-6" />
         <ul className="space-y-2 max-w-lg mx-auto text-left mb-6">
-          {items.map(withContentKeys((item, i, itemKey) => {
-            const text = typeof item === "string" ? item : (item as { text: string }).text;
-            return (
-              <li key={itemKey} className="flex items-start gap-2" data-testid={`guarantee-item-${i}`}>
-                <CheckCircle className="h-4 w-4 text-accent flex-shrink-0 mt-0.5" />
-                <span className="text-sm">{text}</span>
-              </li>
-            );
-          }))}
+          {items.map(
+            withContentKeys((item, i, itemKey) => {
+              const text = typeof item === "string" ? item : (item as { text: string }).text;
+              return (
+                <li
+                  key={itemKey}
+                  className="flex items-start gap-2"
+                  data-testid={`guarantee-item-${i}`}
+                >
+                  <CheckCircle className="h-4 w-4 text-accent flex-shrink-0 mt-0.5" />
+                  <span className="text-sm">{text}</span>
+                </li>
+              );
+            }),
+          )}
         </ul>
         {str(props.ctaText) && (
           <FormModalButton
@@ -1633,37 +1727,46 @@ function DeliverySetupBlock({ props }: { props: Record<string, unknown> }) {
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
       <div className="max-w-3xl mx-auto mb-8">
         <div className="space-y-6">
-          {steps.map(withContentKeys((step, i, itemKey) => (
-            <div key={itemKey} className="flex gap-4 sm:gap-6" data-testid={`setup-step-${i}`}>
-              <div className="relative flex w-12 flex-shrink-0 justify-center">
-                {i < steps.length - 1 ? (
-                  <div className="absolute left-1/2 top-12 h-[calc(100%+1.5rem)] w-0.5 -translate-x-1/2 bg-border hidden sm:block" />
-                ) : null}
-                <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-accent text-accent-foreground font-bold text-sm">
-                  {step.step}
+          {steps.map(
+            withContentKeys((step, i, itemKey) => (
+              <div key={itemKey} className="flex gap-4 sm:gap-6" data-testid={`setup-step-${i}`}>
+                <div className="relative flex w-12 flex-shrink-0 justify-center">
+                  {i < steps.length - 1 ? (
+                    <div className="absolute left-1/2 top-12 h-[calc(100%+1.5rem)] w-0.5 -translate-x-1/2 bg-border hidden sm:block" />
+                  ) : null}
+                  <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-accent text-accent-foreground font-bold text-sm">
+                    {step.step}
+                  </div>
+                </div>
+                <div className="pt-2">
+                  <h3 className="font-semibold text-sm sm:text-base mb-1">{step.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {step.description}
+                  </p>
                 </div>
               </div>
-              <div className="pt-2">
-                <h3 className="font-semibold text-sm sm:text-base mb-1">{step.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
-              </div>
-            </div>
-          )))}
+            )),
+          )}
         </div>
       </div>
       {includedItems.length > 0 && (
         <div className="bg-muted/30 rounded-xl p-6 max-w-3xl mx-auto">
           <h3 className="font-semibold text-sm mb-3">What's Included</h3>
           <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {includedItems.map(withContentKeys((item, i, itemKey) => {
-              const text = typeof item === "string" ? item : (item as { text: string }).text;
-              return (
-                <li key={itemKey} className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle className="h-3.5 w-3.5 text-accent flex-shrink-0" />
-                  {text}
-                </li>
-              );
-            }))}
+            {includedItems.map(
+              withContentKeys((item, i, itemKey) => {
+                const text = typeof item === "string" ? item : (item as { text: string }).text;
+                return (
+                  <li
+                    key={itemKey}
+                    className="flex items-center gap-2 text-sm text-muted-foreground"
+                  >
+                    <CheckCircle className="h-3.5 w-3.5 text-accent flex-shrink-0" />
+                    {text}
+                  </li>
+                );
+              }),
+            )}
           </ul>
         </div>
       )}
@@ -1677,21 +1780,23 @@ function RecoveryUseCasesBlock({ props }: { props: Record<string, unknown> }) {
     <div className="py-4" data-testid="block-recovery-use-cases">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {personas.map(withContentKeys((p, i, itemKey) => (
-          <Card
-            key={itemKey}
-            className="text-center hover:shadow-md transition-shadow"
-            data-testid={`persona-card-${i}`}
-          >
-            <CardContent className="pt-8 pb-6">
-              <div className="h-14 w-14 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
-                <LucideIcon name={p.icon || "User"} className="h-7 w-7 text-accent" />
-              </div>
-              <h3 className="font-semibold mb-2">{p.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{p.description}</p>
-            </CardContent>
-          </Card>
-        )))}
+        {personas.map(
+          withContentKeys((p, i, itemKey) => (
+            <Card
+              key={itemKey}
+              className="text-center hover:shadow-md transition-shadow"
+              data-testid={`persona-card-${i}`}
+            >
+              <CardContent className="pt-8 pb-6">
+                <div className="h-14 w-14 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
+                  <LucideIcon name={p.icon || "User"} className="h-7 w-7 text-accent" />
+                </div>
+                <h3 className="font-semibold mb-2">{p.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{p.description}</p>
+              </CardContent>
+            </Card>
+          )),
+        )}
       </div>
     </div>
   );
@@ -1716,17 +1821,23 @@ function ProtocolBuilderBlock({ props }: { props: Record<string, unknown> }) {
         </span>
       </div>
       <div className="space-y-4">
-        {steps.map(withContentKeys((step, i, itemKey) => (
-          <div key={itemKey} className="flex gap-4 items-start" data-testid={`protocol-step-${i}`}>
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold text-sm">
-              {i + 1}
+        {steps.map(
+          withContentKeys((step, i, itemKey) => (
+            <div
+              key={itemKey}
+              className="flex gap-4 items-start"
+              data-testid={`protocol-step-${i}`}
+            >
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold text-sm">
+                {i + 1}
+              </div>
+              <div className="flex-1 border rounded-lg p-4">
+                <h3 className="font-semibold text-sm mb-1">{step.title}</h3>
+                <p className="text-sm text-muted-foreground">{step.description}</p>
+              </div>
             </div>
-            <div className="flex-1 border rounded-lg p-4">
-              <h3 className="font-semibold text-sm mb-1">{step.title}</h3>
-              <p className="text-sm text-muted-foreground">{step.description}</p>
-            </div>
-          </div>
-        )))}
+          )),
+        )}
       </div>
     </div>
   );

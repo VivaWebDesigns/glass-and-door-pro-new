@@ -17,11 +17,17 @@ export class UserStorage {
   }
 
   async createUser(data: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(data as UserInsertData).returning();
+    const [user] = await db
+      .insert(users)
+      .values(data as UserInsertData)
+      .returning();
     return user;
   }
 
-  async updateUser(id: string, data: Partial<InsertUser>): Promise<User | undefined> {
+  async updateUser(
+    id: string,
+    data: Partial<Omit<User, "id" | "createdAt">>,
+  ): Promise<User | undefined> {
     const [user] = await db
       .update(users)
       .set({ ...(data as Partial<UserInsertData>), updatedAt: new Date() })
@@ -49,10 +55,11 @@ export class UserStorage {
 
   async getFormNotificationUsers(formId: string): Promise<User[]> {
     const systemUsers = await this.getUsersByRoles(["admin", "editor"]);
-    return systemUsers.filter((user) =>
-      !user.isSuspended &&
-      Array.isArray(user.formNotificationFormIds) &&
-      user.formNotificationFormIds.includes(formId)
+    return systemUsers.filter(
+      (user) =>
+        !user.isSuspended &&
+        Array.isArray(user.formNotificationFormIds) &&
+        user.formNotificationFormIds.includes(formId),
     );
   }
 

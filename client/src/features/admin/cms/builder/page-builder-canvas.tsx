@@ -65,12 +65,15 @@ function BlockPreviewFallback({
         This block preview could not be rendered in the builder.
       </p>
       <p className="mt-2 text-sm text-amber-800/90 dark:text-amber-300/90">
-        The section is still available for editing. You can adjust its settings in the inspector and keep working.
+        The section is still available for editing. You can adjust its settings in the inspector and
+        keep working.
       </p>
       <div className="mt-3 flex flex-wrap gap-2 text-xs text-amber-900/80 dark:text-amber-200/80">
         <span className="rounded-full bg-background/80 px-2 py-1">Block ID: {blockId}</span>
         <span className="rounded-full bg-background/80 px-2 py-1">Type: {blockType}</span>
-        {summary ? <span className="rounded-full bg-background/80 px-2 py-1">{summary}</span> : null}
+        {summary ? (
+          <span className="rounded-full bg-background/80 px-2 py-1">{summary}</span>
+        ) : null}
       </div>
     </div>
   );
@@ -91,7 +94,13 @@ function CanvasBlockPreview({ block, index }: { block: BlockInstance; index: num
             context: { index, label },
           })
         }
-        fallback={<BlockPreviewFallback blockType={label} summary={getBlockSummary(block)} blockId={block.id} />}
+        fallback={
+          <BlockPreviewFallback
+            blockType={label}
+            summary={getBlockSummary(block)}
+            blockId={block.id}
+          />
+        }
       >
         <AdminBlockRenderer block={block} isAdminPreview disableSectionStyleWrap />
       </ErrorBoundary>
@@ -108,13 +117,19 @@ function CanvasBlockBadges({ block, index }: { block: BlockInstance; index: numb
         {getBlockDef(block.type)?.label ?? block.type}
       </Badge>
       {isDynamicBlock(block.type) && (
-        <Badge variant="outline" className="border-amber-300 bg-amber-50/90 text-amber-800 backdrop-blur dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-300">
+        <Badge
+          variant="outline"
+          className="border-amber-300 bg-amber-50/90 text-amber-800 backdrop-blur dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-300"
+        >
           <Lock className="mr-1 h-2.5 w-2.5" />
           Dynamic
         </Badge>
       )}
       {block.props.isActive === false && (
-        <Badge variant="outline" className="border-slate-300 bg-slate-50/90 text-slate-700 backdrop-blur dark:border-slate-700 dark:bg-slate-950/40 dark:text-slate-300">
+        <Badge
+          variant="outline"
+          className="border-slate-300 bg-slate-50/90 text-slate-700 backdrop-blur dark:border-slate-700 dark:bg-slate-950/40 dark:text-slate-300"
+        >
           Inactive
         </Badge>
       )}
@@ -219,12 +234,43 @@ function CanvasBlockToolbar({
         onActivate={() => onToggleActive(block.id)}
         testId={`canvas-toggle-active-${block.id}`}
       />
-      <CanvasToolbarButton label="Edit block" icon={Pencil} onActivate={() => onSelect(block.id)} testId={`canvas-edit-${block.id}`} />
-      <CanvasToolbarButton label="Move block up" icon={ArrowUp} onActivate={() => onMove(block.id, "up")} testId={`canvas-move-up-${block.id}`} />
-      <CanvasToolbarButton label="Move block down" icon={ArrowDown} onActivate={() => onMove(block.id, "down")} testId={`canvas-move-down-${block.id}`} />
-      <CanvasToolbarButton label="Add block below" icon={Plus} onActivate={() => onAddBelow(block.id)} testId={`canvas-add-below-${block.id}`} />
-      <CanvasToolbarButton label="Duplicate block" icon={Copy} onActivate={() => onDuplicate(block.id)} testId={`canvas-duplicate-${block.id}`} />
-      <CanvasToolbarButton label="Delete block" icon={Trash2} onActivate={() => onDelete(block.id)} testId={`canvas-delete-${block.id}`} destructive />
+      <CanvasToolbarButton
+        label="Edit block"
+        icon={Pencil}
+        onActivate={() => onSelect(block.id)}
+        testId={`canvas-edit-${block.id}`}
+      />
+      <CanvasToolbarButton
+        label="Move block up"
+        icon={ArrowUp}
+        onActivate={() => onMove(block.id, "up")}
+        testId={`canvas-move-up-${block.id}`}
+      />
+      <CanvasToolbarButton
+        label="Move block down"
+        icon={ArrowDown}
+        onActivate={() => onMove(block.id, "down")}
+        testId={`canvas-move-down-${block.id}`}
+      />
+      <CanvasToolbarButton
+        label="Add block below"
+        icon={Plus}
+        onActivate={() => onAddBelow(block.id)}
+        testId={`canvas-add-below-${block.id}`}
+      />
+      <CanvasToolbarButton
+        label="Duplicate block"
+        icon={Copy}
+        onActivate={() => onDuplicate(block.id)}
+        testId={`canvas-duplicate-${block.id}`}
+      />
+      <CanvasToolbarButton
+        label="Delete block"
+        icon={Trash2}
+        onActivate={() => onDelete(block.id)}
+        testId={`canvas-delete-${block.id}`}
+        destructive
+      />
     </div>
   );
 }
@@ -253,8 +299,10 @@ function CanvasBlockFrame(props: CanvasBlockFrameProps) {
       className={cn(
         "group relative scroll-mt-24 transition-all",
         draggedBlockId === block.id && "opacity-60",
-        dropPosition === "before" && "pt-4 before:absolute before:left-6 before:right-6 before:top-1 before:z-30 before:h-1 before:rounded-full before:bg-violet-500",
-        dropPosition === "after" && "pb-4 after:absolute after:left-6 after:right-6 after:bottom-1 after:z-30 after:h-1 after:rounded-full after:bg-violet-500",
+        dropPosition === "before" &&
+          "pt-4 before:absolute before:left-6 before:right-6 before:top-1 before:z-30 before:h-1 before:rounded-full before:bg-violet-500",
+        dropPosition === "after" &&
+          "pb-4 after:absolute after:left-6 after:right-6 after:bottom-1 after:z-30 after:h-1 after:rounded-full after:bg-violet-500",
       )}
       onDragOver={(event) => onBlockDragOver(event, block.id)}
       onDrop={(event) => onBlockDrop(event, block.id)}
@@ -332,12 +380,18 @@ export function VisualCanvas({
 
   return (
     <div className="h-full bg-[radial-gradient(circle_at_top,_rgba(137,205,161,0.12),_transparent_45%),linear-gradient(180deg,_rgba(255,255,255,0.96),_rgba(248,250,252,0.98))] p-5">
-      <div className={cn("mx-auto flex min-h-full max-w-full flex-col overflow-hidden rounded-[28px] border border-border/60 bg-background shadow-[0_20px_70px_rgba(15,23,42,0.08)] transition-[max-width] duration-200", desktopFrameClassName)}>
+      <div
+        className={cn(
+          "mx-auto flex min-h-full max-w-full flex-col overflow-hidden rounded-[28px] border border-border/60 bg-background shadow-[0_20px_70px_rgba(15,23,42,0.08)] transition-[max-width] duration-200",
+          desktopFrameClassName,
+        )}
+      >
         <div className="flex items-center justify-between border-b border-border/60 bg-muted/20 px-4 py-3">
           <div>
             <p className="text-sm font-semibold">Visual Canvas</p>
             <p className="text-xs text-muted-foreground">
-              This editing surface uses the published page renderer, then layers selection and editing tools on top.
+              This editing surface uses the published page renderer, then layers selection and
+              editing tools on top.
             </p>
           </div>
         </div>
@@ -349,7 +403,8 @@ export function VisualCanvas({
                 <Layers className="mx-auto mb-3 h-10 w-10 text-muted-foreground/40" />
                 <p className="text-base font-semibold">Your page canvas is empty</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Add a block or insert a saved section from the left panel to begin building visually.
+                  Add a block or insert a saved section from the left panel to begin building
+                  visually.
                 </p>
               </div>
             </div>
@@ -358,7 +413,8 @@ export function VisualCanvas({
               {blocks.map((block, index) => {
                 const isFullWidth = FULL_WIDTH_BLOCK_TYPES.has(block.type);
                 const sectionStyleConfig = getSectionStyleConfig(block.props);
-                const hasCustomSectionStyle = block.type !== "hero" && hasSectionStyleConfig(sectionStyleConfig);
+                const hasCustomSectionStyle =
+                  block.type !== "hero" && hasSectionStyleConfig(sectionStyleConfig);
                 const visualIndex = isFullWidth ? nonFullWidthIndex : nonFullWidthIndex++;
                 const isAlternate = visualIndex % 2 === 1 && !hasCustomSectionStyle;
 
@@ -391,14 +447,14 @@ export function VisualCanvas({
                       key={block.id}
                       props={block.props}
                       className="rounded-none"
-                      contentClassName={isFullWidth ? undefined : getSectionPaddingClasses(block.props)}
+                      contentClassName={
+                        isFullWidth ? undefined : getSectionPaddingClasses(block.props)
+                      }
                     >
                       {isFullWidth ? (
                         framedBlock
                       ) : (
-                        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-                          {framedBlock}
-                        </div>
+                        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">{framedBlock}</div>
                       )}
                     </SectionStyleWrapper>
                   );
@@ -409,11 +465,13 @@ export function VisualCanvas({
                 }
 
                 return (
-                  <section
-                    key={block.id}
-                    className={cn("relative", isAlternate && "bg-muted/30")}
-                  >
-                    <div className={cn("relative mx-auto max-w-7xl px-4 sm:px-6", getSectionPaddingClasses(block.props))}>
+                  <section key={block.id} className={cn("relative", isAlternate && "bg-muted/30")}>
+                    <div
+                      className={cn(
+                        "relative mx-auto max-w-7xl px-4 sm:px-6",
+                        getSectionPaddingClasses(block.props),
+                      )}
+                    >
                       {framedBlock}
                     </div>
                   </section>

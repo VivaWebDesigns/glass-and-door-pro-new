@@ -1,24 +1,31 @@
-import sanitizeHtml from "sanitize-html";
-import type { CmsPage, SeoSettings } from "@shared/schema";
+import { getGlassLocationSearchCopy } from "@shared/glass-location-search";
 import {
-  GLASS_PRIMARY_SERVICE_AREAS,
-  GLASS_PRIMARY_SERVICE_AREA_NAMES,
-} from "@shared/glass-service-areas";
-import { normalizeSeoDescription } from "@shared/seo-description";
+  DESKTOP_HERO_MEDIA,
+  getMobileHeroImageUrl,
+  MOBILE_HERO_MEDIA,
+} from "@shared/glass-hero-images";
 import { correctGlassSearchTitle } from "@shared/glass-search-snippets";
-import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
 import {
   buildGlassBreadcrumbItems,
   buildGlassLocalBusinessLd,
   buildGlassServiceLdForCmsPage,
+  getCmsPublicPath,
+  getCmsSlugForPublicPath,
   getGlassCityPageArea,
   getGlassServiceSeoOverride,
   getGlassServiceSocialMetadata,
-  getCmsPublicPath,
-  getCmsSlugForPublicPath,
   isGlassLegalNoindexSlug,
   isGlassServicePageSlug,
 } from "@shared/glass-seo";
+import {
+  GLASS_PRIMARY_SERVICE_AREAS,
+  GLASS_PRIMARY_SERVICE_AREA_NAMES,
+  GLASS_SERVICE_AREAS_HERO_IMAGE,
+} from "@shared/glass-service-areas";
+import type { CmsPage, SeoSettings } from "@shared/schema";
+import { normalizeSeoDescription } from "@shared/seo-description";
+import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
+import sanitizeHtml from "sanitize-html";
 import { storage } from "../storage";
 
 interface PublicHtmlSnapshot {
@@ -33,6 +40,7 @@ interface PublicHtmlSnapshot {
   bodyHtml: string;
   jsonLd?: Array<Record<string, unknown>>;
   cmsPage?: CmsPage;
+  heroImageUrl?: string;
 }
 
 type PrerenderLink = {
@@ -41,7 +49,6 @@ type PrerenderLink = {
   description?: string;
 };
 
-const DEFAULT_TITLE = "Glass and Door Pro | Charlotte Glass, Windows & Doors";
 const DEFAULT_DESCRIPTION =
   "Glass and Door Pro serves the Charlotte area with frameless showers, residential windows, door installation, window repair, and commercial glass.";
 
@@ -712,9 +719,21 @@ function getFallbackLinkSections(pathname: string) {
   return [];
 }
 
-function getPrerenderHeading(page: Pick<CmsPage, "slug" | "title">) {
+function getPrerenderHeading(page: Pick<CmsPage, "slug" | "title" | "content">) {
   if (page.slug === "home") {
     return "Glass and Door Pro: Charlotte Glass, Door & Window Services";
+  }
+
+  if (getGlassLocationSearchCopy(page.slug)) {
+    const content = page.content;
+    const blocks =
+      content && typeof content === "object" && !Array.isArray(content)
+        ? (content as Record<string, unknown>).blocks
+        : null;
+    if (Array.isArray(blocks)) {
+      const hero = blocks.find((block) => block?.type === "hero");
+      if (typeof hero?.props?.heading === "string") return hero.props.heading;
+    }
   }
 
   return page.title;
@@ -766,9 +785,11 @@ function buildCmsSnapshot(
   const cityArea = getGlassCityPageArea(normalizedVisiblePage.slug);
 
   return {
-    title: buildHeadTitle(title, seo, {
-      brandLast: isGlassServicePageSlug(normalizedVisiblePage.slug),
-    }),
+    title: getGlassLocationSearchCopy(normalizedVisiblePage.slug)
+      ? title
+      : buildHeadTitle(title, seo, {
+          brandLast: isGlassServicePageSlug(normalizedVisiblePage.slug),
+        }),
     description,
     canonicalUrl,
     ogTitle: socialOverride?.ogTitle || null,
@@ -834,12 +855,13 @@ function buildFallbackSnapshot(
       ].filter(Boolean),
     ),
     jsonLd: fallbackJsonLd,
+    heroImageUrl: pathname === "/service-areas" ? GLASS_SERVICE_AREAS_HERO_IMAGE : undefined,
   };
 }
 
 export async function getPublicHtmlSnapshot(
   pathname: string,
-  search = "",
+  _search = "",
 ): Promise<PublicHtmlSnapshot | null> {
   if (
     pathname.startsWith("/api") ||
@@ -879,6 +901,32 @@ export async function getPublicHtmlSnapshot(
   return buildFallbackSnapshot(pathname, seo, siteUrl);
 }
 
+// Match the first visible hero only. Static site assets have no legacy URL remapping;
+// uploaded/external assets are left to the renderer rather than risking a wasted preload.
+function getStaticHeroPreload(page: CmsPage | undefined, fallbackImage?: string) {
+  let image: unknown = fallbackImage;
+  if (page) {
+    const content = page.content;
+    if (!content || typeof content !== "object" || Array.isArray(content)) return "";
+    const blocks = (content as Record<string, unknown>).blocks;
+    if (!Array.isArray(blocks) || blocks[0]?.type !== "hero") return "";
+    image = blocks[0]?.props?.backgroundImageUrl;
+  }
+  if (
+    typeof image !== "string" ||
+    !/^\/images\/glass-door-pro\/[a-zA-Z0-9/_-]+\.(webp|png|jpe?g|avif)$/.test(image)
+  )
+    return "";
+  const mobileImage = getMobileHeroImageUrl(image);
+  if (mobileImage) {
+    return [
+      `<link rel="preload" as="image" href="${escapeHtml(mobileImage)}" media="${MOBILE_HERO_MEDIA}" fetchpriority="high" />`,
+      `<link rel="preload" as="image" href="${escapeHtml(image)}" media="${DESKTOP_HERO_MEDIA}" fetchpriority="high" />`,
+    ].join("\n");
+  }
+  return `<link rel="preload" as="image" href="${escapeHtml(image)}" fetchpriority="high" />`;
+}
+
 export function injectPublicHtmlSnapshot(
   template: string,
   snapshot: PublicHtmlSnapshot | null,
@@ -905,6 +953,7 @@ export function injectPublicHtmlSnapshot(
   }
 
   const headParts = [
+    getStaticHeroPreload(snapshot.cmsPage, snapshot.heroImageUrl),
     `<meta name="description" content="${escapeHtml(snapshot.description)}" />`,
     `<meta property="og:title" content="${escapeHtml(snapshot.ogTitle || snapshot.title)}" />`,
     `<meta property="og:description" content="${escapeHtml(snapshot.ogDescription || snapshot.description)}" />`,

@@ -117,8 +117,8 @@ function RobotsTxtDialog({
         <DialogHeader>
           <DialogTitle>Edit robots.txt</DialogTitle>
           <DialogDescription>
-            Review the generated default file and customize it when needed. Leave this blank to
-            fall back to the generated version.
+            Review the generated default file and customize it when needed. Leave this blank to fall
+            back to the generated version.
           </DialogDescription>
         </DialogHeader>
 
@@ -265,8 +265,8 @@ function SitemapOverviewCard({
         </div>
         <CardDescription className="text-xs">
           The sitemap is auto-generated at{" "}
-          <code className="text-xs bg-muted px-1 py-0.5 rounded">/sitemap.xml</code> from
-          published content. Draft, noindex, and non-public content is automatically excluded.
+          <code className="text-xs bg-muted px-1 py-0.5 rounded">/sitemap.xml</code> from published
+          content. Draft, noindex, and non-public content is automatically excluded.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -326,8 +326,8 @@ function SitemapOverviewCard({
 
         {!siteUrl && (
           <div className="rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-3 py-2.5 text-xs text-amber-700 dark:text-amber-400">
-            <strong>Tip:</strong> Set your Canonical Site URL in Global Settings so the sitemap
-            uses absolute URLs.
+            <strong>Tip:</strong> Set your Canonical Site URL in Global Settings so the sitemap uses
+            absolute URLs.
           </div>
         )}
       </CardContent>
@@ -370,7 +370,15 @@ export function CmsSitemapTab() {
   ];
 
   const corePageSlugs = ["home"];
-  const retiredPageSlugs = ["about", "contact", "directory", "events", "insights", "join", "recordings"];
+  const retiredPageSlugs = [
+    "about",
+    "contact",
+    "directory",
+    "events",
+    "insights",
+    "join",
+    "recordings",
+  ];
 
   const cmsEntries: SitemapEntry[] = (pages ?? [])
     .filter((p) => !corePageSlugs.includes(p.slug) && !retiredPageSlugs.includes(p.slug))
@@ -486,7 +494,6 @@ export function CmsSitemapTab() {
               ))}
             </CardContent>
           </Card>
-
         </>
       )}
 

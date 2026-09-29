@@ -49,7 +49,7 @@ The application uses **Pino** with named child loggers:
 | `http` | `logger.http` | Request/response logging |
 | `email` | `logger.email` | Email send operations |
 | `r2` | `logger.r2` | Cloudflare R2 file operations |
-| `stripe` | `logger.stripe` | Stripe API calls and webhooks |
+| `backup` | `logger.backup` | System backup runs and backup storage |
 | `auth` | `logger.auth` | Authentication events |
 | `app` | `logger.app` | General application events |
 | `db` | `logger.db` | Database operations |
@@ -85,9 +85,9 @@ All `/api/*` requests are logged on completion with:
 ### Sensitive Data Handling
 
 The following fields are automatically redacted in logs:
-`password`, `currentPassword`, `newPassword`, `token`, `resetToken`, `secret`, `authorization`, `email`, `phone`, `address`, `ssn`, `dateOfBirth`
+`password`, `currentPassword`, `newPassword`, `token`, `resetToken`, `secret`, `authorization`, `email`, `phone`, `address`, `addressLine1`, `addressLine2`, `refereeEmail`, `refereePhone`, `ssn`, `dateOfBirth`, `secureToken` (matched case-insensitively as substrings of the key)
 
-Long text fields (`bio`, `content`, `body`, `description`) are truncated to 100 characters.
+Long text fields (`bio`, `content`, `body`, `description`) are truncated to 100 characters, and the serialized body is capped at 500 characters.
 
 ## Common Operational Tasks
 
@@ -102,19 +102,12 @@ curl http://localhost:5000/api/health/ready
 
 In production, pipe stdout through `jq` for readability:
 ```bash
-node server/index.js | jq '.'
+npm start | jq '.'
 ```
 
 ### Checking Database Connectivity
 
 The `/api/health/ready` endpoint runs `SELECT 1` against the database. If it returns 503, check:
 1. `DATABASE_URL` environment variable is set correctly
-2. Network connectivity to the Neon database endpoint
-3. Database is not in a suspended state (Neon auto-suspends idle databases)
-
-### Stripe Webhook Debugging
-
-1. Check logs for `[stripe]` source entries
-2. Webhook endpoint: `POST /api/stripe/webhook`
-3. Verify `STRIPE_WEBHOOK_SECRET` is set correctly
-4. Stripe webhook events are verified via signature before processing
+2. Network connectivity to the Postgres host (Railway's private internal hostname only resolves inside Railway)
+3. The Railway Postgres service is running

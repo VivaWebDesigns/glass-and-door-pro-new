@@ -139,10 +139,11 @@ export function getSectionPaddingClasses(props: Record<string, unknown>) {
   );
 }
 
-
 function getSectionBackgroundStyle(config: SectionStyleConfig): CSSProperties {
   const defaultBackgroundColor =
-    !config.backgroundColor && !config.backgroundImageUrl && config.showRadialGradient ? "#ffffff" : "";
+    !config.backgroundColor && !config.backgroundImageUrl && config.showRadialGradient
+      ? "#ffffff"
+      : "";
   const backgroundColor = config.backgroundColor || defaultBackgroundColor;
   const colorStyle: CSSProperties = backgroundColor ? { backgroundColor } : {};
 

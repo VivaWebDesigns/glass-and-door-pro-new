@@ -1,9 +1,10 @@
+import type { CmsPage } from "@shared/schema";
 import { Router } from "express";
 import { storage } from "../../storage/index";
 
 const router = Router();
 
-function pageIssues(page: any): string[] {
+function pageIssues(page: CmsPage): string[] {
   const issues: string[] = [];
   if (!page.seoTitle) issues.push("missing_seo_title");
   if (!page.seoDescription) issues.push("missing_seo_description");
@@ -35,7 +36,7 @@ router.get("/seo-audit", async (_req, res) => {
       posts: [],
       events: [],
     });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: "Failed to run SEO audit" });
   }
 });

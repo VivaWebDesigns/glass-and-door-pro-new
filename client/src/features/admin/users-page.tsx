@@ -54,9 +54,9 @@ import {
   ShieldCheck,
   AlertTriangle,
   Shield,
-  
   Palette,
-  FolderKanban } from "lucide-react";
+  FolderKanban,
+} from "lucide-react";
 
 type SafeUser = Omit<User, "password"> & { country?: string | null };
 type ActiveForm = {
@@ -118,7 +118,11 @@ function summarizePermissions(user: SafeUser) {
   if (permissions.length === 0) return "No tool groups assigned";
 
   return permissions
-    .map((permission) => EDITOR_PERMISSION_OPTIONS.find((option) => option.value === permission)?.label ?? permission)
+    .map(
+      (permission) =>
+        EDITOR_PERMISSION_OPTIONS.find((option) => option.value === permission)?.label ??
+        permission,
+    )
     .join(", ");
 }
 
@@ -201,15 +205,14 @@ function UsersContent() {
     refetchOnWindowFocus: true,
   });
 
-  const activeForms = useMemo(
-    () => forms.filter((form) => form.isActive),
-    [forms]
-  );
+  const activeForms = useMemo(() => forms.filter((form) => form.isActive), [forms]);
 
   const filtered = users?.filter((user) => {
     const matchesSearch =
       !search ||
-      `${user.firstName ?? ""} ${user.lastName ?? ""}`.toLowerCase().includes(search.toLowerCase()) ||
+      `${user.firstName ?? ""} ${user.lastName ?? ""}`
+        .toLowerCase()
+        .includes(search.toLowerCase()) ||
       user.email.toLowerCase().includes(search.toLowerCase());
     return matchesSearch;
   });
@@ -230,7 +233,8 @@ function UsersContent() {
             System Users
           </h1>
           <p className="text-sm text-muted-foreground">
-            Manage admin and editor accounts used to operate the platform. Directory members are managed separately in the Directory app.
+            Manage admin and editor accounts used to operate the platform. Directory members are
+            managed separately in the Directory app.
           </p>
         </div>
         <Button onClick={() => setCreateOpen(true)} data-testid="button-create-user">
@@ -271,7 +275,10 @@ function UsersContent() {
                       {`${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || "—"}
                     </span>
                     {user.isSuspended && (
-                      <Badge variant="secondary" className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-xs">
+                      <Badge
+                        variant="secondary"
+                        className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-xs"
+                      >
                         Suspended
                       </Badge>
                     )}
@@ -279,7 +286,11 @@ function UsersContent() {
                 </TableCell>
                 <TableCell data-testid={`text-user-email-${user.id}`}>{user.email}</TableCell>
                 <TableCell>
-                  <Badge variant="secondary" className={ROLE_COLORS[user.role] || ""} data-testid={`badge-role-${user.id}`}>
+                  <Badge
+                    variant="secondary"
+                    className={ROLE_COLORS[user.role] || ""}
+                    data-testid={`badge-role-${user.id}`}
+                  >
                     {displayRole(user.role)}
                   </Badge>
                 </TableCell>
@@ -391,7 +402,10 @@ function FormNotificationPanel({
       ) : (
         <div className="space-y-3">
           {activeForms.map((form) => (
-            <label key={form.id} className="flex items-start gap-3 rounded-md border p-3 cursor-pointer hover:bg-muted/30">
+            <label
+              key={form.id}
+              className="flex items-start gap-3 rounded-md border p-3 cursor-pointer hover:bg-muted/30"
+            >
               <Checkbox
                 checked={selectedFormIdSet.has(form.id)}
                 onCheckedChange={() => onToggle(form.id)}
@@ -400,7 +414,11 @@ function FormNotificationPanel({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">{form.name}</span>
-                  {form.isSystem && <Badge variant="outline" className="text-[10px]">System</Badge>}
+                  {form.isSystem && (
+                    <Badge variant="outline" className="text-[10px]">
+                      System
+                    </Badge>
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">Slug: {form.slug}</p>
               </div>
@@ -490,17 +508,36 @@ export function CreateUserSheet({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="create-first">First Name</Label>
-                <Input id="create-first" value={firstName} onChange={(event) => setFirstName(event.target.value)} required data-testid="input-create-first-name" />
+                <Input
+                  id="create-first"
+                  value={firstName}
+                  onChange={(event) => setFirstName(event.target.value)}
+                  required
+                  data-testid="input-create-first-name"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="create-last">Last Name</Label>
-                <Input id="create-last" value={lastName} onChange={(event) => setLastName(event.target.value)} required data-testid="input-create-last-name" />
+                <Input
+                  id="create-last"
+                  value={lastName}
+                  onChange={(event) => setLastName(event.target.value)}
+                  required
+                  data-testid="input-create-last-name"
+                />
               </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="create-email">Email</Label>
-              <Input id="create-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required data-testid="input-create-email" />
+              <Input
+                id="create-email"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+                data-testid="input-create-email"
+              />
             </div>
 
             <div className="space-y-2">
@@ -531,9 +568,12 @@ export function CreateUserSheet({
 
             <div className="rounded-lg border bg-muted/20 p-4 space-y-3">
               <div>
-                <Label htmlFor="create-role" className="text-sm font-medium">System Role</Label>
+                <Label htmlFor="create-role" className="text-sm font-medium">
+                  System Role
+                </Label>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Admins have full platform access. Editors are limited to the tool groups you choose below.
+                  Admins have full platform access. Editors are limited to the tool groups you
+                  choose below.
                 </p>
               </div>
               <SystemRoleSelector role={role} onChange={setRole} testIdPrefix="create-role" />
@@ -542,20 +582,26 @@ export function CreateUserSheet({
             {role === "editor" ? (
               <EditorPermissionsPanel
                 permissions={adminPermissions}
-                onToggle={(permission) => setAdminPermissions((current) => toggleValue(current, permission))}
+                onToggle={(permission) =>
+                  setAdminPermissions((current) => toggleValue(current, permission))
+                }
               />
             ) : (
               <div className="rounded-lg border bg-muted/20 p-4">
                 <div className="flex items-center gap-2">
                   <Shield className="h-4 w-4 text-primary" />
-                  <p className="text-sm font-medium">System Admins can access every admin tool group, including System settings.</p>
+                  <p className="text-sm font-medium">
+                    System Admins can access every admin tool group, including System settings.
+                  </p>
                 </div>
               </div>
             )}
 
             <FormNotificationPanel
               selectedFormIds={formNotificationFormIds}
-              onToggle={(formId) => setFormNotificationFormIds((current) => toggleValue(current, formId))}
+              onToggle={(formId) =>
+                setFormNotificationFormIds((current) => toggleValue(current, formId))
+              }
               activeForms={activeForms}
             />
 
@@ -580,10 +626,20 @@ export function CreateUserSheet({
           </form>
         </SheetBody>
         <SheetFooter>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)} data-testid="button-cancel-create">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            data-testid="button-cancel-create"
+          >
             Cancel
           </Button>
-          <Button type="submit" form="create-user-form" disabled={createMutation.isPending} data-testid="button-submit-create">
+          <Button
+            type="submit"
+            form="create-user-form"
+            disabled={createMutation.isPending}
+            data-testid="button-submit-create"
+          >
             {createMutation.isPending ? "Creating..." : "Create System User"}
           </Button>
         </SheetFooter>
@@ -611,7 +667,8 @@ function DeleteUserDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete System User</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to permanently delete <strong>{fullName}</strong> ({user?.email})? This action is irreversible.
+            Are you sure you want to permanently delete <strong>{fullName}</strong> ({user?.email})?
+            This action is irreversible.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -658,7 +715,9 @@ function UserSecurityTab({
           <KeyRound className="h-4 w-4 text-muted-foreground" />
           <h3 className="font-medium text-sm">Reset Password</h3>
         </div>
-        <p className="text-xs text-muted-foreground">Set a new password directly for this account.</p>
+        <p className="text-xs text-muted-foreground">
+          Set a new password directly for this account.
+        </p>
         <form
           id="detail-reset-form"
           onSubmit={(event) => {
@@ -688,12 +747,16 @@ function UserSecurityTab({
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </Button>
           </div>
-          <Button type="submit" disabled={resetPasswordMutation.isPending || !newPassword.trim()} data-testid="button-detail-reset-password">
+          <Button
+            type="submit"
+            disabled={resetPasswordMutation.isPending || !newPassword.trim()}
+            data-testid="button-detail-reset-password"
+          >
             {resetPasswordMutation.isPending ? "Saving..." : "Set"}
           </Button>
         </form>
       </div>
-  
+
       <div className="rounded-lg border p-4 space-y-3">
         <div className="flex items-center gap-2">
           <Mail className="h-4 w-4 text-muted-foreground" />
@@ -712,7 +775,7 @@ function UserSecurityTab({
           {sendResetLinkMutation.isPending ? "Sending..." : "Send Reset Link"}
         </Button>
       </div>
-  
+
       <div className="rounded-lg border p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -736,7 +799,7 @@ function UserSecurityTab({
             : "Suspending this system user will prevent them from logging in."}
         </p>
       </div>
-  
+
       <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 space-y-3">
         <div className="flex items-center gap-2">
           <AlertTriangle className="h-4 w-4 text-destructive" />
@@ -745,7 +808,12 @@ function UserSecurityTab({
         <p className="text-xs text-muted-foreground">
           Permanently delete this system account. This action cannot be undone.
         </p>
-        <Button variant="destructive" size="sm" onClick={() => setDeleteConfirmOpen(true)} data-testid="button-detail-delete">
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={() => setDeleteConfirmOpen(true)}
+          data-testid="button-detail-delete"
+        >
           <Trash2 className="mr-2 h-4 w-4" />
           Delete Account
         </Button>
@@ -797,21 +865,40 @@ function UserProfileForm({
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="detail-first">First Name</Label>
-          <Input id="detail-first" value={firstName} onChange={(event) => setFirstName(event.target.value)} data-testid="input-detail-first-name" />
+          <Input
+            id="detail-first"
+            value={firstName}
+            onChange={(event) => setFirstName(event.target.value)}
+            data-testid="input-detail-first-name"
+          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="detail-last">Last Name</Label>
-          <Input id="detail-last" value={lastName} onChange={(event) => setLastName(event.target.value)} data-testid="input-detail-last-name" />
+          <Input
+            id="detail-last"
+            value={lastName}
+            onChange={(event) => setLastName(event.target.value)}
+            data-testid="input-detail-last-name"
+          />
         </div>
       </div>
       <div className="space-y-2">
         <Label htmlFor="detail-email">Email</Label>
-        <Input id="detail-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required data-testid="input-detail-email" />
+        <Input
+          id="detail-email"
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          required
+          data-testid="input-detail-email"
+        />
       </div>
 
       <div className="rounded-lg border bg-muted/20 p-4 space-y-3">
         <div>
-          <Label htmlFor="detail-role" className="text-sm font-medium">System Role</Label>
+          <Label htmlFor="detail-role" className="text-sm font-medium">
+            System Role
+          </Label>
           <p className="text-xs text-muted-foreground mt-1">
             Editors can only access the tool groups you assign here. System remains admin-only.
           </p>
@@ -822,13 +909,17 @@ function UserProfileForm({
       {role === "editor" ? (
         <EditorPermissionsPanel
           permissions={adminPermissions}
-          onToggle={(permission) => setAdminPermissions((current) => toggleValue(current, permission))}
+          onToggle={(permission) =>
+            setAdminPermissions((current) => toggleValue(current, permission))
+          }
         />
       ) : (
         <div className="rounded-lg border bg-muted/20 p-4">
           <div className="flex items-center gap-2">
             <Shield className="h-4 w-4 text-primary" />
-            <p className="text-sm font-medium">System Admins always have full platform access, including the System tool group.</p>
+            <p className="text-sm font-medium">
+              System Admins always have full platform access, including the System tool group.
+            </p>
           </div>
         </div>
       )}
@@ -842,10 +933,7 @@ function UserProfileForm({
   );
 }
 
-function UserSheetHeader({ fullName, user }: {
-  fullName: string;
-  user: SafeUser | null;
-}) {
+function UserSheetHeader({ fullName, user }: { fullName: string; user: SafeUser | null }) {
   return (
     <SheetHeader>
       <div className="flex items-start justify-between">
@@ -857,11 +945,18 @@ function UserSheetHeader({ fullName, user }: {
         </div>
         {user && (
           <div className="flex flex-col items-end gap-1 pt-1">
-            <Badge variant="secondary" className={ROLE_COLORS[user.role] || ""} data-testid="badge-detail-role">
+            <Badge
+              variant="secondary"
+              className={ROLE_COLORS[user.role] || ""}
+              data-testid="badge-detail-role"
+            >
               {displayRole(user.role)}
             </Badge>
             {user.isSuspended && (
-              <Badge variant="secondary" className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-xs">
+              <Badge
+                variant="secondary"
+                className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-xs"
+              >
                 Suspended
               </Badge>
             )}
@@ -879,7 +974,9 @@ function readUserProfile(user: SafeUser) {
     email: user.email,
     role: (user.role === "admin" ? "admin" : "editor") as "admin" | "editor",
     adminPermissions: Array.isArray(user.adminPermissions) ? user.adminPermissions : [],
-    formNotificationFormIds: Array.isArray(user.formNotificationFormIds) ? user.formNotificationFormIds : [],
+    formNotificationFormIds: Array.isArray(user.formNotificationFormIds)
+      ? user.formNotificationFormIds
+      : [],
   };
 }
 
@@ -967,7 +1064,10 @@ function UserDetailSheet({
       await apiRequest("POST", `/api/admin/users/${user!.id}/reset-password`, {});
     },
     onSuccess: () => {
-      toast({ title: "Password reset email sent", description: `Reset link sent to ${user?.email}` });
+      toast({
+        title: "Password reset email sent",
+        description: `Reset link sent to ${user?.email}`,
+      });
     },
     onError: (err: Error) => {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -982,7 +1082,10 @@ function UserDetailSheet({
     onSuccess: (updated: SafeUser) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       const action = updated.isSuspended ? "suspended" : "reactivated";
-      toast({ title: `Account ${action}`, description: `${user?.firstName} ${user?.lastName}'s account has been ${action}.` });
+      toast({
+        title: `Account ${action}`,
+        description: `${user?.firstName} ${user?.lastName}'s account has been ${action}.`,
+      });
       onUserUpdated({ ...updated });
     },
     onError: (err: Error) => {
@@ -1064,10 +1167,20 @@ function UserDetailSheet({
 
           {activeTab === "profile" && (
             <SheetFooter>
-              <Button type="button" variant="outline" onClick={onClose} data-testid="button-detail-cancel">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                data-testid="button-detail-cancel"
+              >
                 Cancel
               </Button>
-              <Button type="submit" form="detail-profile-form" disabled={updateMutation.isPending} data-testid="button-detail-save">
+              <Button
+                type="submit"
+                form="detail-profile-form"
+                disabled={updateMutation.isPending}
+                data-testid="button-detail-save"
+              >
                 {updateMutation.isPending ? "Saving..." : "Save Changes"}
               </Button>
             </SheetFooter>

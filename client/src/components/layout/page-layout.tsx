@@ -13,11 +13,7 @@ function SiteOrganizationJsonLd() {
 
   if (!globalSeo) return null;
 
-  return (
-    <JsonLd
-      schemas={[buildOrganizationLd(globalSeo), buildWebSiteLd(globalSeo)]}
-    />
-  );
+  return <JsonLd schemas={[buildOrganizationLd(globalSeo), buildWebSiteLd(globalSeo)]} />;
 }
 
 export function PageLayout({ children }: { children: React.ReactNode }) {

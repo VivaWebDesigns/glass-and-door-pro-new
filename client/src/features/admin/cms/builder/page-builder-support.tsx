@@ -59,7 +59,7 @@ import {
   Workflow,
 } from "lucide-react";
 import type { CmsSection } from "@shared/schema";
-import type {   BlockInstance } from "./block-registry";
+import type { BlockInstance } from "./block-registry";
 import { getBlockDef } from "./block-registry";
 
 const ICON_MAP: Record<string, ElementType> = {
@@ -104,7 +104,16 @@ const ICON_MAP: Record<string, ElementType> = {
   Users,
 };
 
-const SECTION_CATEGORIES = ["general", "hero", "cta", "testimonials", "faq", "features", "content", "team"];
+const SECTION_CATEGORIES = [
+  "general",
+  "hero",
+  "cta",
+  "testimonials",
+  "faq",
+  "features",
+  "content",
+  "team",
+];
 const SYSTEM_SECTION_NAME_PREFIX = "Starter - ";
 
 export function BlockIcon({ name, className }: { name: string; className?: string }) {
@@ -263,7 +272,9 @@ export function SectionsLibrary({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all" className="text-xs">All</SelectItem>
+            <SelectItem value="all" className="text-xs">
+              All
+            </SelectItem>
             {SECTION_CATEGORIES.map((value) => (
               <SelectItem key={value} value={value} className="text-xs capitalize">
                 {value}
@@ -274,13 +285,19 @@ export function SectionsLibrary({
       </div>
 
       {isLoading ? (
-        <div className="flex h-24 items-center justify-center text-sm text-muted-foreground">Loading...</div>
+        <div className="flex h-24 items-center justify-center text-sm text-muted-foreground">
+          Loading...
+        </div>
       ) : filteredSections.length === 0 ? (
         <div className="flex h-32 flex-col items-center justify-center gap-2 text-muted-foreground">
           <Blocks className="h-8 w-8 opacity-30" />
-          <p className="text-sm font-medium">{search ? "No sections match" : "No saved sections yet"}</p>
+          <p className="text-sm font-medium">
+            {search ? "No sections match" : "No saved sections yet"}
+          </p>
           <p className="text-xs">
-            {search ? "Try a different search" : "Save a block as a reusable section from the visual builder"}
+            {search
+              ? "Try a different search"
+              : "Save a block as a reusable section from the visual builder"}
           </p>
         </div>
       ) : (

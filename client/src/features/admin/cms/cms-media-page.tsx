@@ -1,5 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
-import { useQuery, useMutation, useQueryClient, type UseMutationResult } from "@tanstack/react-query";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  type UseMutationResult,
+} from "@tanstack/react-query";
 import { AdminSidebar } from "@/features/admin/admin-sidebar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -72,7 +77,11 @@ function buildMetadataForm(asset: CmsMediaLibraryAsset | null): MediaMetadataFor
   };
 }
 
-function DeleteMediaDialog({ deletingId, setDeletingId, deleteMutation }: {
+function DeleteMediaDialog({
+  deletingId,
+  setDeletingId,
+  deleteMutation,
+}: {
   deletingId: string | null;
   setDeletingId: React.Dispatch<React.SetStateAction<string | null>>;
   deleteMutation: UseMutationResult<void, Error, string, unknown>;
@@ -84,8 +93,8 @@ function DeleteMediaDialog({ deletingId, setDeletingId, deleteMutation }: {
           <AlertDialogTitle>Delete this media item?</AlertDialogTitle>
           <AlertDialogDescription>
             This will permanently remove the file from your media library and from Cloudflare R2.
-            Any pages, posts, events, or blocks that reference this URL will show a broken file
-            link or missing image.
+            Any pages, posts, events, or blocks that reference this URL will show a broken file link
+            or missing image.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -119,7 +128,12 @@ function MediaAssetActions({
   isPreparingCrop: boolean;
   isReplaceImagePending: boolean;
   copyUrl: (url: string) => void;
-  metadataMutation: UseMutationResult<Partial<CmsMediaLibraryAsset>, Error, { id: string; data: MediaMetadataForm; }, unknown>;
+  metadataMutation: UseMutationResult<
+    Partial<CmsMediaLibraryAsset>,
+    Error,
+    { id: string; data: MediaMetadataForm },
+    unknown
+  >;
   metadataForm: MediaMetadataForm;
   hasMetadataChanges: boolean;
   setDeletingId: React.Dispatch<React.SetStateAction<string | null>>;
@@ -163,9 +177,7 @@ function MediaAssetActions({
           type="button"
           size="sm"
           className="gap-1.5"
-          onClick={() =>
-            metadataMutation.mutate({ id: selectedAsset.id, data: metadataForm })
-          }
+          onClick={() => metadataMutation.mutate({ id: selectedAsset.id, data: metadataForm })}
           disabled={
             !hasMetadataChanges ||
             selectedAsset.isManaged === false ||
@@ -194,7 +206,11 @@ function MediaAssetActions({
   );
 }
 
-function MediaSeoMetadataFields({ metadataForm, updateMetadataField, selectedAsset }: {
+function MediaSeoMetadataFields({
+  metadataForm,
+  updateMetadataField,
+  selectedAsset,
+}: {
   metadataForm: MediaMetadataForm;
   updateMetadataField: (key: keyof MediaMetadataForm, value: string) => void;
   selectedAsset: CmsMediaLibraryAsset;
@@ -204,8 +220,8 @@ function MediaSeoMetadataFields({ metadataForm, updateMetadataField, selectedAss
       <div>
         <h3 className="text-sm font-semibold">SEO & Social Metadata</h3>
         <p className="text-xs text-muted-foreground mt-1">
-          Use these fields when an image needs its own editorial metadata for search
-          previews or social sharing workflows.
+          Use these fields when an image needs its own editorial metadata for search previews or
+          social sharing workflows.
         </p>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
@@ -260,7 +276,11 @@ function MediaSeoMetadataFields({ metadataForm, updateMetadataField, selectedAss
   );
 }
 
-function MediaFileDetailsFields({ metadataForm, updateMetadataField, selectedAsset }: {
+function MediaFileDetailsFields({
+  metadataForm,
+  updateMetadataField,
+  selectedAsset,
+}: {
   metadataForm: MediaMetadataForm;
   updateMetadataField: (key: keyof MediaMetadataForm, value: string) => void;
   selectedAsset: CmsMediaLibraryAsset;
@@ -331,9 +351,7 @@ function MediaFileDetailsFields({ metadataForm, updateMetadataField, selectedAss
   );
 }
 
-function MediaUsageSummary({ selectedAsset }: {
-  selectedAsset: CmsMediaLibraryAsset;
-}) {
+function MediaUsageSummary({ selectedAsset }: { selectedAsset: CmsMediaLibraryAsset }) {
   return (
     <div className="rounded-xl border p-4 space-y-3 bg-muted/10">
       <div className="flex flex-wrap items-center gap-2">
@@ -369,25 +387,24 @@ function MediaUsageSummary({ selectedAsset }: {
       </div>
       {selectedAsset.usageRefs.length > 0 ? (
         <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
-          {selectedAsset.usageRefs.map(withContentKeys((reference, _index, itemKey) => (
-            <div
-              key={itemKey}
-              className="rounded-lg border bg-background px-3 py-2 text-sm"
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="font-medium">{reference.entityName}</span>
-                <span className="text-xs text-muted-foreground">{reference.field}</span>
-                <span
-                  className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${reference.isLive ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}
-                >
-                  {reference.statusLabel}
-                </span>
+          {selectedAsset.usageRefs.map(
+            withContentKeys((reference, _index, itemKey) => (
+              <div key={itemKey} className="rounded-lg border bg-background px-3 py-2 text-sm">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-medium">{reference.entityName}</span>
+                  <span className="text-xs text-muted-foreground">{reference.field}</span>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${reference.isLive ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}
+                  >
+                    {reference.statusLabel}
+                  </span>
+                </div>
+                {reference.path && (
+                  <p className="mt-1 text-xs text-muted-foreground">{reference.path}</p>
+                )}
               </div>
-              {reference.path && (
-                <p className="mt-1 text-xs text-muted-foreground">{reference.path}</p>
-              )}
-            </div>
-          )))}
+            )),
+          )}
         </div>
       ) : (
         <p className="text-sm text-muted-foreground">
@@ -398,9 +415,7 @@ function MediaUsageSummary({ selectedAsset }: {
   );
 }
 
-function MediaAssetPreview({ selectedAsset }: {
-  selectedAsset: CmsMediaLibraryAsset;
-}) {
+function MediaAssetPreview({ selectedAsset }: { selectedAsset: CmsMediaLibraryAsset }) {
   return (
     <>
       {selectedAsset.assetKind === "image" ? (
@@ -426,7 +441,10 @@ function MediaAssetPreview({ selectedAsset }: {
   );
 }
 
-function MediaGridItem({ asset, setSelectedAsset }: {
+function MediaGridItem({
+  asset,
+  setSelectedAsset,
+}: {
   asset: CmsMediaLibraryAsset;
   setSelectedAsset: React.Dispatch<React.SetStateAction<CmsMediaLibraryAsset | null>>;
 }) {
@@ -553,8 +571,27 @@ function MediaFilters({
   setUsageFilter: React.Dispatch<React.SetStateAction<"all" | "in-use" | "draft-only" | "unused">>;
   typeFilter: "all" | "images" | "documents";
   setTypeFilter: React.Dispatch<React.SetStateAction<"all" | "images" | "documents">>;
-  sortBy: "newest" | "oldest" | "name-asc" | "name-desc" | "largest" | "smallest" | "most-used" | "least-used";
-  setSortBy: React.Dispatch<React.SetStateAction<"newest" | "oldest" | "name-asc" | "name-desc" | "largest" | "smallest" | "most-used" | "least-used">>;
+  sortBy:
+    | "newest"
+    | "oldest"
+    | "name-asc"
+    | "name-desc"
+    | "largest"
+    | "smallest"
+    | "most-used"
+    | "least-used";
+  setSortBy: React.Dispatch<
+    React.SetStateAction<
+      | "newest"
+      | "oldest"
+      | "name-asc"
+      | "name-desc"
+      | "largest"
+      | "smallest"
+      | "most-used"
+      | "least-used"
+    >
+  >;
 }) {
   return (
     <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_180px_180px_180px]">
@@ -620,12 +657,20 @@ function formatBytes(bytes: number) {
 
 type MediaUsageFilter = "all" | "in-use" | "draft-only" | "unused";
 type MediaTypeFilter = "all" | "images" | "documents";
-type MediaSort = "newest" | "oldest" | "name-asc" | "name-desc" | "largest" | "smallest" | "most-used" | "least-used";
+type MediaSort =
+  | "newest"
+  | "oldest"
+  | "name-asc"
+  | "name-desc"
+  | "largest"
+  | "smallest"
+  | "most-used"
+  | "least-used";
 
 function mediaMatchesSearch(asset: CmsMediaLibraryAsset, query: string) {
   if (!query) return true;
-  return [asset.originalName, asset.title, asset.alt, asset.caption, asset.description].some((value) =>
-    (value ?? "").toLowerCase().includes(query),
+  return [asset.originalName, asset.title, asset.alt, asset.caption, asset.description].some(
+    (value) => (value ?? "").toLowerCase().includes(query),
   );
 }
 
@@ -652,7 +697,10 @@ function createdTime(asset: CmsMediaLibraryAsset) {
   return new Date(asset.createdAt ?? 0).getTime();
 }
 
-const MEDIA_SORTERS: Record<MediaSort, (a: CmsMediaLibraryAsset, b: CmsMediaLibraryAsset) => number> = {
+const MEDIA_SORTERS: Record<
+  MediaSort,
+  (a: CmsMediaLibraryAsset, b: CmsMediaLibraryAsset) => number
+> = {
   newest: (a, b) => createdTime(b) - createdTime(a),
   oldest: (a, b) => createdTime(a) - createdTime(b),
   "name-asc": (a, b) => a.originalName.localeCompare(b.originalName),
@@ -665,7 +713,12 @@ const MEDIA_SORTERS: Record<MediaSort, (a: CmsMediaLibraryAsset, b: CmsMediaLibr
 
 function filterAndSortMediaAssets(
   assets: CmsMediaLibraryAsset[],
-  filters: { search: string; usageFilter: MediaUsageFilter; typeFilter: MediaTypeFilter; sortBy: MediaSort },
+  filters: {
+    search: string;
+    usageFilter: MediaUsageFilter;
+    typeFilter: MediaTypeFilter;
+    sortBy: MediaSort;
+  },
 ) {
   const query = filters.search.toLowerCase();
   return assets
@@ -707,9 +760,11 @@ function MediaLibraryHeader({
           Media Library
         </h1>
         <p className="text-muted-foreground mt-1">
-          {plural(summary.total, "media item")} · {summary.inUse} live · {summary.draftOnly} draft-only ·{" "}
-          {summary.unused} unused · {plural(summary.documents, "document")}
-          {summary.discovered > 0 ? ` · ${plural(summary.discovered, "discovered site image")}` : ""}
+          {plural(summary.total, "media item")} · {summary.inUse} live · {summary.draftOnly}{" "}
+          draft-only · {summary.unused} unused · {plural(summary.documents, "document")}
+          {summary.discovered > 0
+            ? ` · ${plural(summary.discovered, "discovered site image")}`
+            : ""}
         </p>
       </div>
       <Button onClick={onUpload} className="gap-2" data-testid="button-upload-media">
@@ -827,10 +882,14 @@ export default function CmsMediaPage() {
   >("newest");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedAsset, setSelectedAsset] = useState<CmsMediaLibraryAsset | null>(null);
-  const [metadataForm, setMetadataForm] = useState<MediaMetadataForm>(() => buildMetadataForm(null));
+  const [metadataForm, setMetadataForm] = useState<MediaMetadataForm>(() =>
+    buildMetadataForm(null),
+  );
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [cropFileName, setCropFileName] = useState("image.webp");
   const [isPreparingCrop, setIsPreparingCrop] = useState(false);
+  const cropRequest = useRef<AbortController | null>(null);
+  useEffect(() => () => cropRequest.current?.abort(), []);
 
   const { data: assets = [], isLoading } = useQuery<CmsMediaLibraryAsset[]>({
     queryKey: ["/api/admin/cms/media"],
@@ -877,15 +936,20 @@ export default function CmsMediaPage() {
 
   const prepareCropper = async () => {
     if (!selectedAsset) return;
+    cropRequest.current?.abort();
+    const controller = new AbortController();
+    cropRequest.current = controller;
     setIsPreparingCrop(true);
     try {
       const response = await fetch(`/api/admin/cms/media/${selectedAsset.id}/source`, {
         credentials: "include",
+        signal: controller.signal,
       });
       if (!response.ok) {
         throw new Error("Could not load image for cropping");
       }
       const blob = await response.blob();
+      if (controller.signal.aborted) return;
       if (cropSrc?.startsWith("blob:")) {
         URL.revokeObjectURL(cropSrc);
       }
@@ -893,6 +957,7 @@ export default function CmsMediaPage() {
       const nextCropSrc = URL.createObjectURL(blob);
       setCropSrc(nextCropSrc);
     } catch (error) {
+      if (controller.signal.aborted) return;
       toast({
         title: "Unable to open crop tool",
         description: error instanceof Error ? error.message : "Please try again.",
@@ -1007,9 +1072,17 @@ export default function CmsMediaPage() {
 
               <MediaUsageSummary selectedAsset={selectedAsset} />
 
-              <MediaFileDetailsFields metadataForm={metadataForm} updateMetadataField={updateMetadataField} selectedAsset={selectedAsset} />
+              <MediaFileDetailsFields
+                metadataForm={metadataForm}
+                updateMetadataField={updateMetadataField}
+                selectedAsset={selectedAsset}
+              />
 
-              <MediaSeoMetadataFields metadataForm={metadataForm} updateMetadataField={updateMetadataField} selectedAsset={selectedAsset} />
+              <MediaSeoMetadataFields
+                metadataForm={metadataForm}
+                updateMetadataField={updateMetadataField}
+                selectedAsset={selectedAsset}
+              />
 
               <MediaAssetActions
                 prepareCropper={prepareCropper}
@@ -1047,7 +1120,11 @@ export default function CmsMediaPage() {
         }}
       />
 
-      <DeleteMediaDialog deletingId={deletingId} setDeletingId={setDeletingId} deleteMutation={deleteMutation} />
+      <DeleteMediaDialog
+        deletingId={deletingId}
+        setDeletingId={setDeletingId}
+        deleteMutation={deleteMutation}
+      />
     </AdminSidebar>
   );
 }

@@ -1,3 +1,4 @@
+import { errorMessage, errorStatus } from "@shared/errors";
 import express, { type Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
 import { registerRoutes } from "./routes";
@@ -95,10 +96,7 @@ app.use(originCheck);
 
 app.use("/uploads", express.static(getLocalUploadsRoot()));
 app.get(/^\/uploads\/cms\/.+\.(?:avif|gif|jpe?g|png|svg|webp)$/i, (_req, res) => {
-  res
-    .status(200)
-    .type("image/svg+xml")
-    .set("Cache-Control", "no-cache")
+  res.status(200).type("image/svg+xml").set("Cache-Control", "no-cache")
     .send(`<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
   <title id="title">CMS media unavailable</title>
@@ -136,21 +134,24 @@ const REDACTED_KEYS = [
 ];
 const MAX_LOG_BODY_LENGTH = 500;
 
-function redactSensitive(obj: any): any {
+function redactSensitive(obj: unknown): unknown {
   if (!obj || typeof obj !== "object") return obj;
   if (Array.isArray(obj)) return obj.map((item) => redactSensitive(item));
-  const redacted: Record<string, any> = {};
+  const redacted: Record<string, unknown> = {};
   for (const key of Object.keys(obj)) {
     if (REDACTED_KEYS.some((rk) => key.toLowerCase().includes(rk.toLowerCase()))) {
       redacted[key] = "[REDACTED]";
     } else if (key === "bio" || key === "content" || key === "body" || key === "description") {
-      const val = obj[key];
+      const val = (obj as Record<string, unknown>)[key];
       redacted[key] =
         typeof val === "string" && val.length > 100 ? val.substring(0, 100) + "..." : val;
-    } else if (typeof obj[key] === "object" && obj[key] !== null) {
-      redacted[key] = redactSensitive(obj[key]);
+    } else if (
+      typeof (obj as Record<string, unknown>)[key] === "object" &&
+      (obj as Record<string, unknown>)[key] !== null
+    ) {
+      redacted[key] = redactSensitive((obj as Record<string, unknown>)[key]);
     } else {
-      redacted[key] = obj[key];
+      redacted[key] = (obj as Record<string, unknown>)[key];
     }
   }
   return redacted;
@@ -166,7 +167,7 @@ function truncateBody(body: string): string {
 app.use((req, res, next) => {
   const start = Date.now();
   const reqPath = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
+  let capturedJsonResponse: Record<string, unknown> | undefined = undefined;
 
   const originalResJson = res.json;
   res.json = function (bodyJson, ...args) {
@@ -209,8 +210,8 @@ app.use((req, res, next) => {
 
   await registerRoutes(httpServer, app);
 
-  app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
+  app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+    const status = errorStatus(err);
 
     logger.app.error(`${req.method} ${req.path} ${status}`, err, {
       requestId: req.requestId,
@@ -224,10 +225,7 @@ app.use((req, res, next) => {
     }
 
     const isProduction = process.env.NODE_ENV === "production";
-    const message =
-      status >= 500 && isProduction
-        ? "Internal Server Error"
-        : err.message || "Internal Server Error";
+    const message = status >= 500 && isProduction ? "Internal Server Error" : errorMessage(err);
 
     return res.status(status).json({ message });
   });

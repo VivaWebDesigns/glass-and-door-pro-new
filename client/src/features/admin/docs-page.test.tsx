@@ -57,7 +57,11 @@ vi.mock("@/components/shared/editor-lock-banner", () => ({
     React.createElement("div", { "data-testid": "editor-lock-banner" }, title),
   EditorLockNotice: ({ editorLock }: { editorLock: { summary: { title: string } | null } }) =>
     editorLock.summary
-      ? React.createElement("div", { "data-testid": "editor-lock-banner" }, editorLock.summary.title)
+      ? React.createElement(
+          "div",
+          { "data-testid": "editor-lock-banner" },
+          editorLock.summary.title,
+        )
       : null,
 }));
 
@@ -116,8 +120,12 @@ describe("DocsPage", () => {
         unobserve() {}
       },
     );
-    (globalThis as typeof globalThis & { React?: typeof React; IS_REACT_ACT_ENVIRONMENT?: boolean }).React = React;
-    (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+    (
+      globalThis as typeof globalThis & { React?: typeof React; IS_REACT_ACT_ENVIRONMENT?: boolean }
+    ).React = React;
+    (
+      globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
+    ).IS_REACT_ACT_ENVIRONMENT = true;
     container = document.createElement("div");
     document.body.appendChild(container);
   });
@@ -139,7 +147,9 @@ describe("DocsPage", () => {
       root!.render(React.createElement(DocsPage));
     });
 
-    const editButton = document.body.querySelector('[data-testid="button-edit-doc"]') as HTMLButtonElement | null;
+    const editButton = document.body.querySelector(
+      '[data-testid="button-edit-doc"]',
+    ) as HTMLButtonElement | null;
     expect(editButton).not.toBeNull();
 
     await act(async () => {
@@ -172,14 +182,18 @@ describe("DocsPage", () => {
       root!.render(React.createElement(DocsPage));
     });
 
-    const editButton = document.body.querySelector('[data-testid="button-edit-doc"]') as HTMLButtonElement | null;
+    const editButton = document.body.querySelector(
+      '[data-testid="button-edit-doc"]',
+    ) as HTMLButtonElement | null;
     expect(editButton).not.toBeNull();
 
     await act(async () => {
       editButton?.click();
     });
 
-    const saveButton = document.body.querySelector('[data-testid="button-save-doc"]') as HTMLButtonElement | null;
+    const saveButton = document.body.querySelector(
+      '[data-testid="button-save-doc"]',
+    ) as HTMLButtonElement | null;
     expect(saveButton).not.toBeNull();
 
     await act(async () => {
@@ -192,7 +206,7 @@ describe("DocsPage", () => {
         id: "doc-1",
         title: "Editor Workflow",
         slug: "editor-workflow",
-      })
+      }),
     );
   });
 });

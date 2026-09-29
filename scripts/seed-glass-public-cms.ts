@@ -13,6 +13,7 @@ import { GLASS_PRIVACY_POLICY_HTML } from "../shared/glass-privacy-policy";
 import { glassGoogleReviewDate } from "../shared/glass-review-dates";
 import { GLASS_NEW_GOOGLE_REVIEWS } from "../shared/glass-new-reviews";
 import { isGlassLegalNoindexSlug } from "../shared/glass-seo";
+import { updateGlassLocationSearchContent } from "../shared/glass-location-search";
 import {
   GLASS_COMMERCIAL_LINKED_SERVICE_AREA_CONTENT,
   GLASS_LINKED_SERVICE_AREA_CONTENT,
@@ -3077,17 +3078,17 @@ const glassCityPages: GlassCityPageSeed[] = [
     title: "Monroe, NC",
     slug: "areas-served-monroe-nc",
     path: "/service-areas/monroe",
-    seoTitle: "Glass & Door Services in Monroe, NC | Glass & Door Pro",
+    seoTitle: "Glass Shower Door Installation in Monroe, NC",
     seoDescription:
-      "Charlotte-based, owner-operated glass and door services for Monroe, NC. Frameless showers, windows, doors, repairs, and commercial glass. Call (704) 771-6111.",
+      "Custom glass shower door installation in Monroe, NC. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.",
     seoKeywords:
       "glass services Monroe NC, frameless shower doors Monroe NC, window installation Monroe NC, door installation Monroe NC, window repair Monroe NC",
     ogImageUrl: "/images/glass-door-pro/city-monroe-hero.webp",
     content: cityPageContent({
       hero: {
-        heading: "Glass & Door Services in Monroe, NC",
+        heading: "Glass Shower Door Installer in Monroe, NC",
         subheading:
-          "Frameless shower doors, window and door installation, window repair, and commercial glass — installed personally by Doug, your Charlotte-based owner-operator with 15+ years of experience. Same-week appointments. Saturday hours available.",
+          "Custom glass shower door installation in Monroe, NC. Doug personally measures and installs every door. 15+ years of experience and Saturday appointments available.",
         imageUrl: "/images/glass-door-pro/city-monroe-hero.webp",
         imagePositionY: 45,
       },
@@ -3211,17 +3212,17 @@ const glassCityPages: GlassCityPageSeed[] = [
     title: "Charlotte, NC",
     slug: "areas-served-charlotte-nc",
     path: "/service-areas/charlotte",
-    seoTitle: "Glass & Door Services in Charlotte, NC | Glass & Door Pro",
+    seoTitle: "Glass Shower Door Installation in Charlotte, NC",
     seoDescription:
-      "Charlotte-based, owner-operated glass and door company serving Charlotte, NC. Frameless showers, windows, doors, repairs, and commercial glass. Call (704) 771-6111.",
+      "Custom glass shower door installation in Charlotte, NC. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.",
     seoKeywords:
       "glass services Charlotte NC, frameless shower doors Charlotte NC, window installation Charlotte NC, door installation Charlotte NC, window repair Charlotte NC",
     ogImageUrl: "/images/glass-door-pro/city-charlotte-hero.webp",
     content: cityPageContent({
       hero: {
-        heading: "Glass & Door Services in Charlotte, NC",
+        heading: "Glass Shower Door Installer in Charlotte, NC",
         subheading:
-          "Charlotte-based, owner-operated frameless shower doors, window and door installation, window repair, and commercial glass. 15+ years of experience. Saturday appointments available.",
+          "Custom glass shower door installation in Charlotte, NC. Doug personally measures and installs every door. 15+ years of experience and Saturday appointments available.",
         imageUrl: "/images/glass-door-pro/city-charlotte-hero.webp",
         imagePositionY: 45,
       },
@@ -3349,17 +3350,17 @@ const glassCityPages: GlassCityPageSeed[] = [
     title: "Indian Trail, NC",
     slug: "service-areas-indian-trail",
     path: "/service-areas/indian-trail",
-    seoTitle: "Glass and Door Services in Indian Trail, NC | Glass and Door Pro",
+    seoTitle: "Glass Shower Door Installation in Indian Trail, NC",
     seoDescription:
-      "Frameless showers, window installation, window repair, door installation, and commercial glass services in Indian Trail, NC. Owner-operated, honest pricing, Saturday appointments. Call (704) 771-6111.",
+      "Custom glass shower door installation in Indian Trail, NC. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.",
     seoKeywords:
       "glass services Indian Trail NC, frameless shower doors Indian Trail NC, window installation Indian Trail NC, door installation Indian Trail NC, window repair Indian Trail NC",
     ogImageUrl: "/images/glass-door-pro/city-indian-trail-hero.webp",
     content: cityPageContent({
       hero: {
-        heading: "Glass & Door Services in Indian Trail, NC",
+        heading: "Glass Shower Door Installer in Indian Trail, NC",
         subheading:
-          "Frameless shower doors, window installation, door installation, window repair, and commercial glass services for Indian Trail homeowners and businesses. Owner-operated with 15+ years of experience. Charlotte-based, locally serving Union County. Saturday appointments available.",
+          "Custom glass shower door installation in Indian Trail, NC. Doug personally measures and installs every door. 15+ years of experience and Saturday appointments available.",
         imageUrl: "/images/glass-door-pro/city-indian-trail-hero.webp",
         imagePositionY: 45,
       },
@@ -3482,17 +3483,17 @@ const glassCityPages: GlassCityPageSeed[] = [
     title: "Stallings, NC",
     slug: "service-areas-stallings",
     path: "/service-areas/stallings",
-    seoTitle: "Glass and Door Services in Stallings, NC | Glass and Door Pro",
+    seoTitle: "Glass Shower Door Installation in Stallings, NC",
     seoDescription:
-      "Frameless showers, window installation, window repair, and door installation in Stallings, NC. Charlotte-based, owner-operated, Saturday appointments available. Call (704) 771-6111.",
+      "Custom glass shower door installation in Stallings, NC. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.",
     seoKeywords:
       "glass services Stallings NC, frameless shower doors Stallings NC, window installation Stallings NC, door installation Stallings NC, window repair Stallings NC",
     ogImageUrl: "/images/glass-door-pro/city-stallings-hero.webp",
     content: cityPageContent({
       hero: {
-        heading: "Glass & Door Services in Stallings, NC",
+        heading: "Glass Shower Door Installer in Stallings, NC",
         subheading:
-          "Frameless shower enclosures, replacement windows, door installation, and window repair for Stallings homeowners. Charlotte-based and owner-operated — Doug handles every project personally. Saturday appointments available.",
+          "Custom glass shower door installation in Stallings, NC. Doug personally measures and installs every door. 15+ years of experience and Saturday appointments available.",
         imageUrl: "/images/glass-door-pro/city-stallings-hero.webp",
         imagePositionY: 45,
       },
@@ -3613,17 +3614,17 @@ const glassCityPages: GlassCityPageSeed[] = [
     title: "Wesley Chapel, NC",
     slug: "service-areas-wesley-chapel",
     path: "/service-areas/wesley-chapel",
-    seoTitle: "Glass and Door Services in Wesley Chapel, NC | Glass and Door Pro",
+    seoTitle: "Glass Shower Door Installation in Wesley Chapel, NC",
     seoDescription:
-      "Frameless shower doors, window installation, window repair, and door installation in Wesley Chapel, NC. Charlotte-based, owner-operated, Saturday appointments. Call (704) 771-6111.",
+      "Custom glass shower door installation in Wesley Chapel, NC. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.",
     seoKeywords:
       "glass services Wesley Chapel NC, frameless shower doors Wesley Chapel NC, window installation Wesley Chapel NC, door installation Wesley Chapel NC, window repair Wesley Chapel NC",
     ogImageUrl: "/images/glass-door-pro/city-wesley-chapel-hero.webp",
     content: cityPageContent({
       hero: {
-        heading: "Glass & Door Services in Wesley Chapel, NC",
+        heading: "Glass Shower Door Installer in Wesley Chapel, NC",
         subheading:
-          "Frameless shower enclosures, window replacement, door installation, and window repair for Wesley Chapel homeowners. Charlotte-based and owner-operated — every project handled personally by Doug Adams. Saturday appointments available.",
+          "Custom glass shower door installation in Wesley Chapel, NC. Doug personally measures and installs every door. 15+ years of experience and Saturday appointments available.",
         imageUrl: "/images/glass-door-pro/city-wesley-chapel-hero.webp",
         imagePositionY: 45,
       },
@@ -3747,17 +3748,17 @@ const glassCityPages: GlassCityPageSeed[] = [
     title: "Waxhaw, NC",
     slug: "service-areas-waxhaw",
     path: "/service-areas/waxhaw",
-    seoTitle: "Glass and Door Services in Waxhaw, NC | Glass and Door Pro",
+    seoTitle: "Glass Shower Door Installation in Waxhaw, NC",
     seoDescription:
-      "Frameless shower doors, window installation, window repair, and door installation in Waxhaw, NC. Charlotte-based, owner-operated, honest pricing. Saturday appointments available. Call (704) 771-6111.",
+      "Custom glass shower door installation in Waxhaw, NC. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.",
     seoKeywords:
       "glass services Waxhaw NC, frameless shower doors Waxhaw NC, window installation Waxhaw NC, door installation Waxhaw NC, window repair Waxhaw NC",
     ogImageUrl: "/images/glass-door-pro/city-waxhaw-hero.webp",
     content: cityPageContent({
       hero: {
-        heading: "Glass & Door Services in Waxhaw, NC",
+        heading: "Glass Shower Door Installer in Waxhaw, NC",
         subheading:
-          "Custom frameless shower enclosures, window replacement, door installation, and window repair for Waxhaw homeowners. Charlotte-based, owner-operated, and personally handled by Doug Adams on every project. Saturday appointments available.",
+          "Custom glass shower door installation in Waxhaw, NC. Doug personally measures and installs every door. 15+ years of experience and Saturday appointments available.",
         imageUrl: "/images/glass-door-pro/city-waxhaw-hero.webp",
         imagePositionY: 45,
       },
@@ -3880,17 +3881,17 @@ const glassCityPages: GlassCityPageSeed[] = [
     title: "Matthews, NC",
     slug: "service-areas-matthews",
     path: "/service-areas/matthews",
-    seoTitle: "Glass and Door Services in Matthews, NC | Glass and Door Pro",
+    seoTitle: "Glass Shower Door Installation in Matthews, NC",
     seoDescription:
-      "Frameless shower doors, window installation, window repair, and door installation in Matthews, NC. Owner-operated with 15+ years of experience. Saturday appointments available. Call (704) 771-6111.",
+      "Custom glass shower door installation in Matthews, NC. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.",
     seoKeywords:
       "glass services Matthews NC, frameless shower doors Matthews NC, window installation Matthews NC, door installation Matthews NC, window repair Matthews NC",
     ogImageUrl: "/images/glass-door-pro/city-matthews-hero.webp",
     content: cityPageContent({
       hero: {
-        heading: "Glass & Door Services in Matthews, NC",
+        heading: "Glass Shower Door Installer in Matthews, NC",
         subheading:
-          "Frameless shower enclosures, window replacement, door installation, and window repair for Matthews homeowners. Owner-operated with 15+ years of experience serving the greater Charlotte area. Saturday appointments available.",
+          "Custom glass shower door installation in Matthews, NC. Doug personally measures and installs every door. 15+ years of experience and Saturday appointments available.",
         imageUrl: "/images/glass-door-pro/city-matthews-hero.webp",
         imagePositionY: 45,
       },
@@ -4011,17 +4012,17 @@ const glassCityPages: GlassCityPageSeed[] = [
     title: "Weddington, NC",
     slug: "service-areas-weddington",
     path: "/service-areas/weddington",
-    seoTitle: "Glass and Door Services in Weddington, NC | Glass and Door Pro",
+    seoTitle: "Glass Shower Door Installation in Weddington, NC",
     seoDescription:
-      "Custom frameless shower doors, window installation, door installation, and window repair in Weddington, NC. Owner-operated, detail-oriented, Saturday appointments available. Call (704) 771-6111.",
+      "Custom glass shower door installation in Weddington, NC. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.",
     seoKeywords:
       "glass services Weddington NC, frameless shower doors Weddington NC, window installation Weddington NC, door installation Weddington NC, window repair Weddington NC",
     ogImageUrl: "/images/glass-door-pro/city-weddington-hero.webp",
     content: cityPageContent({
       hero: {
-        heading: "Glass & Door Services in Weddington, NC",
+        heading: "Glass Shower Door Installer in Weddington, NC",
         subheading:
-          "Custom frameless shower enclosures, window replacement, door installation, and window repair for Weddington homeowners. Owner-operated, detail-oriented, and personally handled by Doug Adams. Saturday appointments available.",
+          "Custom glass shower door installation in Weddington, NC. Doug personally measures and installs every door. 15+ years of experience and Saturday appointments available.",
         imageUrl: "/images/glass-door-pro/city-weddington-hero.webp",
         imagePositionY: 45,
       },
@@ -4143,17 +4144,17 @@ const glassCityPages: GlassCityPageSeed[] = [
     title: "Indian Land, SC",
     slug: "service-areas-indian-land",
     path: "/service-areas/indian-land",
-    seoTitle: "Glass and Door Services in Indian Land, SC | Glass and Door Pro",
+    seoTitle: "Glass Shower Door Installation in Indian Land, SC",
     seoDescription:
-      "Frameless shower doors, window installation, window repair, and door installation in Indian Land, SC. Charlotte-based, owner-operated, Saturday appointments available. Call (704) 771-6111.",
+      "Custom glass shower door installation in Indian Land, SC. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.",
     seoKeywords:
       "glass services Indian Land SC, frameless shower doors Indian Land SC, window installation Indian Land SC, door installation Indian Land SC, window repair Indian Land SC",
     ogImageUrl: "/images/glass-door-pro/city-indian-land-hero.webp",
     content: cityPageContent({
       hero: {
-        heading: "Glass & Door Services in Indian Land, SC",
+        heading: "Glass Shower Door Installer in Indian Land, SC",
         subheading:
-          "Frameless shower enclosures, window replacement, door installation, and window repair for Indian Land homeowners. Charlotte-based and owner-operated — Doug handles every project personally. Saturday appointments available.",
+          "Custom glass shower door installation in Indian Land, SC. Doug personally measures and installs every door. 15+ years of experience and Saturday appointments available.",
         imageUrl: "/images/glass-door-pro/city-indian-land-hero.webp",
         imagePositionY: 45,
       },
@@ -4277,17 +4278,17 @@ const glassCityPages: GlassCityPageSeed[] = [
     title: "Fort Mill, SC",
     slug: "service-areas-fort-mill",
     path: "/service-areas/fort-mill",
-    seoTitle: "Glass and Door Services in Fort Mill, SC | Glass and Door Pro",
+    seoTitle: "Glass Shower Door Installation in Fort Mill, SC",
     seoDescription:
-      "Frameless shower doors, window installation, window repair, and door installation in Fort Mill, SC. Charlotte-based, owner-operated, Saturday appointments. Call (704) 771-6111.",
+      "Custom glass shower door installation in Fort Mill, SC. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.",
     seoKeywords:
       "glass services Fort Mill SC, frameless shower doors Fort Mill SC, window installation Fort Mill SC, door installation Fort Mill SC, window repair Fort Mill SC",
     ogImageUrl: "/images/glass-door-pro/city-fort-mill-hero.webp",
     content: cityPageContent({
       hero: {
-        heading: "Glass & Door Services in Fort Mill, SC",
+        heading: "Glass Shower Door Installer in Fort Mill, SC",
         subheading:
-          "Frameless shower enclosures, window replacement, door installation, and window repair for Fort Mill homeowners. Charlotte-based, owner-operated, and personally handled by Doug Adams on every project. Saturday appointments available.",
+          "Custom glass shower door installation in Fort Mill, SC. Doug personally measures and installs every door. 15+ years of experience and Saturday appointments available.",
         imageUrl: "/images/glass-door-pro/city-fort-mill-hero.webp",
         imagePositionY: 45,
       },
@@ -4411,17 +4412,17 @@ const glassCityPages: GlassCityPageSeed[] = [
     title: "Pineville, NC",
     slug: "service-areas-pineville",
     path: "/service-areas/pineville",
-    seoTitle: "Glass and Door Services in Pineville, NC | Glass and Door Pro",
+    seoTitle: "Glass Shower Door Installation in Pineville, NC",
     seoDescription:
-      "Frameless shower doors, window installation, window repair, and door installation in Pineville, NC. Owner-operated, Charlotte-based, Saturday appointments available. Call (704) 771-6111.",
+      "Custom glass shower door installation in Pineville, NC. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.",
     seoKeywords:
       "glass services Pineville NC, frameless shower doors Pineville NC, window installation Pineville NC, door installation Pineville NC, window repair Pineville NC",
     ogImageUrl: "/images/glass-door-pro/city-pineville-hero.webp",
     content: cityPageContent({
       hero: {
-        heading: "Glass & Door Services in Pineville, NC",
+        heading: "Glass Shower Door Installer in Pineville, NC",
         subheading:
-          "Frameless shower enclosures, replacement windows, door installation, and window repair for Pineville homeowners. Owner-operated with 15+ years of experience. Serving the south Charlotte area with same-week scheduling and Saturday appointments.",
+          "Custom glass shower door installation in Pineville, NC. Doug personally measures and installs every door. 15+ years of experience and Saturday appointments available.",
         imageUrl: "/images/glass-door-pro/city-pineville-hero.webp",
         imagePositionY: 45,
       },
@@ -5134,7 +5135,7 @@ export async function seedGlassPublicCms() {
       pageType: "area",
       status: "published",
       template: "full-width",
-      content: cityPage.content,
+      content: updateGlassLocationSearchContent(cityPage.slug, cityPage.content),
       seoTitle: cityPage.seoTitle,
       seoDescription: cityPage.seoDescription,
       seoKeywords: cityPage.seoKeywords,

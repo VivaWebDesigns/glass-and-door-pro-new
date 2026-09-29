@@ -37,13 +37,11 @@ describe("mergeNewGalleryImages", () => {
   it("adds the new batch, updates category counts, and remains idempotent", () => {
     const first = mergeNewGalleryImages(galleryFixture());
     for (const block of first.content.blocks.filter((item) => item.type === "image-grid")) {
-      block.props.images = (block.props.images as Array<Record<string, unknown>>).map(
-        (image) => ({
-          alt: image.alt,
-          url: image.url,
-          caption: image.caption,
-        }),
-      );
+      block.props.images = (block.props.images as Array<Record<string, unknown>>).map((image) => ({
+        alt: image.alt,
+        url: image.url,
+        caption: image.caption,
+      }));
     }
     const second = mergeNewGalleryImages(first.content);
 
@@ -152,9 +150,9 @@ describe("mergeNewGalleryImages", () => {
     const doorUrls = (updatedDoorBlock?.props.images as Array<{ url: string }>).map(
       (image) => image.url,
     );
-    const commercialUrls = (
-      updatedCommercialBlock?.props.images as Array<{ url: string }>
-    ).map((image) => image.url);
+    const commercialUrls = (updatedCommercialBlock?.props.images as Array<{ url: string }>).map(
+      (image) => image.url,
+    );
 
     expect(merged.movedImages).toBe(1);
     expect(doorUrls).not.toContain("/images/glass-door-pro/gallery/doors/02.webp");

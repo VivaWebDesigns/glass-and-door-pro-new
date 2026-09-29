@@ -12,9 +12,20 @@ export const BLOCK_CATEGORY_LABELS: Record<BlockCategory, string> = {
   dynamic: "Dynamic / Interactive",
 };
 
-const BLOCK_CATEGORY_ORDER: BlockCategory[] = ["hero", "layout", "content", "media", "social-proof", "conversion", "data", "dynamic"];
+const BLOCK_CATEGORY_ORDER: BlockCategory[] = [
+  "hero",
+  "layout",
+  "content",
+  "media",
+  "social-proof",
+  "conversion",
+  "data",
+  "dynamic",
+];
 
-export function groupBlocksByCategory(blocks: BlockDef[]): { category: BlockCategory; label: string; items: BlockDef[] }[] {
+export function groupBlocksByCategory(
+  blocks: BlockDef[],
+): { category: BlockCategory; label: string; items: BlockDef[] }[] {
   const grouped = new Map<BlockCategory, BlockDef[]>();
   for (const block of blocks) {
     const category = block.category;
@@ -22,13 +33,11 @@ export function groupBlocksByCategory(blocks: BlockDef[]): { category: BlockCate
     grouped.get(category)!.push(block);
   }
 
-  return BLOCK_CATEGORY_ORDER
-    .filter((category) => grouped.has(category))
-    .map((category) => ({
-      category,
-      label: BLOCK_CATEGORY_LABELS[category],
-      items: grouped.get(category)!,
-    }));
+  return BLOCK_CATEGORY_ORDER.filter((category) => grouped.has(category)).map((category) => ({
+    category,
+    label: BLOCK_CATEGORY_LABELS[category],
+    items: grouped.get(category)!,
+  }));
 }
 
 function cloneProps<T>(value: T): T {
@@ -51,7 +60,9 @@ export function getBlockSummary(block: BlockInstance) {
     block.props.badge,
     block.props.ctaText,
   ];
-  const summary = candidates.find((candidate) => typeof candidate === "string" && candidate.trim().length > 0);
+  const summary = candidates.find(
+    (candidate) => typeof candidate === "string" && candidate.trim().length > 0,
+  );
   return typeof summary === "string" ? summary : "";
 }
 
@@ -63,7 +74,9 @@ export function insertBlocksAt(blocks: BlockInstance[], index: number, inserted:
 
 export function toggleBlockActiveInList(blocks: BlockInstance[], id: string) {
   return blocks.map((block) =>
-    block.id === id ? { ...block, props: { ...block.props, isActive: block.props.isActive === false } } : block,
+    block.id === id
+      ? { ...block, props: { ...block.props, isActive: block.props.isActive === false } }
+      : block,
   );
 }
 
@@ -124,7 +137,12 @@ export function filterBlockGroupsBySearch(blocks: BlockDef[], search: string) {
       category,
       label,
       items: items.filter((definition) =>
-        [definition.label, definition.description, definition.type, BLOCK_CATEGORY_LABELS[definition.category]]
+        [
+          definition.label,
+          definition.description,
+          definition.type,
+          BLOCK_CATEGORY_LABELS[definition.category],
+        ]
           .join(" ")
           .toLowerCase()
           .includes(term),

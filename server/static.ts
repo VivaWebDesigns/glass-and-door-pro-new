@@ -29,7 +29,8 @@ const LEGACY_PUBLIC_REDIRECTS: Record<string, string> = {
   "/frameless-showers": "/services/frameless-showers",
   "/frameless-shower-doors": "/services/frameless-showers",
   "/commercial-storefront-glass-installation": "/services/commercial-storefront-glass-installation",
-  "/commercial-storefront-glass-replacement-repair": "/services/commercial-storefront-glass-replacement-repair",
+  "/commercial-storefront-glass-replacement-repair":
+    "/services/commercial-storefront-glass-replacement-repair",
   "/commercial-door-installation": "/services/commercial-door-installation",
   "/commercial-door-replacement-repair": "/services/commercial-door-replacement-repair",
   "/commercial-window-replacement": "/services/commercial-window-replacement",
@@ -66,19 +67,21 @@ export function serveStatic(app: Express) {
     return cachedIndexTemplate;
   }
 
-  app.use(express.static(distPath, {
-    index: false,
-    setHeaders: (res, filePath) => {
-      if (filePath.endsWith(".html")) {
-        res.setHeader("Cache-Control", "no-cache");
-        return;
-      }
+  app.use(
+    express.static(distPath, {
+      index: false,
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith(".html")) {
+          res.setHeader("Cache-Control", "no-cache");
+          return;
+        }
 
-      if (/\.(js|css|woff2?|ttf|eot|svg|png|jpe?g|gif|webp|avif|ico)$/i.test(filePath)) {
-        res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
-      }
-    },
-  }));
+        if (/\.(js|css|woff2?|ttf|eot|svg|png|jpe?g|gif|webp|avif|ico)$/i.test(filePath)) {
+          res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+        }
+      },
+    }),
+  );
 
   function getRequestPathAndSearch(originalUrl: string) {
     const parsed = new URL(originalUrl, "http://localhost");
@@ -102,13 +105,11 @@ export function serveStatic(app: Express) {
       return;
     }
     if (
-      GONE_PUBLIC_PATH_PREFIXES.some((gonePath) => pathname === gonePath || pathname.startsWith(`${gonePath}/`))
+      GONE_PUBLIC_PATH_PREFIXES.some(
+        (gonePath) => pathname === gonePath || pathname.startsWith(`${gonePath}/`),
+      )
     ) {
-      res
-        .status(410)
-        .type("text")
-        .set("Cache-Control", "no-cache")
-        .send("Gone");
+      res.status(410).type("text").set("Cache-Control", "no-cache").send("Gone");
       return;
     }
     if (pathname.length > 1 && pathname.endsWith("/")) {
@@ -129,20 +130,14 @@ export function serveStatic(app: Express) {
       !pathname.startsWith("/uploads") &&
       !pathname.startsWith("/api");
     if (shouldInjectPublicHead && !snapshot && !isClientOnlyPublicRoute(pathname)) {
-      res
-        .status(404)
-        .type("text")
-        .set("Cache-Control", "no-cache")
-        .send("Not found");
+      res.status(404).type("text").set("Cache-Control", "no-cache").send("Not found");
       return;
     }
     const customHeadHtml = shouldInjectPublicHead ? await getPublicHeadAdditions() : null;
 
     res.setHeader(
       "Cache-Control",
-      pathname.startsWith("/admin") ||
-        pathname.startsWith("/auth") ||
-        pathname.startsWith("/setup")
+      pathname.startsWith("/admin") || pathname.startsWith("/auth") || pathname.startsWith("/setup")
         ? "private, no-store, max-age=0"
         : "no-cache",
     );

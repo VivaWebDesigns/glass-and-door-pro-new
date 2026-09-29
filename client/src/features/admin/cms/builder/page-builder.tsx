@@ -1,20 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import {
-  Bookmark,
-  ListOrdered,
-  Monitor,
-  Plus,
-  Settings2,
-  Sparkles,
-} from "lucide-react";
+import { Bookmark, ListOrdered, Monitor, Plus, Settings2, Sparkles } from "lucide-react";
 import {
   ALL_BLOCKS,
   createBlock,
@@ -22,7 +10,7 @@ import {
   type BlockInstance,
   type BuilderContent,
 } from "./block-registry";
-import { createFallbackBlockDef } from "./block-fallback-def";
+import { createFallbackBlockDef } from "./block-editor-fallback";
 import { FrontendPreviewDialog, type PreviewDevice } from "./page-builder-preview";
 import type { VisualCanvasProps } from "./page-builder-canvas";
 import { BlockInspectorPanel } from "./page-builder-inspector";
@@ -39,7 +27,11 @@ import {
   selectionAfterRemoval,
   toggleBlockActiveInList,
 } from "./page-builder-utils";
-import { useBlockNodeRegistry, useBuilderDragAndDrop, useDesktopInspectorAlignment } from "./page-builder-hooks";
+import {
+  useBlockNodeRegistry,
+  useBuilderDragAndDrop,
+  useDesktopInspectorAlignment,
+} from "./page-builder-hooks";
 
 const EMPTY_BLOCKS: BlockInstance[] = [];
 
@@ -49,7 +41,11 @@ interface PageBuilderProps {
 }
 
 type LeftRailMode = "structure" | "inserter";
-function SaveSectionPickerDialog({ savingSectionBlockId, setSavingSectionBlockId, savingBlock }: {
+function SaveSectionPickerDialog({
+  savingSectionBlockId,
+  setSavingSectionBlockId,
+  savingBlock,
+}: {
   savingSectionBlockId: string | null;
   setSavingSectionBlockId: React.Dispatch<React.SetStateAction<string | null>>;
   savingBlock: BlockInstance | null;
@@ -107,10 +103,13 @@ function PageBuilderToolbar({
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-violet-500" />
           <p className="text-sm font-semibold">Visual Builder</p>
-          <Badge variant="outline">{blocks.length} block{blocks.length !== 1 ? "s" : ""}</Badge>
+          <Badge variant="outline">
+            {blocks.length} block{blocks.length !== 1 ? "s" : ""}
+          </Badge>
         </div>
         <p className="mt-1 text-sm text-muted-foreground">
-          Structure on the left, real page canvas in the center, a compact section toolbar on-canvas, and a docked inspector for full editing.
+          Structure on the left, real page canvas in the center, a compact section toolbar
+          on-canvas, and a docked inspector for full editing.
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
@@ -177,17 +176,19 @@ export function PageBuilder({ content, onChange }: PageBuilderProps) {
   const blocks = content.blocks ?? EMPTY_BLOCKS;
   const selectedBlock = blocks.find((block) => block.id === selectedId) ?? null;
   const selectedEditorDef = selectedBlock
-    ? (getBlockDef(selectedBlock.type) ?? createFallbackBlockDef(selectedBlock.type, selectedBlock.props))
+    ? (getBlockDef(selectedBlock.type) ??
+      createFallbackBlockDef(selectedBlock.type, selectedBlock.props))
     : null;
   const selectedBlockIndex = selectedBlock ? blocks.indexOf(selectedBlock) : -1;
 
   const { blockRefs, registerBlockRef, scrollBlockIntoView } = useBlockNodeRegistry();
-  const { desktopCanvasPanelRef, desktopInspectorShellRef, desktopInspectorOffset } = useDesktopInspectorAlignment({
-    enabled: advancedInspectorOpen,
-    selectedId,
-    blocks,
-    blockRefs,
-  });
+  const { desktopCanvasPanelRef, desktopInspectorShellRef, desktopInspectorOffset } =
+    useDesktopInspectorAlignment({
+      enabled: advancedInspectorOpen,
+      selectedId,
+      blocks,
+      blockRefs,
+    });
 
   const selectBlock = useCallback((id: string | null) => {
     setSelectedId(id);
@@ -200,10 +201,13 @@ export function PageBuilder({ content, onChange }: PageBuilderProps) {
     (nextBlocks: BlockInstance[] | null) => {
       if (nextBlocks) onChange({ ...content, blocks: nextBlocks });
     },
-    [content, onChange]
+    [content, onChange],
   );
 
-  const visibleBlocks = useMemo(() => filterBlocksBySearch(blocks, navigatorSearch), [blocks, navigatorSearch]);
+  const visibleBlocks = useMemo(
+    () => filterBlocksBySearch(blocks, navigatorSearch),
+    [blocks, navigatorSearch],
+  );
   const filteredAddContentGroups = useMemo(
     () => filterBlockGroupsBySearch(ALL_BLOCKS, addContentSearch),
     [addContentSearch],
@@ -226,49 +230,70 @@ export function PageBuilder({ content, onChange }: PageBuilderProps) {
     return selectedIndex >= 0 ? selectedIndex + 1 : blocks.length;
   }, [blocks, insertAtIndex, selectedId]);
 
-  const insertBlocksAtIndex = useCallback((insertedBlocks: BlockInstance[], index: number) => {
-    setBlocks(insertBlocksAt(blocks, index, insertedBlocks));
-    selectBlock(insertedBlocks[0]?.id ?? null);
-    setInsertAtIndex(null);
-    setLeftRailMode("structure");
-    setStructurePanelOpen(true);
-  }, [blocks, selectBlock, setBlocks]);
+  const insertBlocksAtIndex = useCallback(
+    (insertedBlocks: BlockInstance[], index: number) => {
+      setBlocks(insertBlocksAt(blocks, index, insertedBlocks));
+      selectBlock(insertedBlocks[0]?.id ?? null);
+      setInsertAtIndex(null);
+      setLeftRailMode("structure");
+      setStructurePanelOpen(true);
+    },
+    [blocks, selectBlock, setBlocks],
+  );
 
   const addBlockAtIndex = useCallback(
     (type: string, index: number) => insertBlocksAtIndex([createBlock(type)], index),
     [insertBlocksAtIndex],
   );
-  const addBlock = useCallback((type: string) => addBlockAtIndex(type, resolveInsertIndex()), [addBlockAtIndex, resolveInsertIndex]);
+  const addBlock = useCallback(
+    (type: string) => addBlockAtIndex(type, resolveInsertIndex()),
+    [addBlockAtIndex, resolveInsertIndex],
+  );
   const insertBlocks = useCallback(
     (insertedBlocks: BlockInstance[]) => insertBlocksAtIndex(insertedBlocks, resolveInsertIndex()),
     [insertBlocksAtIndex, resolveInsertIndex],
   );
 
-  const openAddBelow = useCallback((id: string) => {
-    const sourceIndex = blocks.findIndex((block) => block.id === id);
-    setInsertAtIndex(sourceIndex < 0 ? blocks.length : sourceIndex + 1);
-    setLeftRailMode("inserter");
-    setStructurePanelOpen(true);
-  }, [blocks]);
+  const openAddBelow = useCallback(
+    (id: string) => {
+      const sourceIndex = blocks.findIndex((block) => block.id === id);
+      setInsertAtIndex(sourceIndex < 0 ? blocks.length : sourceIndex + 1);
+      setLeftRailMode("inserter");
+      setStructurePanelOpen(true);
+    },
+    [blocks],
+  );
 
-  const updateBlockProps = useCallback((id: string, props: Record<string, unknown>) => {
-    setBlocks(blocks.map((block) => (block.id === id ? { ...block, props } : block)));
-  }, [blocks, setBlocks]);
+  const updateBlockProps = useCallback(
+    (id: string, props: Record<string, unknown>) => {
+      setBlocks(blocks.map((block) => (block.id === id ? { ...block, props } : block)));
+    },
+    [blocks, setBlocks],
+  );
 
-  const toggleBlockActive = useCallback((id: string) => setBlocks(toggleBlockActiveInList(blocks, id)), [blocks, setBlocks]);
+  const toggleBlockActive = useCallback(
+    (id: string) => setBlocks(toggleBlockActiveInList(blocks, id)),
+    [blocks, setBlocks],
+  );
 
-  const removeBlock = useCallback((id: string) => {
-    if (selectedId === id) selectBlock(selectionAfterRemoval(blocks, id));
-    setBlocks(blocks.filter((block) => block.id !== id));
-  }, [blocks, selectBlock, selectedId, setBlocks]);
+  const removeBlock = useCallback(
+    (id: string) => {
+      if (selectedId === id) selectBlock(selectionAfterRemoval(blocks, id));
+      setBlocks(blocks.filter((block) => block.id !== id));
+    },
+    [blocks, selectBlock, selectedId, setBlocks],
+  );
 
-  const duplicateBlock = useCallback((id: string) => {
-    const sourceIndex = blocks.findIndex((block) => block.id === id);
-    if (sourceIndex < 0) return;
-    const copy = duplicateBlockInstance(blocks[sourceIndex]);
-    setBlocks(insertBlocksAt(blocks, sourceIndex + 1, [copy]));
-    selectBlock(copy.id);
-  }, [blocks, selectBlock, setBlocks]);
+  const duplicateBlock = useCallback(
+    (id: string) => {
+      const sourceIndex = blocks.findIndex((block) => block.id === id);
+      if (sourceIndex < 0) return;
+      const copy = duplicateBlockInstance(blocks[sourceIndex]);
+      setBlocks(insertBlocksAt(blocks, sourceIndex + 1, [copy]));
+      selectBlock(copy.id);
+    },
+    [blocks, selectBlock, setBlocks],
+  );
 
   const moveBlock = useCallback(
     (id: string, direction: "up" | "down") => setBlocks(moveBlockInList(blocks, id, direction)),
@@ -297,7 +322,7 @@ export function PageBuilder({ content, onChange }: PageBuilderProps) {
   });
 
   const savingBlock = savingSectionBlockId
-    ? blocks.find((block) => block.id === savingSectionBlockId) ?? null
+    ? (blocks.find((block) => block.id === savingSectionBlockId) ?? null)
     : null;
 
   const structurePanel = (
@@ -416,7 +441,11 @@ export function PageBuilder({ content, onChange }: PageBuilderProps) {
         canvasProps={canvasProps}
       />
 
-      <SaveSectionPickerDialog savingSectionBlockId={savingSectionBlockId} setSavingSectionBlockId={setSavingSectionBlockId} savingBlock={savingBlock} />
+      <SaveSectionPickerDialog
+        savingSectionBlockId={savingSectionBlockId}
+        setSavingSectionBlockId={setSavingSectionBlockId}
+        savingBlock={savingBlock}
+      />
       <FrontendPreviewDialog
         open={frontendPreviewOpen}
         onOpenChange={setFrontendPreviewOpen}

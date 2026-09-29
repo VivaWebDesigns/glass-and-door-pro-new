@@ -16,13 +16,13 @@ const DOCS_ROOT = path.resolve(process.cwd(), "docs");
 const CATEGORY_ORDER: Record<string, number> = {
   "Getting Started": 0,
   "Admin Guides": 1,
-  "Architecture": 2,
+  Architecture: 2,
   "Architecture Decisions": 3,
   "Operations & Recovery": 4,
   "Deployment & Release": 5,
   "API Reference": 6,
   "Engineering Quality": 7,
-  "Security": 8,
+  Security: 8,
   "Product & Planning": 9,
   Reference: 10,
 };
@@ -156,6 +156,7 @@ export async function ensureSystemDocs(options: EnsureSystemDocsOptions = {}) {
 
   let created = 0;
   let updated = 0;
+  let removed = 0;
 
   await Promise.all(
     definitions.map(async (definition) => {
@@ -190,15 +191,29 @@ export async function ensureSystemDocs(options: EnsureSystemDocsOptions = {}) {
     }),
   );
 
+  // System docs are the ones without an author; admin-created docs always have createdBy set.
+  // Remove system docs whose markdown file no longer exists. Skip if no files were found so a
+  // missing docs/ directory can never wipe the library.
+  if (definitions.length > 0) {
+    const currentSlugs = new Set(definitions.map((definition) => definition.slug));
+    const staleDocs = (await storage.docs.getAllDocs()).filter(
+      (doc) => doc.createdBy === null && !currentSlugs.has(doc.slug),
+    );
+    await Promise.all(staleDocs.map((doc) => storage.docs.deleteDoc(doc.id)));
+    removed = staleDocs.length;
+  }
+
   logger.app.info("System documentation synced", {
     total: definitions.length,
     created,
     updated,
+    removed,
   });
 
   return {
     total: definitions.length,
     created,
     updated,
+    removed,
   };
 }

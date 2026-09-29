@@ -14,8 +14,7 @@ interface SeoPreviewProps {
 function TitleMeter({ value }: { value: string }) {
   const len = value.length;
   if (len === 0) return null;
-  const status =
-    len < 20 ? "short" : len <= 60 ? "ok" : len <= 70 ? "long" : "too-long";
+  const status = len < 20 ? "short" : len <= 60 ? "ok" : len <= 70 ? "long" : "too-long";
   const colors = {
     short: "text-amber-500",
     ok: "text-emerald-600 dark:text-emerald-400",
@@ -38,8 +37,7 @@ function TitleMeter({ value }: { value: string }) {
 function DescMeter({ value }: { value: string }) {
   const len = value.length;
   if (len === 0) return null;
-  const status =
-    len < 70 ? "short" : len <= 160 ? "ok" : "too-long";
+  const status = len < 70 ? "short" : len <= 160 ? "ok" : "too-long";
   const colors = {
     short: "text-amber-500",
     ok: "text-emerald-600 dark:text-emerald-400",
@@ -80,7 +78,8 @@ function MissingFieldsNotice({ missingFields }: { missingFields: string[] }) {
     <div className="flex items-start gap-2 rounded-md border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
       <AlertCircle className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
       <span>
-        Missing: <strong>{missingFields.join(", ")}</strong>. Fallbacks from the page title and global defaults will be used.
+        Missing: <strong>{missingFields.join(", ")}</strong>. Fallbacks from the page title and
+        global defaults will be used.
       </span>
     </div>
   );
@@ -107,19 +106,23 @@ function GoogleSearchPreview({
           <Globe className="h-3.5 w-3.5 text-muted-foreground" />
           <span className="text-xs text-muted-foreground truncate">{url}</span>
         </div>
-        <p className={cn(
-          "text-[15px] font-medium leading-snug",
-          preview.hasTitle ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground italic"
-        )}>
+        <p
+          className={cn(
+            "text-[15px] font-medium leading-snug",
+            preview.hasTitle ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground italic",
+          )}
+        >
           {preview.title}
         </p>
         <div className="flex items-center justify-between mt-0.5">
           <TitleMeter value={rawTitle} />
         </div>
-        <p className={cn(
-          "text-xs mt-1 leading-relaxed line-clamp-2",
-          preview.hasDescription ? "text-muted-foreground" : "text-muted-foreground italic"
-        )}>
+        <p
+          className={cn(
+            "text-xs mt-1 leading-relaxed line-clamp-2",
+            preview.hasDescription ? "text-muted-foreground" : "text-muted-foreground italic",
+          )}
+        >
           {preview.description}
         </p>
         <div className="flex items-center justify-between mt-0.5">
@@ -161,16 +164,20 @@ function SocialPreview({
       )}
       <div className="px-4 py-3 border-t">
         <p className="text-[11px] uppercase text-muted-foreground mb-0.5">{siteName}</p>
-        <p className={cn(
-          "text-sm font-medium leading-snug line-clamp-1",
-          !preview.hasTitle && "text-muted-foreground italic"
-        )}>
+        <p
+          className={cn(
+            "text-sm font-medium leading-snug line-clamp-1",
+            !preview.hasTitle && "text-muted-foreground italic",
+          )}
+        >
           {preview.title}
         </p>
-        <p className={cn(
-          "text-xs mt-0.5 line-clamp-2",
-          !preview.hasDescription ? "text-muted-foreground italic" : "text-muted-foreground"
-        )}>
+        <p
+          className={cn(
+            "text-xs mt-0.5 line-clamp-2",
+            !preview.hasDescription ? "text-muted-foreground italic" : "text-muted-foreground",
+          )}
+        >
           {preview.description}
         </p>
       </div>
@@ -208,7 +215,12 @@ export function SeoPreview({
     <div className={cn("space-y-3", className)}>
       {source && <p className="text-[11px] text-muted-foreground">{SOURCE_NOTES[source]}</p>}
       <MissingFieldsNotice missingFields={missingFields} />
-      <GoogleSearchPreview url={url} rawTitle={title} rawDescription={description} preview={preview} />
+      <GoogleSearchPreview
+        url={url}
+        rawTitle={title}
+        rawDescription={description}
+        preview={preview}
+      />
       <SocialPreview ogImage={image} siteName={siteName} preview={preview} />
     </div>
   );

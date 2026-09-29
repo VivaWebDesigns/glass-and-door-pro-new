@@ -64,7 +64,13 @@ type EditorLockSummaryState = {
 };
 
 /** Renders the editor lock banner when the lock has something to report. */
-export function EditorLockNotice({ editorLock, className }: { editorLock: EditorLockSummaryState; className?: string }) {
+export function EditorLockNotice({
+  editorLock,
+  className,
+}: {
+  editorLock: EditorLockSummaryState;
+  className?: string;
+}) {
   if (!editorLock.summary) return null;
   const banner = (
     <EditorLockBanner

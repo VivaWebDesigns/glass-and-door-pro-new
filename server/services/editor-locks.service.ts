@@ -1,4 +1,9 @@
-import { type EditorLock, type EditorLockResourceType, type EditorLockResponse, User } from "@shared/schema";
+import {
+  type EditorLock,
+  type EditorLockResourceType,
+  type EditorLockResponse,
+  User,
+} from "@shared/schema";
 import { storage } from "../storage";
 
 export const EDITOR_LOCK_HEARTBEAT_MS = 30_000;
@@ -24,10 +29,6 @@ function lockPayload(lock: EditorLock | null) {
 function canUseEditorLocks(user: User | undefined): user is User {
   if (!user) return false;
   return user.role === "admin" || user.role === "editor";
-}
-
-function isExpired(lock: EditorLock, now: Date) {
-  return new Date(lock.expiresAt).getTime() <= now.getTime();
 }
 
 function buildResponse(

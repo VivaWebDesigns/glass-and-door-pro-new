@@ -7,7 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import {
   Sheet,
@@ -95,7 +101,14 @@ function DocEditorFields({
   showPreview: boolean;
 }) {
   return (
-    <div className={cn("space-y-4", editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
+    <div
+      className={cn(
+        "space-y-4",
+        editorLock.hasLocking &&
+          editorLock.isReadOnly &&
+          "pointer-events-none select-none opacity-70",
+      )}
+    >
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label>Title</Label>
@@ -272,7 +285,11 @@ function DocEditorSheet({
   );
 }
 
-function DocViewerCard({ selectedDoc, openEdit, deleteMutation }: {
+function DocViewerCard({
+  selectedDoc,
+  openEdit,
+  deleteMutation,
+}: {
   selectedDoc: Doc | null;
   openEdit: (doc: Doc) => void;
   deleteMutation: UseMutationResult<void, Error, string, unknown>;
@@ -305,7 +322,12 @@ function DocViewerCard({ selectedDoc, openEdit, deleteMutation }: {
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" onClick={() => openEdit(selectedDoc)} data-testid="button-edit-doc">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => openEdit(selectedDoc)}
+                  data-testid="button-edit-doc"
+                >
                   <Edit className="h-4 w-4" />
                 </Button>
                 <Button
@@ -337,7 +359,11 @@ function DocViewerCard({ selectedDoc, openEdit, deleteMutation }: {
   );
 }
 
-function DocListCard({ filteredDocs, selectedDoc, setSelectedDocId }: {
+function DocListCard({
+  filteredDocs,
+  selectedDoc,
+  setSelectedDocId,
+}: {
   filteredDocs: Doc[];
   selectedDoc: Doc | null;
   setSelectedDocId: React.Dispatch<React.SetStateAction<string | null>>;
@@ -354,7 +380,9 @@ function DocListCard({ filteredDocs, selectedDoc, setSelectedDocId }: {
               <div className="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
                 <BookOpenText className="mx-auto mb-3 h-10 w-10 opacity-50" />
                 <p>No documentation found yet.</p>
-                <p className="mt-1">Use “Sync System Docs” to import the repo documentation into the admin library.</p>
+                <p className="mt-1">
+                  Use “Sync System Docs” to import the repo documentation into the admin library.
+                </p>
               </div>
             ) : (
               filteredDocs.map((doc) => (
@@ -455,7 +483,11 @@ function DocCategoriesCard({
   );
 }
 
-function DocsStats({ allDocs, categories, filteredDocs }: {
+function DocsStats({
+  allDocs,
+  categories,
+  filteredDocs,
+}: {
   allDocs: Doc[];
   categories: string[];
   filteredDocs: Doc[];
@@ -465,7 +497,9 @@ function DocsStats({ allDocs, categories, filteredDocs }: {
       <Card>
         <CardContent className="py-4">
           <div className="text-sm text-muted-foreground">Published library</div>
-          <div className="mt-1 text-2xl font-semibold" data-testid="text-doc-count">{allDocs.length}</div>
+          <div className="mt-1 text-2xl font-semibold" data-testid="text-doc-count">
+            {allDocs.length}
+          </div>
         </CardContent>
       </Card>
       <Card>
@@ -484,8 +518,16 @@ function DocsStats({ allDocs, categories, filteredDocs }: {
   );
 }
 
-function DocsHeader({ syncMutation, openCreate }: {
-  syncMutation: UseMutationResult<{ total: number; created: number; updated: number; docs: Doc[]; }, Error, void, unknown>;
+function DocsHeader({
+  syncMutation,
+  openCreate,
+}: {
+  syncMutation: UseMutationResult<
+    { total: number; created: number; updated: number; docs: Doc[] },
+    Error,
+    void,
+    unknown
+  >;
   openCreate: () => void;
 }) {
   return (
@@ -495,7 +537,8 @@ function DocsHeader({ syncMutation, openCreate }: {
           Documentation Library
         </h1>
         <p className="max-w-3xl text-sm text-muted-foreground">
-          Internal operating documentation for the CMS, content workflows, infrastructure, deployment, and system architecture.
+          Internal operating documentation for the CMS, content workflows, infrastructure,
+          deployment, and system architecture.
         </p>
       </div>
 
@@ -506,11 +549,7 @@ function DocsHeader({ syncMutation, openCreate }: {
           disabled={syncMutation.isPending}
           data-testid="button-sync-system-docs"
         >
-          {syncMutation.isPending ? (
-            <LoadingSpinner />
-          ) : (
-            <RefreshCw className="mr-2 h-4 w-4" />
-          )}
+          {syncMutation.isPending ? <LoadingSpinner /> : <RefreshCw className="mr-2 h-4 w-4" />}
           Sync System Docs
         </Button>
         <Button onClick={openCreate} data-testid="button-create-doc">
@@ -564,12 +603,18 @@ export default function DocsPage() {
       const res = await apiRequest("POST", "/api/admin/docs/sync");
       return res.json();
     },
-    onSuccess: async (payload: { total: number; created: number; updated: number; docs: Doc[] }) => {
+    onSuccess: async (payload: {
+      total: number;
+      created: number;
+      updated: number;
+      removed: number;
+      docs: Doc[];
+    }) => {
       await queryClient.invalidateQueries({ queryKey: ["/api/admin/docs"] });
       setSelectedDocId(payload.docs?.[0]?.id ?? null);
       toast({
         title: "System documentation synced",
-        description: `${payload.total} documents available, ${payload.created} created, ${payload.updated} refreshed.`,
+        description: `${payload.total} documents available, ${payload.created} created, ${payload.updated} refreshed, ${payload.removed} removed.`,
       });
     },
   });
@@ -589,7 +634,11 @@ export default function DocsPage() {
     },
     onError: (error: Error) => {
       saveFeedbackRef.current.markError();
-      toast({ title: "Failed to create document", description: error.message, variant: "destructive" });
+      toast({
+        title: "Failed to create document",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -608,7 +657,11 @@ export default function DocsPage() {
     },
     onError: (error: Error) => {
       saveFeedbackRef.current.markError();
-      toast({ title: "Failed to update document", description: error.message, variant: "destructive" });
+      toast({
+        title: "Failed to update document",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -748,9 +801,17 @@ export default function DocsPage() {
             allDocs={allDocs}
           />
 
-          <DocListCard filteredDocs={filteredDocs} selectedDoc={selectedDoc} setSelectedDocId={setSelectedDocId} />
+          <DocListCard
+            filteredDocs={filteredDocs}
+            selectedDoc={selectedDoc}
+            setSelectedDocId={setSelectedDocId}
+          />
 
-          <DocViewerCard selectedDoc={selectedDoc} openEdit={openEdit} deleteMutation={deleteMutation} />
+          <DocViewerCard
+            selectedDoc={selectedDoc}
+            openEdit={openEdit}
+            deleteMutation={deleteMutation}
+          />
         </div>
       </div>
 

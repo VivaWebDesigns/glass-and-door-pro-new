@@ -131,7 +131,8 @@ export async function ensureSystemEmailTemplates(refreshExisting = false) {
 
         if (
           existing &&
-          (template.slug === "contact-form-submission" || template.slug === "managed-form-submission")
+          (template.slug === "contact-form-submission" ||
+            template.slug === "managed-form-submission")
         ) {
           const contactTemplateNeedsUpgrade =
             template.slug === "contact-form-submission" &&

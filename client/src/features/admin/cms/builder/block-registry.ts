@@ -23,7 +23,15 @@ export interface PropDef {
   itemSchema?: Omit<PropDef, "itemSchema">[];
 }
 
-export type BlockCategory = "layout" | "hero" | "content" | "media" | "social-proof" | "conversion" | "data" | "dynamic";
+export type BlockCategory =
+  | "layout"
+  | "hero"
+  | "content"
+  | "media"
+  | "social-proof"
+  | "conversion"
+  | "data"
+  | "dynamic";
 
 export interface BlockDef {
   type: string;
@@ -247,35 +255,147 @@ const SHARED_SECTION_STYLE_DEFAULTS = {
 };
 
 const SHARED_SECTION_STYLE_PROP_DEFS: PropDef[] = [
-  { key: "sectionBackgroundColor", label: "Background Color", type: "color", placeholder: "#ffffff" },
-  { key: "sectionBackgroundImageUrl", label: "Background Image", type: "image-url", placeholder: "Upload or select image" },
-  { key: "sectionBackgroundPositionX", label: "Image Position X (%)", type: "number", min: 0, max: 100 },
-  { key: "sectionBackgroundPositionY", label: "Image Position Y (%)", type: "number", min: 0, max: 100 },
-  { key: "sectionBackgroundOverlayColor", label: "Background Image Overlay Color", type: "color", placeholder: "#000000" },
-  { key: "sectionBackgroundOverlayOpacity", label: "Background Image Overlay Opacity (%)", type: "number", min: 0, max: 100 },
+  {
+    key: "sectionBackgroundColor",
+    label: "Background Color",
+    type: "color",
+    placeholder: "#ffffff",
+  },
+  {
+    key: "sectionBackgroundImageUrl",
+    label: "Background Image",
+    type: "image-url",
+    placeholder: "Upload or select image",
+  },
+  {
+    key: "sectionBackgroundPositionX",
+    label: "Image Position X (%)",
+    type: "number",
+    min: 0,
+    max: 100,
+  },
+  {
+    key: "sectionBackgroundPositionY",
+    label: "Image Position Y (%)",
+    type: "number",
+    min: 0,
+    max: 100,
+  },
+  {
+    key: "sectionBackgroundOverlayColor",
+    label: "Background Image Overlay Color",
+    type: "color",
+    placeholder: "#000000",
+  },
+  {
+    key: "sectionBackgroundOverlayOpacity",
+    label: "Background Image Overlay Opacity (%)",
+    type: "number",
+    min: 0,
+    max: 100,
+  },
   { key: "sectionShowRadialGradient", label: "Show Radial Gradient Overlay", type: "boolean" },
-  { key: "sectionRadialGradientColor", label: "Radial Gradient Color", type: "color", placeholder: "#89cda1" },
-  { key: "sectionRadialGradientPosition", label: "Radial Gradient Position", type: "select", options: RADIAL_GRADIENT_POSITION_OPTIONS },
-  { key: "sectionBorderTopWidth", label: "Top Border Thickness (px)", type: "number", min: 0, max: 24 },
-  { key: "sectionBorderTopColor", label: "Top Border Color", type: "color", placeholder: "#d9e2dc" },
-  { key: "sectionBorderBottomWidth", label: "Bottom Border Thickness (px)", type: "number", min: 0, max: 24 },
-  { key: "sectionBorderBottomColor", label: "Bottom Border Color", type: "color", placeholder: "#d9e2dc" },
+  {
+    key: "sectionRadialGradientColor",
+    label: "Radial Gradient Color",
+    type: "color",
+    placeholder: "#89cda1",
+  },
+  {
+    key: "sectionRadialGradientPosition",
+    label: "Radial Gradient Position",
+    type: "select",
+    options: RADIAL_GRADIENT_POSITION_OPTIONS,
+  },
+  {
+    key: "sectionBorderTopWidth",
+    label: "Top Border Thickness (px)",
+    type: "number",
+    min: 0,
+    max: 24,
+  },
+  {
+    key: "sectionBorderTopColor",
+    label: "Top Border Color",
+    type: "color",
+    placeholder: "#d9e2dc",
+  },
+  {
+    key: "sectionBorderBottomWidth",
+    label: "Bottom Border Thickness (px)",
+    type: "number",
+    min: 0,
+    max: 24,
+  },
+  {
+    key: "sectionBorderBottomColor",
+    label: "Bottom Border Color",
+    type: "color",
+    placeholder: "#d9e2dc",
+  },
 ];
 
 const SHARED_SECTION_ACCENT_PROP_DEFS: PropDef[] = [
-  { key: "sectionBackgroundColor", label: "Background Color", type: "color", placeholder: "#ffffff" },
+  {
+    key: "sectionBackgroundColor",
+    label: "Background Color",
+    type: "color",
+    placeholder: "#ffffff",
+  },
   { key: "sectionShowRadialGradient", label: "Show Radial Gradient Overlay", type: "boolean" },
-  { key: "sectionRadialGradientColor", label: "Radial Gradient Color", type: "color", placeholder: "#89cda1" },
-  { key: "sectionRadialGradientPosition", label: "Radial Gradient Position", type: "select", options: RADIAL_GRADIENT_POSITION_OPTIONS },
-  { key: "sectionBorderTopWidth", label: "Top Border Thickness (px)", type: "number", min: 0, max: 24 },
-  { key: "sectionBorderTopColor", label: "Top Border Color", type: "color", placeholder: "#d9e2dc" },
-  { key: "sectionBorderBottomWidth", label: "Bottom Border Thickness (px)", type: "number", min: 0, max: 24 },
-  { key: "sectionBorderBottomColor", label: "Bottom Border Color", type: "color", placeholder: "#d9e2dc" },
+  {
+    key: "sectionRadialGradientColor",
+    label: "Radial Gradient Color",
+    type: "color",
+    placeholder: "#89cda1",
+  },
+  {
+    key: "sectionRadialGradientPosition",
+    label: "Radial Gradient Position",
+    type: "select",
+    options: RADIAL_GRADIENT_POSITION_OPTIONS,
+  },
+  {
+    key: "sectionBorderTopWidth",
+    label: "Top Border Thickness (px)",
+    type: "number",
+    min: 0,
+    max: 24,
+  },
+  {
+    key: "sectionBorderTopColor",
+    label: "Top Border Color",
+    type: "color",
+    placeholder: "#d9e2dc",
+  },
+  {
+    key: "sectionBorderBottomWidth",
+    label: "Bottom Border Thickness (px)",
+    type: "number",
+    min: 0,
+    max: 24,
+  },
+  {
+    key: "sectionBorderBottomColor",
+    label: "Bottom Border Color",
+    type: "color",
+    placeholder: "#d9e2dc",
+  },
 ];
 
 const SHARED_SECTION_PADDING_PROP_DEFS: PropDef[] = [
-  { key: "sectionPaddingTop", label: "Top Padding", type: "select", options: SECTION_PADDING_OPTIONS },
-  { key: "sectionPaddingBottom", label: "Bottom Padding", type: "select", options: SECTION_PADDING_OPTIONS },
+  {
+    key: "sectionPaddingTop",
+    label: "Top Padding",
+    type: "select",
+    options: SECTION_PADDING_OPTIONS,
+  },
+  {
+    key: "sectionPaddingBottom",
+    label: "Bottom Padding",
+    type: "select",
+    options: SECTION_PADDING_OPTIONS,
+  },
 ];
 
 const SHARED_SECTION_HEADING_DEFAULTS = {
@@ -285,9 +405,24 @@ const SHARED_SECTION_HEADING_DEFAULTS = {
 };
 
 const SHARED_SECTION_HEADING_PROP_DEFS: PropDef[] = [
-  { key: "sectionEyebrow", label: "Eyebrow Label", type: "text", placeholder: "Small label above title" },
-  { key: "sectionHeadingLevel", label: "Heading Level", type: "select", options: HEADING_LEVEL_OPTIONS },
-  { key: "sectionHeadingAlignment", label: "Heading Alignment", type: "select", options: ALIGN_OPTIONS },
+  {
+    key: "sectionEyebrow",
+    label: "Eyebrow Label",
+    type: "text",
+    placeholder: "Small label above title",
+  },
+  {
+    key: "sectionHeadingLevel",
+    label: "Heading Level",
+    type: "select",
+    options: HEADING_LEVEL_OPTIONS,
+  },
+  {
+    key: "sectionHeadingAlignment",
+    label: "Heading Alignment",
+    type: "select",
+    options: ALIGN_OPTIONS,
+  },
 ];
 
 const SHARED_VISIBILITY_DEFAULTS = {
@@ -308,15 +443,42 @@ const SHARED_MOBILE_IMAGE_DEFAULTS = {
 };
 
 const SHARED_MOBILE_IMAGE_PROP_DEFS: PropDef[] = [
-  { key: "mobileImageFit", label: "Mobile Image Fit", type: "select", options: MOBILE_IMAGE_FIT_OPTIONS },
-  { key: "mobileImageHeight", label: "Mobile Image Height", type: "select", options: MOBILE_IMAGE_HEIGHT_OPTIONS },
-  { key: "mobileImagePositionX", label: "Mobile Image Position X (%)", type: "number", min: 0, max: 100 },
-  { key: "mobileImagePositionY", label: "Mobile Image Position Y (%)", type: "number", min: 0, max: 100 },
+  {
+    key: "mobileImageFit",
+    label: "Mobile Image Fit",
+    type: "select",
+    options: MOBILE_IMAGE_FIT_OPTIONS,
+  },
+  {
+    key: "mobileImageHeight",
+    label: "Mobile Image Height",
+    type: "select",
+    options: MOBILE_IMAGE_HEIGHT_OPTIONS,
+  },
+  {
+    key: "mobileImagePositionX",
+    label: "Mobile Image Position X (%)",
+    type: "number",
+    min: 0,
+    max: 100,
+  },
+  {
+    key: "mobileImagePositionY",
+    label: "Mobile Image Position Y (%)",
+    type: "number",
+    min: 0,
+    max: 100,
+  },
 ];
 
 const OPTIONAL_SECTION_HEADING_PROP_DEFS: PropDef[] = [
   { key: "title", label: "Section Title", type: "text", placeholder: "Optional section heading" },
-  { key: "subtitle", label: "Subtitle", type: "textarea", placeholder: "Optional supporting description" },
+  {
+    key: "subtitle",
+    label: "Subtitle",
+    type: "textarea",
+    placeholder: "Optional supporting description",
+  },
 ];
 
 const OPTIONAL_SECTION_HEADING_BLOCKS = new Set([
@@ -334,11 +496,13 @@ function mergePropDefs(existing: PropDef[], additions: PropDef[]) {
 
 function withSharedSectionStyles(
   block: BlockDef,
-  options?: { includeImageControls?: boolean; includePaddingControls?: boolean }
+  options?: { includeImageControls?: boolean; includePaddingControls?: boolean },
 ): BlockDef {
   const includeImageControls = options?.includeImageControls ?? true;
   const includePaddingControls = options?.includePaddingControls ?? true;
-  const sharedPropDefs = includeImageControls ? SHARED_SECTION_STYLE_PROP_DEFS : SHARED_SECTION_ACCENT_PROP_DEFS;
+  const sharedPropDefs = includeImageControls
+    ? SHARED_SECTION_STYLE_PROP_DEFS
+    : SHARED_SECTION_ACCENT_PROP_DEFS;
   const sharedDefaults = includeImageControls
     ? SHARED_SECTION_STYLE_DEFAULTS
     : {
@@ -364,7 +528,9 @@ function withSharedSectionStyles(
     },
     propDefs: mergePropDefs(
       block.propDefs,
-      includePaddingControls ? [...sharedPropDefs, ...SHARED_SECTION_PADDING_PROP_DEFS] : sharedPropDefs
+      includePaddingControls
+        ? [...sharedPropDefs, ...SHARED_SECTION_PADDING_PROP_DEFS]
+        : sharedPropDefs,
     ),
   };
 }
@@ -412,7 +578,8 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       accentHeading: "",
       headingColor: "",
       accentHeadingColor: "",
-      subheading: "Glass, window, door, shower, and commercial glass services for the greater Charlotte area.",
+      subheading:
+        "Glass, window, door, shower, and commercial glass services for the greater Charlotte area.",
       subheadingColor: "",
       ctaText: "Get a Free Quote",
       ctaLink: "/#contact",
@@ -444,34 +611,126 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       { key: "variant", label: "Design Variant", type: "select", options: HERO_VARIANT_OPTIONS },
       { key: "badge", label: "Badge Text", type: "text", placeholder: "e.g. New, Coming Soon" },
       { key: "heading", label: "Heading", type: "text", placeholder: "Main heading" },
-      { key: "accentHeading", label: "Accent Heading", type: "text", placeholder: "Optional highlighted heading text" },
+      {
+        key: "accentHeading",
+        label: "Accent Heading",
+        type: "text",
+        placeholder: "Optional highlighted heading text",
+      },
       { key: "headingColor", label: "Heading Color", type: "color", placeholder: "#ffffff" },
-      { key: "accentHeadingColor", label: "Accent Heading Color", type: "color", placeholder: "#89cda1" },
-      { key: "subheading", label: "Subheading", type: "textarea", placeholder: "Supporting text beneath the heading" },
+      {
+        key: "accentHeadingColor",
+        label: "Accent Heading Color",
+        type: "color",
+        placeholder: "#89cda1",
+      },
+      {
+        key: "subheading",
+        label: "Subheading",
+        type: "textarea",
+        placeholder: "Supporting text beneath the heading",
+      },
       { key: "subheadingColor", label: "Subheading Color", type: "color", placeholder: "#ffffff" },
-      { key: "ctaText", label: "Primary Button Text", type: "text", placeholder: "e.g. Get a Free Quote" },
-      { key: "ctaAction", label: "Primary Button Action", type: "select", options: BUTTON_ACTION_OPTIONS },
+      {
+        key: "ctaText",
+        label: "Primary Button Text",
+        type: "text",
+        placeholder: "e.g. Get a Free Quote",
+      },
+      {
+        key: "ctaAction",
+        label: "Primary Button Action",
+        type: "select",
+        options: BUTTON_ACTION_OPTIONS,
+      },
       { key: "ctaLink", label: "Primary Button Link", type: "url", placeholder: "/#contact" },
       { key: "ctaOpenInNewTab", label: "Primary Open In New Tab", type: "boolean" },
       { key: "ctaFormSlug", label: "Primary Button Form", type: "form-select" },
-      { key: "ctaModalTitle", label: "Primary Modal Title", type: "text", placeholder: "Optional modal title override" },
-      { key: "ctaModalDescription", label: "Primary Modal Description", type: "textarea", placeholder: "Optional modal description" },
-      { key: "ctaSecondaryText", label: "Secondary Button Text", type: "text", placeholder: "e.g. Learn More" },
-      { key: "ctaSecondaryAction", label: "Secondary Button Action", type: "select", options: BUTTON_ACTION_OPTIONS },
-      { key: "ctaSecondaryLink", label: "Secondary Button Link", type: "url", placeholder: "/#about" },
+      {
+        key: "ctaModalTitle",
+        label: "Primary Modal Title",
+        type: "text",
+        placeholder: "Optional modal title override",
+      },
+      {
+        key: "ctaModalDescription",
+        label: "Primary Modal Description",
+        type: "textarea",
+        placeholder: "Optional modal description",
+      },
+      {
+        key: "ctaSecondaryText",
+        label: "Secondary Button Text",
+        type: "text",
+        placeholder: "e.g. Learn More",
+      },
+      {
+        key: "ctaSecondaryAction",
+        label: "Secondary Button Action",
+        type: "select",
+        options: BUTTON_ACTION_OPTIONS,
+      },
+      {
+        key: "ctaSecondaryLink",
+        label: "Secondary Button Link",
+        type: "url",
+        placeholder: "/#about",
+      },
       { key: "ctaSecondaryOpenInNewTab", label: "Secondary Open In New Tab", type: "boolean" },
       { key: "ctaSecondaryFormSlug", label: "Secondary Button Form", type: "form-select" },
-      { key: "ctaSecondaryModalTitle", label: "Secondary Modal Title", type: "text", placeholder: "Optional modal title override" },
-      { key: "ctaSecondaryModalDescription", label: "Secondary Modal Description", type: "textarea", placeholder: "Optional modal description" },
-      { key: "backgroundImageUrl", label: "Background Image", type: "image-url", placeholder: "Upload or select image" },
-      { key: "backgroundImageAlt", label: "Background Image Alt Text", type: "text", placeholder: "Describe the hero image" },
-      { key: "backgroundPositionX", label: "Image Position X (%)", type: "number", min: 0, max: 100 },
-      { key: "backgroundPositionY", label: "Image Position Y (%)", type: "number", min: 0, max: 100 },
-      { key: "videoBackgroundUrl", label: "Video Background URL", type: "url", placeholder: "https://example.com/video.mp4" },
+      {
+        key: "ctaSecondaryModalTitle",
+        label: "Secondary Modal Title",
+        type: "text",
+        placeholder: "Optional modal title override",
+      },
+      {
+        key: "ctaSecondaryModalDescription",
+        label: "Secondary Modal Description",
+        type: "textarea",
+        placeholder: "Optional modal description",
+      },
+      {
+        key: "backgroundImageUrl",
+        label: "Background Image",
+        type: "image-url",
+        placeholder: "Upload or select image",
+      },
+      {
+        key: "backgroundImageAlt",
+        label: "Background Image Alt Text",
+        type: "text",
+        placeholder: "Describe the hero image",
+      },
+      {
+        key: "backgroundPositionX",
+        label: "Image Position X (%)",
+        type: "number",
+        min: 0,
+        max: 100,
+      },
+      {
+        key: "backgroundPositionY",
+        label: "Image Position Y (%)",
+        type: "number",
+        min: 0,
+        max: 100,
+      },
+      {
+        key: "videoBackgroundUrl",
+        label: "Video Background URL",
+        type: "url",
+        placeholder: "https://example.com/video.mp4",
+      },
       { key: "overlayColor", label: "Overlay Color", type: "color", placeholder: "#000000" },
       { key: "overlayOpacity", label: "Overlay Opacity (%)", type: "number", min: 0, max: 100 },
       { key: "layout", label: "Layout", type: "select", options: HERO_LAYOUT_OPTIONS },
-      { key: "minHeight", label: "Min Height (px)", type: "select", options: HERO_MIN_HEIGHT_OPTIONS },
+      {
+        key: "minHeight",
+        label: "Min Height (px)",
+        type: "select",
+        options: HERO_MIN_HEIGHT_OPTIONS,
+      },
     ],
   },
   {
@@ -483,16 +742,32 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     defaultProps: {
       eyebrow: "Our Approach",
       title: "Glass & Door Services Built Around Your Project",
-      subtitle: "Clear communication, careful measurements, and clean installation from a local owner-operator.",
+      subtitle:
+        "Clear communication, careful measurements, and clean installation from a local owner-operator.",
       alignment: "center",
       headingLevel: "h2",
     },
     propDefs: [
-      { key: "eyebrow", label: "Eyebrow Label", type: "text", placeholder: "Small label above title" },
+      {
+        key: "eyebrow",
+        label: "Eyebrow Label",
+        type: "text",
+        placeholder: "Small label above title",
+      },
       { key: "title", label: "Title", type: "text", placeholder: "Section title" },
-      { key: "subtitle", label: "Subtitle", type: "textarea", placeholder: "Supporting description" },
+      {
+        key: "subtitle",
+        label: "Subtitle",
+        type: "textarea",
+        placeholder: "Supporting description",
+      },
       { key: "alignment", label: "Alignment", type: "select", options: ALIGN_OPTIONS },
-      { key: "headingLevel", label: "Heading Level", type: "select", options: HEADING_LEVEL_OPTIONS },
+      {
+        key: "headingLevel",
+        label: "Heading Level",
+        type: "select",
+        options: HEADING_LEVEL_OPTIONS,
+      },
     ],
   },
   {
@@ -519,7 +794,8 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     defaultProps: {
       eyebrow: "Our Story",
       heading: "About Glass & Door Pro",
-      subtitle: "Use this supporting introduction to frame the section before the main body copy begins.",
+      subtitle:
+        "Use this supporting introduction to frame the section before the main body copy begins.",
       body: "<p>Glass & Door Pro provides residential and commercial glass, window, door, and shower services across the greater Charlotte area.</p>",
       alignment: "left",
       headingLevel: "h2",
@@ -532,18 +808,53 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       ...SHARED_MOBILE_IMAGE_DEFAULTS,
     },
     propDefs: [
-      { key: "eyebrow", label: "Eyebrow Label", type: "text", placeholder: "Small label above title" },
+      {
+        key: "eyebrow",
+        label: "Eyebrow Label",
+        type: "text",
+        placeholder: "Small label above title",
+      },
       { key: "heading", label: "Section Title", type: "text", placeholder: "Section heading" },
-      { key: "subtitle", label: "Subtitle", type: "textarea", placeholder: "Supporting description" },
+      {
+        key: "subtitle",
+        label: "Subtitle",
+        type: "textarea",
+        placeholder: "Supporting description",
+      },
       { key: "alignment", label: "Alignment", type: "select", options: ALIGN_OPTIONS },
-      { key: "headingLevel", label: "Heading Level", type: "select", options: HEADING_LEVEL_OPTIONS },
+      {
+        key: "headingLevel",
+        label: "Heading Level",
+        type: "select",
+        options: HEADING_LEVEL_OPTIONS,
+      },
       { key: "body", label: "Body Text", type: "richtext", placeholder: "Main text content" },
       { key: "imageUrl", label: "Image", type: "image-url", placeholder: "Upload or select image" },
-      { key: "imageAlt", label: "Image Alt Text", type: "text", placeholder: "Descriptive alt text" },
-      { key: "imageCaption", label: "Image Caption", type: "text", placeholder: "Optional caption" },
-      { key: "imagePosition", label: "Image Position", type: "select", options: IMAGE_POSITION_OPTIONS },
+      {
+        key: "imageAlt",
+        label: "Image Alt Text",
+        type: "text",
+        placeholder: "Descriptive alt text",
+      },
+      {
+        key: "imageCaption",
+        label: "Image Caption",
+        type: "text",
+        placeholder: "Optional caption",
+      },
+      {
+        key: "imagePosition",
+        label: "Image Position",
+        type: "select",
+        options: IMAGE_POSITION_OPTIONS,
+      },
       { key: "badgeValue", label: "Image Badge Value", type: "text", placeholder: "e.g. 15+" },
-      { key: "badgeLabel", label: "Image Badge Label", type: "text", placeholder: "e.g. Years Experience" },
+      {
+        key: "badgeLabel",
+        label: "Image Badge Label",
+        type: "text",
+        placeholder: "e.g. Years Experience",
+      },
       ...SHARED_MOBILE_IMAGE_PROP_DEFS,
     ],
   },
@@ -558,35 +869,63 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       subtitle: "",
       leftHeading: "Column One",
       leftBody: "<p>Use this space for supporting copy before the list.</p>",
-      leftItems: [
-        { text: "Bullet point one" },
-        { text: "Bullet point two" },
-      ],
+      leftItems: [{ text: "Bullet point one" }, { text: "Bullet point two" }],
       rightHeading: "Column Two",
       rightBody: "<p>Use this column for a second list or additional detail.</p>",
-      rightItems: [
-        { text: "Bullet point one" },
-        { text: "Bullet point two" },
-      ],
+      rightItems: [{ text: "Bullet point one" }, { text: "Bullet point two" }],
     },
     propDefs: [
-      { key: "title", label: "Section Title", type: "text", placeholder: "Optional section heading" },
-      { key: "subtitle", label: "Subtitle", type: "textarea", placeholder: "Optional supporting description" },
-      { key: "leftHeading", label: "Left Column Heading", type: "text", placeholder: "Left column title" },
-      { key: "leftBody", label: "Left Column Body", type: "richtext", placeholder: "Optional supporting text" },
+      {
+        key: "title",
+        label: "Section Title",
+        type: "text",
+        placeholder: "Optional section heading",
+      },
+      {
+        key: "subtitle",
+        label: "Subtitle",
+        type: "textarea",
+        placeholder: "Optional supporting description",
+      },
+      {
+        key: "leftHeading",
+        label: "Left Column Heading",
+        type: "text",
+        placeholder: "Left column title",
+      },
+      {
+        key: "leftBody",
+        label: "Left Column Body",
+        type: "richtext",
+        placeholder: "Optional supporting text",
+      },
       {
         key: "leftItems",
         label: "Left Column Items",
         type: "array-items",
-        itemSchema: [{ key: "text", label: "Item Text", type: "text", placeholder: "Bullet point" }],
+        itemSchema: [
+          { key: "text", label: "Item Text", type: "text", placeholder: "Bullet point" },
+        ],
       },
-      { key: "rightHeading", label: "Right Column Heading", type: "text", placeholder: "Right column title" },
-      { key: "rightBody", label: "Right Column Body", type: "richtext", placeholder: "Optional supporting text" },
+      {
+        key: "rightHeading",
+        label: "Right Column Heading",
+        type: "text",
+        placeholder: "Right column title",
+      },
+      {
+        key: "rightBody",
+        label: "Right Column Body",
+        type: "richtext",
+        placeholder: "Optional supporting text",
+      },
       {
         key: "rightItems",
         label: "Right Column Items",
         type: "array-items",
-        itemSchema: [{ key: "text", label: "Item Text", type: "text", placeholder: "Bullet point" }],
+        itemSchema: [
+          { key: "text", label: "Item Text", type: "text", placeholder: "Bullet point" },
+        ],
       },
     ],
   },
@@ -599,7 +938,8 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     defaultProps: {
       title: "Important Takeaway",
       subtitle: "",
-      content: "<p>Use this callout to highlight a key message, important note, or short supporting explanation.</p>",
+      content:
+        "<p>Use this callout to highlight a key message, important note, or short supporting explanation.</p>",
       variant: "accent",
       ctaText: "",
       ctaLink: "",
@@ -610,17 +950,42 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       ctaModalDescription: "",
     },
     propDefs: [
-      { key: "title", label: "Section Title", type: "text", placeholder: "Optional section heading" },
-      { key: "subtitle", label: "Subtitle", type: "textarea", placeholder: "Optional supporting description" },
-      { key: "content", label: "Content", type: "richtext", placeholder: "Add highlighted content..." },
+      {
+        key: "title",
+        label: "Section Title",
+        type: "text",
+        placeholder: "Optional section heading",
+      },
+      {
+        key: "subtitle",
+        label: "Subtitle",
+        type: "textarea",
+        placeholder: "Optional supporting description",
+      },
+      {
+        key: "content",
+        label: "Content",
+        type: "richtext",
+        placeholder: "Add highlighted content...",
+      },
       { key: "variant", label: "Style Variant", type: "select", options: CALLOUT_VARIANT_OPTIONS },
       { key: "ctaText", label: "Button Text", type: "text", placeholder: "Optional button label" },
       { key: "ctaAction", label: "Button Action", type: "select", options: BUTTON_ACTION_OPTIONS },
       { key: "ctaLink", label: "Button Link", type: "url", placeholder: "/page or https://..." },
       { key: "ctaOpenInNewTab", label: "Open In New Tab", type: "boolean" },
       { key: "ctaFormSlug", label: "Assigned Form", type: "form-select" },
-      { key: "ctaModalTitle", label: "Modal Title", type: "text", placeholder: "Optional modal title override" },
-      { key: "ctaModalDescription", label: "Modal Description", type: "textarea", placeholder: "Optional modal description" },
+      {
+        key: "ctaModalTitle",
+        label: "Modal Title",
+        type: "text",
+        placeholder: "Optional modal title override",
+      },
+      {
+        key: "ctaModalDescription",
+        label: "Modal Description",
+        type: "textarea",
+        placeholder: "Optional modal description",
+      },
     ],
   },
   {
@@ -639,8 +1004,18 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       ],
     },
     propDefs: [
-      { key: "title", label: "Section Title", type: "text", placeholder: "Optional section heading" },
-      { key: "subtitle", label: "Subtitle", type: "textarea", placeholder: "Optional supporting description" },
+      {
+        key: "title",
+        label: "Section Title",
+        type: "text",
+        placeholder: "Optional section heading",
+      },
+      {
+        key: "subtitle",
+        label: "Subtitle",
+        type: "textarea",
+        placeholder: "Optional supporting description",
+      },
       { key: "columns", label: "Columns", type: "select", options: LINK_LIST_COLUMNS_OPTIONS },
       {
         key: "links",
@@ -648,7 +1023,12 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
         type: "array-items",
         itemSchema: [
           { key: "label", label: "Label", type: "text", placeholder: "Link title" },
-          { key: "description", label: "Description", type: "textarea", placeholder: "Optional supporting text" },
+          {
+            key: "description",
+            label: "Description",
+            type: "textarea",
+            placeholder: "Optional supporting text",
+          },
           { key: "url", label: "URL", type: "url", placeholder: "/page or https://..." },
         ],
       },
@@ -683,19 +1063,54 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       { key: "heading", label: "Heading", type: "text", placeholder: "CTA heading" },
       { key: "subheading", label: "Subheading", type: "textarea", placeholder: "Supporting text" },
       { key: "primaryText", label: "Primary Button", type: "text", placeholder: "Button label" },
-      { key: "primaryAction", label: "Primary Button Action", type: "select", options: BUTTON_ACTION_OPTIONS },
+      {
+        key: "primaryAction",
+        label: "Primary Button Action",
+        type: "select",
+        options: BUTTON_ACTION_OPTIONS,
+      },
       { key: "primaryLink", label: "Primary Button Link", type: "url", placeholder: "/#contact" },
       { key: "primaryOpenInNewTab", label: "Primary Open In New Tab", type: "boolean" },
       { key: "primaryFormSlug", label: "Primary Button Form", type: "form-select" },
-      { key: "primaryModalTitle", label: "Primary Modal Title", type: "text", placeholder: "Optional modal title override" },
-      { key: "primaryModalDescription", label: "Primary Modal Description", type: "textarea", placeholder: "Optional modal description" },
-      { key: "secondaryText", label: "Secondary Button", type: "text", placeholder: "Optional secondary button" },
-      { key: "secondaryAction", label: "Secondary Button Action", type: "select", options: BUTTON_ACTION_OPTIONS },
+      {
+        key: "primaryModalTitle",
+        label: "Primary Modal Title",
+        type: "text",
+        placeholder: "Optional modal title override",
+      },
+      {
+        key: "primaryModalDescription",
+        label: "Primary Modal Description",
+        type: "textarea",
+        placeholder: "Optional modal description",
+      },
+      {
+        key: "secondaryText",
+        label: "Secondary Button",
+        type: "text",
+        placeholder: "Optional secondary button",
+      },
+      {
+        key: "secondaryAction",
+        label: "Secondary Button Action",
+        type: "select",
+        options: BUTTON_ACTION_OPTIONS,
+      },
       { key: "secondaryLink", label: "Secondary Button Link", type: "url", placeholder: "/#about" },
       { key: "secondaryOpenInNewTab", label: "Secondary Open In New Tab", type: "boolean" },
       { key: "secondaryFormSlug", label: "Secondary Button Form", type: "form-select" },
-      { key: "secondaryModalTitle", label: "Secondary Modal Title", type: "text", placeholder: "Optional modal title override" },
-      { key: "secondaryModalDescription", label: "Secondary Modal Description", type: "textarea", placeholder: "Optional modal description" },
+      {
+        key: "secondaryModalTitle",
+        label: "Secondary Modal Title",
+        type: "text",
+        placeholder: "Optional modal title override",
+      },
+      {
+        key: "secondaryModalDescription",
+        label: "Secondary Modal Description",
+        type: "textarea",
+        placeholder: "Optional modal description",
+      },
       { key: "variant", label: "Style Variant", type: "select", options: CTA_VARIANT_OPTIONS },
     ],
   },
@@ -711,24 +1126,56 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       columns: "3",
       variant: "default",
       cards: [
-        { title: "Owner-Operated", description: "You work directly with Doug from estimate through installation.", icon: "UserCheck" },
-        { title: "Measured Carefully", description: "Every opening is checked before materials are ordered or installed.", icon: "Ruler" },
-        { title: "Clean Finish", description: "Projects are completed with attention to fit, seal, and final appearance.", icon: "Sparkles" },
+        {
+          title: "Owner-Operated",
+          description: "You work directly with Doug from estimate through installation.",
+          icon: "UserCheck",
+        },
+        {
+          title: "Measured Carefully",
+          description: "Every opening is checked before materials are ordered or installed.",
+          icon: "Ruler",
+        },
+        {
+          title: "Clean Finish",
+          description: "Projects are completed with attention to fit, seal, and final appearance.",
+          icon: "Sparkles",
+        },
       ],
     },
     propDefs: [
       { key: "title", label: "Section Title", type: "text", placeholder: "Grid section title" },
-      { key: "subtitle", label: "Section Subtitle", type: "text", placeholder: "Optional subtitle" },
+      {
+        key: "subtitle",
+        label: "Section Subtitle",
+        type: "text",
+        placeholder: "Optional subtitle",
+      },
       { key: "columns", label: "Columns", type: "select", options: COLUMNS_OPTIONS },
-      { key: "variant", label: "Design Variant", type: "select", options: CARDS_GRID_VARIANT_OPTIONS },
+      {
+        key: "variant",
+        label: "Design Variant",
+        type: "select",
+        options: CARDS_GRID_VARIANT_OPTIONS,
+      },
       {
         key: "cards",
         label: "Cards",
         type: "array-items",
         itemSchema: [
           { key: "title", label: "Card Title", type: "text", placeholder: "Card title" },
-          { key: "description", label: "Description", type: "textarea", placeholder: "Card description" },
-          { key: "icon", label: "Icon Name (Lucide)", type: "text", placeholder: "e.g. Globe, Heart, Users" },
+          {
+            key: "description",
+            label: "Description",
+            type: "textarea",
+            placeholder: "Card description",
+          },
+          {
+            key: "icon",
+            label: "Icon Name (Lucide)",
+            type: "text",
+            placeholder: "e.g. Globe, Heart, Users",
+          },
           { key: "link", label: "Card Link", type: "url", placeholder: "/contact or #contact" },
           { key: "buttonText", label: "Button Text", type: "text", placeholder: "Learn More" },
           { key: "openInNewTab", label: "Open In New Tab", type: "boolean" },
@@ -745,8 +1192,16 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     defaultProps: {
       title: "Frequently Asked Questions",
       items: [
-        { question: "What areas do you serve?", answer: "Glass & Door Pro serves Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby communities." },
-        { question: "Do you handle both residential and commercial work?", answer: "Yes. We handle frameless showers, windows, doors, window repair, storefront glass, and commercial door projects." },
+        {
+          question: "What areas do you serve?",
+          answer:
+            "Glass & Door Pro serves Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby communities.",
+        },
+        {
+          question: "Do you handle both residential and commercial work?",
+          answer:
+            "Yes. We handle frameless showers, windows, doors, window repair, storefront glass, and commercial door projects.",
+        },
       ],
     },
     propDefs: [
@@ -772,14 +1227,35 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       title: "What Customers Say",
       variant: "default",
       items: [
-        { quote: "Doug was responsive, professional, and the finished glass work looks great.", name: "Customer", role: "Glass & Door Pro Customer", location: "Charlotte Area" },
-        { quote: "The project was measured carefully, installed cleanly, and finished exactly as discussed.", name: "Customer", role: "Glass & Door Pro Customer", location: "Greater Charlotte" },
+        {
+          quote: "Doug was responsive, professional, and the finished glass work looks great.",
+          name: "Customer",
+          role: "Glass & Door Pro Customer",
+          location: "Charlotte Area",
+        },
+        {
+          quote:
+            "The project was measured carefully, installed cleanly, and finished exactly as discussed.",
+          name: "Customer",
+          role: "Glass & Door Pro Customer",
+          location: "Greater Charlotte",
+        },
       ],
     },
     propDefs: [
       { key: "title", label: "Section Title", type: "text", placeholder: "Testimonials heading" },
-      { key: "variant", label: "Design Variant", type: "select", options: TESTIMONIAL_VARIANT_OPTIONS },
-      { key: "ctaText", label: "CTA Button Text", type: "text", placeholder: "Optional button label" },
+      {
+        key: "variant",
+        label: "Design Variant",
+        type: "select",
+        options: TESTIMONIAL_VARIANT_OPTIONS,
+      },
+      {
+        key: "ctaText",
+        label: "CTA Button Text",
+        type: "text",
+        placeholder: "Optional button label",
+      },
       { key: "ctaLink", label: "CTA Button Link", type: "url", placeholder: "https://..." },
       {
         key: "items",
@@ -806,8 +1282,24 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     defaultProps: {
       alignment: "center",
       buttons: [
-        { text: "Get a Free Quote", action: "url", link: "/#contact", formSlug: "contact-form", modalTitle: "", modalDescription: "", variant: "default" },
-        { text: "Learn More", action: "url", link: "/#about", formSlug: "contact-form", modalTitle: "", modalDescription: "", variant: "outline" },
+        {
+          text: "Get a Free Quote",
+          action: "url",
+          link: "/#contact",
+          formSlug: "contact-form",
+          modalTitle: "",
+          modalDescription: "",
+          variant: "default",
+        },
+        {
+          text: "Learn More",
+          action: "url",
+          link: "/#about",
+          formSlug: "contact-form",
+          modalTitle: "",
+          modalDescription: "",
+          variant: "outline",
+        },
       ],
     },
     propDefs: [
@@ -822,8 +1314,18 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
           { key: "link", label: "Link", type: "url", placeholder: "/page or https://..." },
           { key: "openInNewTab", label: "Open In New Tab", type: "boolean" },
           { key: "formSlug", label: "Assigned Form", type: "form-select" },
-          { key: "modalTitle", label: "Modal Title", type: "text", placeholder: "Optional modal title override" },
-          { key: "modalDescription", label: "Modal Description", type: "textarea", placeholder: "Optional modal description" },
+          {
+            key: "modalTitle",
+            label: "Modal Title",
+            type: "text",
+            placeholder: "Optional modal title override",
+          },
+          {
+            key: "modalDescription",
+            label: "Modal Description",
+            type: "textarea",
+            placeholder: "Optional modal description",
+          },
           { key: "variant", label: "Style", type: "select", options: BUTTON_VARIANT_OPTIONS },
         ],
       },
@@ -845,10 +1347,20 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     },
     propDefs: [
       { key: "imageUrl", label: "Image", type: "image-url", placeholder: "Upload or select image" },
-      { key: "alt", label: "Alt Text", type: "text", placeholder: "Descriptive alt text for accessibility" },
+      {
+        key: "alt",
+        label: "Alt Text",
+        type: "text",
+        placeholder: "Descriptive alt text for accessibility",
+      },
       { key: "caption", label: "Caption", type: "text", placeholder: "Optional image caption" },
       { key: "width", label: "Image Width", type: "select", options: IMAGE_WIDTH_OPTIONS },
-      { key: "variant", label: "Design Variant", type: "select", options: IMAGE_BLOCK_VARIANT_OPTIONS },
+      {
+        key: "variant",
+        label: "Design Variant",
+        type: "select",
+        options: IMAGE_BLOCK_VARIANT_OPTIONS,
+      },
       ...SHARED_MOBILE_IMAGE_PROP_DEFS,
     ],
   },
@@ -864,7 +1376,12 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       aspectRatio: "16/9",
     },
     propDefs: [
-      { key: "url", label: "Video URL (YouTube or Vimeo)", type: "url", placeholder: "https://youtube.com/..." },
+      {
+        key: "url",
+        label: "Video URL (YouTube or Vimeo)",
+        type: "url",
+        placeholder: "https://youtube.com/...",
+      },
       { key: "title", label: "Title (optional)", type: "text", placeholder: "Video title" },
       { key: "aspectRatio", label: "Aspect Ratio", type: "select", options: VIDEO_ASPECT_OPTIONS },
     ],
@@ -878,12 +1395,27 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     defaultProps: {
       title: "",
       subtitle: "",
-      html: "<div class=\"rounded-xl border p-6 text-center text-sm text-muted-foreground\">Paste trusted embed code here.</div>",
+      html: '<div class="rounded-xl border p-6 text-center text-sm text-muted-foreground">Paste trusted embed code here.</div>',
     },
     propDefs: [
-      { key: "title", label: "Section Title", type: "text", placeholder: "Optional section heading" },
-      { key: "subtitle", label: "Subtitle", type: "textarea", placeholder: "Optional supporting description" },
-      { key: "html", label: "HTML / Embed Code", type: "textarea", placeholder: "<iframe ...></iframe>" },
+      {
+        key: "title",
+        label: "Section Title",
+        type: "text",
+        placeholder: "Optional section heading",
+      },
+      {
+        key: "subtitle",
+        label: "Subtitle",
+        type: "textarea",
+        placeholder: "Optional supporting description",
+      },
+      {
+        key: "html",
+        label: "HTML / Embed Code",
+        type: "textarea",
+        placeholder: "<iframe ...></iframe>",
+      },
     ],
   },
   {
@@ -900,13 +1432,23 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       ],
     },
     propDefs: [
-      { key: "title", label: "Section Title", type: "text", placeholder: "Contact section heading" },
+      {
+        key: "title",
+        label: "Section Title",
+        type: "text",
+        placeholder: "Contact section heading",
+      },
       {
         key: "items",
         label: "Contact Items",
         type: "array-items",
         itemSchema: [
-          { key: "icon", label: "Icon (Lucide name)", type: "text", placeholder: "e.g. MapPin, Mail, Phone" },
+          {
+            key: "icon",
+            label: "Icon (Lucide name)",
+            type: "text",
+            placeholder: "e.g. MapPin, Mail, Phone",
+          },
           { key: "label", label: "Label", type: "text", placeholder: "e.g. Email, Phone" },
           { key: "value", label: "Value", type: "text", placeholder: "Contact detail" },
         ],
@@ -939,9 +1481,22 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       subtitle: "",
       columns: "3",
       features: [
-        { icon: "CheckCircle", title: "Careful Measurements", description: "Openings are measured before glass, windows, or doors are ordered." },
-        { icon: "Wrench", title: "Repair & Installation", description: "Support for residential and commercial glass, door, and window projects." },
-        { icon: "MapPin", title: "Local Service", description: "Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas." },
+        {
+          icon: "CheckCircle",
+          title: "Careful Measurements",
+          description: "Openings are measured before glass, windows, or doors are ordered.",
+        },
+        {
+          icon: "Wrench",
+          title: "Repair & Installation",
+          description: "Support for residential and commercial glass, door, and window projects.",
+        },
+        {
+          icon: "MapPin",
+          title: "Local Service",
+          description:
+            "Serving Charlotte, Monroe, Indian Trail, Matthews, Waxhaw, and nearby areas.",
+        },
       ],
     },
     propDefs: [
@@ -953,9 +1508,19 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
         label: "Features",
         type: "array-items",
         itemSchema: [
-          { key: "icon", label: "Icon (Lucide)", type: "text", placeholder: "e.g. CheckCircle, Globe" },
+          {
+            key: "icon",
+            label: "Icon (Lucide)",
+            type: "text",
+            placeholder: "e.g. CheckCircle, Globe",
+          },
           { key: "title", label: "Title", type: "text", placeholder: "Feature title" },
-          { key: "description", label: "Description", type: "textarea", placeholder: "Feature description" },
+          {
+            key: "description",
+            label: "Description",
+            type: "textarea",
+            placeholder: "Feature description",
+          },
         ],
       },
     ],
@@ -970,8 +1535,16 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       title: "Common Questions & Concerns",
       subtitle: "",
       items: [
-        { concern: "Can you look at my project before I decide?", response: "Yes. Glass & Door Pro can review the opening, discuss options, and provide a project-specific estimate." },
-        { concern: "Do you handle both homes and businesses?", response: "Yes. We handle residential glass, windows, doors, showers, and commercial storefront or door projects." },
+        {
+          concern: "Can you look at my project before I decide?",
+          response:
+            "Yes. Glass & Door Pro can review the opening, discuss options, and provide a project-specific estimate.",
+        },
+        {
+          concern: "Do you handle both homes and businesses?",
+          response:
+            "Yes. We handle residential glass, windows, doors, showers, and commercial storefront or door projects.",
+        },
       ],
     },
     propDefs: [
@@ -983,7 +1556,12 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
         type: "array-items",
         itemSchema: [
           { key: "concern", label: "Concern", type: "text", placeholder: "What they worry about" },
-          { key: "response", label: "Response", type: "textarea", placeholder: "Reassuring answer" },
+          {
+            key: "response",
+            label: "Response",
+            type: "textarea",
+            placeholder: "Reassuring answer",
+          },
         ],
       },
     ],
@@ -998,9 +1576,21 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       title: "Your Journey",
       subtitle: "",
       items: [
-        { before: "Broken, drafty, or outdated opening", after: "Measured project with clear repair or replacement options", milestone: "Estimate" },
-        { before: "Unclear schedule or materials", after: "Ordered materials and installation timing confirmed", milestone: "Planning" },
-        { before: "Unfinished glass, window, or door issue", after: "Clean installation or repair completed", milestone: "Finish" },
+        {
+          before: "Broken, drafty, or outdated opening",
+          after: "Measured project with clear repair or replacement options",
+          milestone: "Estimate",
+        },
+        {
+          before: "Unclear schedule or materials",
+          after: "Ordered materials and installation timing confirmed",
+          milestone: "Planning",
+        },
+        {
+          before: "Unfinished glass, window, or door issue",
+          after: "Clean installation or repair completed",
+          milestone: "Finish",
+        },
       ],
     },
     propDefs: [
@@ -1011,7 +1601,12 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
         label: "Milestones",
         type: "array-items",
         itemSchema: [
-          { key: "milestone", label: "Milestone Label", type: "text", placeholder: "e.g. Week 1, Step 1" },
+          {
+            key: "milestone",
+            label: "Milestone Label",
+            type: "text",
+            placeholder: "e.g. Week 1, Step 1",
+          },
           { key: "before", label: "Before", type: "text", placeholder: "Starting point" },
           { key: "after", label: "After", type: "text", placeholder: "Outcome" },
         ],
@@ -1038,7 +1633,12 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
         label: "Trust Signals",
         type: "array-items",
         itemSchema: [
-          { key: "icon", label: "Icon (Lucide)", type: "text", placeholder: "e.g. ShieldCheck, Lock" },
+          {
+            key: "icon",
+            label: "Icon (Lucide)",
+            type: "text",
+            placeholder: "e.g. ShieldCheck, Lock",
+          },
           { key: "label", label: "Label", type: "text", placeholder: "Trust signal text" },
         ],
       },
@@ -1052,12 +1652,15 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     category: "social-proof",
     defaultProps: {
       title: "As Seen In",
-      items: [
-        { name: "Publication Name", logoUrl: "", link: "" },
-      ],
+      items: [{ name: "Publication Name", logoUrl: "", link: "" }],
     },
     propDefs: [
-      { key: "title", label: "Section Title", type: "text", placeholder: "e.g. As Seen In, Featured By" },
+      {
+        key: "title",
+        label: "Section Title",
+        type: "text",
+        placeholder: "e.g. As Seen In, Featured By",
+      },
       {
         key: "items",
         label: "Press Items",
@@ -1096,7 +1699,12 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
           { key: "label", label: "Label", type: "text", placeholder: "What the stat represents" },
         ],
       },
-      { key: "disclaimer", label: "Disclaimer", type: "text", placeholder: "Optional disclaimer text" },
+      {
+        key: "disclaimer",
+        label: "Disclaimer",
+        type: "text",
+        placeholder: "Optional disclaimer text",
+      },
     ],
   },
   {
@@ -1116,7 +1724,12 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       { key: "title", label: "Section Title", type: "text", placeholder: "Optional heading" },
       { key: "columns", label: "Columns", type: "select", options: COLUMNS_OPTIONS },
       { key: "gap", label: "Gap Size", type: "select", options: SPACING_OPTIONS },
-      { key: "variant", label: "Design Variant", type: "select", options: IMAGE_GRID_VARIANT_OPTIONS },
+      {
+        key: "variant",
+        label: "Design Variant",
+        type: "select",
+        options: IMAGE_GRID_VARIANT_OPTIONS,
+      },
       {
         key: "images",
         label: "Images",
@@ -1151,7 +1764,12 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
         itemSchema: [
           { key: "imageUrl", label: "Image", type: "image-url", placeholder: "Upload slide image" },
           { key: "heading", label: "Heading", type: "text", placeholder: "Slide heading" },
-          { key: "description", label: "Description", type: "textarea", placeholder: "Slide description" },
+          {
+            key: "description",
+            label: "Description",
+            type: "textarea",
+            placeholder: "Slide description",
+          },
         ],
       },
     ],
@@ -1225,9 +1843,21 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       subtitle: "",
       layout: "stack",
       items: [
-        { icon: "CheckCircle", title: "Clear Options", description: "Review repair, replacement, and installation options before work begins." },
-        { icon: "Ruler", title: "Project Fit", description: "Measurements and product choices are matched to the actual opening." },
-        { icon: "Sparkles", title: "Finished Appearance", description: "Work is completed with attention to fit, seal, and visible details." },
+        {
+          icon: "CheckCircle",
+          title: "Clear Options",
+          description: "Review repair, replacement, and installation options before work begins.",
+        },
+        {
+          icon: "Ruler",
+          title: "Project Fit",
+          description: "Measurements and product choices are matched to the actual opening.",
+        },
+        {
+          icon: "Sparkles",
+          title: "Finished Appearance",
+          description: "Work is completed with attention to fit, seal, and visible details.",
+        },
       ],
     },
     propDefs: [
@@ -1241,7 +1871,12 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
         itemSchema: [
           { key: "icon", label: "Icon (Lucide)", type: "text", placeholder: "e.g. CheckCircle" },
           { key: "title", label: "Title", type: "text", placeholder: "Benefit title" },
-          { key: "description", label: "Description", type: "textarea", placeholder: "Benefit description" },
+          {
+            key: "description",
+            label: "Description",
+            type: "textarea",
+            placeholder: "Benefit description",
+          },
         ],
       },
     ],
@@ -1255,9 +1890,7 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     defaultProps: {
       title: "Project Details",
       body: "",
-      citations: [
-        { text: "Manufacturer product details or warranty reference", url: "" },
-      ],
+      citations: [{ text: "Manufacturer product details or warranty reference", url: "" }],
     },
     propDefs: [
       { key: "title", label: "Title", type: "text", placeholder: "Section heading" },
@@ -1291,7 +1924,12 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     },
     propDefs: [
       { key: "title", label: "Title", type: "text", placeholder: "Section heading" },
-      { key: "disclaimer", label: "Disclaimer", type: "textarea", placeholder: "Optional legal disclaimer" },
+      {
+        key: "disclaimer",
+        label: "Disclaimer",
+        type: "textarea",
+        placeholder: "Optional legal disclaimer",
+      },
       {
         key: "items",
         label: "Checklist Items",
@@ -1337,12 +1975,27 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
         ],
       },
       { key: "ctaText", label: "CTA Button Text", type: "text", placeholder: "Button label" },
-      { key: "ctaAction", label: "CTA Button Action", type: "select", options: BUTTON_ACTION_OPTIONS },
+      {
+        key: "ctaAction",
+        label: "CTA Button Action",
+        type: "select",
+        options: BUTTON_ACTION_OPTIONS,
+      },
       { key: "ctaLink", label: "CTA Link", type: "url", placeholder: "/#contact" },
       { key: "ctaOpenInNewTab", label: "Open In New Tab", type: "boolean" },
       { key: "ctaFormSlug", label: "Assigned Form", type: "form-select" },
-      { key: "ctaModalTitle", label: "Modal Title", type: "text", placeholder: "Optional modal title override" },
-      { key: "ctaModalDescription", label: "Modal Description", type: "textarea", placeholder: "Optional modal description" },
+      {
+        key: "ctaModalTitle",
+        label: "Modal Title",
+        type: "text",
+        placeholder: "Optional modal title override",
+      },
+      {
+        key: "ctaModalDescription",
+        label: "Modal Description",
+        type: "textarea",
+        placeholder: "Optional modal description",
+      },
     ],
   },
   {
@@ -1355,9 +2008,21 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       title: "How It Works",
       subtitle: "",
       steps: [
-        { step: "1", title: "Request an Estimate", description: "Share the glass, window, door, shower, or commercial project details." },
-        { step: "2", title: "Measure & Review Options", description: "Confirm measurements, product choices, and timing." },
-        { step: "3", title: "Install or Repair", description: "Complete the project with a clean, finished result." },
+        {
+          step: "1",
+          title: "Request an Estimate",
+          description: "Share the glass, window, door, shower, or commercial project details.",
+        },
+        {
+          step: "2",
+          title: "Measure & Review Options",
+          description: "Confirm measurements, product choices, and timing.",
+        },
+        {
+          step: "3",
+          title: "Install or Repair",
+          description: "Complete the project with a clean, finished result.",
+        },
       ],
       includedItems: [],
     },
@@ -1371,16 +2036,19 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
         itemSchema: [
           { key: "step", label: "Step Number/Label", type: "text", placeholder: "e.g. 1, Step A" },
           { key: "title", label: "Title", type: "text", placeholder: "Step title" },
-          { key: "description", label: "Description", type: "textarea", placeholder: "Step details" },
+          {
+            key: "description",
+            label: "Description",
+            type: "textarea",
+            placeholder: "Step details",
+          },
         ],
       },
       {
         key: "includedItems",
         label: "What's Included (optional)",
         type: "array-items",
-        itemSchema: [
-          { key: "text", label: "Item", type: "text", placeholder: "Included item" },
-        ],
+        itemSchema: [{ key: "text", label: "Item", type: "text", placeholder: "Included item" }],
       },
     ],
   },
@@ -1394,9 +2062,22 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       title: "Who We Help",
       subtitle: "",
       personas: [
-        { title: "Homeowners", description: "Residential glass, window, door, and shower projects across the Charlotte area.", icon: "Home" },
-        { title: "Property Managers", description: "Repairs and replacements for rental, multi-unit, and managed properties.", icon: "Building2" },
-        { title: "Businesses", description: "Storefront glass, commercial doors, and facility repair needs.", icon: "BriefcaseBusiness" },
+        {
+          title: "Homeowners",
+          description:
+            "Residential glass, window, door, and shower projects across the Charlotte area.",
+          icon: "Home",
+        },
+        {
+          title: "Property Managers",
+          description: "Repairs and replacements for rental, multi-unit, and managed properties.",
+          icon: "Building2",
+        },
+        {
+          title: "Businesses",
+          description: "Storefront glass, commercial doors, and facility repair needs.",
+          icon: "BriefcaseBusiness",
+        },
       ],
     },
     propDefs: [
@@ -1409,7 +2090,12 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
         itemSchema: [
           { key: "icon", label: "Icon (Lucide)", type: "text", placeholder: "e.g. User, Users" },
           { key: "title", label: "Persona Title", type: "text", placeholder: "e.g. Homeowners" },
-          { key: "description", label: "Description", type: "textarea", placeholder: "Who they are and what they need" },
+          {
+            key: "description",
+            label: "Description",
+            type: "textarea",
+            placeholder: "Who they are and what they need",
+          },
         ],
       },
     ],
@@ -1425,22 +2111,41 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
       subtitle: "",
       level: "beginner",
       steps: [
-        { title: "Describe the Project", description: "Send the service type, location, photos if available, and timing needs." },
-        { title: "Confirm the Scope", description: "Review repair or replacement recommendations and any product details." },
-        { title: "Schedule the Work", description: "Set a time for measurement, installation, or repair." },
+        {
+          title: "Describe the Project",
+          description: "Send the service type, location, photos if available, and timing needs.",
+        },
+        {
+          title: "Confirm the Scope",
+          description: "Review repair or replacement recommendations and any product details.",
+        },
+        {
+          title: "Schedule the Work",
+          description: "Set a time for measurement, installation, or repair.",
+        },
       ],
     },
     propDefs: [
       { key: "title", label: "Title", type: "text", placeholder: "Protocol title" },
       { key: "subtitle", label: "Subtitle", type: "text", placeholder: "Optional subtitle" },
-      { key: "level", label: "Experience Level", type: "select", options: EXPERIENCE_LEVEL_OPTIONS },
+      {
+        key: "level",
+        label: "Experience Level",
+        type: "select",
+        options: EXPERIENCE_LEVEL_OPTIONS,
+      },
       {
         key: "steps",
         label: "Steps",
         type: "array-items",
         itemSchema: [
           { key: "title", label: "Step Title", type: "text", placeholder: "Step title" },
-          { key: "description", label: "Description", type: "textarea", placeholder: "Step details" },
+          {
+            key: "description",
+            label: "Description",
+            type: "textarea",
+            placeholder: "Step details",
+          },
         ],
       },
     ],
@@ -1457,15 +2162,17 @@ const FULL_WIDTH_BLOCK_TYPES = new Set([
 ]);
 
 export const BLOCK_REGISTRY: BlockDef[] = BASE_BLOCK_REGISTRY.map((block) => {
-    const blockWithHeading = withSharedSectionHeading(block);
-    if (block.type === "hero") {
-      return withSharedVisibility(blockWithHeading);
-    }
-    return withSharedVisibility(withSharedSectionStyles(blockWithHeading, {
+  const blockWithHeading = withSharedSectionHeading(block);
+  if (block.type === "hero") {
+    return withSharedVisibility(blockWithHeading);
+  }
+  return withSharedVisibility(
+    withSharedSectionStyles(blockWithHeading, {
       includeImageControls: true,
       includePaddingControls: !FULL_WIDTH_BLOCK_TYPES.has(block.type),
-    }));
-  });
+    }),
+  );
+});
 
 const BASE_DYNAMIC_BLOCK_TYPES: BlockDef[] = [
   {
@@ -1486,10 +2193,20 @@ const BASE_DYNAMIC_BLOCK_TYPES: BlockDef[] = [
       contactItems: [],
     },
     propDefs: [
-      { key: "variant", label: "Design Variant", type: "select", options: CONTACT_FORM_VARIANT_OPTIONS },
+      {
+        key: "variant",
+        label: "Design Variant",
+        type: "select",
+        options: CONTACT_FORM_VARIANT_OPTIONS,
+      },
       { key: "anchorId", label: "Anchor ID", type: "text", placeholder: "contact" },
       { key: "eyebrow", label: "Eyebrow Label", type: "text", placeholder: "Get in touch" },
-      { key: "heading", label: "Heading", type: "text", placeholder: "Ready to start your project?" },
+      {
+        key: "heading",
+        label: "Heading",
+        type: "text",
+        placeholder: "Ready to start your project?",
+      },
       { key: "subheading", label: "Subheading", type: "textarea", placeholder: "Supporting text" },
       { key: "formTitle", label: "Form Title", type: "text", placeholder: "Send a Message" },
       { key: "formSlug", label: "Assigned Form", type: "form-select" },
@@ -1498,7 +2215,12 @@ const BASE_DYNAMIC_BLOCK_TYPES: BlockDef[] = [
         label: "Contact Cards",
         type: "array-items",
         itemSchema: [
-          { key: "icon", label: "Icon Name (Lucide)", type: "text", placeholder: "Phone, Mail, MapPin, Clock" },
+          {
+            key: "icon",
+            label: "Icon Name (Lucide)",
+            type: "text",
+            placeholder: "Phone, Mail, MapPin, Clock",
+          },
           { key: "label", label: "Label", type: "text", placeholder: "Phone" },
           { key: "value", label: "Value", type: "textarea", placeholder: "(704) 771-6111" },
           { key: "href", label: "Link", type: "url", placeholder: "tel:+17047716111" },
@@ -1516,17 +2238,17 @@ const BASE_DYNAMIC_BLOCK_TYPES: BlockDef[] = [
     defaultProps: {
       formSlug: "contact-form",
     },
-    propDefs: [
-      { key: "formSlug", label: "Assigned Form", type: "form-select" },
-    ],
+    propDefs: [{ key: "formSlug", label: "Assigned Form", type: "form-select" }],
   },
 ];
 
 export const DYNAMIC_BLOCK_TYPES: BlockDef[] = BASE_DYNAMIC_BLOCK_TYPES.map((block) =>
-    withSharedVisibility(withSharedSectionStyles(withSharedSectionHeading(block), {
+  withSharedVisibility(
+    withSharedSectionStyles(withSharedSectionHeading(block), {
       includePaddingControls: !FULL_WIDTH_BLOCK_TYPES.has(block.type),
-    }))
-  );
+    }),
+  ),
+);
 
 export const ALL_BLOCKS: BlockDef[] = [...BLOCK_REGISTRY, ...DYNAMIC_BLOCK_TYPES];
 

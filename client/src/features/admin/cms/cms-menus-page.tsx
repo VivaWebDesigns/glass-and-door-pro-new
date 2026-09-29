@@ -101,31 +101,32 @@ function MenuItemEditor({
     (transform: (children: MenuItem[]) => MenuItem[]) => {
       onUpdate(item.id, { children: transform(item.children) });
     },
-    [item, onUpdate]
+    [item, onUpdate],
   );
   const updateChild = useCallback(
-    (childId: string, updates: Partial<MenuItem>) => updateChildren((children) => updateMenuItem(children, childId, updates)),
-    [updateChildren]
+    (childId: string, updates: Partial<MenuItem>) =>
+      updateChildren((children) => updateMenuItem(children, childId, updates)),
+    [updateChildren],
   );
   const deleteChild = useCallback(
     (childId: string) => updateChildren((children) => removeMenuItem(children, childId)),
-    [updateChildren]
+    [updateChildren],
   );
   const moveChildUp = useCallback(
     (childId: string) => updateChildren((children) => moveMenuItem(children, childId, "up")),
-    [updateChildren]
+    [updateChildren],
   );
   const moveChildDown = useCallback(
     (childId: string) => updateChildren((children) => moveMenuItem(children, childId, "down")),
-    [updateChildren]
+    [updateChildren],
   );
   const indentChild = useCallback(
     (childId: string) => updateChildren((children) => indentMenuItem(children, childId)),
-    [updateChildren]
+    [updateChildren],
   );
   const addChild = useCallback(
     () => updateChildren((children) => [...children, createMenuItem()]),
-    [updateChildren]
+    [updateChildren],
   );
 
   return (
@@ -182,7 +183,13 @@ function MenuItemEditor({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" aria-label="Menu item actions" className="h-7 w-7 shrink-0" data-testid={`menu-item-actions-${item.id}`}>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Menu item actions"
+              className="h-7 w-7 shrink-0"
+              data-testid={`menu-item-actions-${item.id}`}
+            >
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -190,7 +197,10 @@ function MenuItemEditor({
             <DropdownMenuItem onClick={() => onMoveUp(item.id)} disabled={index === 0}>
               <ArrowUp className="mr-2 h-4 w-4" /> Move up
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onMoveDown(item.id)} disabled={index === totalSiblings - 1}>
+            <DropdownMenuItem
+              onClick={() => onMoveDown(item.id)}
+              disabled={index === totalSiblings - 1}
+            >
               <ArrowDown className="mr-2 h-4 w-4" /> Move down
             </DropdownMenuItem>
             {depth > 1 && (
@@ -321,7 +331,10 @@ function MenuItemsList({
       </div>
 
       {items.length === 0 ? (
-        <div className="border border-dashed rounded-lg p-8 text-center text-muted-foreground" data-testid="text-no-items">
+        <div
+          className="border border-dashed rounded-lg p-8 text-center text-muted-foreground"
+          data-testid="text-no-items"
+        >
           <MenuIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
           <p className="text-sm">No menu items yet. Click "Add Item" to get started.</p>
         </div>
@@ -355,7 +368,9 @@ function MenuEditor({
   const { toast } = useToast();
   const isNew = !menu;
   const [name, setName] = useState(menu?.name || draft?.name || "");
-  const [location, setLocation] = useState<MenuLocation>((menu?.location as MenuLocation) || (draft?.location as MenuLocation) || "unassigned");
+  const [location, setLocation] = useState<MenuLocation>(
+    (menu?.location as MenuLocation) || (draft?.location as MenuLocation) || "unassigned",
+  );
   const [items, setItems] = useState<MenuItem[]>((menu?.items as MenuItem[]) || []);
   const { editorLock, lockedClass } = useLockedResourceEditor({
     resourceType: "cms_menu",
@@ -387,10 +402,19 @@ function MenuEditor({
     setItems((prev) => updateMenuItem(prev, id, updates));
   }, []);
   const deleteItem = useCallback((id: string) => setItems((prev) => removeMenuItem(prev, id)), []);
-  const moveItemUp = useCallback((id: string) => setItems((prev) => moveMenuItem(prev, id, "up")), []);
-  const moveItemDown = useCallback((id: string) => setItems((prev) => moveMenuItem(prev, id, "down")), []);
+  const moveItemUp = useCallback(
+    (id: string) => setItems((prev) => moveMenuItem(prev, id, "up")),
+    [],
+  );
+  const moveItemDown = useCallback(
+    (id: string) => setItems((prev) => moveMenuItem(prev, id, "down")),
+    [],
+  );
   const indentItem = useCallback((id: string) => setItems((prev) => indentMenuItem(prev, id)), []);
-  const outdentItem = useCallback((id: string) => setItems((prev) => outdentMenuItem(prev, id)), []);
+  const outdentItem = useCallback(
+    (id: string) => setItems((prev) => outdentMenuItem(prev, id)),
+    [],
+  );
   const addItem = useCallback(() => setItems((prev) => [...prev, createMenuItem()]), []);
 
   return (
@@ -442,7 +466,9 @@ function MenuEditor({
 export default function CmsMenusPage() {
   const { toast } = useToast();
   const [editingMenu, setEditingMenu] = useState<CmsMenu | null | "new">(null);
-  const [draftMenuDefaults, setDraftMenuDefaults] = useState<Partial<Pick<CmsMenu, "name" | "location">> | null>(null);
+  const [draftMenuDefaults, setDraftMenuDefaults] = useState<Partial<
+    Pick<CmsMenu, "name" | "location">
+  > | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<CmsMenu | null>(null);
 
   const { data: menus, isLoading } = useQuery<CmsMenu[]>({
@@ -463,7 +489,6 @@ export default function CmsMenusPage() {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     },
   });
-
 
   const menusByLocation = new Map<MenuLocation, CmsMenu>();
   for (const menu of menus || []) {
@@ -495,9 +520,12 @@ export default function CmsMenusPage() {
       <div className="p-6 max-w-4xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold" data-testid="text-menus-title">Navigation Menus</h1>
+            <h1 className="text-2xl font-bold" data-testid="text-menus-title">
+              Navigation Menus
+            </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Create reusable menus and assign them to theme locations like the main navigation and footer areas.
+              Create reusable menus and assign them to theme locations like the main navigation and
+              footer areas.
             </p>
           </div>
           <Button
@@ -536,7 +564,11 @@ export default function CmsMenusPage() {
                   ? `${displayMenu.name} (${location === "main_navigation" ? "legacy header menu" : "legacy footer menu"})`
                   : "No menu assigned yet";
               return (
-                <div key={location} className="rounded-lg border p-4" data-testid={`card-menu-location-${location}`}>
+                <div
+                  key={location}
+                  className="rounded-lg border p-4"
+                  data-testid={`card-menu-location-${location}`}
+                >
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-sm font-semibold">{MENU_LOCATION_LABELS[location]}</p>
@@ -581,7 +613,9 @@ export default function CmsMenusPage() {
           <Card>
             <CardContent className="py-12 text-center">
               <MenuIcon className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
-              <h3 className="text-lg font-medium mb-1" data-testid="text-no-menus">No Menus Yet</h3>
+              <h3 className="text-lg font-medium mb-1" data-testid="text-no-menus">
+                No Menus Yet
+              </h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Create a menu and assign it to a theme location to replace the default navigation.
               </p>
@@ -671,14 +705,19 @@ export default function CmsMenusPage() {
               Are you sure you want to delete "{deleteConfirm?.name}"? This action cannot be undone.
               {deleteConfirm?.location !== "unassigned" && (
                 <span className="block mt-1 font-medium text-destructive">
-                  This menu is currently assigned to the {MENU_LOCATION_LABELS[(deleteConfirm?.location as MenuLocation) || "unassigned"]}.
+                  This menu is currently assigned to the{" "}
+                  {MENU_LOCATION_LABELS[(deleteConfirm?.location as MenuLocation) || "unassigned"]}.
                   Deleting it will revert that area to the default navigation.
                 </span>
               )}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteConfirm(null)} data-testid="button-cancel-delete">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteConfirm(null)}
+              data-testid="button-cancel-delete"
+            >
               Cancel
             </Button>
             <Button

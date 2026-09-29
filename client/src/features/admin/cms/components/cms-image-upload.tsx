@@ -76,13 +76,17 @@ export interface CmsImageUploadProps {
 }
 
 const ACCEPT_ATTRIBUTE = {
-  all: [...MEDIA_ACCEPTED_TYPES, ...MEDIA_ACCEPTED_EXTENSIONS.filter((ext) => !IMAGE_ACCEPTED_EXTENSIONS.includes(ext))].join(","),
+  all: [
+    ...MEDIA_ACCEPTED_TYPES,
+    ...MEDIA_ACCEPTED_EXTENSIONS.filter((ext) => !IMAGE_ACCEPTED_EXTENSIONS.includes(ext)),
+  ].join(","),
   images: IMAGE_ACCEPTED_TYPES.join(","),
 };
 
 const MODE_COPY = {
   all: {
-    invalidType: "Accepted file types: images, PDF, Word, Excel, PowerPoint, CSV, TXT, RTF, and OpenDocument files",
+    invalidType:
+      "Accepted file types: images, PDF, Word, Excel, PowerPoint, CSV, TXT, RTF, and OpenDocument files",
     uploaded: "File uploaded successfully",
     noun: "file",
     formats: "Images, PDF, Word, Excel, PowerPoint, CSV, TXT, RTF, OpenDocument · Max 10 MB",
@@ -126,7 +130,9 @@ function validateUploadFile(file: File, acceptedMode: "images" | "all") {
     throw new Error(MODE_COPY[acceptedMode].invalidType);
   }
   if (file.size > MAX_BYTES) {
-    throw new Error(`File must be under 10 MB (this file is ${(file.size / (1024 * 1024)).toFixed(1)} MB)`);
+    throw new Error(
+      `File must be under 10 MB (this file is ${(file.size / (1024 * 1024)).toFixed(1)} MB)`,
+    );
   }
 }
 
@@ -178,7 +184,8 @@ function UploadedMediaPreview({
   onOpenLibrary: () => void;
   onRemove: () => void;
 }) {
-  const assetKind = selectedAsset?.url === value ? selectedAsset.assetKind : inferAssetKindFromValue(value);
+  const assetKind =
+    selectedAsset?.url === value ? selectedAsset.assetKind : inferAssetKindFromValue(value);
   return (
     <div className="relative group rounded-lg border bg-muted/20 overflow-hidden">
       {assetKind === "image" ? (

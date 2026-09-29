@@ -6,19 +6,16 @@ import { AdminPermission, type AdminPermission as AdminPermissionType } from "@s
 function getAdminPermissions(user: User | null): AdminPermissionType[] {
   if (!user) return [];
   if (user.role === "admin") {
-    return [
-      AdminPermission.CONTENT,
-      AdminPermission.DESIGN,
-    ];
+    return [AdminPermission.CONTENT, AdminPermission.DESIGN];
   }
 
   if (user.role !== "editor" || !Array.isArray(user.adminPermissions)) {
     return [];
   }
 
-  return user.adminPermissions.filter((permission): permission is AdminPermissionType =>
-    permission === AdminPermission.CONTENT ||
-    permission === AdminPermission.DESIGN
+  return user.adminPermissions.filter(
+    (permission): permission is AdminPermissionType =>
+      permission === AdminPermission.CONTENT || permission === AdminPermission.DESIGN,
   );
 }
 
@@ -57,6 +54,7 @@ export function useAuth() {
     isAdmin: user?.role === "admin",
     isEditor: user?.role === "editor",
     adminPermissions: getAdminPermissions(user ?? null),
-    hasAdminPermission: (permission: AdminPermissionType) => getAdminPermissions(user ?? null).includes(permission),
+    hasAdminPermission: (permission: AdminPermissionType) =>
+      getAdminPermissions(user ?? null).includes(permission),
   };
 }

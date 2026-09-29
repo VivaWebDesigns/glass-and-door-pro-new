@@ -14,7 +14,11 @@ export function createMenuItem(): MenuItem {
   };
 }
 
-export function updateMenuItem(items: MenuItem[], id: string, updates: Partial<MenuItem>): MenuItem[] {
+export function updateMenuItem(
+  items: MenuItem[],
+  id: string,
+  updates: Partial<MenuItem>,
+): MenuItem[] {
   return items.map((item) => (item.id === id ? { ...item, ...updates } : item));
 }
 

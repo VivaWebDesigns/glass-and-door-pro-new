@@ -59,11 +59,257 @@ function ToolbarButton({
       title={title}
       className={cn(
         "h-8 min-w-8 shrink-0 rounded-md px-2 text-xs",
-        active && "bg-primary/10 text-primary ring-1 ring-primary/20"
+        active && "bg-primary/10 text-primary ring-1 ring-primary/20",
       )}
     >
       {children}
     </Button>
+  );
+}
+
+function RichTextLinkPanel({
+  linkUrl,
+  setLinkUrl,
+  insertLink,
+  testId,
+  linkText,
+  setLinkText,
+  linkOpenInNewTab,
+  setLinkOpenInNewTab,
+  editor,
+  setShowLinkPanel,
+}: {
+  linkUrl: string;
+  setLinkUrl: React.Dispatch<React.SetStateAction<string>>;
+  insertLink: () => void;
+  testId: string | undefined;
+  linkText: string;
+  setLinkText: React.Dispatch<React.SetStateAction<string>>;
+  linkOpenInNewTab: boolean;
+  setLinkOpenInNewTab: React.Dispatch<React.SetStateAction<boolean>>;
+  editor: ReturnType<typeof useEditor>;
+  setShowLinkPanel: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  return (
+    <div className="space-y-2 border-b bg-muted/20 px-3 py-3">
+      <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+        <div className="space-y-1">
+          <Label className="text-xs">Link URL</Label>
+          <Input
+            value={linkUrl}
+            onChange={(e) => setLinkUrl(e.target.value)}
+            placeholder="https://example.com"
+            autoPrependHttps
+            className="h-8 text-xs"
+            autoFocus
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                insertLink();
+              }
+            }}
+            data-testid={`${testId}-link-url`}
+          />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs">Link text if nothing is selected</Label>
+          <Input
+            value={linkText}
+            onChange={(e) => setLinkText(e.target.value)}
+            placeholder="Read more"
+            className="h-8 text-xs"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                insertLink();
+              }
+            }}
+            data-testid={`${testId}-link-text`}
+          />
+        </div>
+        <div className="space-y-1 sm:col-span-2">
+          <div className="flex items-center gap-2 pt-1">
+            <Checkbox
+              id={`${testId ?? "cms-richtext"}-link-new-tab`}
+              checked={linkOpenInNewTab}
+              onCheckedChange={(checked) => setLinkOpenInNewTab(checked === true)}
+            />
+            <Label
+              htmlFor={`${testId ?? "cms-richtext"}-link-new-tab`}
+              className="text-xs font-normal"
+            >
+              Open in new tab
+            </Label>
+          </div>
+        </div>
+        <div className="flex items-center gap-1">
+          <Button
+            type="button"
+            size="sm"
+            className="h-8 text-xs"
+            onClick={insertLink}
+            disabled={!linkUrl.trim()}
+          >
+            {editor.isActive("link") ? "Update" : "Insert"}
+          </Button>
+          {editor.isActive("link") && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs"
+              onClick={() => {
+                editor.chain().focus().unsetLink().run();
+                setLinkOpenInNewTab(false);
+                setShowLinkPanel(false);
+              }}
+            >
+              Remove
+            </Button>
+          )}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+            onClick={() => {
+              setShowLinkPanel(false);
+              setLinkUrl("");
+              setLinkText("");
+              setLinkOpenInNewTab(false);
+            }}
+          >
+            <X className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RichTextToolbar({
+  editor,
+  showLinkPanel,
+  setLinkUrl,
+  setLinkOpenInNewTab,
+  setShowLinkPanel,
+}: {
+  editor: ReturnType<typeof useEditor>;
+  showLinkPanel: boolean;
+  setLinkUrl: React.Dispatch<React.SetStateAction<string>>;
+  setLinkOpenInNewTab: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowLinkPanel: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-1 border-b bg-muted/40 px-2 py-2">
+      <ToolbarButton
+        onClick={() => editor.chain().focus().undo().run()}
+        disabled={!editor.can().undo()}
+        title="Undo"
+      >
+        <Undo2 className="h-3.5 w-3.5" />
+      </ToolbarButton>
+      <ToolbarButton
+        onClick={() => editor.chain().focus().redo().run()}
+        disabled={!editor.can().redo()}
+        title="Redo"
+      >
+        <Redo2 className="h-3.5 w-3.5" />
+      </ToolbarButton>
+      <ToolbarSep />
+      <ToolbarButton
+        active={editor.isActive("paragraph")}
+        onClick={() => editor.chain().focus().setParagraph().run()}
+        title="Paragraph"
+      >
+        <span className="font-semibold leading-none">P</span>
+      </ToolbarButton>
+      <ToolbarButton
+        active={editor.isActive("heading", { level: 2 })}
+        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+        title="Heading"
+      >
+        <span className="font-semibold leading-none">H2</span>
+      </ToolbarButton>
+      <ToolbarSep />
+      <ToolbarButton
+        active={editor.isActive("bold")}
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        title="Bold"
+      >
+        <Bold className="h-3.5 w-3.5" />
+      </ToolbarButton>
+      <ToolbarButton
+        active={editor.isActive("italic")}
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        title="Italic"
+      >
+        <Italic className="h-3.5 w-3.5" />
+      </ToolbarButton>
+      <ToolbarButton
+        active={editor.isActive("underline")}
+        onClick={() => editor.chain().focus().toggleUnderline().run()}
+        title="Underline"
+      >
+        <UnderlineIcon className="h-3.5 w-3.5" />
+      </ToolbarButton>
+      <ToolbarButton
+        active={editor.isActive("strike")}
+        onClick={() => editor.chain().focus().toggleStrike().run()}
+        title="Strikethrough"
+      >
+        <Strikethrough className="h-3.5 w-3.5" />
+      </ToolbarButton>
+      <ToolbarButton
+        active={editor.isActive("code")}
+        onClick={() => editor.chain().focus().toggleCode().run()}
+        title="Inline code"
+      >
+        <Code className="h-3.5 w-3.5" />
+      </ToolbarButton>
+      <ToolbarSep />
+      <ToolbarButton
+        active={editor.isActive("bulletList")}
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        title="Bullet list"
+      >
+        <List className="h-3.5 w-3.5" />
+      </ToolbarButton>
+      <ToolbarButton
+        active={editor.isActive("orderedList")}
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        title="Numbered list"
+      >
+        <ListOrdered className="h-3.5 w-3.5" />
+      </ToolbarButton>
+      <ToolbarButton
+        active={editor.isActive("blockquote")}
+        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+        title="Quote"
+      >
+        <Quote className="h-3.5 w-3.5" />
+      </ToolbarButton>
+      <ToolbarSep />
+      <ToolbarButton
+        active={showLinkPanel || editor.isActive("link")}
+        onClick={() => {
+          const existingUrl = editor.getAttributes("link").href as string | undefined;
+          const existingTarget = editor.getAttributes("link").target as string | undefined;
+          setLinkUrl(existingUrl ?? "");
+          setLinkOpenInNewTab(existingTarget === "_blank");
+          setShowLinkPanel((open) => !open);
+        }}
+        title="Insert or edit link"
+      >
+        <LinkIcon className="h-3.5 w-3.5" />
+      </ToolbarButton>
+      <ToolbarButton
+        onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}
+        title="Clear formatting"
+      >
+        <span className="font-semibold leading-none">Tx</span>
+      </ToolbarButton>
+    </div>
   );
 }
 
@@ -123,14 +369,16 @@ export function CmsRichTextEditor({
         .insertContent({
           type: "text",
           text: linkText.trim(),
-          marks: [{
-            type: "link",
-            attrs: {
-              href: url,
-              target: linkOpenInNewTab ? "_blank" : null,
-              rel: linkOpenInNewTab ? "noopener noreferrer" : null,
+          marks: [
+            {
+              type: "link",
+              attrs: {
+                href: url,
+                target: linkOpenInNewTab ? "_blank" : null,
+                rel: linkOpenInNewTab ? "noopener noreferrer" : null,
+              },
             },
-          }],
+          ],
         })
         .run();
     } else {
@@ -155,17 +403,31 @@ export function CmsRichTextEditor({
   if (!editor) return null;
 
   return (
-    <Tabs value={activeTab} onValueChange={(tab) => setActiveTab(tab as "visual" | "html")} className="w-full">
+    <Tabs
+      value={activeTab}
+      onValueChange={(tab) => setActiveTab(tab as "visual" | "html")}
+      className="w-full"
+    >
       <div className="mb-2 flex items-center justify-between gap-3">
         <TabsList className="h-9 rounded-full">
-          <TabsTrigger value="visual" className="rounded-full px-3 text-xs" data-testid={`${testId}-visual-tab`}>
+          <TabsTrigger
+            value="visual"
+            className="rounded-full px-3 text-xs"
+            data-testid={`${testId}-visual-tab`}
+          >
             Visual
           </TabsTrigger>
-          <TabsTrigger value="html" className="rounded-full px-3 text-xs" data-testid={`${testId}-html-tab`}>
+          <TabsTrigger
+            value="html"
+            className="rounded-full px-3 text-xs"
+            data-testid={`${testId}-html-tab`}
+          >
             HTML
           </TabsTrigger>
         </TabsList>
-        <p className="text-[11px] text-muted-foreground">Use HTML only when you need advanced control.</p>
+        <p className="text-[11px] text-muted-foreground">
+          Use HTML only when you need advanced control.
+        </p>
       </div>
 
       <TabsContent value="visual" className="mt-0">
@@ -173,156 +435,33 @@ export function CmsRichTextEditor({
           className="overflow-hidden rounded-xl border bg-background shadow-sm focus-within:ring-1 focus-within:ring-ring"
           data-testid={testId}
         >
-          <div className="flex flex-wrap items-center gap-1 border-b bg-muted/40 px-2 py-2">
-            <ToolbarButton onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} title="Undo">
-              <Undo2 className="h-3.5 w-3.5" />
-            </ToolbarButton>
-            <ToolbarButton onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} title="Redo">
-              <Redo2 className="h-3.5 w-3.5" />
-            </ToolbarButton>
-            <ToolbarSep />
-            <ToolbarButton active={editor.isActive("paragraph")} onClick={() => editor.chain().focus().setParagraph().run()} title="Paragraph">
-              <span className="font-semibold leading-none">P</span>
-            </ToolbarButton>
-            <ToolbarButton active={editor.isActive("heading", { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} title="Heading">
-              <span className="font-semibold leading-none">H2</span>
-            </ToolbarButton>
-            <ToolbarSep />
-            <ToolbarButton active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()} title="Bold">
-              <Bold className="h-3.5 w-3.5" />
-            </ToolbarButton>
-            <ToolbarButton active={editor.isActive("italic")} onClick={() => editor.chain().focus().toggleItalic().run()} title="Italic">
-              <Italic className="h-3.5 w-3.5" />
-            </ToolbarButton>
-            <ToolbarButton active={editor.isActive("underline")} onClick={() => editor.chain().focus().toggleUnderline().run()} title="Underline">
-              <UnderlineIcon className="h-3.5 w-3.5" />
-            </ToolbarButton>
-            <ToolbarButton active={editor.isActive("strike")} onClick={() => editor.chain().focus().toggleStrike().run()} title="Strikethrough">
-              <Strikethrough className="h-3.5 w-3.5" />
-            </ToolbarButton>
-            <ToolbarButton active={editor.isActive("code")} onClick={() => editor.chain().focus().toggleCode().run()} title="Inline code">
-              <Code className="h-3.5 w-3.5" />
-            </ToolbarButton>
-            <ToolbarSep />
-            <ToolbarButton active={editor.isActive("bulletList")} onClick={() => editor.chain().focus().toggleBulletList().run()} title="Bullet list">
-              <List className="h-3.5 w-3.5" />
-            </ToolbarButton>
-            <ToolbarButton active={editor.isActive("orderedList")} onClick={() => editor.chain().focus().toggleOrderedList().run()} title="Numbered list">
-              <ListOrdered className="h-3.5 w-3.5" />
-            </ToolbarButton>
-            <ToolbarButton active={editor.isActive("blockquote")} onClick={() => editor.chain().focus().toggleBlockquote().run()} title="Quote">
-              <Quote className="h-3.5 w-3.5" />
-            </ToolbarButton>
-            <ToolbarSep />
-            <ToolbarButton
-              active={showLinkPanel || editor.isActive("link")}
-              onClick={() => {
-                const existingUrl = editor.getAttributes("link").href as string | undefined;
-                const existingTarget = editor.getAttributes("link").target as string | undefined;
-                setLinkUrl(existingUrl ?? "");
-                setLinkOpenInNewTab(existingTarget === "_blank");
-                setShowLinkPanel((open) => !open);
-              }}
-              title="Insert or edit link"
-            >
-              <LinkIcon className="h-3.5 w-3.5" />
-            </ToolbarButton>
-            <ToolbarButton
-              onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}
-              title="Clear formatting"
-            >
-              <span className="font-semibold leading-none">Tx</span>
-            </ToolbarButton>
-          </div>
+          <RichTextToolbar
+            editor={editor}
+            showLinkPanel={showLinkPanel}
+            setLinkUrl={setLinkUrl}
+            setLinkOpenInNewTab={setLinkOpenInNewTab}
+            setShowLinkPanel={setShowLinkPanel}
+          />
 
           {showLinkPanel && (
-            <div className="space-y-2 border-b bg-muted/20 px-3 py-3">
-              <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
-                <div className="space-y-1">
-                  <Label className="text-xs">Link URL</Label>
-                  <Input
-                    value={linkUrl}
-                    onChange={(e) => setLinkUrl(e.target.value)}
-                    placeholder="https://example.com"
-                    autoPrependHttps
-                    className="h-8 text-xs"
-                    autoFocus
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        insertLink();
-                      }
-                    }}
-                    data-testid={`${testId}-link-url`}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Link text if nothing is selected</Label>
-                  <Input
-                    value={linkText}
-                    onChange={(e) => setLinkText(e.target.value)}
-                    placeholder="Read more"
-                    className="h-8 text-xs"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        insertLink();
-                      }
-                    }}
-                    data-testid={`${testId}-link-text`}
-                  />
-                </div>
-                <div className="space-y-1 sm:col-span-2">
-                  <div className="flex items-center gap-2 pt-1">
-                    <Checkbox
-                      id={`${testId ?? "cms-richtext"}-link-new-tab`}
-                      checked={linkOpenInNewTab}
-                      onCheckedChange={(checked) => setLinkOpenInNewTab(checked === true)}
-                    />
-                    <Label htmlFor={`${testId ?? "cms-richtext"}-link-new-tab`} className="text-xs font-normal">
-                      Open in new tab
-                    </Label>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Button type="button" size="sm" className="h-8 text-xs" onClick={insertLink} disabled={!linkUrl.trim()}>
-                    {editor.isActive("link") ? "Update" : "Insert"}
-                  </Button>
-                  {editor.isActive("link") && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="h-8 text-xs"
-                      onClick={() => {
-                        editor.chain().focus().unsetLink().run();
-                        setLinkOpenInNewTab(false);
-                        setShowLinkPanel(false);
-                      }}
-                    >
-                      Remove
-                    </Button>
-                  )}
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0"
-                    onClick={() => {
-                      setShowLinkPanel(false);
-                      setLinkUrl("");
-                      setLinkText("");
-                      setLinkOpenInNewTab(false);
-                    }}
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <RichTextLinkPanel
+              linkUrl={linkUrl}
+              setLinkUrl={setLinkUrl}
+              insertLink={insertLink}
+              testId={testId}
+              linkText={linkText}
+              setLinkText={setLinkText}
+              linkOpenInNewTab={linkOpenInNewTab}
+              setLinkOpenInNewTab={setLinkOpenInNewTab}
+              editor={editor}
+              setShowLinkPanel={setShowLinkPanel}
+            />
           )}
 
-          <EditorContent editor={editor} data-testid={testId ? `${testId}-content` : "cms-richtext-content"} />
+          <EditorContent
+            editor={editor}
+            data-testid={testId ? `${testId}-content` : "cms-richtext-content"}
+          />
         </div>
       </TabsContent>
 

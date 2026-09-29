@@ -1,22 +1,13 @@
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { AdminSidebar } from "@/features/admin/admin-sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Globe,
-  FileCode,
-  Image,
-  SearchIcon,
-  Plus,
-  ArrowRight,
-  Clock,
-} from "lucide-react";
+import { Globe, FileCode, Image, SearchIcon, Plus, ArrowRight, Clock } from "lucide-react";
 import type { CmsPage } from "@shared/schema";
 import { format } from "date-fns";
-import { onActivateKey } from "@/lib/a11y";
 
 const HIDDEN_CMS_PAGE_SLUGS = new Set(["directory", "recordings", "events", "insights"]);
 
@@ -94,7 +85,9 @@ export default function CmsOverviewPage() {
                   {isLoading ? (
                     <Skeleton className="h-6 w-10" />
                   ) : (
-                    <p className="text-xl font-bold" data-testid="text-stat-total">{totalPages}</p>
+                    <p className="text-xl font-bold" data-testid="text-stat-total">
+                      {totalPages}
+                    </p>
                   )}
                   <p className="text-xs text-muted-foreground">Total Pages</p>
                 </div>
@@ -112,7 +105,9 @@ export default function CmsOverviewPage() {
                   {isLoading ? (
                     <Skeleton className="h-6 w-10" />
                   ) : (
-                    <p className="text-xl font-bold" data-testid="text-stat-published">{publishedPages}</p>
+                    <p className="text-xl font-bold" data-testid="text-stat-published">
+                      {publishedPages}
+                    </p>
                   )}
                   <p className="text-xs text-muted-foreground">Published Pages</p>
                 </div>
@@ -130,7 +125,9 @@ export default function CmsOverviewPage() {
                   {isLoading ? (
                     <Skeleton className="h-6 w-10" />
                   ) : (
-                    <p className="text-xl font-bold" data-testid="text-stat-drafts">{draftPages}</p>
+                    <p className="text-xl font-bold" data-testid="text-stat-drafts">
+                      {draftPages}
+                    </p>
                   )}
                   <p className="text-xs text-muted-foreground">Draft Pages</p>
                 </div>
@@ -148,7 +145,9 @@ export default function CmsOverviewPage() {
               data-testid={`card-quicklink-${link.title.toLowerCase().replace(/\s+/g, "-")}`}
             >
               <CardContent className="pt-5 pb-4">
-                <div className={`h-9 w-9 rounded-lg ${link.bg} flex items-center justify-center mb-3`}>
+                <div
+                  className={`h-9 w-9 rounded-lg ${link.bg} flex items-center justify-center mb-3`}
+                >
                   <link.icon className={`h-4.5 w-4.5 ${link.color}`} />
                 </div>
                 <div className="flex items-center justify-between mb-1">
@@ -156,7 +155,9 @@ export default function CmsOverviewPage() {
                   {link.available ? (
                     <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
                   ) : (
-                    <Badge variant="outline" className="text-[10px]">Soon</Badge>
+                    <Badge variant="outline" className="text-[10px]">
+                      Soon
+                    </Badge>
                   )}
                 </div>
                 <p className="text-[11px] text-muted-foreground leading-snug">{link.description}</p>
@@ -175,10 +176,15 @@ export default function CmsOverviewPage() {
           <CardContent>
             {pagesLoading ? (
               <div className="space-y-3">
-                {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} className="h-10 w-full" />
+                ))}
               </div>
             ) : recentPages.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground" data-testid="text-no-recent-pages">
+              <div
+                className="text-center py-8 text-muted-foreground"
+                data-testid="text-no-recent-pages"
+              >
                 <Globe className="h-8 w-8 mx-auto mb-2 opacity-40" />
                 <p className="text-sm">No pages yet. Create your first CMS page to get started.</p>
                 <Button
@@ -207,12 +213,13 @@ export default function CmsOverviewPage() {
                     <tr
                       key={page.id}
                       className="border-b last:border-0 hover:bg-muted/30 cursor-pointer"
-                      onClick={() => navigate(`/admin/cms/pages/${page.id}`)}
-                      onKeyDown={onActivateKey(() => navigate(`/admin/cms/pages/${page.id}`))}
-                      tabIndex={0}
                       data-testid={`row-recent-page-${page.id}`}
                     >
-                      <td className="py-2 font-medium">{page.title}</td>
+                      <td className="py-2 font-medium">
+                        <Link href={`/admin/cms/pages/${page.id}`} className="hover:underline">
+                          {page.title}
+                        </Link>
+                      </td>
                       <td className="py-2 text-muted-foreground font-mono text-xs">{page.slug}</td>
                       <td className="py-2">
                         <Badge
@@ -232,7 +239,6 @@ export default function CmsOverviewPage() {
             )}
           </CardContent>
         </Card>
-
       </div>
     </AdminSidebar>
   );

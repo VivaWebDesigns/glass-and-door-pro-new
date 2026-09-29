@@ -202,7 +202,8 @@ const blocks: BlockInstance[] = [
       primaryAction: "form-modal",
       primaryFormSlug: "contact-form",
       primaryModalTitle: "Request a Free Estimate",
-      primaryModalDescription: "Share a few project details and Doug will follow up with next steps.",
+      primaryModalDescription:
+        "Share a few project details and Doug will follow up with next steps.",
       secondaryText: "Back to Home",
       secondaryAction: "internal-link",
       secondaryLink: "/",

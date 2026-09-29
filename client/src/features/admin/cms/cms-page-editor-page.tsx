@@ -56,11 +56,7 @@ import {
   AlertTriangle,
   Sparkles,
 } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { CmsPage, CmsPageRevision, CmsSidebar } from "@shared/schema";
 import { format } from "date-fns";
 import { PageBuilder } from "./builder/page-builder";
@@ -77,7 +73,10 @@ import { SwitchFieldRow } from "@/components/shared/switch-field-row";
 
 const editorSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  slug: z.string().min(1, "Slug is required").regex(/^[a-z0-9-/]+$/, "Lowercase letters, numbers, hyphens and slashes only"),
+  slug: z
+    .string()
+    .min(1, "Slug is required")
+    .regex(/^[a-z0-9-/]+$/, "Lowercase letters, numbers, hyphens and slashes only"),
   pageType: z.enum(["home", "about", "contact", "landing", "custom", "service", "area"]),
   template: z.enum(["full-width", "with-sidebar"]).default("full-width"),
   sidebarId: z.string().default(""),
@@ -170,7 +169,7 @@ function PageReadinessCard({
   isNew,
   copyDraftPreview,
 }: {
-  qualitySummary: { errors: number; warnings: number; info: number; };
+  qualitySummary: { errors: number; warnings: number; info: number };
   openDraftPreview: () => Promise<void>;
   isPreviewLinkPending: boolean;
   isNew: boolean;
@@ -229,14 +228,18 @@ function PageReadinessCard({
         </div>
 
         <p className="text-xs text-muted-foreground">
-          Preview links open the real frontend renderer with the current saved draft, so editors can review layout and content before publishing.
+          Preview links open the real frontend renderer with the current saved draft, so editors can
+          review layout and content before publishing.
         </p>
       </CardContent>
     </Card>
   );
 }
 
-function PagePublicationChecklist({ qualityIssues, setActiveTab }: {
+function PagePublicationChecklist({
+  qualityIssues,
+  setActiveTab,
+}: {
   qualityIssues: CmsPageQualityIssue[];
   setActiveTab: React.Dispatch<React.SetStateAction<string>>;
 }) {
@@ -265,7 +268,7 @@ function PagePublicationChecklist({ qualityIssues, setActiveTab }: {
                   "rounded-xl border p-4",
                   issue.severity === "error" && "border-red-200 bg-red-50",
                   issue.severity === "warning" && "border-amber-200 bg-amber-50",
-                  issue.severity === "info" && "border-blue-200 bg-blue-50"
+                  issue.severity === "info" && "border-blue-200 bg-blue-50",
                 )}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -273,7 +276,9 @@ function PagePublicationChecklist({ qualityIssues, setActiveTab }: {
                     <p className="font-medium text-sm">{issue.title}</p>
                     <p className="mt-1 text-sm text-muted-foreground">{issue.description}</p>
                   </div>
-                  <Badge variant="outline" className="capitalize">{issue.severity}</Badge>
+                  <Badge variant="outline" className="capitalize">
+                    {issue.severity}
+                  </Badge>
                 </div>
                 <div className="mt-3">
                   <Button
@@ -283,7 +288,8 @@ function PagePublicationChecklist({ qualityIssues, setActiveTab }: {
                     className="h-7 px-2 text-xs"
                     onClick={() => setActiveTab(issue.tab)}
                   >
-                    Open {issue.tab === "builder" ? "Builder" : issue.tab === "seo" ? "SEO" : "Settings"}
+                    Open{" "}
+                    {issue.tab === "builder" ? "Builder" : issue.tab === "seo" ? "SEO" : "Settings"}
                   </Button>
                 </div>
               </div>
@@ -295,9 +301,7 @@ function PagePublicationChecklist({ qualityIssues, setActiveTab }: {
   );
 }
 
-function PageSeoForm({ form }: {
-  form: ReturnType<typeof useForm<EditorForm>>;
-}) {
+function PageSeoForm({ form }: { form: ReturnType<typeof useForm<EditorForm>> }) {
   return (
     <Form {...form}>
       <form className="space-y-5">
@@ -315,17 +319,28 @@ function PageSeoForm({ form }: {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center justify-between">
-                    <FormLabel>SEO Title <span className="text-muted-foreground font-normal text-xs">(optional)</span></FormLabel>
+                    <FormLabel>
+                      SEO Title{" "}
+                      <span className="text-muted-foreground font-normal text-xs">(optional)</span>
+                    </FormLabel>
                     {(field.value ?? "").length > 0 && (
-                      <span className={`text-xs ${(field.value ?? "").length > 60 ? "text-amber-500" : (field.value ?? "").length < 20 ? "text-amber-500" : "text-emerald-600 dark:text-emerald-400"}`}>
+                      <span
+                        className={`text-xs ${(field.value ?? "").length > 60 ? "text-amber-500" : (field.value ?? "").length < 20 ? "text-amber-500" : "text-emerald-600 dark:text-emerald-400"}`}
+                      >
                         {(field.value ?? "").length}/60
                       </span>
                     )}
                   </div>
                   <FormControl>
-                    <Input placeholder="Overrides page title in search results" {...field} data-testid="input-seo-title" />
+                    <Input
+                      placeholder="Overrides page title in search results"
+                      {...field}
+                      data-testid="input-seo-title"
+                    />
                   </FormControl>
-                  <FormDescription className="text-xs">If blank, the page title is used. Aim for 30–60 characters.</FormDescription>
+                  <FormDescription className="text-xs">
+                    If blank, the page title is used. Aim for 30–60 characters.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -337,7 +352,9 @@ function PageSeoForm({ form }: {
                 <FormItem>
                   <FormLabel>
                     Meta Description
-                    <span className={`ml-2 text-xs font-normal ${(field.value ?? "").length > 160 ? "text-amber-500" : (field.value ?? "").length > 130 ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}>
+                    <span
+                      className={`ml-2 text-xs font-normal ${(field.value ?? "").length > 160 ? "text-amber-500" : (field.value ?? "").length > 130 ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}
+                    >
                       ({(field.value ?? "").length}/160)
                     </span>
                   </FormLabel>
@@ -349,7 +366,9 @@ function PageSeoForm({ form }: {
                       data-testid="textarea-seo-description"
                     />
                   </FormControl>
-                  <FormDescription className="text-xs">Aim for 130-160 characters. Longer descriptions can still be saved.</FormDescription>
+                  <FormDescription className="text-xs">
+                    Aim for 130-160 characters. Longer descriptions can still be saved.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -359,9 +378,16 @@ function PageSeoForm({ form }: {
               name="seoKeywords"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Keywords <span className="text-muted-foreground font-normal text-xs">(optional)</span></FormLabel>
+                  <FormLabel>
+                    Keywords{" "}
+                    <span className="text-muted-foreground font-normal text-xs">(optional)</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="comma, separated, keywords" {...field} data-testid="input-seo-keywords" />
+                    <Input
+                      placeholder="comma, separated, keywords"
+                      {...field}
+                      data-testid="input-seo-keywords"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -372,12 +398,21 @@ function PageSeoForm({ form }: {
               name="canonicalUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Canonical URL <span className="text-muted-foreground font-normal text-xs">(optional)</span></FormLabel>
+                  <FormLabel>
+                    Canonical URL{" "}
+                    <span className="text-muted-foreground font-normal text-xs">(optional)</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="https://coreplatform.com/about" autoPrependHttps {...field} data-testid="input-canonical-url" />
+                    <Input
+                      placeholder="https://coreplatform.com/about"
+                      autoPrependHttps
+                      {...field}
+                      data-testid="input-canonical-url"
+                    />
                   </FormControl>
                   <FormDescription className="text-xs">
-                    Override the canonical link tag. Leave blank to auto-generate from the page slug.
+                    Override the canonical link tag. Leave blank to auto-generate from the page
+                    slug.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -414,7 +449,10 @@ function PageSeoForm({ form }: {
               name="ogImageUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Open Graph Image <span className="text-muted-foreground font-normal text-xs">(optional)</span></FormLabel>
+                  <FormLabel>
+                    Open Graph Image{" "}
+                    <span className="text-muted-foreground font-normal text-xs">(optional)</span>
+                  </FormLabel>
                   <CmsImageUpload
                     value={field.value ?? ""}
                     onChange={field.onChange}
@@ -458,10 +496,16 @@ function PageRevisionHistory({
           ) : (
             <div className="space-y-2" data-testid="list-revisions">
               {revisions.slice(0, 8).map((rev, idx) => (
-                <div key={rev.id} className="text-xs border-b last:border-0 pb-2 last:pb-0" data-testid={`item-revision-${rev.id}`}>
+                <div
+                  key={rev.id}
+                  className="text-xs border-b last:border-0 pb-2 last:pb-0"
+                  data-testid={`item-revision-${rev.id}`}
+                >
                   <div className="flex items-center justify-between gap-1 flex-wrap">
                     <div>
-                      <span className="font-medium">{idx === 0 ? "Current" : `v${revisions.length - idx}`}</span>
+                      <span className="font-medium">
+                        {idx === 0 ? "Current" : `v${revisions.length - idx}`}
+                      </span>
                       <span className="text-muted-foreground ml-1.5">
                         {rev.createdAt ? format(new Date(rev.createdAt), "MMM d 'at' h:mm a") : "—"}
                       </span>
@@ -493,7 +537,9 @@ function PageRevisionHistory({
                 </div>
               ))}
               {revisions.length > 8 && (
-                <p className="text-xs text-muted-foreground">+{revisions.length - 8} older revisions</p>
+                <p className="text-xs text-muted-foreground">
+                  +{revisions.length - 8} older revisions
+                </p>
               )}
             </div>
           )}
@@ -627,7 +673,10 @@ function PageDetailsForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Assigned Sidebar</FormLabel>
-                    <Select onValueChange={(value) => field.onChange(value === "none" ? "" : value)} value={field.value || "none"}>
+                    <Select
+                      onValueChange={(value) => field.onChange(value === "none" ? "" : value)}
+                      value={field.value || "none"}
+                    >
                       <FormControl>
                         <SelectTrigger data-testid="select-page-sidebar">
                           <SelectValue placeholder="Select sidebar" />
@@ -668,7 +717,9 @@ function PageDetailsForm({
                         <SelectItem value="draft">Draft</SelectItem>
                         <SelectItem value="published">Published</SelectItem>
                         {field.value === "scheduled" && (
-                          <SelectItem value="scheduled" disabled>Scheduled</SelectItem>
+                          <SelectItem value="scheduled" disabled>
+                            Scheduled
+                          </SelectItem>
                         )}
                         <SelectItem value="archived">Archived</SelectItem>
                       </SelectContent>
@@ -701,7 +752,13 @@ function PageBuilderCanvas({
   handleBuilderChange: (content: BuilderContent) => void;
 }) {
   return (
-    <div className={cn(editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
+    <div
+      className={cn(
+        editorLock.hasLocking &&
+          editorLock.isReadOnly &&
+          "pointer-events-none select-none opacity-70",
+      )}
+    >
       <ErrorBoundary
         name="page-builder-shell"
         onError={(error, errorInfo) =>
@@ -722,7 +779,9 @@ function PageBuilderCanvas({
               The visual page builder hit a rendering problem.
             </h3>
             <p className="mt-2 text-sm text-amber-800/90 dark:text-amber-300/90">
-              The page content is still loaded, but one builder surface failed to render. Reload after deploying this patch. If a single section preview is the issue, the builder will now isolate that section instead of blanking the whole editor.
+              The page content is still loaded, but one builder surface failed to render. Reload
+              after deploying this patch. If a single section preview is the issue, the builder will
+              now isolate that section instead of blanking the whole editor.
             </p>
           </div>
         }
@@ -756,9 +815,7 @@ function DraftPageActions({
     <>
       <Button
         variant="outline"
-        onClick={() =>
-          confirmPageStatusAction("Publishing", () => publishMutation.mutate())
-        }
+        onClick={() => confirmPageStatusAction("Publishing", () => publishMutation.mutate())}
         disabled={publishMutation.isPending || editorLock.isReadOnly}
         data-testid="button-publish"
       >
@@ -797,7 +854,7 @@ function DraftPageActions({
               disabled={!scheduleDate || scheduleMutation.isPending || editorLock.isReadOnly}
               onClick={() =>
                 confirmPageStatusAction("Scheduling this page", () =>
-                  scheduleMutation.mutate(new Date(scheduleDate).toISOString())
+                  scheduleMutation.mutate(new Date(scheduleDate).toISOString()),
                 )
               }
               data-testid="button-confirm-schedule"
@@ -858,7 +915,11 @@ function ScheduledPageActions({
   );
 }
 
-function PublishedPageActions({ confirmPageStatusAction, unpublishMutation, editorLock }: {
+function PublishedPageActions({
+  confirmPageStatusAction,
+  unpublishMutation,
+  editorLock,
+}: {
   confirmPageStatusAction: (actionLabel: string, onProceed: () => void) => boolean;
   unpublishMutation: UseMutationResult<Response, Error, void, unknown>;
   editorLock: ReturnType<typeof useEditorLock>;
@@ -872,9 +933,7 @@ function PublishedPageActions({ confirmPageStatusAction, unpublishMutation, edit
       <Button
         variant="outline"
         size="sm"
-        onClick={() =>
-          confirmPageStatusAction("Unpublishing", () => unpublishMutation.mutate())
-        }
+        onClick={() => confirmPageStatusAction("Unpublishing", () => unpublishMutation.mutate())}
         disabled={unpublishMutation.isPending || editorLock.isReadOnly}
         data-testid="button-unpublish"
       >
@@ -889,7 +948,11 @@ function PublishedPageActions({ confirmPageStatusAction, unpublishMutation, edit
   );
 }
 
-function ExistingPageActions({ copyDraftPreview, isPreviewLinkPending, openDraftPreview }: {
+function ExistingPageActions({
+  copyDraftPreview,
+  isPreviewLinkPending,
+  openDraftPreview,
+}: {
   copyDraftPreview: () => Promise<void>;
   isPreviewLinkPending: boolean;
   openDraftPreview: () => Promise<void>;
@@ -1005,7 +1068,11 @@ function useDraftPreviewLink(id: string | undefined) {
   const previewLinkMutation = useMutation({
     mutationFn: async () => {
       const response = await apiRequest("GET", `/api/admin/cms/pages/${id}/preview-link`);
-      return response.json() as Promise<{ previewUrl: string; previewPath: string; expiresInHours: number }>;
+      return response.json() as Promise<{
+        previewUrl: string;
+        previewPath: string;
+        expiresInHours: number;
+      }>;
     },
     onSuccess: (result) => {
       previewUrlRef.current = result.previewUrl;
@@ -1046,18 +1113,22 @@ function useDraftPreviewLink(id: string | undefined) {
   return { open, copy, reset, isPending: previewLinkMutation.isPending };
 }
 
-function usePageQuality(form: ReturnType<typeof useForm<EditorForm>>, builderContent: BuilderContent) {
-  const [title, slug, status, template, sidebarId, seoTitle, seoDescription, ogImageUrl, noindex] = form.watch([
-    "title",
-    "slug",
-    "status",
-    "template",
-    "sidebarId",
-    "seoTitle",
-    "seoDescription",
-    "ogImageUrl",
-    "noindex",
-  ]);
+function usePageQuality(
+  form: ReturnType<typeof useForm<EditorForm>>,
+  builderContent: BuilderContent,
+) {
+  const [title, slug, status, template, sidebarId, seoTitle, seoDescription, ogImageUrl, noindex] =
+    form.watch([
+      "title",
+      "slug",
+      "status",
+      "template",
+      "sidebarId",
+      "seoTitle",
+      "seoDescription",
+      "ogImageUrl",
+      "noindex",
+    ]);
 
   const qualityIssues = useMemo(
     () =>
@@ -1073,7 +1144,18 @@ function usePageQuality(form: ReturnType<typeof useForm<EditorForm>>, builderCon
         noindex,
         blocks: builderContent.blocks,
       }),
-    [builderContent.blocks, noindex, ogImageUrl, seoDescription, seoTitle, sidebarId, slug, status, template, title],
+    [
+      builderContent.blocks,
+      noindex,
+      ogImageUrl,
+      seoDescription,
+      seoTitle,
+      sidebarId,
+      slug,
+      status,
+      template,
+      title,
+    ],
   );
 
   const qualitySummary = useMemo(
@@ -1112,7 +1194,14 @@ function PageSeoTab({
   hasFaqBlocks: boolean;
 }) {
   return (
-    <div className={cn("max-w-2xl space-y-5", editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
+    <div
+      className={cn(
+        "max-w-2xl space-y-5",
+        editorLock.hasLocking &&
+          editorLock.isReadOnly &&
+          "pointer-events-none select-none opacity-70",
+      )}
+    >
       <PageSeoForm form={form} />
 
       <SeoPreview
@@ -1148,7 +1237,8 @@ function PageEditorTitle({ title, page }: { title: string; page: CmsPage | undef
       </h1>
       {page && (
         <p className="text-xs text-muted-foreground mt-0.5">
-          Last saved {page.updatedAt ? format(new Date(page.updatedAt), "MMM d, yyyy 'at' h:mm a") : "—"}
+          Last saved{" "}
+          {page.updatedAt ? format(new Date(page.updatedAt), "MMM d, yyyy 'at' h:mm a") : "—"}
         </p>
       )}
     </div>
@@ -1165,7 +1255,11 @@ function PageQualityBadge({ hasIssues, issueCount }: { hasIssues: boolean; issue
     );
   }
   return (
-    <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-800" data-testid="badge-quality-issues">
+    <Badge
+      variant="outline"
+      className="border-amber-300 bg-amber-50 text-amber-800"
+      data-testid="badge-quality-issues"
+    >
       <AlertTriangle className="mr-1 h-3 w-3" />
       {issueCount} quality issue{issueCount === 1 ? "" : "s"}
     </Badge>
@@ -1235,7 +1329,7 @@ function PageEditorHeader({
   isPending,
 }: {
   unsavedChangesGuard: ReturnType<typeof useUnsavedChangesGuard>;
-  navigate: <S = any>(to: string | URL, options?: { replace?: boolean; state?: S; }) => void;
+  navigate: <S = any>(to: string | URL, options?: { replace?: boolean; state?: S }) => void;
   isNew: boolean;
   form: ReturnType<typeof useForm<EditorForm>>;
   page: CmsPage | undefined;
@@ -1272,13 +1366,23 @@ function PageEditorHeader({
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <PageEditorTitle title={isNew ? "Create Page" : form.watch("title") || "Edit Page"} page={isNew ? undefined : page} />
+        <PageEditorTitle
+          title={isNew ? "Create Page" : form.watch("title") || "Edit Page"}
+          page={isNew ? undefined : page}
+        />
       </div>
       <div className="flex items-center gap-2">
         {!isNew && (
-          <ExistingPageActions copyDraftPreview={copyDraftPreview} isPreviewLinkPending={isDraftPreviewPending} openDraftPreview={openDraftPreview} />
+          <ExistingPageActions
+            copyDraftPreview={copyDraftPreview}
+            isPreviewLinkPending={isDraftPreviewPending}
+            openDraftPreview={openDraftPreview}
+          />
         )}
-        <PageQualityBadge hasIssues={qualityIssues.length > 0} issueCount={qualitySummary.errors + qualitySummary.warnings} />
+        <PageQualityBadge
+          hasIssues={qualityIssues.length > 0}
+          issueCount={qualitySummary.errors + qualitySummary.warnings}
+        />
         <EditorSaveIndicator state={saveState.state} />
         {isNew && (
           <Button
@@ -1347,7 +1451,9 @@ function usePageEditorState(page: CmsPage | undefined, isNew: boolean) {
   const titleRef = useRef<string>("");
   const slugManuallyEdited = useRef(false);
   const [builderContent, setBuilderContent] = useState<BuilderContent>(EMPTY_CONTENT);
-  const [savedBuilderSnapshot, setSavedBuilderSnapshot] = useState(() => JSON.stringify(EMPTY_CONTENT));
+  const [savedBuilderSnapshot, setSavedBuilderSnapshot] = useState(() =>
+    JSON.stringify(EMPTY_CONTENT),
+  );
   const form = useForm<EditorForm>({
     resolver: zodResolver(editorSchema),
     defaultValues: EDITOR_FORM_DEFAULTS,
@@ -1376,15 +1482,22 @@ function usePageEditorState(page: CmsPage | undefined, isNew: boolean) {
       setBuilderContent(content);
       setSavedBuilderSnapshot(JSON.stringify(content));
     },
-    [form]
+    [form],
   );
 
   const builderDirty = useMemo(
     () => JSON.stringify(builderContent) !== savedBuilderSnapshot,
-    [builderContent, savedBuilderSnapshot]
+    [builderContent, savedBuilderSnapshot],
   );
 
-  return { form, slugManuallyEdited, builderContent, setBuilderContent, builderDirty, applySavedState };
+  return {
+    form,
+    slugManuallyEdited,
+    builderContent,
+    setBuilderContent,
+    builderDirty,
+    applySavedState,
+  };
 }
 
 function usePageRevisionRestore(
@@ -1445,12 +1558,37 @@ function usePageSaveMutation({
       toast({ title: isNew ? "Page created successfully" : "Page saved" });
       onSaved(created, variables);
     },
-    onError: async (err: any) => {
-      const msg = await err?.response?.json?.().catch(() => null);
-      toast({ title: msg?.error || (isNew ? "Failed to create page" : "Failed to save page"), variant: "destructive" });
+    onError: (err: Error) => {
+      toast({
+        title: err.message || (isNew ? "Failed to create page" : "Failed to save page"),
+        variant: "destructive",
+      });
       onError();
     },
   });
+}
+
+function PageLoadError({
+  message,
+  onRetry,
+  onBack,
+}: {
+  message: string;
+  onRetry: () => void;
+  onBack: () => void;
+}) {
+  return (
+    <AdminSidebar>
+      <div role="alert" className="p-6 max-w-6xl mx-auto space-y-4">
+        <h1 className="text-xl font-semibold">Unable to load this page</h1>
+        <p>{message}</p>
+        <Button onClick={onRetry}>Try again</Button>
+        <Button variant="outline" onClick={onBack}>
+          Back to pages
+        </Button>
+      </div>
+    </AdminSidebar>
+  );
 }
 
 export default function CmsPageEditorPage() {
@@ -1464,13 +1602,20 @@ export default function CmsPageEditorPage() {
   const [templatePickerOpen, setTemplatePickerOpen] = useState(isNew);
   const [wizardOpen, setWizardOpen] = useState(false);
 
-  const { data: page, isLoading: pageLoading } = useQuery<CmsPage>({
+  const {
+    data: page,
+    isLoading: pageLoading,
+    error: pageError,
+    refetch: refetchPage,
+  } = useQuery<CmsPage>({
     queryKey: ["/api/admin/cms/pages", id],
+    queryFn: () => apiRequest("GET", `/api/admin/cms/pages/${id}`).then((r) => r.json()),
     enabled: !isNew,
   });
 
   const { data: revisions = [] } = useQuery<CmsPageRevision[]>({
     queryKey: ["/api/admin/cms/pages", id, "revisions"],
+    queryFn: () => apiRequest("GET", `/api/admin/cms/pages/${id}/revisions`).then((r) => r.json()),
     enabled: !isNew,
   });
 
@@ -1485,9 +1630,14 @@ export default function CmsPageEditorPage() {
     onConflict: () => navigate("/admin/cms/pages"),
   });
 
-  const { form, slugManuallyEdited, builderContent, setBuilderContent, builderDirty, applySavedState } =
-    usePageEditorState(page, isNew);
-
+  const {
+    form,
+    slugManuallyEdited,
+    builderContent,
+    setBuilderContent,
+    builderDirty,
+    applySavedState,
+  } = usePageEditorState(page, isNew);
 
   const watchTitle = form.watch("title");
   const watchSlug = form.watch("slug");
@@ -1497,7 +1647,7 @@ export default function CmsPageEditorPage() {
   const watchNoindex = form.watch("noindex");
   const watchStatus = form.watch("status");
   const watchTemplate = form.watch("template");
-  const hasFaqBlocks = (builderContent?.blocks ?? []).some((b: any) => b.type === "faq");
+  const hasFaqBlocks = (builderContent?.blocks ?? []).some((b) => b.type === "faq");
 
   const handleBuilderChange = setBuilderContent;
 
@@ -1518,15 +1668,21 @@ export default function CmsPageEditorPage() {
 
   const [scheduleDate, setScheduleDate] = useState("");
   const [schedulePopoverOpen, setSchedulePopoverOpen] = useState(false);
-  const { publishMutation, unpublishMutation, scheduleMutation } = usePageStatusMutations(id, () => {
-    setSchedulePopoverOpen(false);
-    setScheduleDate("");
-  });
+  const { publishMutation, unpublishMutation, scheduleMutation } = usePageStatusMutations(
+    id,
+    () => {
+      setSchedulePopoverOpen(false);
+      setScheduleDate("");
+    },
+  );
 
-  const { restoringId, setRestoringId, restoreMutation } = usePageRevisionRestore(id, (restored) => {
-    setBuilderContent(parseBuilderContent(restored?.content));
-    form.setValue("title", restored?.title ?? form.getValues("title"));
-  });
+  const { restoringId, setRestoringId, restoreMutation } = usePageRevisionRestore(
+    id,
+    (restored) => {
+      setBuilderContent(parseBuilderContent(restored?.content));
+      form.setValue("title", restored?.title ?? form.getValues("title"));
+    },
+  );
 
   const draftPreview = useDraftPreviewLink(id);
   const { open: openDraftPreview, copy: copyDraftPreview } = draftPreview;
@@ -1557,9 +1713,9 @@ export default function CmsPageEditorPage() {
     (actionLabel: string, onProceed: () => void) =>
       unsavedChangesGuard.confirmIfDirty(
         onProceed,
-        `You have unsaved changes to this page. ${actionLabel} will use the last saved version, not your in-progress edits. Continue?`
+        `You have unsaved changes to this page. ${actionLabel} will use the last saved version, not your in-progress edits. Continue?`,
       ),
-    [unsavedChangesGuard]
+    [unsavedChangesGuard],
   );
 
   useEffect(() => {
@@ -1569,6 +1725,16 @@ export default function CmsPageEditorPage() {
   }, []);
 
   const { qualityIssues, qualitySummary } = usePageQuality(form, builderContent);
+
+  if (!isNew && pageError) {
+    return (
+      <PageLoadError
+        message={pageError.message}
+        onRetry={() => refetchPage()}
+        onBack={() => navigate("/admin/cms/pages")}
+      />
+    );
+  }
 
   if (!isNew && pageLoading) {
     return (
@@ -1581,13 +1747,12 @@ export default function CmsPageEditorPage() {
     );
   }
 
-
   return (
     <AdminSidebar>
       <div
         className={cn(
           "space-y-4 p-6 mx-auto",
-          activeTab === "builder" ? "max-w-[1800px]" : "max-w-6xl"
+          activeTab === "builder" ? "max-w-[1800px]" : "max-w-6xl",
         )}
       >
         <EditorLockNotice editorLock={editorLock} />

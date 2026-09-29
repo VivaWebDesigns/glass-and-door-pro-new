@@ -23,15 +23,13 @@ describe("ensureSystemCmsMenus", () => {
   });
 
   it("migrates complete location lists in header and footer menus, preserving IDs and unrelated links", async () => {
-    const areaItems = [...GLASS_PRIMARY_SERVICE_AREAS]
-      .reverse()
-      .map(({ label, href }) => ({
-        id: href,
-        label,
-        url: href,
-        children: [],
-        openInNewTab: false,
-      }));
+    const areaItems = [...GLASS_PRIMARY_SERVICE_AREAS].reverse().map(({ label, href }) => ({
+      id: href,
+      label,
+      url: href,
+      children: [],
+      openInNewTab: false,
+    }));
     const about = {
       id: "about",
       label: "About",
@@ -90,8 +88,7 @@ describe("ensureSystemCmsMenus", () => {
       children: [],
       openInNewTab: false,
     };
-    const { migrateServiceAreaMenuOrder } =
-      await import("../services/system-cms-menus.service");
+    const { migrateServiceAreaMenuOrder } = await import("../services/system-cms-menus.service");
 
     const migrated = migrateServiceAreaMenuOrder([...previousAreaItems, about]);
 
@@ -99,12 +96,8 @@ describe("ensureSystemCmsMenus", () => {
       ...GLASS_PRIMARY_SERVICE_AREAS.map(({ href }) => href),
       "/#about",
     ]);
-    expect(migrated.find((entry) => entry.url === "/service-areas/waxhaw")?.label).toBe(
-      "Waxhaw",
-    );
-    expect(migrated.find((entry) => entry.url === "/service-areas/monroe")?.label).toBe(
-      "Monroe",
-    );
+    expect(migrated.find((entry) => entry.url === "/service-areas/waxhaw")?.label).toBe("Waxhaw");
+    expect(migrated.find((entry) => entry.url === "/service-areas/monroe")?.label).toBe("Monroe");
     expect(migrateServiceAreaMenuOrder(migrated)).toBe(migrated);
   });
 

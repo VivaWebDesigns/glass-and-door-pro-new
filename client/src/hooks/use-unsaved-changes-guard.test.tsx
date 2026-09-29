@@ -9,12 +9,12 @@ type HarnessProps = {
   isDirty: boolean;
   enabled?: boolean;
   message?: string;
-  onReady: (api: ReturnType<typeof useUnsavedChangesGuard>) => void;
+  apiRef: React.Ref<ReturnType<typeof useUnsavedChangesGuard>>;
 };
 
-function UnsavedChangesHarness({ onReady, ...props }: HarnessProps) {
+function UnsavedChangesHarness({ apiRef, ...props }: HarnessProps) {
   const api = useUnsavedChangesGuard(props);
-  onReady(api);
+  React.useImperativeHandle(apiRef, () => api, [api]);
   return React.createElement("div", null, "guard");
 }
 
@@ -23,8 +23,12 @@ describe("useUnsavedChangesGuard", () => {
   let root: Root | null = null;
 
   beforeEach(() => {
-    (globalThis as typeof globalThis & { React?: typeof React; IS_REACT_ACT_ENVIRONMENT?: boolean }).React = React;
-    (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+    (
+      globalThis as typeof globalThis & { React?: typeof React; IS_REACT_ACT_ENVIRONMENT?: boolean }
+    ).React = React;
+    (
+      globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
+    ).IS_REACT_ACT_ENVIRONMENT = true;
     container = document.createElement("div");
     document.body.appendChild(container);
   });
@@ -39,29 +43,27 @@ describe("useUnsavedChangesGuard", () => {
     document.body.innerHTML = "";
   });
 
-  async function renderHarness(props: Omit<HarnessProps, "onReady">) {
+  async function renderHarness(props: Omit<HarnessProps, "apiRef">) {
     if (!root) {
       root = createRoot(container);
     }
 
-    let latestApi: ReturnType<typeof useUnsavedChangesGuard> | null = null;
+    const apiRef = React.createRef<ReturnType<typeof useUnsavedChangesGuard>>();
 
     await act(async () => {
       root!.render(
         React.createElement(UnsavedChangesHarness, {
           ...props,
-          onReady: (api) => {
-            latestApi = api;
-          },
-        })
+          apiRef,
+        }),
       );
     });
 
-    if (!latestApi) {
+    if (!apiRef.current) {
       throw new Error("Guard API not ready");
     }
 
-    return latestApi;
+    return apiRef.current;
   }
 
   it("confirms before discarding when the editor is dirty", async () => {
@@ -89,9 +91,7 @@ describe("useUnsavedChangesGuard", () => {
     const onProceed = vi.fn();
     const api = await renderHarness({ isDirty: true, message: "Leave this editor?" });
 
-    expect(
-      api.confirmIfDirty(onProceed, "Publish the saved version instead?")
-    ).toBe(true);
+    expect(api.confirmIfDirty(onProceed, "Publish the saved version instead?")).toBe(true);
     expect(confirmSpy).toHaveBeenCalledWith("Publish the saved version instead?");
     expect(onProceed).toHaveBeenCalledTimes(1);
   });

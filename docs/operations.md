@@ -101,7 +101,7 @@ All server logs are structured JSON (in production) or pretty-printed (in develo
 |-------|------|-------------|
 | `level` | number | Pino log level (30=info, 40=warn, 50=error) |
 | `time` | number | Unix timestamp in milliseconds |
-| `source` | string | Logger category (http, email, r2, stripe, auth, app, db, cms, metrics) |
+| `source` | string | Logger category (http, email, r2, backup, auth, app, db, cms, metrics) |
 | `msg` | string | Human-readable log message |
 | `requestId` | string | Full UUID correlation ID for the request |
 | `method` | string | HTTP method (on request logs) |
@@ -116,7 +116,7 @@ All server logs are structured JSON (in production) or pretty-printed (in develo
 - **http**: Request/response logging
 - **email**: Email sending outcomes
 - **r2**: Cloudflare R2 storage operations
-- **stripe**: Stripe payment/webhook operations
+- **backup**: System backup runs and backup storage
 - **auth**: Authentication and authorization
 - **app**: General application events and errors
 - **db**: Database operations and connection status
@@ -143,7 +143,7 @@ The following fields are automatically redacted from all logged response bodies:
 | `email` | Personal email addresses |
 | `phone` | Phone numbers |
 | `address`, `addressLine1`, `addressLine2` | Physical addresses |
-| `refereeEmail`, `refereePhone` | Reference contact info |
+| `refereeEmail`, `refereePhone` | Legacy reference contact fields (kept in the redaction list) |
 | `ssn` | Social security numbers |
 | `dateOfBirth` | Date of birth |
 

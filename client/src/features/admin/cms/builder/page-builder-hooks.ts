@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useRef, useState, type DragEvent, type MutableRefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type DragEvent,
+  type MutableRefObject,
+} from "react";
 import type { BlockInstance } from "./block-registry";
 
 export type InsertPayload =
@@ -35,10 +42,15 @@ export function useBlockNodeRegistry() {
       const nodeRect = node.getBoundingClientRect();
       const highZoneThreshold = viewportRect.top + viewport.clientHeight * 0.14;
       const lowZoneThreshold = viewportRect.top + viewport.clientHeight * 0.68;
-      const bottomSafetyThreshold = viewportRect.bottom - Math.min(180, viewport.clientHeight * 0.18);
+      const bottomSafetyThreshold =
+        viewportRect.bottom - Math.min(180, viewport.clientHeight * 0.18);
       const desiredTop = viewportRect.top + Math.min(240, viewport.clientHeight * 0.34);
 
-      if (nodeRect.top < highZoneThreshold || nodeRect.top > lowZoneThreshold || nodeRect.bottom > bottomSafetyThreshold) {
+      if (
+        nodeRect.top < highZoneThreshold ||
+        nodeRect.top > lowZoneThreshold ||
+        nodeRect.bottom > bottomSafetyThreshold
+      ) {
         viewport.scrollTo({
           top: Math.max(0, viewport.scrollTop + (nodeRect.top - desiredTop)),
           behavior: "smooth",
@@ -96,7 +108,9 @@ export function useDesktopInspectorAlignment({
             desktopInspectorShellRef.current,
           )
         : 0;
-    setDesktopInspectorOffset((current) => (Math.abs(current - nextOffset) > 2 || nextOffset === 0 ? nextOffset : current));
+    setDesktopInspectorOffset((current) =>
+      Math.abs(current - nextOffset) > 2 || nextOffset === 0 ? nextOffset : current,
+    );
   }, [blockRefs, enabled, selectedId]);
 
   useEffect(() => {
@@ -176,42 +190,59 @@ export function useBuilderDragAndDrop({
     setDropTarget(null);
   }, []);
 
-  const handleDragOver = useCallback((event: DragEvent, targetId: string) => {
-    if (!draggedBlockId && !draggedInsertPayload) return;
-    if (draggedBlockId && draggedBlockId === targetId) return;
+  const handleDragOver = useCallback(
+    (event: DragEvent, targetId: string) => {
+      if (!draggedBlockId && !draggedInsertPayload) return;
+      if (draggedBlockId && draggedBlockId === targetId) return;
 
-    event.preventDefault();
-    event.dataTransfer.dropEffect = draggedInsertPayload ? "copy" : "move";
+      event.preventDefault();
+      event.dataTransfer.dropEffect = draggedInsertPayload ? "copy" : "move";
 
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const position = event.clientY - bounds.top < bounds.height / 2 ? "before" : "after";
+      const bounds = event.currentTarget.getBoundingClientRect();
+      const position = event.clientY - bounds.top < bounds.height / 2 ? "before" : "after";
 
-    setDropTarget((current) =>
-      current?.id === targetId && current.position === position ? current : { id: targetId, position },
-    );
-  }, [draggedBlockId, draggedInsertPayload]);
+      setDropTarget((current) =>
+        current?.id === targetId && current.position === position
+          ? current
+          : { id: targetId, position },
+      );
+    },
+    [draggedBlockId, draggedInsertPayload],
+  );
 
-  const handleDrop = useCallback((event: DragEvent, targetId: string) => {
-    event.preventDefault();
+  const handleDrop = useCallback(
+    (event: DragEvent, targetId: string) => {
+      event.preventDefault();
 
-    const sourceId = draggedBlockId ?? event.dataTransfer.getData("text/plain");
-    const insertPayload = draggedInsertPayload ?? readInsertPayload(event);
-    const position = dropTarget?.id === targetId ? dropTarget.position : "after";
-    const targetIndex = blocks.findIndex((block) => block.id === targetId);
-    const insertIndex = position === "before" ? targetIndex : targetIndex + 1;
+      const sourceId = draggedBlockId ?? event.dataTransfer.getData("text/plain");
+      const insertPayload = draggedInsertPayload ?? readInsertPayload(event);
+      const position = dropTarget?.id === targetId ? dropTarget.position : "after";
+      const targetIndex = blocks.findIndex((block) => block.id === targetId);
+      const insertIndex = position === "before" ? targetIndex : targetIndex + 1;
 
-    if (insertPayload && targetIndex >= 0) {
-      if (insertPayload.kind === "block") {
-        onInsertBlock(insertPayload.type, insertIndex);
-      } else {
-        onInsertBlocks(insertPayload.blocks, insertIndex);
+      if (insertPayload && targetIndex >= 0) {
+        if (insertPayload.kind === "block") {
+          onInsertBlock(insertPayload.type, insertIndex);
+        } else {
+          onInsertBlocks(insertPayload.blocks, insertIndex);
+        }
+      } else if (sourceId && sourceId !== targetId) {
+        onReorder(sourceId, targetId, position);
       }
-    } else if (sourceId && sourceId !== targetId) {
-      onReorder(sourceId, targetId, position);
-    }
 
-    clearDragState();
-  }, [blocks, clearDragState, draggedBlockId, draggedInsertPayload, dropTarget, onInsertBlock, onInsertBlocks, onReorder]);
+      clearDragState();
+    },
+    [
+      blocks,
+      clearDragState,
+      draggedBlockId,
+      draggedInsertPayload,
+      dropTarget,
+      onInsertBlock,
+      onInsertBlocks,
+      onReorder,
+    ],
+  );
 
   return {
     draggedBlockId,

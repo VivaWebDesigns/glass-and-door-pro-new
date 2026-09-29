@@ -51,12 +51,21 @@ type SectionForm = z.infer<typeof sectionFormSchema>;
 
 const CATEGORIES = ["general", "hero", "cta", "testimonials", "faq", "features", "content", "team"];
 
-function SectionDetailsCard({ editorLock, form }: {
+function SectionDetailsCard({
+  editorLock,
+  form,
+}: {
   editorLock: ReturnType<typeof useEditorLock>;
   form: ReturnType<typeof useForm<SectionForm>>;
 }) {
   return (
-    <Card className={cn(editorLock.hasLocking && editorLock.isReadOnly && "pointer-events-none select-none opacity-70")}>
+    <Card
+      className={cn(
+        editorLock.hasLocking &&
+          editorLock.isReadOnly &&
+          "pointer-events-none select-none opacity-70",
+      )}
+    >
       <CardHeader>
         <CardTitle className="text-sm font-medium text-muted-foreground">Section Details</CardTitle>
       </CardHeader>
@@ -111,7 +120,10 @@ function SectionDetailsCard({ editorLock, form }: {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
+                  <FormLabel>
+                    Description{" "}
+                    <span className="text-muted-foreground font-normal">(optional)</span>
+                  </FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Brief description of when to use this section…"
@@ -142,7 +154,7 @@ function SectionEditorHeader({
   editorLock,
 }: {
   unsavedChangesGuard: ReturnType<typeof useUnsavedChangesGuard>;
-  navigate: <S = any>(to: string | URL, options?: { replace?: boolean; state?: S; }) => void;
+  navigate: <S = any>(to: string | URL, options?: { replace?: boolean; state?: S }) => void;
   isNew: boolean;
   form: ReturnType<typeof useForm<SectionForm>>;
   saveState: ReturnType<typeof useEditorSaveState>;
@@ -166,8 +178,11 @@ function SectionEditorHeader({
         </Button>
         <div className="flex items-center gap-2">
           <Layers className="h-5 w-5 text-violet-500" />
-          <h1 className="text-xl font-heading font-semibold" data-testid="text-section-editor-title">
-            {isNew ? "New Section" : (form.watch("name") || "Edit Section")}
+          <h1
+            className="text-xl font-heading font-semibold"
+            data-testid="text-section-editor-title"
+          >
+            {isNew ? "New Section" : form.watch("name") || "Edit Section"}
           </h1>
         </div>
       </div>
@@ -195,7 +210,9 @@ function sectionToForm(section: CmsSection): SectionForm {
 }
 
 function sectionToContent(section: CmsSection): BuilderContent {
-  return { blocks: (Array.isArray(section.blocks) ? section.blocks : []) as BuilderContent["blocks"] };
+  return {
+    blocks: (Array.isArray(section.blocks) ? section.blocks : []) as BuilderContent["blocks"],
+  };
 }
 
 export default function CmsSectionEditorPage() {
@@ -208,7 +225,7 @@ export default function CmsSectionEditorPage() {
   const [builderContent, setBuilderContent] = useState<BuilderContent>(EMPTY_CONTENT);
   const initializedRef = useRef(false);
   const [savedBuilderSnapshot, setSavedBuilderSnapshot] = useState(() =>
-    JSON.stringify(EMPTY_CONTENT)
+    JSON.stringify(EMPTY_CONTENT),
   );
 
   const { data: section, isLoading: sectionLoading } = useQuery<CmsSection>({
@@ -267,7 +284,10 @@ export default function CmsSectionEditorPage() {
       if (created) navigate(`/admin/cms/sections/${created.id}`);
     },
     onError: () => {
-      toast({ title: isNew ? "Failed to create section" : "Failed to save section", variant: "destructive" });
+      toast({
+        title: isNew ? "Failed to create section" : "Failed to save section",
+        variant: "destructive",
+      });
       saveState.markError();
     },
   });
@@ -277,8 +297,7 @@ export default function CmsSectionEditorPage() {
   };
 
   const isSaving = saveMutation.isPending;
-  const builderDirty =
-    JSON.stringify(builderContent) !== savedBuilderSnapshot;
+  const builderDirty = JSON.stringify(builderContent) !== savedBuilderSnapshot;
   const isDirty = form.formState.isDirty || builderDirty;
   const saveState = useEditorSaveState({
     isDirty,
@@ -323,10 +342,7 @@ export default function CmsSectionEditorPage() {
           <h2 className="text-sm font-medium text-muted-foreground">Blocks</h2>
           <Card className={cn(lockedClass)}>
             <CardContent className="pt-4">
-              <PageBuilder
-                content={builderContent}
-                onChange={setBuilderContent}
-              />
+              <PageBuilder content={builderContent} onChange={setBuilderContent} />
             </CardContent>
           </Card>
         </div>

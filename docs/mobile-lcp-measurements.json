@@ -1,0 +1,357 @@
+{
+  "date": "2026-09-18",
+  "baseline": "53cb836",
+  "conditions": {
+    "type": "local replay; not Google PageSpeed",
+    "cpuSlowdown": 4,
+    "latencyMs": 150,
+    "downloadBytesPerSecond": 200000,
+    "device": "Pixel 7",
+    "freshContexts": true,
+    "externalRequests": "blocked"
+  },
+  "runs": [
+    {
+      "slug": "home",
+      "preload": false,
+      "run": 0,
+      "lcp": {
+        "time": 5480,
+        "url": "http://127.0.0.1:4178/images/glass-door-pro/gallery-shower1-1280w.webp"
+      },
+      "hero": [
+        {
+          "start": 2591,
+          "end": 5460,
+          "bytes": 94182,
+          "transferred": 94482,
+          "initiator": "video"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slug": "home",
+      "preload": false,
+      "run": 1,
+      "lcp": {
+        "time": 5472,
+        "url": "http://127.0.0.1:4178/images/glass-door-pro/gallery-shower1-1280w.webp"
+      },
+      "hero": [
+        {
+          "start": 2584.5,
+          "end": 5453.899999999441,
+          "bytes": 94182,
+          "transferred": 94482,
+          "initiator": "video"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slug": "home",
+      "preload": false,
+      "run": 2,
+      "lcp": {
+        "time": 5476,
+        "url": "http://127.0.0.1:4178/images/glass-door-pro/gallery-shower1-1280w.webp"
+      },
+      "hero": [
+        {
+          "start": 2584.2999999998137,
+          "end": 5453.5999999996275,
+          "bytes": 94182,
+          "transferred": 94482,
+          "initiator": "video"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slug": "home",
+      "preload": true,
+      "run": 0,
+      "lcp": {
+        "time": 3084,
+        "url": "http://127.0.0.1:4178/images/glass-door-pro/gallery-shower1-1280w.webp"
+      },
+      "hero": [
+        {
+          "start": 189.59999999962747,
+          "end": 1973.699999999255,
+          "bytes": 94182,
+          "transferred": 94482,
+          "initiator": "link"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slug": "home",
+      "preload": true,
+      "run": 1,
+      "lcp": {
+        "time": 3096,
+        "url": "http://127.0.0.1:4178/images/glass-door-pro/gallery-shower1-1280w.webp"
+      },
+      "hero": [
+        {
+          "start": 190.29999999981374,
+          "end": 1965.5999999996275,
+          "bytes": 94182,
+          "transferred": 94482,
+          "initiator": "link"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slug": "home",
+      "preload": true,
+      "run": 2,
+      "lcp": {
+        "time": 3104,
+        "url": "http://127.0.0.1:4178/images/glass-door-pro/gallery-shower1-1280w.webp"
+      },
+      "hero": [
+        {
+          "start": 188.29999999981374,
+          "end": 1965.7000000001863,
+          "bytes": 94182,
+          "transferred": 94482,
+          "initiator": "link"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slug": "frameless-showers",
+      "preload": false,
+      "run": 0,
+      "lcp": {
+        "time": 4920,
+        "url": "http://127.0.0.1:4178/images/glass-door-pro/modern-frameless-shower-hero-1920x1080.webp"
+      },
+      "hero": [
+        {
+          "start": 2656.2000000001863,
+          "end": 4905.799999999814,
+          "bytes": 180132,
+          "transferred": 180432,
+          "initiator": "img"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slug": "frameless-showers",
+      "preload": false,
+      "run": 1,
+      "lcp": {
+        "time": 4940,
+        "url": "http://127.0.0.1:4178/images/glass-door-pro/modern-frameless-shower-hero-1920x1080.webp"
+      },
+      "hero": [
+        {
+          "start": 2658.7000000001863,
+          "end": 4912.0999999996275,
+          "bytes": 180132,
+          "transferred": 180432,
+          "initiator": "img"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slug": "frameless-showers",
+      "preload": false,
+      "run": 2,
+      "lcp": {
+        "time": 4932,
+        "url": "http://127.0.0.1:4178/images/glass-door-pro/modern-frameless-shower-hero-1920x1080.webp"
+      },
+      "hero": [
+        {
+          "start": 2664.600000000559,
+          "end": 4913.600000000559,
+          "bytes": 180132,
+          "transferred": 180432,
+          "initiator": "img"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slug": "frameless-showers",
+      "preload": true,
+      "run": 0,
+      "lcp": {
+        "time": 3300,
+        "url": "http://127.0.0.1:4178/images/glass-door-pro/modern-frameless-shower-hero-1920x1080.webp"
+      },
+      "hero": [
+        {
+          "start": 220.29999999981374,
+          "end": 2714.399999999441,
+          "bytes": 180132,
+          "transferred": 180432,
+          "initiator": "link"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slug": "frameless-showers",
+      "preload": true,
+      "run": 1,
+      "lcp": {
+        "time": 3288,
+        "url": "http://127.0.0.1:4178/images/glass-door-pro/modern-frameless-shower-hero-1920x1080.webp"
+      },
+      "hero": [
+        {
+          "start": 219.09999999962747,
+          "end": 2714.7000000001863,
+          "bytes": 180132,
+          "transferred": 180432,
+          "initiator": "link"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slug": "frameless-showers",
+      "preload": true,
+      "run": 2,
+      "lcp": {
+        "time": 3260,
+        "url": "http://127.0.0.1:4178/images/glass-door-pro/modern-frameless-shower-hero-1920x1080.webp"
+      },
+      "hero": [
+        {
+          "start": 220.5,
+          "end": 2723.7999999998137,
+          "bytes": 180132,
+          "transferred": 180432,
+          "initiator": "link"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slug": "waxhaw",
+      "preload": false,
+      "run": 0,
+      "lcp": {
+        "time": 4328,
+        "url": "http://127.0.0.1:4178/images/glass-door-pro/city-waxhaw-hero.webp"
+      },
+      "hero": [
+        {
+          "start": 2608.100000000559,
+          "end": 4312.600000000559,
+          "bytes": 309268,
+          "transferred": 309568,
+          "initiator": "img"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slug": "waxhaw",
+      "preload": false,
+      "run": 1,
+      "lcp": {
+        "time": 4328,
+        "url": "http://127.0.0.1:4178/images/glass-door-pro/city-waxhaw-hero.webp"
+      },
+      "hero": [
+        {
+          "start": 2599.9000000003725,
+          "end": 4305.600000000559,
+          "bytes": 309268,
+          "transferred": 309568,
+          "initiator": "img"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slug": "waxhaw",
+      "preload": false,
+      "run": 2,
+      "lcp": {
+        "time": 4340,
+        "url": "http://127.0.0.1:4178/images/glass-door-pro/city-waxhaw-hero.webp"
+      },
+      "hero": [
+        {
+          "start": 2621.2999999998137,
+          "end": 4320.399999999441,
+          "bytes": 309268,
+          "transferred": 309568,
+          "initiator": "img"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slug": "waxhaw",
+      "preload": true,
+      "run": 0,
+      "lcp": {
+        "time": 3636,
+        "url": "http://127.0.0.1:4178/images/glass-door-pro/city-waxhaw-hero.webp"
+      },
+      "hero": [
+        {
+          "start": 204.20000000018626,
+          "end": 3592.5999999996275,
+          "bytes": 309268,
+          "transferred": 309568,
+          "initiator": "link"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slug": "waxhaw",
+      "preload": true,
+      "run": 1,
+      "lcp": {
+        "time": 3616,
+        "url": "http://127.0.0.1:4178/images/glass-door-pro/city-waxhaw-hero.webp"
+      },
+      "hero": [
+        {
+          "start": 205.20000000018626,
+          "end": 3592.7000000001863,
+          "bytes": 309268,
+          "transferred": 309568,
+          "initiator": "link"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slug": "waxhaw",
+      "preload": true,
+      "run": 2,
+      "lcp": {
+        "time": 3620,
+        "url": "http://127.0.0.1:4178/images/glass-door-pro/city-waxhaw-hero.webp"
+      },
+      "hero": [
+        {
+          "start": 204.79999999981374,
+          "end": 3593.7999999998137,
+          "bytes": 309268,
+          "transferred": 309568,
+          "initiator": "link"
+        }
+      ],
+      "errors": []
+    }
+  ]
+}

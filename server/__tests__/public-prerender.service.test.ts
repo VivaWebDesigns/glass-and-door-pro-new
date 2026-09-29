@@ -1,5 +1,12 @@
+import { readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getMobileHeroImageUrl } from "@shared/glass-hero-images";
+import { GLASS_SERVICE_AREAS_HERO_IMAGE } from "@shared/glass-service-areas";
 import type { CmsPage, SeoSettings } from "@shared/schema";
+
+const heroPages = JSON.parse(
+  readFileSync(new URL("../../e2e/mobile-hero-pages.json", import.meta.url), "utf8"),
+) as Record<string, string>;
 
 const mockGetSeo = vi.fn();
 const mockGetSetting = vi.fn();
@@ -69,6 +76,135 @@ const cmsPage: CmsPage = {
 };
 
 describe("public-prerender.service", () => {
+  it.each(Object.entries(heroPages))(
+    "preloads the matching mobile hero on %s",
+    async (path, image) => {
+      if (path !== "/service-areas") {
+        mockGetPageBySlug.mockResolvedValue({
+          ...cmsPage,
+          content: {
+            blocks: [{ id: "hero", type: "hero", props: { backgroundImageUrl: image } }],
+          },
+        });
+      }
+      const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } =
+        await import("../services/public-prerender.service");
+      const snapshot = await getPublicHtmlSnapshot(path);
+      const head = injectPublicHtmlSnapshot("<head><!--APP_DYNAMIC_HEAD--></head>", snapshot);
+      expect(head).toContain(
+        `href="${getMobileHeroImageUrl(image)}" media="(max-width: 640px)" fetchpriority="high"`,
+      );
+      expect(head).toContain(`href="${image}" media="(min-width: 641px)" fetchpriority="high"`);
+      expect(head.match(/rel="preload"/g)).toHaveLength(2);
+    },
+  );
+
+  it("preloads the standalone service-area hero using the renderer's shared asset", async () => {
+    mockGetSeo.mockResolvedValue(seoSettings);
+    mockGetPageBySlug.mockResolvedValue(null);
+    const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } =
+      await import("../services/public-prerender.service");
+    const snapshot = await getPublicHtmlSnapshot("/service-areas");
+    expect(snapshot?.heroImageUrl).toBe(GLASS_SERVICE_AREAS_HERO_IMAGE);
+    const html = injectPublicHtmlSnapshot("<head><!--APP_DYNAMIC_HEAD--></head>", snapshot);
+    expect(html).toContain(
+      '<link rel="preload" as="image" href="/images/glass-door-pro/charming-suburban-home-hero-1920x1080-mobile-1280w.webp" media="(max-width: 640px)" fetchpriority="high" />',
+    );
+    expect(html).toContain(
+      `<link rel="preload" as="image" href="${GLASS_SERVICE_AREAS_HERO_IMAGE}" media="(min-width: 641px)" fetchpriority="high" />`,
+    );
+    expect(html.match(/rel="preload"/g)).toHaveLength(2);
+    const gallery = injectPublicHtmlSnapshot(
+      "<head><!--APP_DYNAMIC_HEAD--></head>",
+      await getPublicHtmlSnapshot("/gallery"),
+    );
+    expect(gallery).not.toContain('rel="preload"');
+  });
+
+  it("preloads only the leading static hero image in the document head", async () => {
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      content: {
+        blocks: [
+          {
+            type: "hero",
+            props: { backgroundImageUrl: "/images/glass-door-pro/city-waxhaw-hero.webp" },
+          },
+          {
+            type: "hero",
+            props: { backgroundImageUrl: "/images/glass-door-pro/reviews-hero-1920w.webp" },
+          },
+        ],
+      },
+    });
+    const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } =
+      await import("../services/public-prerender.service");
+    const snapshot = await getPublicHtmlSnapshot("/custom-landing");
+    const html = injectPublicHtmlSnapshot(
+      "<html><head><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--></body></html>",
+      snapshot,
+    );
+    const head = html.split("</head>")[0];
+    expect(head).toContain(
+      '<link rel="preload" as="image" href="/images/glass-door-pro/city-waxhaw-hero-mobile-1280w.webp" media="(max-width: 640px)" fetchpriority="high" />',
+    );
+    expect(head).toContain(
+      '<link rel="preload" as="image" href="/images/glass-door-pro/city-waxhaw-hero.webp" media="(min-width: 641px)" fetchpriority="high" />',
+    );
+    expect(head.match(/rel="preload"/g)).toHaveLength(2);
+    expect(head).not.toContain("reviews-hero-1920w.webp");
+  });
+
+  it.each([
+    [],
+    [
+      { type: "text", props: {} },
+      {
+        type: "hero",
+        props: { backgroundImageUrl: "/images/glass-door-pro/city-waxhaw-hero.webp" },
+      },
+    ],
+    [{ type: "hero", props: {} }],
+    [{ type: "hero", props: { backgroundImageUrl: '" onload="alert(1)' } }],
+    [{ type: "hero", props: { backgroundImageUrl: "https://example.com/hero.webp" } }],
+    [{ type: "hero", props: { backgroundImageUrl: "/uploads/cms/1781107243034-monroe.webp" } }],
+  ])("does not preload non-leading, absent or unsupported hero assets (%j)", async (...blocks) => {
+    mockGetPageBySlug.mockResolvedValue({ ...cmsPage, content: { blocks } });
+    const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } =
+      await import("../services/public-prerender.service");
+    const html = injectPublicHtmlSnapshot(
+      "<head><!--APP_DYNAMIC_HEAD--></head>",
+      await getPublicHtmlSnapshot("/custom-landing"),
+    );
+    expect(html).not.toContain('rel="preload"');
+  });
+
+  it("renders a location title without the brand prefix and matches the shower heading", async () => {
+    mockGetSeo.mockResolvedValue(seoSettings);
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      slug: "service-areas-waxhaw",
+      title: "Waxhaw, NC",
+      content: {
+        blocks: [
+          {
+            id: "hero",
+            type: "hero",
+            props: { heading: "Glass Shower Door Installer in Waxhaw, NC" },
+          },
+        ],
+      },
+      seoTitle: "Glass Shower Door Installation in Waxhaw, NC",
+      seoDescription:
+        "Custom glass shower door installation in Waxhaw, NC. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.",
+    });
+    const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
+    const snapshot = await getPublicHtmlSnapshot("/service-areas/waxhaw");
+    expect(snapshot?.title).toBe("Glass Shower Door Installation in Waxhaw, NC");
+    expect(snapshot?.bodyHtml).toContain("<h1>Glass Shower Door Installer in Waxhaw, NC</h1>");
+    expect(snapshot?.description).toContain("Call (704) 771-6111");
+  });
+
   it("corrects the hub title without rewriting its description", async () => {
     mockGetSeo.mockResolvedValue(seoSettings);
     mockGetPageBySlug.mockResolvedValue({

@@ -114,8 +114,12 @@ async function streamToBuffer(stream: unknown): Promise<Buffer> {
     return Buffer.from(stream);
   }
 
-  if (typeof (stream as any).transformToByteArray === "function") {
-    const bytes = await (stream as any).transformToByteArray();
+  if (
+    typeof stream === "object" &&
+    "transformToByteArray" in stream &&
+    typeof stream.transformToByteArray === "function"
+  ) {
+    const bytes: Uint8Array = await stream.transformToByteArray();
     return Buffer.from(bytes);
   }
 
@@ -153,7 +157,7 @@ export async function uploadBackupObject(
   key: string,
   body: Buffer,
   contentType: string,
-  options?: { contentEncoding?: string; metadata?: Record<string, string> }
+  options?: { contentEncoding?: string; metadata?: Record<string, string> },
 ): Promise<{ key: string } | null> {
   const result = await getClient();
   if (!result) return null;
@@ -168,7 +172,7 @@ export async function uploadBackupObject(
       ContentType: contentType,
       ContentEncoding: options?.contentEncoding,
       Metadata: options?.metadata,
-    })
+    }),
   );
 
   return { key: qualifiedKey };
@@ -182,13 +186,16 @@ export async function downloadBackupObject(key: string): Promise<Buffer | null> 
     new GetObjectCommand({
       Bucket: result.config.bucketName,
       Key: key,
-    })
+    }),
   );
 
   return streamToBuffer(response.Body);
 }
 
-export async function listBackupObjects(relativePrefix = "", maxKeys = 100): Promise<BackupObjectSummary[]> {
+export async function listBackupObjects(
+  relativePrefix = "",
+  maxKeys = 100,
+): Promise<BackupObjectSummary[]> {
   const result = await getClient();
   if (!result) return [];
 
@@ -201,7 +208,7 @@ export async function listBackupObjects(relativePrefix = "", maxKeys = 100): Pro
       Bucket: result.config.bucketName,
       Prefix: prefix,
       MaxKeys: maxKeys,
-    })
+    }),
   );
 
   return (response.Contents ?? [])
@@ -226,7 +233,7 @@ export async function deleteBackupObject(key: string): Promise<void> {
     new DeleteObjectCommand({
       Bucket: result.config.bucketName,
       Key: key,
-    })
+    }),
   );
 }
 

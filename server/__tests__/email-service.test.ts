@@ -36,12 +36,14 @@ const contactTemplateFixture = {
   isActive: true,
 };
 vi.mock("mailgun.js", () => ({
-  default: vi.fn(() => ({
-    client: () => ({
-      messages: { create: mockCreate },
-      domains: { get: mockDomainsGet },
-    }),
-  })),
+  default: vi.fn(function () {
+    return {
+      client: () => ({
+        messages: { create: mockCreate },
+        domains: { get: mockDomainsGet },
+      }),
+    };
+  }),
 }));
 
 vi.mock("form-data", () => ({

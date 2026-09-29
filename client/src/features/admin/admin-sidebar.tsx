@@ -182,13 +182,6 @@ function isRouteActive(location: string, href?: string) {
 
 function isChildRouteActive(location: string, child: NavItem) {
   if (!child.href) return false;
-  if (child.href === "/admin/cms/blog") {
-    return (
-      location === child.href ||
-      location === "/admin/cms/blog/new" ||
-      /^\/admin\/cms\/blog\/[^/]+$/.test(location)
-    );
-  }
   return isRouteActive(location, child.href);
 }
 
@@ -228,8 +221,18 @@ function AdminNavChildLink({ child, location }: { child: NavItem; location: stri
   );
 }
 
-function AdminNavItem({ item, location, collapsed }: { item: NavItem; location: string; collapsed: boolean }) {
-  const childIsActive = Boolean(item.children?.some((child) => isChildRouteActive(location, child)));
+function AdminNavItem({
+  item,
+  location,
+  collapsed,
+}: {
+  item: NavItem;
+  location: string;
+  collapsed: boolean;
+}) {
+  const childIsActive = Boolean(
+    item.children?.some((child) => isChildRouteActive(location, child)),
+  );
   const parentIsActive = isRouteActive(location, item.href) || childIsActive;
   const linkContent = (
     <Link href={item.href ?? "#"}>
@@ -240,9 +243,7 @@ function AdminNavItem({ item, location, collapsed }: { item: NavItem; location: 
         )}
         data-testid={navTestId(item.title)}
       >
-        <item.icon
-          className={cn("h-4 w-4 flex-shrink-0", parentIsActive ? "" : item.iconColor)}
-        />
+        <item.icon className={cn("h-4 w-4 flex-shrink-0", parentIsActive ? "" : item.iconColor)} />
         <span
           className={cn(
             "transition-opacity duration-200 flex-1",
@@ -309,10 +310,7 @@ function AdminSidebarUserPanel({
               </span>
             </div>
             <div className="min-w-0">
-              <p
-                className="text-sm font-medium truncate"
-                data-testid="text-sidebar-username"
-              >
+              <p className="text-sm font-medium truncate" data-testid="text-sidebar-username">
                 {user.firstName} {user.lastName}
               </p>
               <Badge
@@ -339,11 +337,7 @@ function AdminSidebarUserPanel({
                   data-testid="button-sidebar-profile"
                 >
                   {user?.profileImageUrl ? (
-                    <img
-                      src={user.profileImageUrl}
-                      alt=""
-                      className="h-full w-full object-cover"
-                    />
+                    <img src={user.profileImageUrl} alt="" className="h-full w-full object-cover" />
                   ) : (
                     <User className="h-4 w-4 text-muted-foreground" />
                   )}
@@ -380,11 +374,7 @@ function AdminSidebarUserPanel({
             >
               <span className="h-6 w-6 rounded-full border border-border bg-background flex items-center justify-center overflow-hidden shrink-0">
                 {user?.profileImageUrl ? (
-                  <img
-                    src={user.profileImageUrl}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
+                  <img src={user.profileImageUrl} alt="" className="h-full w-full object-cover" />
                 ) : (
                   <User className="h-4 w-4 text-muted-foreground" />
                 )}
@@ -490,16 +480,22 @@ export function AdminSidebar({ children }: AdminSidebarProps) {
   const toggleGroup = (label: string, open: boolean) => {
     setOpenGroup(open ? label : null);
   };
-  const activeGroupLabel = navGroups.find((group) =>
-    group.label && group.items.some((item) => isNavItemActive(location, item))
-  )?.label ?? null;
+  const activeGroupLabel =
+    navGroups.find(
+      (group) => group.label && group.items.some((item) => isNavItemActive(location, item)),
+    )?.label ?? null;
 
   useEffect(() => {
     setOpenGroup(activeGroupLabel);
   }, [activeGroupLabel]);
 
   const renderNavItem = (item: NavItem) => (
-    <AdminNavItem key={item.href ?? item.title} item={item} location={location} collapsed={collapsed} />
+    <AdminNavItem
+      key={item.href ?? item.title}
+      item={item}
+      location={location}
+      collapsed={collapsed}
+    />
   );
 
   return (
@@ -555,6 +551,7 @@ export function AdminSidebar({ children }: AdminSidebarProps) {
           <button
             type="button"
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-expanded={!collapsed}
             onClick={() => setCollapsed(!collapsed)}
             className="absolute top-6 -right-3.5 z-20 h-7 w-7 rounded-full border bg-background shadow-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:shadow-md transition"
             data-testid="button-toggle-sidebar"

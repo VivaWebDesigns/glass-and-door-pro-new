@@ -11,11 +11,7 @@ import {
 } from "../middleware/auth";
 import { validateBody } from "../middleware/validation";
 import { asyncHandler } from "../middleware/error-handler";
-import {
-  loginLimiter,
-  forgotPasswordLimiter,
-  resetPasswordLimiter,
-} from "../middleware/security";
+import { loginLimiter, forgotPasswordLimiter, resetPasswordLimiter } from "../middleware/security";
 import * as r2Service from "../services/r2.service";
 import { logger } from "../utils/logger";
 
@@ -26,7 +22,9 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
-async function normalizeUserImage<T extends { profileImageUrl?: string | null }>(user: T): Promise<T> {
+async function normalizeUserImage<T extends { profileImageUrl?: string | null }>(
+  user: T,
+): Promise<T> {
   return {
     ...user,
     profileImageUrl: (await r2Service.normalizePublicUrl(user.profileImageUrl)) ?? null,
@@ -57,7 +55,7 @@ router.post(
       return;
     }
 
-    await storage.users.updateUser(user.id, { lastLoginAt: new Date() } as any);
+    await storage.users.updateUser(user.id, { lastLoginAt: new Date() });
     await storage.activity.log(user.id, "login", "User logged in");
 
     const token = generateToken(user);
@@ -65,7 +63,7 @@ router.post(
 
     const { password: _, ...safeUser } = user;
     res.json(await normalizeUserImage(safeUser));
-  })
+  }),
 );
 
 router.post("/logout", (_req, res) => {
@@ -79,7 +77,7 @@ router.get(
   asyncHandler(async (req, res) => {
     const { password: _, ...safeUser } = req.user!;
     res.json(await normalizeUserImage(safeUser));
-  })
+  }),
 );
 
 const forgotPasswordSchema = z.object({
@@ -98,10 +96,14 @@ router.post(
       const baseUrl = `${req.protocol}://${req.get("host")}`;
       const resetUrl = `${baseUrl}/auth/reset-password?token=${resetToken.token}`;
       const { sendPasswordResetEmail } = await import("../services/email.service");
-      sendPasswordResetEmail(user.email, user.firstName, resetUrl).catch((err) => logger.email.warn("Failed to send password reset email", { error: err.message }));
+      sendPasswordResetEmail(user.email, user.firstName, resetUrl).catch((err) =>
+        logger.email.warn("Failed to send password reset email", { error: err.message }),
+      );
     }
-    res.json({ message: "If an account with that email exists, a password reset link has been sent." });
-  })
+    res.json({
+      message: "If an account with that email exists, a password reset link has been sent.",
+    });
+  }),
 );
 
 const resetPasswordSchema = z.object({
@@ -126,7 +128,7 @@ router.post(
     await storage.passwordResets.markUsed(resetToken.id);
 
     res.json({ message: "Password reset successfully. You can now log in." });
-  })
+  }),
 );
 
 const updateProfileSchema = z.object({
@@ -164,7 +166,7 @@ router.put(
 
     const { password: _, ...safeUser } = updated;
     res.json(await normalizeUserImage(safeUser));
-  })
+  }),
 );
 
 const changePasswordSchema = z.object({
@@ -189,7 +191,7 @@ router.put(
     await storage.users.updateUser(req.user!.id, { password: hashed });
 
     res.json({ message: "Password changed successfully" });
-  })
+  }),
 );
 
 export default router;

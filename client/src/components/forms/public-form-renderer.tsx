@@ -1,4 +1,6 @@
-import { useMemo, useState } from "react";
+import { useRowKeys } from "@/hooks/use-row-keys";
+import { sanitizeHtml } from "@/lib/sanitize-html";
+import { useId, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { CmsForm, CmsFormField, CmsFormListColumn } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
@@ -17,9 +19,6 @@ import {
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { pushGlassDoorProLeadSuccess } from "@/lib/lead-tracking";
-import { sanitizeRichHtml } from "@/lib/sanitize-html";
-import { onActivateKey } from "@/lib/a11y";
-import { pairWithKeys, useListKeys } from "@/hooks/use-list-keys";
 
 interface PublicFormRendererProps {
   slug: string;
@@ -65,7 +64,10 @@ function buildInitialValues(fields: CmsFormField[]) {
               : { fullName: "" },
           ];
         case "address":
-          return [field.key, { street: "", street2: "", city: "", state: "", postalCode: "", country: "" }];
+          return [
+            field.key,
+            { street: "", street2: "", city: "", state: "", postalCode: "", country: "" },
+          ];
         case "list":
           return [field.key, []];
         case "hidden":
@@ -76,7 +78,7 @@ function buildInitialValues(fields: CmsFormField[]) {
             typeof field.config?.defaultValue === "string" ? field.config.defaultValue : "",
           ];
       }
-    })
+    }),
   ) as FormValues;
 }
 
@@ -92,7 +94,9 @@ function fieldSpanClass(field: CmsFormField, compact: boolean) {
   if (
     compact ||
     field.width !== "half" ||
-    ["textarea", "address", "consent", "list", "html", "section", "page", "image-choice"].includes(field.type)
+    ["textarea", "address", "consent", "list", "html", "section", "page", "image-choice"].includes(
+      field.type,
+    )
   ) {
     return "md:col-span-2";
   }
@@ -154,7 +158,13 @@ function validatePageFields(fields: CmsFormField[], values: FormValues) {
 
     if (field.type === "address") {
       const record = objectValue(value);
-      if (!text(record.street) && !text(record.city) && !text(record.state) && !text(record.postalCode) && !text(record.country)) {
+      if (
+        !text(record.street) &&
+        !text(record.city) &&
+        !text(record.state) &&
+        !text(record.postalCode) &&
+        !text(record.country)
+      ) {
         return `${field.label} is required`;
       }
       continue;
@@ -187,24 +197,30 @@ function ChoiceGroup({
   value: unknown;
   onChange: (next: unknown) => void;
 }) {
-  const choiceLayout = field.config?.choiceLayout === "grid"
-    ? "grid gap-3 sm:grid-cols-2"
-    : field.config?.choiceLayout === "inline"
-      ? "flex flex-wrap gap-4"
-      : "space-y-3";
-  const multiple = field.type === "checkbox" || field.type === "multiselect" || (field.type === "image-choice" && field.config?.selectionMode === "multiple");
-  const selectedValues = new Set(multiple ? arrayValue(value).map((item) => text(item)) : []);
+  const groupName = useId();
+  const choiceLayout =
+    field.config?.choiceLayout === "grid"
+      ? "grid gap-3 sm:grid-cols-2"
+      : field.config?.choiceLayout === "inline"
+        ? "flex flex-wrap gap-4"
+        : "space-y-3";
+  const multiple =
+    field.type === "checkbox" ||
+    field.type === "multiselect" ||
+    (field.type === "image-choice" && field.config?.selectionMode === "multiple");
+  const selectedValues = multiple ? arrayValue(value).map((item) => text(item)) : [];
   const selectedValue = multiple ? "" : text(value);
+  const selectedSet = new Set(selectedValues);
 
   return (
-    <div className={choiceLayout}>
+    <div role="group" aria-label={field.label} className={choiceLayout}>
       {(field.options ?? []).map((option) => {
-        const checked = multiple ? selectedValues.has(option.value) : selectedValue === option.value;
+        const checked = multiple ? selectedSet.has(option.value) : selectedValue === option.value;
         const toggle = (nextChecked: boolean) => {
           if (multiple) {
             const nextValues = nextChecked
               ? [...selectedValues, option.value]
-              : [...selectedValues].filter((item) => item !== option.value);
+              : selectedValues.filter((item) => item !== option.value);
             onChange(Array.from(new Set(nextValues)));
           } else {
             onChange(nextChecked ? option.value : "");
@@ -213,33 +229,40 @@ function ChoiceGroup({
 
         if (field.type === "image-choice") {
           return (
-            <div
+            <label
               key={option.value}
-              role="checkbox"
-              aria-checked={checked}
-              aria-label={option.label}
-              tabIndex={0}
-              onClick={() => toggle(!checked)}
-              onKeyDown={onActivateKey(() => toggle(!checked))}
               className={cn(
-                "cursor-pointer rounded-xl border p-3 text-left transition-colors",
-                checked ? "border-primary ring-2 ring-primary/10" : "hover:border-primary/50"
+                "block cursor-pointer rounded-xl border p-3 text-left transition-colors focus-within:ring-2 focus-within:ring-primary",
+                checked ? "border-primary ring-2 ring-primary/10" : "hover:border-primary/50",
               )}
             >
               {option.imageUrl ? (
-                <img src={option.imageUrl} alt={option.label} className="mb-3 h-32 w-full rounded-lg object-cover" />
+                <img
+                  src={option.imageUrl}
+                  alt={option.label}
+                  className="mb-3 h-32 w-full rounded-lg object-cover"
+                />
               ) : null}
               <div className="flex items-center gap-3">
-                <Checkbox checked={checked} className="pointer-events-none" tabIndex={-1} aria-hidden="true" />
+                <input
+                  type={multiple ? "checkbox" : "radio"}
+                  name={groupName}
+                  checked={checked}
+                  onChange={(event) => toggle(event.target.checked)}
+                  className="h-4 w-4 accent-primary"
+                />
                 <span className="text-sm font-medium">{option.label}</span>
               </div>
-            </div>
+            </label>
           );
         }
 
         if (multiple) {
           return (
-            <label key={option.value} className="flex items-start gap-3 rounded-lg border px-3 py-2">
+            <label
+              key={option.value}
+              className="flex items-start gap-3 rounded-lg border px-3 py-2"
+            >
               <Checkbox checked={checked} onCheckedChange={(next) => toggle(Boolean(next))} />
               <span className="text-sm">{option.label}</span>
             </label>
@@ -249,9 +272,8 @@ function ChoiceGroup({
         return (
           <label key={option.value} className="flex items-start gap-3 rounded-lg border px-3 py-2">
             <input
+              name={groupName}
               type="radio"
-              name={field.key}
-              value={option.value}
               checked={checked}
               onChange={() => onChange(option.value)}
               className="mt-1 h-4 w-4"
@@ -273,10 +295,12 @@ function ListField({
   value: unknown;
   onChange: (next: unknown) => void;
 }) {
-  const columns = Array.isArray(field.config?.listColumns) && field.config.listColumns.length > 0
-    ? field.config.listColumns
-    : [{ id: "item", label: "Item", placeholder: "" } satisfies CmsFormListColumn];
+  const columns =
+    Array.isArray(field.config?.listColumns) && field.config.listColumns.length > 0
+      ? field.config.listColumns
+      : [{ id: "item", label: "Item", placeholder: "" } satisfies CmsFormListColumn];
   const rows = arrayValue(value).map((row) => objectValue(row));
+  const rowKeys = useRowKeys(rows);
   const maxRows = typeof field.config?.maxRows === "number" ? field.config.maxRows : 10;
 
   const updateRow = (index: number, columnId: string, nextValue: string) => {
@@ -292,17 +316,14 @@ function ListField({
     onChange([...rows, nextRow]);
   };
 
-  const { keys: rowKeys, removeKey: removeRowKey } = useListKeys(rows.length);
-
   const removeRow = (index: number) => {
-    removeRowKey(index);
     onChange(rows.filter((_, rowIndex) => rowIndex !== index));
   };
 
   return (
     <div className="space-y-3 rounded-xl border p-3">
-      {pairWithKeys(rows, rowKeys).map(({ item: row, key: rowKey }, index) => (
-        <div key={rowKey} className="rounded-lg border bg-muted/10 p-3">
+      {rows.map((row, index) => (
+        <div key={rowKeys[index]} className="rounded-lg border bg-muted/10 p-3">
           <div className="grid gap-3 md:grid-cols-2">
             {columns.map((column) => (
               <div key={column.id} className="space-y-1.5">
@@ -315,13 +336,25 @@ function ListField({
               </div>
             ))}
           </div>
-          <Button type="button" variant="ghost" size="sm" className="mt-3 text-destructive" onClick={() => removeRow(index)}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="mt-3 text-destructive"
+            onClick={() => removeRow(index)}
+          >
             <Trash2 className="mr-1.5 h-3.5 w-3.5" />
             Remove Row
           </Button>
         </div>
       ))}
-      <Button type="button" variant="outline" size="sm" onClick={addRow} disabled={rows.length >= maxRows}>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={addRow}
+        disabled={rows.length >= maxRows}
+      >
         <Plus className="mr-1.5 h-3.5 w-3.5" />
         Add Row
       </Button>
@@ -333,13 +366,14 @@ function renderFieldInput(
   field: CmsFormField,
   value: unknown,
   setValue: (next: unknown) => void,
-  compact: boolean
+  compact: boolean,
+  fieldId: string,
 ) {
   if (field.type === "html") {
     return (
       <div
         className="rounded-xl border bg-muted/20 p-4 text-sm"
-        dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(text(field.config?.htmlContent)) }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(text(field.config?.htmlContent)) }}
       />
     );
   }
@@ -347,10 +381,17 @@ function renderFieldInput(
   if (field.type === "section") {
     return (
       <div className="space-y-3 rounded-xl border bg-muted/10 p-4">
-        {text(field.config?.sectionTitle) ? <h4 className="text-lg font-semibold">{text(field.config?.sectionTitle)}</h4> : null}
-        {text(field.config?.sectionSubtitle) ? <p className="text-sm text-muted-foreground">{text(field.config?.sectionSubtitle)}</p> : null}
+        {text(field.config?.sectionTitle) ? (
+          <h4 className="text-lg font-semibold">{text(field.config?.sectionTitle)}</h4>
+        ) : null}
+        {text(field.config?.sectionSubtitle) ? (
+          <p className="text-sm text-muted-foreground">{text(field.config?.sectionSubtitle)}</p>
+        ) : null}
         {field.config?.showDivider !== false ? (
-          <div className="h-px w-full" style={{ backgroundColor: text(field.config?.dividerColor) || "#e2e8f0" }} />
+          <div
+            className="h-px w-full"
+            style={{ backgroundColor: text(field.config?.dividerColor) || "#e2e8f0" }}
+          />
         ) : null}
       </div>
     );
@@ -359,6 +400,7 @@ function renderFieldInput(
   if (field.type === "textarea") {
     return (
       <Textarea
+        id={fieldId}
         value={text(value)}
         onChange={(event) => setValue(event.target.value)}
         placeholder={field.placeholder}
@@ -370,7 +412,7 @@ function renderFieldInput(
   if (field.type === "select") {
     return (
       <Select value={text(value)} onValueChange={setValue}>
-        <SelectTrigger>
+        <SelectTrigger id={fieldId}>
           <SelectValue placeholder={field.placeholder || `Select ${field.label.toLowerCase()}`} />
         </SelectTrigger>
         <SelectContent>
@@ -388,8 +430,9 @@ function renderFieldInput(
     const current = arrayValue(value).map((item) => text(item));
     return (
       <select
-        multiple
+        id={fieldId}
         aria-label={field.label}
+        multiple
         value={current}
         onChange={(event) =>
           setValue(Array.from(event.target.selectedOptions).map((option) => option.value))
@@ -433,11 +476,13 @@ function renderFieldInput(
           <Input
             value={text(record.firstName)}
             onChange={(event) => setValue({ ...record, firstName: event.target.value })}
+            aria-label={`${field.label}: First name`}
             placeholder="First name"
           />
           <Input
             value={text(record.lastName)}
             onChange={(event) => setValue({ ...record, lastName: event.target.value })}
+            aria-label={`${field.label}: Last name`}
             placeholder="Last name"
           />
         </div>
@@ -446,6 +491,7 @@ function renderFieldInput(
 
     return (
       <Input
+        id={fieldId}
         value={text(record.fullName)}
         onChange={(event) => setValue({ fullName: event.target.value })}
         placeholder={field.placeholder || "Full name"}
@@ -458,15 +504,45 @@ function renderFieldInput(
     const compactLayout = field.config?.addressLayout === "compact";
     return (
       <div className={cn("grid gap-4", compactLayout ? "md:grid-cols-2" : "grid-cols-1")}>
-        <Input value={text(record.street)} onChange={(event) => setValue({ ...record, street: event.target.value })} placeholder="Street address" />
+        <Input
+          aria-label={`${field.label}: Street address`}
+          value={text(record.street)}
+          onChange={(event) => setValue({ ...record, street: event.target.value })}
+          placeholder="Street address"
+        />
         {field.config?.showStreet2 ? (
-          <Input value={text(record.street2)} onChange={(event) => setValue({ ...record, street2: event.target.value })} placeholder="Address line 2" />
+          <Input
+            aria-label={`${field.label}: Address line 2`}
+            value={text(record.street2)}
+            onChange={(event) => setValue({ ...record, street2: event.target.value })}
+            placeholder="Address line 2"
+          />
         ) : null}
-        <Input value={text(record.city)} onChange={(event) => setValue({ ...record, city: event.target.value })} placeholder="City" />
-        <Input value={text(record.state)} onChange={(event) => setValue({ ...record, state: event.target.value })} placeholder="State / Province" />
-        <Input value={text(record.postalCode)} onChange={(event) => setValue({ ...record, postalCode: event.target.value })} placeholder="Postal code" />
+        <Input
+          aria-label={`${field.label}: City`}
+          value={text(record.city)}
+          onChange={(event) => setValue({ ...record, city: event.target.value })}
+          placeholder="City"
+        />
+        <Input
+          aria-label={`${field.label}: State / Province`}
+          value={text(record.state)}
+          onChange={(event) => setValue({ ...record, state: event.target.value })}
+          placeholder="State / Province"
+        />
+        <Input
+          aria-label={`${field.label}: Postal code`}
+          value={text(record.postalCode)}
+          onChange={(event) => setValue({ ...record, postalCode: event.target.value })}
+          placeholder="Postal code"
+        />
         {field.config?.showCountry !== false ? (
-          <Input value={text(record.country)} onChange={(event) => setValue({ ...record, country: event.target.value })} placeholder="Country" />
+          <Input
+            aria-label={`${field.label}: Country`}
+            value={text(record.country)}
+            onChange={(event) => setValue({ ...record, country: event.target.value })}
+            placeholder="Country"
+          />
         ) : null}
       </div>
     );
@@ -477,16 +553,23 @@ function renderFieldInput(
   }
 
   const inputType =
-    field.type === "email" ? "email" :
-    field.type === "tel" ? "tel" :
-    field.type === "website" ? "url" :
-    field.type === "number" ? "number" :
-    field.type === "date" ? "date" :
-    field.type === "time" ? "time" :
-    "text";
+    field.type === "email"
+      ? "email"
+      : field.type === "tel"
+        ? "tel"
+        : field.type === "website"
+          ? "url"
+          : field.type === "number"
+            ? "number"
+            : field.type === "date"
+              ? "date"
+              : field.type === "time"
+                ? "time"
+                : "text";
 
   return (
     <Input
+      id={fieldId}
       type={inputType}
       value={text(value)}
       onChange={(event) => setValue(event.target.value)}
@@ -494,6 +577,44 @@ function renderFieldInput(
       autoPrependHttps={field.type === "website"}
     />
   );
+}
+
+export function PublicFormRenderer(props: PublicFormRendererProps) {
+  const { slug, className } = props;
+  const { data: form, isLoading } = useQuery<CmsForm>({
+    queryKey: ["/api/forms", slug],
+    queryFn: async () => {
+      const response = await fetch(`/api/forms/${slug}`, { credentials: "include" });
+      if (!response.ok) {
+        throw new Error("Form not found");
+      }
+      return response.json();
+    },
+    staleTime: 60_000,
+  });
+
+  if (isLoading) {
+    return (
+      <div className={cn("flex items-center justify-center py-10", className)}>
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!form) {
+    return (
+      <div
+        className={cn(
+          "rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground",
+          className,
+        )}
+      >
+        This form is unavailable right now.
+      </div>
+    );
+  }
+
+  return <LoadedPublicForm key={`${slug}:${form.id}`} initialForm={form} {...props} />;
 }
 
 type FormPage = ReturnType<typeof splitPages>[number];
@@ -506,7 +627,8 @@ function getFormDescription(form: CmsForm, override: string | undefined) {
 function getSubmitLabel(form: CmsForm, override: string | undefined) {
   if (override !== undefined) return override;
   const settings = typeof form.settings === "object" && form.settings ? form.settings : null;
-  const configured = typeof settings?.submitButtonText === "string" ? settings.submitButtonText.trim() : "";
+  const configured =
+    typeof settings?.submitButtonText === "string" ? settings.submitButtonText.trim() : "";
   return configured || "Submit";
 }
 
@@ -518,15 +640,28 @@ async function submitPublicForm(slug: string, values: FormValues) {
     body: JSON.stringify(values),
   });
   if (!response.ok) {
-    const errorPayload = (await response.json().catch(() => ({}))) as { message?: string; error?: string };
+    const errorPayload = (await response.json().catch(() => ({}))) as {
+      message?: string;
+      error?: string;
+    };
     throw new Error(errorPayload.message || errorPayload.error || "Failed to submit form.");
   }
 
   return (await response.json().catch(() => ({}))) as { message?: string; submissionId?: string };
 }
 
-function PublicFormHeader({ name, description, showName }: { name: string; description: string; showName: boolean }) {
-  const descriptionNode = description ? <p className="text-sm public-supporting-copy">{description}</p> : null;
+function PublicFormHeader({
+  name,
+  description,
+  showName,
+}: {
+  name: string;
+  description: string;
+  showName: boolean;
+}) {
+  const descriptionNode = description ? (
+    <p className="text-sm public-supporting-copy">{description}</p>
+  ) : null;
   if (!showName) return descriptionNode;
   return (
     <div className="space-y-1">
@@ -536,14 +671,24 @@ function PublicFormHeader({ name, description, showName }: { name: string; descr
   );
 }
 
-function FormStepProgress({ page, pageIndex, pageCount }: { page: FormPage; pageIndex: number; pageCount: number }) {
+function FormStepProgress({
+  page,
+  pageIndex,
+  pageCount,
+}: {
+  page: FormPage;
+  pageIndex: number;
+  pageCount: number;
+}) {
   const pageTitle = text(page.meta?.config?.pageTitle);
   const pageDescription = text(page.meta?.config?.pageDescription);
   const percent = ((pageIndex + 1) / pageCount) * 100;
   return (
     <div className="space-y-3 rounded-xl border bg-muted/10 p-4">
       <div className="flex items-center justify-between gap-3 text-sm">
-        <span className="font-medium">Step {pageIndex + 1} of {pageCount}</span>
+        <span className="font-medium">
+          Step {pageIndex + 1} of {pageCount}
+        </span>
         <span className="text-muted-foreground">{Math.round(percent)}%</span>
       </div>
       <div className="h-2 rounded-full bg-muted">
@@ -560,13 +705,13 @@ function FormStepProgress({ page, pageIndex, pageCount }: { page: FormPage; page
 
 function PublicFormField({
   field,
-  slug,
+  fieldId,
   value,
   compact,
   onChange,
 }: {
   field: CmsFormField;
-  slug: string;
+  fieldId: string;
   value: unknown;
   compact: boolean;
   onChange: (next: unknown) => void;
@@ -575,8 +720,8 @@ function PublicFormField({
   const showHelpText = !isStructuralField(field.type) && Boolean(field.helpText);
   return (
     <div className={cn("space-y-1.5", fieldSpanClass(field, compact))}>
-      {showLabel ? <Label htmlFor={`${slug}-${field.key}`}>{field.label}</Label> : null}
-      {renderFieldInput(field, value, onChange, compact)}
+      {showLabel ? <Label htmlFor={fieldId}>{field.label}</Label> : null}
+      {renderFieldInput(field, value, onChange, compact, fieldId)}
       {showHelpText ? <p className="text-xs public-helper-text">{field.helpText}</p> : null}
     </div>
   );
@@ -623,10 +768,8 @@ function FormNavigation({
   );
 }
 
-type LoadedPublicFormProps = Omit<PublicFormRendererProps, "className"> & { form: CmsForm; className?: string };
-
 function LoadedPublicForm({
-  form,
+  initialForm,
   slug,
   className,
   showHeader = true,
@@ -635,23 +778,19 @@ function LoadedPublicForm({
   submitButtonClassName,
   compact = false,
   onSubmitSuccess,
-}: LoadedPublicFormProps) {
+}: PublicFormRendererProps & { initialForm: CmsForm }) {
   const { toast } = useToast();
-  const [values, setValues] = useState<FormValues>({});
+  const formId = useId();
+  // Keep one schema snapshot for the lifetime of this form session. A background
+  // refresh must not replace fields or discard answers while someone is typing.
+  const [form] = useState(initialForm);
+  const [values, setValues] = useState<FormValues>(() => buildInitialValues(form.fields ?? []));
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
   const fields = useMemo(() => (Array.isArray(form.fields) ? form.fields : []), [form.fields]);
   const pages = useMemo(() => splitPages(fields), [fields]);
   const activePage = pages[currentPageIndex] ?? pages[0] ?? { meta: null, fields };
   const visibleFields = currentPageFields(activePage).filter((field) => field.type !== "hidden");
-
-  const [syncedForm, setSyncedForm] = useState<{ fields: typeof fields; slug: string } | null>(null);
-  if (syncedForm?.fields !== fields || syncedForm.slug !== slug) {
-    setSyncedForm({ fields, slug });
-    setValues(buildInitialValues(fields));
-    setCurrentPageIndex(0);
-  }
-
   const description = getFormDescription(form, descriptionOverride);
 
   const mutation = useMutation({
@@ -716,7 +855,7 @@ function LoadedPublicForm({
             <PublicFormField
               key={field.id}
               field={field}
-              slug={slug}
+              fieldId={`${formId}-${field.key}`}
               value={values[field.key]}
               compact={compact}
               onChange={(next) => setValues((current) => ({ ...current, [field.key]: next }))}
@@ -737,37 +876,4 @@ function LoadedPublicForm({
       </form>
     </div>
   );
-}
-
-export function PublicFormRenderer(props: PublicFormRendererProps) {
-  const { slug, className } = props;
-  const { data: form, isLoading } = useQuery<CmsForm>({
-    queryKey: ["/api/forms", slug],
-    queryFn: async () => {
-      const response = await fetch(`/api/forms/${slug}`, { credentials: "include" });
-      if (!response.ok) {
-        throw new Error("Form not found");
-      }
-      return response.json();
-    },
-    staleTime: 60_000,
-  });
-
-  if (isLoading) {
-    return (
-      <div className={cn("flex items-center justify-center py-10", className)}>
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
-  if (!form) {
-    return (
-      <div className={cn("rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground", className)}>
-        This form is unavailable right now.
-      </div>
-    );
-  }
-
-  return <LoadedPublicForm {...props} form={form} />;
 }

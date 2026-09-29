@@ -24,7 +24,7 @@ router.get(
   asyncHandler(async (_req, res) => {
     const allDocs = await storage.docs.getAllDocs();
     res.json(allDocs);
-  })
+  }),
 );
 
 router.post(
@@ -36,7 +36,7 @@ router.post(
       ...result,
       docs: allDocs,
     });
-  })
+  }),
 );
 
 router.get(
@@ -48,7 +48,7 @@ router.get(
       return;
     }
     res.json(doc);
-  })
+  }),
 );
 
 router.post(
@@ -61,7 +61,7 @@ router.post(
       createdBy: req.user!.id,
     });
     res.status(201).json(doc);
-  })
+  }),
 );
 
 router.put(
@@ -75,7 +75,7 @@ router.put(
       return;
     }
     res.json(doc);
-  })
+  }),
 );
 
 router.delete(
@@ -83,7 +83,7 @@ router.delete(
   asyncHandler(async (req, res) => {
     await storage.docs.deleteDoc(paramString(req.params.id));
     res.json({ message: "Document deleted" });
-  })
+  }),
 );
 
 export default router;

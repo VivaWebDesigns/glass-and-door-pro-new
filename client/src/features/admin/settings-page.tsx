@@ -320,7 +320,7 @@ const INTEGRATIONS: IntegrationConfig[] = [
         key: "ga4_reporting_private_key",
         label: "Reporting Private Key",
         isSecret: true,
-        placeholder: "-----BEGIN PRIVATE KEY-----",
+        placeholder: "Paste the complete reporting private key",
       },
     ],
   },
@@ -871,7 +871,9 @@ function FontOptionCard({
       onClick={() => onSelect(option.value)}
       className={cn(
         "w-full rounded-xl border p-4 text-left transition-all hover:border-primary/50 hover:bg-primary/5",
-        isSelected ? "border-primary bg-primary/5 ring-1 ring-primary/20" : "border-border/70 bg-background",
+        isSelected
+          ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+          : "border-border/70 bg-background",
       )}
       data-testid={`button-branding-font-${sampleKind}-${option.value}`}
     >
@@ -921,20 +923,29 @@ const MUTED_COLOR_FALLBACK_KEYS = new Set<BrandingColorSettingKey>([
 
 type BrandingSettingsMap = SettingsData[string];
 
-function readBrandingFont(settings: BrandingSettingsMap, key: "frontend_body_font" | "frontend_heading_font") {
+function readBrandingFont(
+  settings: BrandingSettingsMap,
+  key: "frontend_body_font" | "frontend_heading_font",
+) {
   return settings[key]?.value || "__default__";
 }
 
-function readCompanyInfo(settings: BrandingSettingsMap): Record<BrandingCompanyInfoSettingKey, string> {
+function readCompanyInfo(
+  settings: BrandingSettingsMap,
+): Record<BrandingCompanyInfoSettingKey, string> {
   return Object.fromEntries(
     COMPANY_INFO_KEYS.map((key) => [key, settings[key]?.value || ""]),
   ) as Record<BrandingCompanyInfoSettingKey, string>;
 }
 
-function readBrandingColorValues(settings: BrandingSettingsMap): Record<BrandingColorSettingKey, string> {
+function readBrandingColorValues(
+  settings: BrandingSettingsMap,
+): Record<BrandingColorSettingKey, string> {
   return Object.fromEntries(
     BRANDING_COLOR_FIELDS.map((field) => {
-      const fallback = MUTED_COLOR_FALLBACK_KEYS.has(field.key) ? settings.text_muted_color?.value : undefined;
+      const fallback = MUTED_COLOR_FALLBACK_KEYS.has(field.key)
+        ? settings.text_muted_color?.value
+        : undefined;
       return [field.key, resolveBrandingColor(field.key, settings[field.key]?.value || fallback)];
     }),
   ) as Record<BrandingColorSettingKey, string>;
@@ -952,7 +963,10 @@ function getBrandingSignature(settings: BrandingSettingsMap) {
 }
 
 function familyStyle(fontValue: string) {
-  return { fontFamily: fontFamilyForBrandingOption(fontValue === "__default__" ? null : fontValue) ?? undefined };
+  return {
+    fontFamily:
+      fontFamilyForBrandingOption(fontValue === "__default__" ? null : fontValue) ?? undefined,
+  };
 }
 
 function getBrandingPreviewStyles(
@@ -977,7 +991,12 @@ function getBrandingPreviewStyles(
 async function saveBrandingSettings(entries: Array<[string, string]>) {
   await Promise.all(
     entries.map(([key, value]) =>
-      apiRequest("PUT", "/api/admin/settings", { key, value, category: "branding", isSecret: false }),
+      apiRequest("PUT", "/api/admin/settings", {
+        key,
+        value,
+        category: "branding",
+        isSecret: false,
+      }),
     ),
   );
 }
@@ -1021,8 +1040,8 @@ function BrandingTypographyCard({
   setHeadingFont: React.Dispatch<React.SetStateAction<string>>;
   bodyFont: string;
   setBodyFont: React.Dispatch<React.SetStateAction<string>>;
-  previewHeadingStyle: { fontFamily: string | undefined; };
-  previewBodyStyle: { fontFamily: string | undefined; };
+  previewHeadingStyle: { fontFamily: string | undefined };
+  previewBodyStyle: { fontFamily: string | undefined };
   saveFontsMutation: UseMutationResult<void, Error, void, unknown>;
   hasFontChanges: boolean;
 }) {
@@ -1034,9 +1053,8 @@ function BrandingTypographyCard({
           Frontend Typography
         </CardTitle>
         <CardDescription>
-          Choose one font for headings and another for body copy on the public-facing website.
-          Each option includes an inline sample so editors can compare type directly in the
-          admin.
+          Choose one font for headings and another for body copy on the public-facing website. Each
+          option includes an inline sample so editors can compare type directly in the admin.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
@@ -1098,9 +1116,15 @@ function BrandingTypographyCard({
                   </p>
                 </div>
                 <div className="grid gap-3">
-                  {BRANDING_SANS_FONT_OPTIONS.map((option) =>
-                    <FontOptionCard key={option.value} option={option} selectedValue={headingFont} onSelect={setHeadingFont} sampleKind="heading" />,
-                  )}
+                  {BRANDING_SANS_FONT_OPTIONS.map((option) => (
+                    <FontOptionCard
+                      key={option.value}
+                      option={option}
+                      selectedValue={headingFont}
+                      onSelect={setHeadingFont}
+                      sampleKind="heading"
+                    />
+                  ))}
                 </div>
               </div>
               <div className="space-y-3">
@@ -1110,9 +1134,15 @@ function BrandingTypographyCard({
                   </p>
                 </div>
                 <div className="grid gap-3">
-                  {BRANDING_SERIF_FONT_OPTIONS.map((option) =>
-                    <FontOptionCard key={option.value} option={option} selectedValue={headingFont} onSelect={setHeadingFont} sampleKind="heading" />,
-                  )}
+                  {BRANDING_SERIF_FONT_OPTIONS.map((option) => (
+                    <FontOptionCard
+                      key={option.value}
+                      option={option}
+                      selectedValue={headingFont}
+                      onSelect={setHeadingFont}
+                      sampleKind="heading"
+                    />
+                  ))}
                 </div>
               </div>
             </CardContent>
@@ -1133,9 +1163,15 @@ function BrandingTypographyCard({
                   </p>
                 </div>
                 <div className="grid gap-3">
-                  {BRANDING_SANS_FONT_OPTIONS.map((option) =>
-                    <FontOptionCard key={option.value} option={option} selectedValue={bodyFont} onSelect={setBodyFont} sampleKind="body" />,
-                  )}
+                  {BRANDING_SANS_FONT_OPTIONS.map((option) => (
+                    <FontOptionCard
+                      key={option.value}
+                      option={option}
+                      selectedValue={bodyFont}
+                      onSelect={setBodyFont}
+                      sampleKind="body"
+                    />
+                  ))}
                 </div>
               </div>
               <div className="space-y-3">
@@ -1145,9 +1181,15 @@ function BrandingTypographyCard({
                   </p>
                 </div>
                 <div className="grid gap-3">
-                  {BRANDING_SERIF_FONT_OPTIONS.map((option) =>
-                    <FontOptionCard key={option.value} option={option} selectedValue={bodyFont} onSelect={setBodyFont} sampleKind="body" />,
-                  )}
+                  {BRANDING_SERIF_FONT_OPTIONS.map((option) => (
+                    <FontOptionCard
+                      key={option.value}
+                      option={option}
+                      selectedValue={bodyFont}
+                      onSelect={setBodyFont}
+                      sampleKind="body"
+                    />
+                  ))}
                 </div>
               </div>
             </CardContent>
@@ -1162,8 +1204,8 @@ function BrandingTypographyCard({
             Glass & Door Pro helps Charlotte-area homes and businesses look their best.
           </h4>
           <p className="mt-3 text-sm text-muted-foreground" style={previewBodyStyle}>
-            Use this preview to compare heading and body combinations before saving. These
-            font selections only apply to the public-facing website, not the admin dashboard.
+            Use this preview to compare heading and body combinations before saving. These font
+            selections only apply to the public-facing website, not the admin dashboard.
           </p>
         </div>
 
@@ -1205,12 +1247,12 @@ function BrandingColorPreview({
   previewLinkStyle,
   previewLinkHoverStyle,
 }: {
-  previewPaletteStyle: { backgroundColor: string | undefined; color: string | undefined; };
+  previewPaletteStyle: { backgroundColor: string | undefined; color: string | undefined };
   colorValues: Record<BrandingColorSettingKey, string>;
-  previewHeadingStyle: { fontFamily: string | undefined; };
-  previewBodyStyle: { fontFamily: string | undefined; };
-  previewLinkStyle: { color: string | undefined; };
-  previewLinkHoverStyle: { color: string | undefined; };
+  previewHeadingStyle: { fontFamily: string | undefined };
+  previewBodyStyle: { fontFamily: string | undefined };
+  previewLinkStyle: { color: string | undefined };
+  previewLinkHoverStyle: { color: string | undefined };
 }) {
   return (
     <div className="rounded-xl border bg-muted/10 p-5">
@@ -1218,10 +1260,7 @@ function BrandingColorPreview({
         Palette Preview
       </p>
       <div className="mt-4 flex flex-wrap gap-3">
-        <div
-          className="rounded-lg px-4 py-2 text-sm font-medium"
-          style={previewPaletteStyle}
-        >
+        <div className="rounded-lg px-4 py-2 text-sm font-medium" style={previewPaletteStyle}>
           Primary Action
         </div>
         <div
@@ -1246,8 +1285,10 @@ function BrandingColorPreview({
           className="rounded-lg px-4 py-2 text-sm font-medium"
           style={{
             backgroundColor: firstColor(colorValues.brand_quaternary_color, "#A8623A"),
-            color:
-              firstColor(colorValues.text_inverse_color, colorValues.text_primary_foreground_color),
+            color: firstColor(
+              colorValues.text_inverse_color,
+              colorValues.text_primary_foreground_color,
+            ),
           }}
         >
           Quaternary Action
@@ -1267,8 +1308,11 @@ function BrandingColorPreview({
           className="text-2xl font-semibold"
           style={{
             ...previewHeadingStyle,
-            color:
-              firstColor(colorValues.text_h2_color, colorValues.text_h1_color, colorValues.text_body_color),
+            color: firstColor(
+              colorValues.text_h2_color,
+              colorValues.text_h1_color,
+              colorValues.text_body_color,
+            ),
           }}
         >
           H2 section heading preview
@@ -1277,8 +1321,11 @@ function BrandingColorPreview({
           className="text-lg font-semibold"
           style={{
             ...previewHeadingStyle,
-            color:
-              firstColor(colorValues.text_h3_h6_color, colorValues.text_h2_color, colorValues.text_body_color),
+            color: firstColor(
+              colorValues.text_h3_h6_color,
+              colorValues.text_h2_color,
+              colorValues.text_body_color,
+            ),
           }}
         >
           H3-H6 card and supporting heading preview
@@ -1299,8 +1346,7 @@ function BrandingColorPreview({
             color: cssColor(colorValues.text_supporting_copy_color),
           }}
         >
-          Supporting copy preview for section introductions, lead-ins, and editorial
-          setup.
+          Supporting copy preview for section introductions, lead-ins, and editorial setup.
         </p>
         <p
           className="text-sm"
@@ -1321,8 +1367,7 @@ function BrandingColorPreview({
         <p
           className="text-xs uppercase tracking-wide"
           style={{
-            color:
-              firstColor(colorValues.text_meta_color, colorValues.text_helper_text_color),
+            color: firstColor(colorValues.text_meta_color, colorValues.text_helper_text_color),
           }}
         >
           Meta text preview for dates, authors, categories, and labels
@@ -1344,8 +1389,10 @@ function BrandingColorPreview({
           className="rounded-lg px-4 py-3 text-sm font-medium"
           style={{
             backgroundColor: firstColor(colorValues.brand_primary_color, "#1F2A44"),
-            color:
-              firstColor(colorValues.text_inverse_color, colorValues.text_primary_foreground_color),
+            color: firstColor(
+              colorValues.text_inverse_color,
+              colorValues.text_primary_foreground_color,
+            ),
           }}
         >
           Inverse text preview on dark or branded surfaces
@@ -1355,7 +1402,10 @@ function BrandingColorPreview({
   );
 }
 
-function BrandingColorGroups({ colorValues, updateColorValue }: {
+function BrandingColorGroups({
+  colorValues,
+  updateColorValue,
+}: {
   colorValues: Record<BrandingColorSettingKey, string>;
   updateColorValue: (key: BrandingColorSettingKey, value: string) => void;
 }) {
@@ -1427,7 +1477,9 @@ function BrandingCompanyInfoCard({
   hasCompanyInfoChanges,
 }: {
   companyInfo: Record<BrandingCompanyInfoSettingKey, string>;
-  setCompanyInfo: React.Dispatch<React.SetStateAction<Record<BrandingCompanyInfoSettingKey, string>>>;
+  setCompanyInfo: React.Dispatch<
+    React.SetStateAction<Record<BrandingCompanyInfoSettingKey, string>>
+  >;
   saveCompanyInfoMutation: UseMutationResult<void, Error, void, unknown>;
   hasCompanyInfoChanges: boolean;
 }) {
@@ -1439,8 +1491,8 @@ function BrandingCompanyInfoCard({
           Company Information
         </CardTitle>
         <CardDescription>
-          These details automatically populate the Location card on the Contact page and the
-          live Contact Form block.
+          These details automatically populate the Location card on the Contact page and the live
+          Contact Form block.
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4 md:grid-cols-2">
@@ -1537,8 +1589,12 @@ export function BrandingTab({
   showHeader?: boolean;
 }) {
   const brandingSettings = settings.branding || {};
-  const [bodyFont, setBodyFont] = useState(() => readBrandingFont(brandingSettings, "frontend_body_font"));
-  const [headingFont, setHeadingFont] = useState(() => readBrandingFont(brandingSettings, "frontend_heading_font"));
+  const [bodyFont, setBodyFont] = useState(() =>
+    readBrandingFont(brandingSettings, "frontend_body_font"),
+  );
+  const [headingFont, setHeadingFont] = useState(() =>
+    readBrandingFont(brandingSettings, "frontend_heading_font"),
+  );
   const [companyInfo, setCompanyInfo] = useState(() => readCompanyInfo(brandingSettings));
   const [colorValues, setColorValues] = useState(() => readBrandingColorValues(brandingSettings));
 
@@ -1564,14 +1620,18 @@ export function BrandingTab({
   const saveCompanyInfoMutation = useBrandingSettingsMutation({
     successTitle: "Company information updated",
     errorTitle: "Could not save company information",
-    save: () => saveBrandingSettings(COMPANY_INFO_KEYS.map((key) => [key, companyInfo[key].trim()])),
+    save: () =>
+      saveBrandingSettings(COMPANY_INFO_KEYS.map((key) => [key, companyInfo[key].trim()])),
   });
   const saveColorsMutation = useBrandingSettingsMutation({
     successTitle: "Brand color palette updated",
     errorTitle: "Could not save brand colors",
     save: () =>
       saveBrandingSettings(
-        BRANDING_COLOR_FIELDS.map((field) => [field.key, normalizeHexColor(colorValues[field.key]) || ""]),
+        BRANDING_COLOR_FIELDS.map((field) => [
+          field.key,
+          normalizeHexColor(colorValues[field.key]) || "",
+        ]),
       ),
   });
 
@@ -1585,8 +1645,13 @@ export function BrandingTab({
   const hasColorChanges = BRANDING_COLOR_FIELDS.some(
     (field) => colorValues[field.key] !== savedColorValues[field.key],
   );
-  const { previewBodyStyle, previewHeadingStyle, previewPaletteStyle, previewLinkStyle, previewLinkHoverStyle } =
-    getBrandingPreviewStyles(colorValues, bodyFont, headingFont);
+  const {
+    previewBodyStyle,
+    previewHeadingStyle,
+    previewPaletteStyle,
+    previewLinkStyle,
+    previewLinkHoverStyle,
+  } = getBrandingPreviewStyles(colorValues, bodyFont, headingFont);
 
   const updateColorValue = (key: BrandingColorSettingKey, value: string) => {
     setColorValues((current) => ({ ...current, [key]: value }));
@@ -1712,8 +1777,8 @@ function TemplateEditorFooter({
 }: {
   updateMutation: UseMutationResult<void, Error, void, unknown>;
   editorLock: ReturnType<typeof useEditorLock>;
-  previewMutation: UseMutationResult<{ subject: string; html: string; }, Error, void, unknown>;
-  testMutation: UseMutationResult<{ success: boolean; message: string; }, Error, void, unknown>;
+  previewMutation: UseMutationResult<{ subject: string; html: string }, Error, void, unknown>;
+  testMutation: UseMutationResult<{ success: boolean; message: string }, Error, void, unknown>;
 }) {
   return (
     <SheetFooter>
@@ -1759,8 +1824,11 @@ function TemplateEditorFooter({
   );
 }
 
-function TemplatePreviewPanel({ previewMutation, previewHtml }: {
-  previewMutation: UseMutationResult<{ subject: string; html: string; }, Error, void, unknown>;
+function TemplatePreviewPanel({
+  previewMutation,
+  previewHtml,
+}: {
+  previewMutation: UseMutationResult<{ subject: string; html: string }, Error, void, unknown>;
   previewHtml: string | null;
 }) {
   return (
@@ -1836,11 +1904,7 @@ function TemplateLinkPanel({
                 data-testid="input-template-link-url"
               />
             </div>
-            <Button
-              type="button"
-              onClick={applyLink}
-              data-testid="button-template-apply-link"
-            >
+            <Button type="button" onClick={applyLink} data-testid="button-template-apply-link">
               Apply Link
             </Button>
           </div>
@@ -1850,7 +1914,11 @@ function TemplateLinkPanel({
   );
 }
 
-function TemplateFormattingToolbar({ applyCommand, focusVisualEditor, setShowLinkPanel }: {
+function TemplateFormattingToolbar({
+  applyCommand,
+  focusVisualEditor,
+  setShowLinkPanel,
+}: {
   applyCommand: (command: string, value?: string) => void;
   focusVisualEditor: () => void;
   setShowLinkPanel: React.Dispatch<React.SetStateAction<boolean>>;
@@ -1954,7 +2022,10 @@ function TemplateFormattingToolbar({ applyCommand, focusVisualEditor, setShowLin
   );
 }
 
-function TemplateVariableChips({ template, insertVariable }: {
+function TemplateVariableChips({
+  template,
+  insertVariable,
+}: {
   template: EmailTemplate;
   insertVariable: (variable: string) => void;
 }) {
@@ -2200,7 +2271,11 @@ function TemplateEditor({
 
                 {editorTab === "visual" ? (
                   <div className="overflow-hidden rounded-xl border bg-background shadow-sm">
-                    <TemplateFormattingToolbar applyCommand={applyCommand} focusVisualEditor={focusVisualEditor} setShowLinkPanel={setShowLinkPanel} />
+                    <TemplateFormattingToolbar
+                      applyCommand={applyCommand}
+                      focusVisualEditor={focusVisualEditor}
+                      setShowLinkPanel={setShowLinkPanel}
+                    />
 
                     <TemplateLinkPanel
                       showLinkPanel={showLinkPanel}
@@ -2450,7 +2525,6 @@ export default function AdminSettingsPage() {
               <HeadTagAdditionsTab settings={settings || {}} />
             )}
           </TabsContent>
-
         </Tabs>
       </div>
     </AdminSidebar>
