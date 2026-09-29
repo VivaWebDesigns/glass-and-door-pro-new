@@ -133,7 +133,7 @@ Generated from full codebase audit. Non-destructive; preserves all existing feat
 
 1. Split `application.routes.ts` (551 lines) into sub-routers if it grows further.
 2. Split `applications.routes.ts` (479 lines) similarly.
-3. Keep `replit.md` up to date with architectural decisions.
+3. Keep `README.md` and `docs/architecture/` up to date with architectural decisions.
 4. Add API route documentation (consider auto-gen from route definitions).
 
 ---
