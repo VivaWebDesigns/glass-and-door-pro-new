@@ -2,74 +2,56 @@
 
 ## Database Engine
 
-PostgreSQL hosted on Neon (serverless). Accessed via `@neondatabase/serverless` WebSocket driver with Drizzle ORM.
+PostgreSQL, accessed through Drizzle ORM with the `pg` (node-postgres) Pool driver (`server/db.ts`). Production runs on Railway Postgres.
 
 ## Index Strategy
 
-The schema defines 45+ B-tree indexes across all major tables. Key indexing patterns:
+Indexes are declared alongside table definitions in `shared/schema/`. Tables are small, so indexes focus on the lookup and ordering patterns the CMS and admin actually use.
 
-### Therapist Profiles Indexes
-
-Defined in `shared/schema/therapist-profiles.ts`:
-
-| Index Name | Columns | Type | Purpose |
-|------------|---------|------|---------|
-| `idx_tp_user_id` | `userId` | B-tree | User-to-profile lookup |
-| `idx_tp_visibility` | `isApproved, isActive` | B-tree | Base directory filter |
-| `idx_tp_country` | `country` | B-tree | Country filter |
-| `idx_tp_practice_mode` | `practiceMode` | B-tree | Practice mode filter |
-| `idx_tp_featured` | `isFeatured` | B-tree | Featured therapist queries |
-| `idx_tp_specializations_gin` | `specializations` | GIN | Array containment queries |
-| `idx_tp_languages_gin` | `languages` | GIN | Array containment queries |
-| `idx_tp_directory_filter` | `isApproved, isActive, practiceMode, acceptingClients` | B-tree | Common directory filter pattern |
-
-### Other Key Table Indexes
+### Key Table Indexes
 
 | Table | Indexes | Notes |
 |-------|---------|-------|
-| `users` | `email` (unique), `role` | Core lookup patterns |
-| `specializations` | `name` (unique) | Lookup by name |
-| `cms_pages` | `slug` (unique), `status` | Page rendering |
-| `blog_posts` | `slug`, `isPublished` | Blog listing |
-| `notifications` | `userId`, `isRead` | User notification queries |
-| `provider_applications` | `userId`, `status` | Application lookup |
-| `events` | `status`, `startDate` | Event listing/filtering |
+| `users` | `email` (unique), `idx_users_role` | Login lookup, role filtering |
+| `cms_pages` | `idx_cms_pages_slug` (unique), `idx_cms_pages_status` | Page rendering by slug, published filter |
+| `cms_page_revisions` | `idx_cms_page_revisions_page_id` | Revision history per page |
+| `cms_media` | `idx_cms_media_created_at` | Media library ordering |
+| `cms_sections` | `idx_cms_sections_category`, `idx_cms_sections_created_at` | Section library filtering |
+| `cms_sidebars` | `idx_cms_sidebars_default`, `idx_cms_sidebars_updated_at` | Default sidebar lookup |
+| `cms_forms` | `idx_cms_forms_slug_unique` (unique), `idx_cms_forms_kind`, `idx_cms_forms_updated_at` | Public form lookup by slug |
+| `cms_form_submissions` | `idx_cms_form_submissions_form_id`, `idx_cms_form_submissions_created_at` | Submissions per form, newest first |
+| `editor_locks` | `editor_locks_resource_unique` on `(resource_type, resource_id)` | One lock per resource |
+| `contact_messages` | `idx_contact_messages_created_at` | Admin listing by date |
+| `notifications` | `idx_notif_user_date`, `idx_notif_user_unread` | User notification queries |
+| `activity_logs` | `idx_activity_user_date` | Activity per user |
+| `docs`, `email_templates`, `system_settings`, `password_reset_tokens` | Unique `slug` / `key` / `token` | Lookup by natural key |
 
 ## Foreign Key Relationships
 
-All tables use `varchar` IDs (UUID-style strings). Foreign keys are declared via Drizzle's `references()`:
-
-### Core Relationships
+Most tables use `varchar` IDs (UUID-style strings); `notifications` uses a serial ID. Foreign keys are declared via Drizzle's `references()`:
 
 ```
-users.id ←── therapist_profiles.userId
 users.id ←── notifications.userId
-users.id ←── saved_professionals.userId
-users.id ←── profile_views.viewerId / profileId
-users.id ←── event_registrations.userId
-users.id ←── conversations.participant1Id / participant2Id
-users.id ←── direct_messages.senderId
-users.id ←── provider_applications.userId
+users.id ←── notification_preferences.userId
+users.id ←── activity_logs.userId
+users.id ←── password_reset_tokens.userId
+users.id ←── docs.createdBy
+users.id ←── cms_pages.createdBy / updatedBy          (on delete set null)
+users.id ←── cms_page_revisions.changedBy             (on delete set null)
+users.id ←── cms_media.uploadedBy                     (on delete set null)
+users.id ←── cms_sections.createdBy                   (on delete set null)
 
-therapist_profiles.id ←── therapist_subscriptions.therapistProfileId
-
-membership_tiers.id ←── therapist_subscriptions.tierId
-
-events.id ←── event_registrations.eventId
-
-cms_pages.id ←── cms_page_revisions.pageId
-
-provider_applications.id ←── provider_application_timeline.applicationId
-provider_applications.id ←── provider_application_credentials.applicationId
-provider_applications.id ←── provider_application_references.applicationId
-provider_applications.id ←── provider_background_checks.applicationId
-provider_applications.id ←── provider_interviews.applicationId
-provider_applications.id ←── provider_application_decisions.applicationId
+cms_pages.id ←── cms_page_revisions.pageId            (on delete cascade)
+cms_forms.id ←── cms_form_submissions.formId          (on delete cascade)
 ```
+
+### Legacy starter tables
+
+`shared/schema/` still defines `conversations`, `direct_messages`, and `guest_messages` (with their indexes) from the starter template, but no server or client code reads or writes them. Older migrations also created starter tables that are no longer in the schema; they have not been dropped, and `server/migrate.ts` still runs an `events` slug backfill on startup.
 
 ## Migration Strategy
 
-- Migrations are stored in `migrations/` directory (with journal metadata in `migrations/meta/`)
-- Production migrations run automatically on startup via `server/migrate.ts`
+- Migrations are stored in `migrations/` (journal metadata in `migrations/meta/`)
+- Production migrations run automatically on startup via `server/migrate.ts`; if the database has tables but no Drizzle journal, startup migrations are skipped (schema assumed to be provisioned via push)
 - Schema changes use `npm run db:push` for development
-- Migration files are numbered sequentially (0001, 0002, etc.)
+- Migration files are numbered sequentially (0000, 0001, etc.)

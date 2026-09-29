@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Core Platform CMS visual builder is a registry-first, canvas-based editor for CMS pages. It preserves the existing structured JSON page model while upgrading the authoring experience from form-driven editing to a synchronized navigator, visual canvas, and inspector.
+The Glass & Door Pro CMS visual builder is a registry-first, canvas-based editor for CMS pages. It preserves the existing structured JSON page model while upgrading the authoring experience from form-driven editing to a synchronized navigator, visual canvas, and inspector.
 
 This phase does **not** introduce front-end live editing. It focuses only on the admin authoring experience.
 
@@ -36,8 +36,9 @@ This registry is the equivalent of a component config layer in a framework-backe
 
 ### 2. Visual Builder Shell
 
-File:
+Files:
 - `client/src/features/admin/cms/builder/page-builder.tsx`
+- `client/src/features/admin/cms/builder/page-builder-layout.tsx`, `page-builder-panels.tsx`, `page-builder-canvas.tsx`, `page-builder-inspector.tsx`
 
 Responsibilities:
 - left navigator / structure panel
@@ -55,11 +56,12 @@ The page itself is now the editing surface, instead of a list of preview cards w
 ### 3. Shared Render Path
 
 Files:
-- `client/src/features/public/public-block-renderer.tsx`
-- `client/src/features/admin/cms/builder/page-builder.tsx`
-- `client/src/features/admin/cms/builder/section-style.tsx`
+- `client/src/features/public/public-block-renderer.tsx` — renderer for published pages
+- `client/src/features/admin/cms/builder/block-renderer.tsx` — renderer used on the admin canvas
+- `client/src/features/admin/cms/builder/block-renderer.shared.ts`, `section-style.tsx`, `section-heading.tsx` — helpers and section wrappers shared by both
+- `client/src/features/admin/cms/builder/page-builder-preview.tsx` — device preview (desktop/tablet/mobile) that lazy-loads the public `PublicPageRenderer`
 
-The admin visual canvas now renders blocks through the same public block renderer path used for published pages. The admin layer adds selection chrome, action overlays, and inspector synchronization on top of the shared output.
+The admin canvas renders blocks with the builder's `BlockRenderer`, which shares spacing, color, media, and section-style helpers with the public renderer. The device preview renders through the actual public renderer. The admin layer adds selection chrome, action overlays, and inspector synchronization on top.
 
 That gives us:
 - truer WYSIWYG behavior
@@ -74,7 +76,7 @@ File:
 Responsibilities:
 - full editing for the currently selected block
 - grouped controls for `Content`, `Media`, `Layout`, and `Settings`
-- continued use of Cloudflare R2-backed media pickers instead of raw media URL entry
+- continued use of CMS media library pickers instead of raw media URL entry
 
 The same block editor now supports two roles:
 - `contextual` mode for future lightweight inline use where safe
@@ -122,7 +124,7 @@ The right inspector is the primary editing surface:
 - remains visible as a docked desktop rail while the canvas scrolls inside the sticky builder shell
 - supports long forms through its own internal scrolling region
 - keeps grouped controls for `Content`, `Media`, `Layout`, and `Settings`
-- continues using Cloudflare R2-backed media upload and picker flows instead of raw URL entry
+- continues using CMS media library upload and picker flows instead of raw URL entry
 
 The inspector can still be hidden to prioritize canvas space, but the default editing pattern is now:
 1. select a section on the canvas
@@ -148,7 +150,7 @@ Additional long-page usability improvements:
 ## Media Handling Rules
 
 All image-oriented editing in the visual builder continues to use the existing CMS media flow:
-- Cloudflare R2-backed upload
+- media upload (Cloudflare R2 when configured, otherwise local uploads storage)
 - media library selection
 - image focal / position controls where supported
 
@@ -166,14 +168,14 @@ The visual builder preserves the current CMS contracts:
 - draft / publish / scheduled publish flows remain unchanged
 - revision history remains compatible
 - public SEO behavior remains unchanged
-- blog and dynamic block behavior remain unchanged
+- dynamic block behavior (e.g., live forms) remains unchanged
 
 ## Why We Did Not Swap In a New Editor Package Immediately
 
 The existing CMS already had:
 - typed blocks
 - shared rendering primitives
-- R2 media flows
+- media library flows
 - revision history
 - public rendering contracts
 

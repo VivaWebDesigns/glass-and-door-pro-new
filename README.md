@@ -7,7 +7,7 @@ Marketing website for **Glass & Door Pro**, a glass, window, and door contractor
 
 Public pages are managed through a built-in CMS (block-based page builder, media library, forms, navigation) behind an admin dashboard.
 
-> The codebase was started from an internal starter template ("Core Platform"). Some older docs under `docs/` still describe that template's features (directory, subscriptions, events) and may not apply to this site.
+> The codebase was started from an internal starter template ("Core Platform"). Its directory, subscription, and events features have been removed; dated audits and `docs/changelog.md` may still mention them as history.
 
 ## Stack
 
@@ -53,6 +53,7 @@ npm run test:browser   # Playwright
 ## Further reading
 
 - `AGENTS.md` — working rules for this repo (commit/push policy, legacy URL handling)
+- `docs/architecture/overview.md` — architecture and key flows
 - `docs/deployment-notes.md`, `docs/runbooks/` — deployment, operations, backups, security
 - `docs/admin/` — CMS and admin how-tos
 - `docs/changelog.md`, `docs/roadmap.md`

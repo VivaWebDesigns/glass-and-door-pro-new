@@ -1,6 +1,6 @@
 # CMS Pages And Visual Builder
 
-The Core Platform page builder uses structured content blocks rather than freeform page design. This keeps the site maintainable, consistent, and safer for non-technical editors.
+The page builder uses structured content blocks rather than freeform page design. This keeps the site maintainable, consistent, and safer for non-technical editors.
 
 ## Builder Layout
 
@@ -31,8 +31,8 @@ The structure rail and inspector rail can both be collapsed to create more worki
 Any block can be saved as a reusable section from the page builder.
 
 - Use `Save Section` from the block toolbar or inspector.
-- Saved sections appear in the sections library and can be inserted into other pages later.
-- The reusable sections library is available under `Admin > CMS > Sections`.
+- Saved sections appear in the builder's block inserter and can be inserted into other pages later.
+- There is currently no standalone sections admin screen (`/admin/cms/sections` is not routed).
 
 ## Previewing
 
@@ -43,7 +43,7 @@ Any block can be saved as a reusable section from the page builder.
 
 - Keep blocks focused on a single content purpose.
 - Prefer page sections over trying to force unrelated content into one block.
-- Use reusable dynamic blocks for content that already has its own system, such as blog previews or event previews.
+- Use dedicated blocks for content that already has its own system, such as managed forms.
 - Review tablet and mobile preview before publishing large layout changes.
 
 ## Draft And Publish

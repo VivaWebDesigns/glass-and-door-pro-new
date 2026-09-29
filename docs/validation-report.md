@@ -1,7 +1,9 @@
 # Validation Report
 
 **Date**: 2026-04-03
-**Scope**: Final validation sweep for Core Platform stabilization sprint
+**Scope**: Final validation sweep for the starter-template ("Core Platform") stabilization sprint
+
+> Historical record. This report reflects the codebase on 2026-04-03, before the starter's therapist directory, provider applications, Stripe, and public registration features were removed. Those flows (and `server/tests/directory.test.ts`) no longer exist, so their sections have been dropped; the test output below is kept verbatim. Current quality gates are described in [Quality Gates](./quality-gates.md).
 
 ---
 
@@ -53,8 +55,8 @@ No warnings are blocking. The `any` type warnings are the largest category and r
    Duration  3.44s
 ```
 
-All 65 tests across 5 test files pass. Key coverage areas:
-- Directory search/filtering logic (44 tests)
+All 65 tests across 5 test files pass. Key coverage areas at the time:
+- Directory search/filtering logic (44 tests; since removed)
 - Auth middleware (password hashing, token generation — 7 tests)
 - Request validation middleware (3 tests)
 - Logger utility (9 tests)
@@ -62,27 +64,16 @@ All 65 tests across 5 test files pass. Key coverage areas:
 
 ## 4. Functional Flow Verification
 
-### Therapist Directory Flow
-
-- **Directory listing**: `GET /api/therapists` endpoint accepts validated query parameters (search, specialization, practiceMode, language, country, acceptingClients, willingToTravel, page, pageSize, sort, latitude, longitude)
-- **Filter options**: `GET /api/therapists/filters` returns available filter values
-- **Featured therapists**: `GET /api/therapists/featured` returns featured profiles
-- **Profile detail**: `GET /api/therapists/:id` returns full profile with user data
-- **Client-side**: Directory page has debounced search, filter sidebar, pagination, and map toggle
-- **Status**: Routes are registered and request validation via Zod schema is in place
-
 ### Admin Flow
 
 - **Protected routes**: All admin pages wrapped in `<ProtectedRoute roles={["admin"]}>` 
 - **Admin routes**: 18 admin route files registered under `/api/admin/` with role enforcement
 - **CMS**: Full page builder with block editor, media library, sections, menus, SEO, themes, and redirects
-- **Application review**: Multi-step provider application workflow with timeline, credentials, references, background checks, interviews, and decisions
 - **Status**: Route structure is complete with proper auth guards
 
 ### Auth / Session Flow
 
 - **Login**: JWT token generated on successful login, set as HTTP-only cookie
-- **Registration**: Password hashed with bcrypt (12 rounds), user created, token issued
 - **Password reset**: Token-based reset flow with rate limiting
 - **Token validation**: `authenticateToken` middleware verifies JWT and loads user from database
 - **Role enforcement**: `requireRole()` middleware checks user role against allowed roles
@@ -93,7 +84,7 @@ All 65 tests across 5 test files pass. Key coverage areas:
 
 - **TypeScript**: Strict mode, all compilation passes
 - **Vite**: Dev server configured with HMR, production build to `dist/public/`
-- **Drizzle**: ORM configured with Neon PostgreSQL driver
+- **Drizzle**: ORM configured for PostgreSQL (now `node-postgres` / `pg`)
 - **ESLint**: Configured for client, server, and shared directories
 
 ## Summary
@@ -103,6 +94,5 @@ All 65 tests across 5 test files pass. Key coverage areas:
 | TypeScript (`tsc`) | PASS | 0 errors |
 | ESLint | PASS | 0 errors, 207 warnings |
 | Tests (vitest) | PASS | 65/65 tests pass |
-| Directory flows | VERIFIED | Search, filters, pagination, profiles functional |
-| Admin flows | VERIFIED | CMS, applications, user management properly guarded |
+| Admin flows | VERIFIED | CMS and user management properly guarded |
 | Auth flows | VERIFIED | JWT cookies, role checks, rate limiting in place |

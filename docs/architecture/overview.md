@@ -1,4 +1,6 @@
-# Core Platform — Architecture Overview
+# Glass & Door Pro — Architecture Overview
+
+Marketing site and CMS for Glass & Door Pro (Charlotte, NC glass, window, and door contractor). Public pages are rendered from CMS page content with hardcoded React fallbacks; staff manage content, forms, media, SEO, and settings from the admin area.
 
 ## Tech Stack
 
@@ -6,17 +8,20 @@
 |-------|-----------|-------|
 | Frontend | React 18 + TypeScript | Vite bundler, SPA with route-level code splitting via `React.lazy()` |
 | Routing (client) | wouter | Lightweight alternative to React Router |
-| State / Data | TanStack Query v5 | Global defaults: `staleTime: 5min`, `gcTime: 10min` |
-| UI Framework | shadcn/ui + Tailwind CSS | Dark mode via class strategy, theme presets system |
-| Backend | Express 5 (TypeScript) | Runs on Node.js with HTTP server |
-| ORM | Drizzle ORM | PostgreSQL driver via `@neondatabase/serverless` |
-| Database | PostgreSQL | Hosted on Neon (serverless), 45+ B-tree indexes |
-| Auth | JWT (HTTP-only cookies) | `bcryptjs` for password hashing, 7-day token expiry |
-| Payments | Stripe | Subscriptions, webhook handling, recording purchases |
-| File Storage | Cloudflare R2 | For media uploads (images, recordings) |
-| Email | Custom email service | Template-based with `email.service.ts` |
+| State / Data | TanStack Query v5 | Global defaults: `staleTime: 5min`, `gcTime: 10min` (`client/src/lib/queryClient.ts`) |
+| UI Framework | shadcn/ui (Radix) + Tailwind CSS | Brand colors/fonts served from `/api/branding` |
+| Rich text | Tiptap | CMS rich-text blocks and admin editors |
+| Backend | Express 5 (TypeScript) | Node.js HTTP server, bundled for production by `script/build.ts` |
+| ORM | Drizzle ORM | `drizzle-orm/node-postgres` with the `pg` Pool (`server/db.ts`) |
+| Database | PostgreSQL | Connection via `DATABASE_URL`; SSL enabled in production unless `sslmode` is in the URL |
+| Auth | JWT (HTTP-only cookie) | `bcryptjs` password hashing, 7-day token expiry, `admin` / `editor` roles |
+| File Storage | Cloudflare R2 or local disk | R2 when configured in settings; otherwise local uploads dir (`UPLOADS_DIR` / Railway volume) |
+| Image processing | sharp | Upload optimization in `server/services/image-optimizer.ts` |
+| Email | `email.service.ts` | Resend → Mailgun → SMTP (nodemailer) fallback chain, DB-managed templates |
+| Marketing sync | Mailchimp | Optional form-submission sync (`mailchimp.service.ts`) |
 | Logging | Pino | Structured logging with named sources and request IDs |
 | Security | Helmet, rate limiting, origin checking | CSP headers, per-endpoint rate limits |
+| Hosting | Railway | Postgres + persistent volume for local uploads |
 
 ## Folder Structure
 
@@ -25,77 +30,54 @@
 │   └── src/
 │       ├── App.tsx                  # Main router with lazy-loaded pages
 │       ├── components/
-│       │   ├── auth/                # Login/register dialogs
-│       │   ├── directory/           # Directory-specific components
-│       │   ├── layout/              # Site layout components
-│       │   ├── shared/              # Shared components (editors, SEO, theme)
+│       │   ├── auth/                # Auth UI helpers
+│       │   ├── forms/               # Public form renderer + modal button
+│       │   ├── layout/              # Navbar, footer, page layout
+│       │   ├── shared/              # Branding provider, SEO/JSON-LD, editors, cookie consent
 │       │   └── ui/                  # shadcn/ui primitives
 │       ├── features/
-│       │   ├── admin/               # Admin dashboard, CMS, blog, applications
-│       │   ├── auth/                # Auth pages (login, register, reset)
-│       │   ├── directory/           # Therapist directory and profile pages
-│       │   ├── public/              # Public pages (home, about, events, insights)
-│       │   └── therapist/           # Therapist dashboard, profile edit, subscription
-│       ├── hooks/                   # Custom React hooks
-│       └── lib/                     # Utilities, query client, theme presets
+│       │   ├── admin/               # Admin dashboard, CMS builder, forms, users, settings, docs, backups
+│       │   ├── auth/                # Login, forgot/reset password, first-admin setup
+│       │   └── public/              # Home, services, service areas, gallery, reviews, contact, CMS hybrid pages
+│       ├── hooks/                   # Custom React hooks (SEO, editor locks, unsaved changes)
+│       └── lib/                     # Query client, analytics/consent, sanitization, structured data
 ├── server/
 │   ├── index.ts                     # Express app bootstrap, middleware pipeline
-│   ├── db.ts                        # Drizzle database connection
+│   ├── db.ts                        # Drizzle + pg Pool connection
 │   ├── migrate.ts                   # Production migration runner
-│   ├── middleware/
-│   │   ├── auth.ts                  # JWT auth, role-based access
-│   │   ├── security.ts              # Helmet, rate limiters, origin check
-│   │   ├── error-handler.ts         # Error handling, async wrapper
-│   │   └── validation.ts            # Request body validation middleware
+│   ├── static.ts                    # Prod static serving, legacy 301s, retired-URL 410s, prerender injection
+│   ├── middleware/                  # auth.ts, security.ts, error-handler.ts, validation.ts
 │   ├── routes/
-│   │   ├── index.ts                 # Route registration hub
-│   │   ├── admin/                   # Admin-only routes (18 files)
-│   │   ├── directory.routes.ts      # Public therapist directory
-│   │   ├── auth.routes.ts           # Login, register, password reset
-│   │   ├── stripe.routes.ts         # Stripe checkout/portal/webhooks
-│   │   ├── application.routes.ts    # Therapist application flow
-│   │   └── ...                      # Events, blog, CMS, contacts, etc.
-│   ├── services/
-│   │   ├── email.service.ts         # Email template rendering and sending
-│   │   ├── r2.service.ts            # Cloudflare R2 file operations
-│   │   ├── background-check.service.ts
-│   │   └── scheduled-publish.service.ts
-│   ├── storage/                     # Data access layer (28 storage files)
-│   │   ├── index.ts                 # Storage facade aggregating all stores
-│   │   ├── therapist.storage.ts     # Therapist profiles with pagination/filtering
-│   │   ├── application.storage.ts   # Provider application workflow
-│   │   └── ...
-│   ├── utils/
-│   │   ├── logger.ts                # Pino-based structured logger
-│   │   ├── metrics.ts               # In-memory request metrics
-│   │   └── params.ts                # Express param helpers
-│   └── webhooks/
-│       └── stripe.handler.ts        # Stripe webhook event processing
+│   │   ├── index.ts                 # Route registration hub (+ branding, sitemap, robots, redirects)
+│   │   ├── admin/                   # Admin-only routes (CMS, forms, users, backups, editor locks)
+│   │   └── *.routes.ts              # Auth, CMS public, forms, contact, uploads, settings, setup, etc.
+│   ├── services/                    # Email, R2, forms, prerender, backups, editor locks, system bootstrap
+│   ├── storage/                     # Data access layer (storage facade + per-domain classes)
+│   ├── scripts/                     # System backup run/restore, email template seed
+│   └── utils/                       # Logger, metrics, retry, route helpers, CMS preview tokens
 ├── shared/
-│   ├── schema/                      # Drizzle table definitions (30 files)
-│   │   ├── index.ts                 # Re-exports all schemas
-│   │   ├── users.ts
-│   │   ├── therapist-profiles.ts
-│   │   ├── provider-applications.ts # Multi-step application workflow
-│   │   └── ...
-│   └── types/
-│       ├── index.ts                 # Shared TypeScript types and enums
-│       └── directory.ts             # Directory search params schema
+│   ├── schema/                      # Drizzle table definitions (re-exported from index.ts)
+│   ├── types/index.ts               # Roles, admin permissions, doc categories
+│   └── glass-*.ts                   # Site-specific SEO, service areas, reviews, hero image data
+├── scripts/                         # CMS seed / gallery sync scripts
+├── migrations/                      # Drizzle SQL migrations
 └── docs/                            # Developer documentation (this folder)
 ```
 
-## Data Flow
+## Key Flows
 
-1. **Client → Server**: React components use TanStack Query to make HTTP requests to `/api/*` endpoints. Mutations use `apiRequest()` from `queryClient.ts`.
+1. **Client → Server**: React components use TanStack Query to call `/api/*` endpoints. Mutations use `apiRequest()` from `queryClient.ts`.
 
-2. **Server → Storage**: Express route handlers call methods on the `storage` facade (`server/storage/index.ts`), which delegates to domain-specific storage classes.
+2. **Server → Storage**: Route handlers call the `storage` facade (`server/storage/index.ts`) directly, or a service in `server/services/` when there is orchestration (email, form submission, backups, editor locks).
 
-3. **Storage → Database**: Storage classes use Drizzle ORM query builders to interact with PostgreSQL. All table definitions live in `shared/schema/`.
+3. **Storage → Database**: Storage classes use Drizzle query builders against PostgreSQL. Table definitions live in `shared/schema/`.
 
-4. **Auth Flow**: JWT tokens are stored in HTTP-only cookies (`corePlatform_token`). The `authenticateToken` middleware verifies tokens and attaches the user to `req.user`. Role-based access is enforced via `requireRole()`.
+4. **Auth**: JWT tokens are stored in an HTTP-only cookie (`corePlatform_token`, a name inherited from the starter). `authenticateToken` verifies the token and attaches the user to `req.user`; `requireRole()` and `requireAdminPermission()` (content/design) gate admin routes. The first admin is created via `/api/setup`.
 
-5. **File Uploads**: Files are uploaded to Cloudflare R2 via `r2.service.ts`. The upload route handles multipart form data and returns the R2 URL.
+5. **Public page rendering**: `CmsHybridPage` renders a published CMS page by slug, or falls back to a hardcoded React page. In production, `server/static.ts` handles legacy 301 redirects and retired-URL 410s, then injects a server-side HTML snapshot from `public-prerender.service.ts` for known public paths; unknown public paths return a real 404.
 
-6. **Payments**: Stripe handles subscriptions and one-time purchases. Webhook events are processed by `stripe.handler.ts` to update local subscription records.
+6. **Forms / leads**: Managed forms (`cms_forms`) are rendered on public pages and submitted to `/api/forms/:slug/submit`. `forms.service.ts` stores the submission, emails recipients, and optionally syncs to Mailchimp.
 
-7. **CMS**: A hybrid rendering system allows pages to be served from the CMS block builder or fall back to hardcoded React components. The `CmsHybridPage` component checks for CMS content first.
+7. **File uploads**: Media uploads are optimized with sharp, then stored in Cloudflare R2 when configured (served via `/r2/*`) or on the local uploads volume (served from `/uploads`).
+
+8. **Background jobs**: On startup the server runs `runSystemBootstrap()` (ensures system pages, menus, sections, forms, email templates, docs, branding), then starts the scheduled-publish loop and the system backup service.

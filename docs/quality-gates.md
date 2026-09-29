@@ -1,6 +1,6 @@
 # Quality Gates
 
-This document describes the quality checks available in the Core Platform codebase and how to use them.
+This document describes the quality checks available in the Glass & Door Pro codebase and how to use them.
 
 ## Available Scripts
 
@@ -10,6 +10,7 @@ This document describes the quality checks available in the Core Platform codeba
 | Lint             | `npm run lint`       | Runs ESLint across client, server, and shared code |
 | Format (check)   | `npm run format`     | Runs Prettier in check mode (reports issues only)  |
 | Test             | `npm test`           | Runs Vitest unit tests                            |
+| Browser tests    | `npm run test:browser` | Runs Playwright specs in `e2e/` (`test:browser:local` uses the local config) |
 
 ## Running Checks Locally
 
@@ -22,7 +23,7 @@ npm run format
 npm test
 ```
 
-All four commands must pass cleanly before a pull request will be merged.
+All four commands should pass cleanly before pushing to `main`.
 
 ## Lint
 
@@ -51,13 +52,15 @@ npx prettier --write client/src server shared
 
 ## Tests
 
-Tests use [Vitest](https://vitest.dev/) and are co-located with the source files they test (e.g., `server/utils/logger.test.ts`).
+Tests use [Vitest](https://vitest.dev/) and are mostly co-located with the source files they test (e.g., `server/utils/logger.test.ts`); some server tests live in `server/__tests__/`.
 
 Test files are included in type validation via `tsconfig.test.json`, which extends the main `tsconfig.json` but adds `**/*.test.ts` to its include list.
 
+Playwright browser specs and local measurement scripts (`measure:mobile:local`, `test:bundles:local`, `test:heroes:local`) live in `e2e/`.
+
 ### Adding New Tests
 
-1. Create a file named `*.test.ts` next to the module you want to test.
+1. Create a file named `*.test.ts` (or `*.test.tsx`) next to the module you want to test.
 2. Import `describe`, `it`, `expect` (and `vi` for mocks) from `vitest`.
 3. Keep tests pure and fast — no database or network calls in unit tests.
 4. Run `npm test` to verify your tests pass.
@@ -70,17 +73,7 @@ npx vitest --watch
 
 ## CI Workflow
 
-A GitHub Actions workflow (`.github/workflows/ci.yml`) runs automatically on every push to `main` and on every pull request targeting `main`. It executes:
-
-1. `npm ci` — clean install of dependencies
-2. `npm run check` — type-checking
-3. `npm run lint` — linting
-4. `npm run format` — formatting check (non-blocking, see note below)
-5. `npm test` — unit tests
-
-All steps must pass for the CI run to be green.
-
-**Note:** The format check runs with `continue-on-error: true` in CI because the existing codebase has not yet been mass-formatted. It reports formatting issues without blocking the pipeline. Once a baseline format pass is applied, the `continue-on-error` flag can be removed to enforce formatting strictly.
+There is currently no CI workflow in the repository (no `.github/workflows/`). Railway builds and deploys from `main` on push, running only `npm run build`, so type-check, lint, format, and tests must be run locally before pushing.
 
 ## Conventions
 
