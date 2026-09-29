@@ -92,7 +92,7 @@ export function LocationServiceLayout({
   const whyBlock = pageBlocks.find(
     (block) =>
       block.type === "cards-grid" &&
-      /^Why .+ Choose Glass and Door Pro$/i.test(text(block.props.title)),
+      /^Why .+ Choose Glass (?:&|and) Door Pro$/i.test(text(block.props.title)),
   );
   const featuredIds = new Set(
     [serviceBlock?.id, localIntroBlock?.id, whyBlock?.id].filter(Boolean),

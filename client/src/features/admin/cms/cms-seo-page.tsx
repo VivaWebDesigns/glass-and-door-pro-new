@@ -44,7 +44,7 @@ import { SwitchFieldRow } from "@/components/shared/switch-field-row";
 
 const seoFormSchema = z.object({
   siteName: z.string().min(1, "Site name is required"),
-  titleSuffix: z.string().default(" | Glass and Door Pro"),
+  titleSuffix: z.string().default(" | Glass & Door Pro"),
   defaultMetaDescription: z.string().max(320, "Keep under 320 characters").optional().nullable(),
   siteUrl: z
     .string()
@@ -388,12 +388,12 @@ function SeoDefaultMetaCard({ form, descValue }: { form: SeoForm; descValue: str
               <FormControl>
                 <Input
                   {...field}
-                  placeholder=" | Glass and Door Pro"
+                  placeholder=" | Glass & Door Pro"
                   data-testid="input-title-suffix"
                 />
               </FormControl>
               <FormDescription className="text-xs">
-                Appended to page titles — e.g. "Window Repair Charlotte NC | Glass and Door Pro"
+                Appended to page titles — e.g. "Window Repair Charlotte NC | Glass & Door Pro"
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -467,7 +467,7 @@ function SeoSiteIdentityCard({ form }: { form: SeoForm }) {
             <FormItem>
               <FormLabel>Site Name</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Glass and Door Pro" data-testid="input-site-name" />
+                <Input {...field} placeholder="Glass & Door Pro" data-testid="input-site-name" />
               </FormControl>
               <FormDescription className="text-xs">
                 Used in title patterns and structured data
@@ -486,7 +486,7 @@ function SeoSiteIdentityCard({ form }: { form: SeoForm }) {
                 <Input
                   {...field}
                   value={field.value ?? ""}
-                  placeholder="Glass and Door Pro"
+                  placeholder="Glass & Door Pro"
                   data-testid="input-org-name"
                 />
               </FormControl>
@@ -535,12 +535,12 @@ export default function CmsSeoPage() {
   const form = useForm<SeoFormValues>({
     resolver: zodResolver(seoFormSchema),
     defaultValues: {
-      siteName: "Glass and Door Pro",
-      titleSuffix: " | Glass and Door Pro",
+      siteName: "Glass & Door Pro",
+      titleSuffix: " | Glass & Door Pro",
       defaultMetaDescription: "",
       siteUrl: "",
       defaultOgImageUrl: "",
-      organizationName: "Glass and Door Pro",
+      organizationName: "Glass & Door Pro",
       organizationLogoUrl: "",
       facebookUrl: "",
       twitterHandle: "",
@@ -553,12 +553,12 @@ export default function CmsSeoPage() {
   useEffect(() => {
     if (settings) {
       form.reset({
-        siteName: settings.siteName ?? "Glass and Door Pro",
-        titleSuffix: settings.titleSuffix ?? " | Glass and Door Pro",
+        siteName: settings.siteName ?? "Glass & Door Pro",
+        titleSuffix: settings.titleSuffix ?? " | Glass & Door Pro",
         defaultMetaDescription: settings.defaultMetaDescription ?? "",
         siteUrl: settings.siteUrl ?? "",
         defaultOgImageUrl: settings.defaultOgImageUrl ?? "",
-        organizationName: settings.organizationName ?? "Glass and Door Pro",
+        organizationName: settings.organizationName ?? "Glass & Door Pro",
         organizationLogoUrl: settings.organizationLogoUrl ?? "",
         facebookUrl: settings.facebookUrl ?? "",
         twitterHandle: settings.twitterHandle ?? "",

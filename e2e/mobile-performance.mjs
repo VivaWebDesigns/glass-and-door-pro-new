@@ -14,7 +14,7 @@ if (!["home", "door-installation"].includes(pageName)) {
 const isHome = pageName === "home";
 const routePath = isHome ? "/" : "/services/door-installation";
 const heading = isHome
-  ? "Glass and Door Pro: Charlotte Glass, Door & Window Services"
+  ? "Glass & Door Pro: Charlotte Glass, Door & Window Services"
   : "Door Installation";
 const output = process.env.PERF_OUTPUT || "/tmp/glass-mobile-performance.json";
 const pageFixture = {

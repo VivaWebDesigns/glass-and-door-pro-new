@@ -28,13 +28,13 @@ vi.mock("../storage", () => ({
 
 const seoSettings: SeoSettings = {
   id: "seo-1",
-  siteName: "Glass and Door Pro",
+  siteName: "Glass & Door Pro",
   siteUrl: "https://glassanddoorpro.com",
-  titleSuffix: " | Glass and Door Pro",
+  titleSuffix: " | Glass & Door Pro",
   defaultMetaDescription: "Default description",
   defaultOgImageUrl: "https://glassanddoorpro.com/og.jpg",
   defaultRobotsNoindex: false,
-  organizationName: "Glass and Door Pro",
+  organizationName: "Glass & Door Pro",
   organizationLogoUrl: null,
   facebookUrl: null,
   instagramUrl: null,
@@ -215,7 +215,7 @@ describe("public-prerender.service", () => {
     });
     const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
     const snapshot = await getPublicHtmlSnapshot("/services");
-    expect(snapshot?.title).toBe("Glass and Door Pro | Glass and Door Services in Charlotte, NC");
+    expect(snapshot?.title).toBe("Glass & Door Pro | Glass and Door Services in Charlotte, NC");
     expect(snapshot?.description).toBe(
       "Original description with Charlotte, Monroe and one phone: (704) 771-6111.",
     );
@@ -290,10 +290,10 @@ describe("public-prerender.service", () => {
   it("emits CMS FAQPage schema and maps nested public routes to CMS slugs", async () => {
     mockGetSeo.mockResolvedValue({
       ...seoSettings,
-      siteName: "Glass and Door Pro",
+      siteName: "Glass & Door Pro",
       siteUrl: "https://glassanddoorpro.com",
-      titleSuffix: " | Glass and Door Pro",
-      organizationName: "Glass and Door Pro",
+      titleSuffix: " | Glass & Door Pro",
+      organizationName: "Glass & Door Pro",
     });
     mockGetPageBySlug.mockResolvedValue({
       ...cmsPage,
@@ -329,7 +329,7 @@ describe("public-prerender.service", () => {
     );
 
     expect(mockGetPageBySlug).toHaveBeenCalledWith("services-frameless-showers");
-    expect(snapshot?.title).toBe("Frameless Shower Doors Charlotte NC | Glass and Door Pro");
+    expect(snapshot?.title).toBe("Frameless Shower Doors Charlotte NC | Glass & Door Pro");
     expect(snapshot?.jsonLd?.map((schema) => schema["@type"])).toEqual([
       "LocalBusiness",
       "Service",
@@ -420,10 +420,10 @@ describe("public-prerender.service", () => {
   it("keeps CMS internals out of the home prerender body", async () => {
     mockGetSeo.mockResolvedValue({
       ...seoSettings,
-      siteName: "Glass and Door Pro",
+      siteName: "Glass & Door Pro",
       siteUrl: "https://glassanddoorpro.com",
-      titleSuffix: " | Glass and Door Pro",
-      organizationName: "Glass and Door Pro",
+      titleSuffix: " | Glass & Door Pro",
+      organizationName: "Glass & Door Pro",
     });
     mockGetPageBySlug.mockResolvedValue({
       ...cmsPage,
@@ -457,10 +457,10 @@ describe("public-prerender.service", () => {
     const snapshot = await getPublicHtmlSnapshot("/");
 
     expect(snapshot?.title).toBe(
-      "Glass and Door Pro | Glass & Door Services in Charlotte & Monroe, NC",
+      "Glass & Door Pro | Glass & Door Services in Charlotte & Monroe, NC",
     );
     expect(snapshot?.bodyHtml).toContain(
-      "<h1>Glass and Door Pro: Charlotte Glass, Door &amp; Window Services</h1>",
+      "<h1>Glass &amp; Door Pro: Charlotte Glass, Door &amp; Window Services</h1>",
     );
     expect(snapshot?.jsonLd?.map((schema) => schema["@type"])).toEqual([
       "Organization",
@@ -468,8 +468,8 @@ describe("public-prerender.service", () => {
       "LocalBusiness",
     ]);
     expect(snapshot?.jsonLd?.find((schema) => schema["@type"] === "WebSite")).toMatchObject({
-      name: "Glass and Door Pro",
-      alternateName: ["Glass & Door Pro", "glassanddoorpro.com"],
+      name: "Glass & Door Pro",
+      alternateName: ["Glass and Door Pro", "glassanddoorpro.com"],
       url: "https://glassanddoorpro.com/",
     });
     expect(snapshot?.bodyHtml).toContain("We&#39;ve got your glass &amp; door needs covered.");
@@ -487,7 +487,7 @@ describe("public-prerender.service", () => {
 
     expect(snapshot?.title).toContain("Gallery");
     expect(snapshot?.canonicalUrl).toBe("https://glassanddoorpro.com/gallery");
-    expect(snapshot?.bodyHtml).toContain("Glass and Door Pro project photos");
+    expect(snapshot?.bodyHtml).toContain("Glass &amp; Door Pro project photos");
   });
 
   it("returns a reviews fallback snapshot when the CMS reviews page is not seeded", async () => {
@@ -497,7 +497,7 @@ describe("public-prerender.service", () => {
 
     expect(snapshot?.title).toContain("Customer Reviews");
     expect(snapshot?.canonicalUrl).toBe("https://glassanddoorpro.com/reviews");
-    expect(snapshot?.bodyHtml).toContain("Glass and Door Pro customer reviews");
+    expect(snapshot?.bodyHtml).toContain("Glass &amp; Door Pro customer reviews");
   });
 
   it("returns a services fallback snapshot when the CMS services hub is not seeded", async () => {
@@ -525,7 +525,7 @@ describe("public-prerender.service", () => {
 
     expect(snapshot?.title).toContain("Service Areas");
     expect(snapshot?.description).toBe(
-      "Explore Glass and Door Pro service areas across Charlotte, Union County, and nearby South Carolina for showers, windows, doors, repairs, and commercial glass.",
+      "Explore Glass & Door Pro service areas across Charlotte, Union County, and nearby South Carolina for showers, windows, doors, repairs, and commercial glass.",
     );
     expect(snapshot?.canonicalUrl).toBe("https://glassanddoorpro.com/service-areas");
     expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/charlotte">Charlotte</a>');

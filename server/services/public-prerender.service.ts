@@ -50,7 +50,7 @@ type PrerenderLink = {
 };
 
 const DEFAULT_DESCRIPTION =
-  "Glass and Door Pro serves the Charlotte area with frameless showers, residential windows, door installation, window repair, and commercial glass.";
+  "Glass & Door Pro serves the Charlotte area with frameless showers, residential windows, door installation, window repair, and commercial glass.";
 
 const FALLBACK_STATIC_PAGES: Record<
   string,
@@ -59,31 +59,31 @@ const FALLBACK_STATIC_PAGES: Record<
   "/": {
     title: "Charlotte Glass, Door & Window Services",
     description:
-      "Explore frameless showers, window installation, door installation, window repair, and commercial glass from Glass and Door Pro.",
-    body: "Glass and Door Pro serves greater Charlotte with frameless showers, windows, doors, window repair, and commercial glass.",
+      "Explore frameless showers, window installation, door installation, window repair, and commercial glass from Glass & Door Pro.",
+    body: "Glass & Door Pro serves greater Charlotte with frameless showers, windows, doors, window repair, and commercial glass.",
   },
   "/gallery": {
     title: "Gallery",
     description:
-      "Browse recent frameless shower, glass, window, and door installation projects from Glass and Door Pro in the Charlotte area.",
-    body: `Browse recent Glass and Door Pro project photos, including frameless shower installations across ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby communities.`,
+      "Browse recent frameless shower, glass, window, and door installation projects from Glass & Door Pro in the Charlotte area.",
+    body: `Browse recent Glass & Door Pro project photos, including frameless shower installations across ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby communities.`,
   },
   "/reviews": {
     title: "Customer Reviews",
     description:
-      "Read customer reviews for Glass and Door Pro glass, shower, window, door, and commercial glass work in the Charlotte area.",
-    body: `Read Glass and Door Pro customer reviews from homeowners and businesses across ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby communities.`,
+      "Read customer reviews for Glass & Door Pro glass, shower, window, door, and commercial glass work in the Charlotte area.",
+    body: `Read Glass & Door Pro customer reviews from homeowners and businesses across ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby communities.`,
   },
   "/services": {
     title: "Glass and Door Services",
-    description: `Explore frameless showers, window installation, door installation, window repair, and commercial glass services from Glass and Door Pro in ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby areas.`,
-    body: `Glass and Door Pro provides frameless shower doors, residential window installation, door installation, window repair, and commercial glass services across ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby communities.`,
+    description: `Explore frameless showers, window installation, door installation, window repair, and commercial glass services from Glass & Door Pro in ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby areas.`,
+    body: `Glass & Door Pro provides frameless shower doors, residential window installation, door installation, window repair, and commercial glass services across ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby communities.`,
   },
   "/service-areas": {
     title: "Service Areas",
     description:
-      "Explore Glass and Door Pro service areas across Charlotte, Union County, and nearby South Carolina for showers, windows, doors, repairs, and commercial glass.",
-    body: "Explore Glass and Door Pro service areas across the greater Charlotte metro, Union County, and nearby South Carolina communities.",
+      "Explore Glass & Door Pro service areas across Charlotte, Union County, and nearby South Carolina for showers, windows, doors, repairs, and commercial glass.",
+    body: "Explore Glass & Door Pro service areas across the greater Charlotte metro, Union County, and nearby South Carolina communities.",
   },
   "/privacy-policy": {
     title: "Privacy Policy",
@@ -533,8 +533,8 @@ function buildHeadTitle(
   seo?: SeoSettings | null,
   options?: { brandLast?: boolean },
 ) {
-  const titleSuffix = seo?.titleSuffix ?? " | Glass and Door Pro";
-  const siteName = seo?.siteName ?? "Glass and Door Pro";
+  const titleSuffix = seo?.titleSuffix ?? " | Glass & Door Pro";
+  const siteName = seo?.siteName ?? "Glass & Door Pro";
   return options?.brandLast
     ? formatBrandLastTitle(rawTitle, titleSuffix, siteName)
     : formatBrandFirstTitle(rawTitle, titleSuffix, siteName);
@@ -545,7 +545,7 @@ function buildOrganizationSchema(seo: SeoSettings | null, siteUrl: string) {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: seo?.organizationName || seo?.siteName || "Glass and Door Pro",
+    name: seo?.organizationName || seo?.siteName || "Glass & Door Pro",
     url: siteUrl,
     logo: seo?.organizationLogoUrl
       ? {
@@ -577,8 +577,8 @@ function buildWebsiteSchema(seo: SeoSettings | null, siteUrl: string) {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: seo?.siteName || "Glass and Door Pro",
-    alternateName: ["Glass & Door Pro", "glassanddoorpro.com"],
+    name: seo?.siteName || "Glass & Door Pro",
+    alternateName: ["Glass and Door Pro", "glassanddoorpro.com"],
     url: `${siteUrl.replace(/\/$/, "")}/`,
   };
 }
@@ -721,7 +721,7 @@ function getFallbackLinkSections(pathname: string) {
 
 function getPrerenderHeading(page: Pick<CmsPage, "slug" | "title" | "content">) {
   if (page.slug === "home") {
-    return "Glass and Door Pro: Charlotte Glass, Door & Window Services";
+    return "Glass & Door Pro: Charlotte Glass, Door & Window Services";
   }
 
   if (getGlassLocationSearchCopy(page.slug)) {

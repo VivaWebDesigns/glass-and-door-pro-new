@@ -590,7 +590,7 @@ describe("ensureSystemCmsPages", () => {
 
     expect(mockUpdatePage).toHaveBeenCalledTimes(1);
     expect(mockUpdatePage).toHaveBeenCalledWith("home-id", {
-      seoTitle: "Glass and Door Pro | Charlotte Glass, Door & Window Services",
+      seoTitle: "Glass & Door Pro | Charlotte Glass, Door & Window Services",
       content: {
         _system: { callFirstButtons2026: true },
         blocks: [
@@ -598,7 +598,7 @@ describe("ensureSystemCmsPages", () => {
             id: "hero",
             type: "hero",
             props: {
-              heading: "Glass and Door Pro: Charlotte Glass, Door & Window Services",
+              heading: "Glass & Door Pro: Charlotte Glass, Door & Window Services",
               backgroundImageAlt: "Alt",
             },
           },
@@ -790,7 +790,7 @@ describe("ensureSystemCmsPages", () => {
               props: {
                 title: "Your Local Glass & Door Company in Monroe",
                 content:
-                  "<p>Glass and Door Pro is based right here in Monroe. Doug Adams lives and works in Union County, and Monroe homeowners are some of our most valued clients — many have become repeat customers and personal friends.</p><p>Being local matters more than most people realize. When you call a Monroe-area company for a frameless shower install, you're not waiting for a Charlotte-based crew to fit you into a route. We answer the phone, get out for a quote quickly, and don't add a travel premium to Union County projects the way some competitors quietly do. We're also the only local glass and door specialist working Saturdays.</p><p>Whether you're remodeling a master bathroom in one of the newer subdivisions off Highway 74, repairing a foggy bedroom window in a 1990s home near Sun Valley, or replacing the entry door on a historic home near downtown Monroe, this is the kind of work I do every week.</p>",
+                  "<p>Glass & Door Pro is based right here in Monroe. Doug Adams lives and works in Union County, and Monroe homeowners are some of our most valued clients — many have become repeat customers and personal friends.</p><p>Being local matters more than most people realize. When you call a Monroe-area company for a frameless shower install, you're not waiting for a Charlotte-based crew to fit you into a route. We answer the phone, get out for a quote quickly, and don't add a travel premium to Union County projects the way some competitors quietly do. We're also the only local glass and door specialist working Saturdays.</p><p>Whether you're remodeling a master bathroom in one of the newer subdivisions off Highway 74, repairing a foggy bedroom window in a 1990s home near Sun Valley, or replacing the entry door on a historic home near downtown Monroe, this is the kind of work I do every week.</p>",
               },
             },
             {
@@ -801,7 +801,7 @@ describe("ensureSystemCmsPages", () => {
                   {
                     question: "Are you actually based in Monroe, NC?",
                     answer:
-                      "<p>Yes. Glass and Door Pro is based right here in Monroe. Doug lives and works in Union County, which means shorter response times for Monroe homeowners and a real local presence — not a Charlotte-based company driving an hour into Union County for a quote.</p>",
+                      "<p>Yes. Glass & Door Pro is based right here in Monroe. Doug lives and works in Union County, which means shorter response times for Monroe homeowners and a real local presence — not a Charlotte-based company driving an hour into Union County for a quote.</p>",
                   },
                 ],
               },
@@ -823,7 +823,7 @@ describe("ensureSystemCmsPages", () => {
               props: {
                 title: "Owner-Operated Glass & Door Service in Charlotte",
                 content:
-                  "<p>Charlotte has no shortage of glass and door companies — but most of them have something in common: when you call, you talk to a salesperson. When the crew shows up, they're subcontractors. When something needs follow-up, you're calling a 1-800 number.</p><p>Glass and Door Pro is different. I'm Doug — owner, operator, and the person who'll actually come measure your project, plan it with you, and install it myself. I've been doing this work in the greater Charlotte area for 15+ years, and the reason I keep getting referrals is simple: the person who quotes the job is the person who does the job.</p><p>We're based in Monroe, just 30-40 minutes from most Charlotte addresses, and the greater Charlotte metro is our primary service area. Whether you're remodeling a master bathroom in SouthPark, replacing a foggy bedroom window in NoDa, or putting a new entry door on a craftsman bungalow in Dilworth, this is the work I do every week.</p>",
+                  "<p>Charlotte has no shortage of glass and door companies — but most of them have something in common: when you call, you talk to a salesperson. When the crew shows up, they're subcontractors. When something needs follow-up, you're calling a 1-800 number.</p><p>Glass & Door Pro is different. I'm Doug — owner, operator, and the person who'll actually come measure your project, plan it with you, and install it myself. I've been doing this work in the greater Charlotte area for 15+ years, and the reason I keep getting referrals is simple: the person who quotes the job is the person who does the job.</p><p>We're based in Monroe, just 30-40 minutes from most Charlotte addresses, and the greater Charlotte metro is our primary service area. Whether you're remodeling a master bathroom in SouthPark, replacing a foggy bedroom window in NoDa, or putting a new entry door on a craftsman bungalow in Dilworth, this is the work I do every week.</p>",
               },
             },
             {
@@ -835,7 +835,7 @@ describe("ensureSystemCmsPages", () => {
                     question:
                       "Do you actually come into Charlotte, or do you stay in Union County?",
                     answer:
-                      "<p>We work throughout Charlotte regularly. Glass and Door Pro is based in Monroe, but the greater Charlotte metro is our primary service area. We have clients across South Charlotte, Ballantyne, SouthPark, Myers Park, Dilworth, Cotswold, and most other Charlotte neighborhoods. We're typically less than 40 minutes from any Charlotte address.</p>",
+                      "<p>We work throughout Charlotte regularly. Glass & Door Pro is based in Monroe, but the greater Charlotte metro is our primary service area. We have clients across South Charlotte, Ballantyne, SouthPark, Myers Park, Dilworth, Cotswold, and most other Charlotte neighborhoods. We're typically less than 40 minutes from any Charlotte address.</p>",
                   },
                 ],
               },
@@ -867,7 +867,7 @@ describe("ensureSystemCmsPages", () => {
     );
     expect(charlotteContent).toContain("Your Charlotte-Based Glass & Door Company");
     expect(charlotteContent).toContain("6135 Park South Drive");
-    expect(charlotteContent).toContain("Where is Glass and Door Pro based?");
+    expect(charlotteContent).toContain("Where is Glass & Door Pro based?");
     expect(charlotteContent).not.toContain("We're based in Monroe");
   });
 
@@ -903,7 +903,7 @@ describe("ensureSystemCmsPages", () => {
               props: {
                 title: "Monroe-Based, Truly Local",
                 description:
-                  "We're not a Charlotte company that occasionally drives to Union County. Glass and Door Pro is based in Monroe and Indian Trail is one of our most consistent service areas.",
+                  "We're not a Charlotte company that occasionally drives to Union County. Glass & Door Pro is based in Monroe and Indian Trail is one of our most consistent service areas.",
               },
             },
             {

@@ -92,7 +92,7 @@ try {
   });
   await page.goto(origin);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Glass and Door Pro: Charlotte Glass, Door & Window Services",
+    "Glass & Door Pro: Charlotte Glass, Door & Window Services",
   );
   await page.waitForLoadState("networkidle");
   assert(

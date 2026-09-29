@@ -1,7 +1,9 @@
 import { storage } from "../storage";
 
 export const GLASS_COMPANY_ADDRESS = "6135 Park South Drive\nSuite 542\nCharlotte, NC 28210";
-export const GLASS_COMPANY_NAME = "Glass and Door Pro";
+// Matches the Google Business Profile name exactly.
+export const GLASS_COMPANY_NAME = "Glass & Door Pro";
+const LEGACY_GLASS_COMPANY_NAME = "Glass and Door Pro";
 
 const LEGACY_GLASS_COMPANY_ADDRESSES = new Set([
   "2341 Waverly Dr\nMonroe, NC 28112",
@@ -15,7 +17,7 @@ export async function ensureSystemBranding() {
     storage.seoSettings.get(),
   ]);
 
-  if (currentName === null || currentName.trim() === "Glass & Door Pro") {
+  if (currentName === null || currentName.trim() === LEGACY_GLASS_COMPANY_NAME) {
     await storage.settings.upsertSetting("company_name", GLASS_COMPANY_NAME, "branding", false);
   }
 
@@ -30,17 +32,19 @@ export async function ensureSystemBranding() {
 
   if (currentSeo) {
     const updates = {
-      ...(currentSeo.siteName === "Glass & Door Pro" ? { siteName: GLASS_COMPANY_NAME } : {}),
-      ...(currentSeo.organizationName === "Glass & Door Pro"
+      ...(currentSeo.siteName === LEGACY_GLASS_COMPANY_NAME
+        ? { siteName: GLASS_COMPANY_NAME }
+        : {}),
+      ...(currentSeo.organizationName === LEGACY_GLASS_COMPANY_NAME
         ? { organizationName: GLASS_COMPANY_NAME }
         : {}),
-      ...(currentSeo.titleSuffix === " | Glass & Door Pro"
+      ...(currentSeo.titleSuffix === ` | ${LEGACY_GLASS_COMPANY_NAME}`
         ? { titleSuffix: ` | ${GLASS_COMPANY_NAME}` }
         : {}),
-      ...(currentSeo.defaultMetaDescription?.startsWith("Glass & Door Pro serves ")
+      ...(currentSeo.defaultMetaDescription?.includes(LEGACY_GLASS_COMPANY_NAME)
         ? {
-            defaultMetaDescription: currentSeo.defaultMetaDescription.replace(
-              "Glass & Door Pro",
+            defaultMetaDescription: currentSeo.defaultMetaDescription.replaceAll(
+              LEGACY_GLASS_COMPANY_NAME,
               GLASS_COMPANY_NAME,
             ),
           }

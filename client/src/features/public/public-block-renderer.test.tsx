@@ -46,7 +46,7 @@ it("uses the still image without mounting the hero video on mobile", () => {
     id: "hero",
     type: "hero",
     props: {
-      heading: "Glass and Door Pro",
+      heading: "Glass & Door Pro",
       backgroundImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
       videoBackgroundUrl: "/videos/glass-door-pro/hero-video.mp4",
     },

@@ -118,13 +118,13 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
       page.slug,
       seoOverride?.title || page.seoTitle || page.title,
     );
-    const titleSuffix = globalSeo?.titleSuffix ?? " | Glass and Door Pro";
+    const titleSuffix = globalSeo?.titleSuffix ?? " | Glass & Door Pro";
     const titleFormatter = isGlassServicePageSlug(page.slug)
       ? formatBrandLastTitle
       : formatBrandFirstTitle;
     const headTitle = getGlassLocationSearchCopy(page.slug)
       ? effectiveTitle || page.title
-      : titleFormatter(effectiveTitle, titleSuffix, globalSeo?.siteName ?? "Glass and Door Pro");
+      : titleFormatter(effectiveTitle, titleSuffix, globalSeo?.siteName ?? "Glass & Door Pro");
     const effectiveDescription =
       seoOverride?.description ||
       normalizeSeoDescription(page.seoDescription) ||

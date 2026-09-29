@@ -54,54 +54,54 @@ const serviceSocialMetadata: Record<
   { ogTitle: string; ogDescription: string; twitterCard: string; twitterSite?: string }
 > = {
   "services-window-installation": {
-    ogTitle: "Window Installation & Replacement | Glass and Door Pro",
+    ogTitle: "Window Installation & Replacement | Glass & Door Pro",
     ogDescription:
       "Owner-operated window installation serving Charlotte, Monroe, and the greater Union County area. Residential replacement windows, honest quotes, Saturday appointments available.",
     twitterCard: "summary_large_image",
     twitterSite: "@GlassDoorPro",
   },
   "services-window-repair": {
-    ogTitle: "Window Repair Services | Glass and Door Pro",
+    ogTitle: "Window Repair Services | Glass & Door Pro",
     ogDescription:
       "Fix foggy windows, broken seals, failed panes, and damaged hardware without replacing the whole window. Owner-operated window repair across Charlotte and Monroe, NC.",
     twitterCard: "summary_large_image",
     twitterSite: "@GlassDoorPro",
   },
   "services-door-installation": {
-    ogTitle: "Door Installation Services | Glass and Door Pro",
+    ogTitle: "Door Installation Services | Glass & Door Pro",
     ogDescription:
       "Entry doors, patio doors, storm doors, and exterior door installation. Owner-operated service across Charlotte, Monroe, and the greater Union County area. Honest pricing, clean finish.",
     twitterCard: "summary_large_image",
     twitterSite: "@GlassDoorPro",
   },
   "services-commercial-storefront-glass-installation": {
-    ogTitle: "Commercial Storefront Glass Installation Charlotte, NC | Glass and Door Pro",
+    ogTitle: "Commercial Storefront Glass Installation Charlotte, NC | Glass & Door Pro",
     ogDescription:
       "Storefront glass installation for new construction, tenant buildouts, and commercial renovations in Charlotte, NC. Owner-operated, reliable scheduling, and clean execution on every project.",
     twitterCard: "summary_large_image",
   },
   "services-commercial-storefront-glass-replacement-repair": {
-    ogTitle: "Commercial Storefront Glass Replacement & Repair Charlotte, NC | Glass and Door Pro",
+    ogTitle: "Commercial Storefront Glass Replacement & Repair Charlotte, NC | Glass & Door Pro",
     ogDescription:
       "Broken storefront glass in Charlotte? We board up, secure, and replace commercial storefront glass fast. Owner-operated with same-day emergency response available.",
     twitterCard: "summary_large_image",
   },
   "services-commercial-door-installation": {
-    ogTitle: "Commercial Door Installation Charlotte, NC | Glass and Door Pro",
+    ogTitle: "Commercial Door Installation Charlotte, NC | Glass & Door Pro",
     ogDescription:
       "Commercial door installation for GCs, project managers, and business owners in Charlotte. Aluminum entry doors, glass storefront doors, and complete entrance systems. Reliable scheduling, owner-operated.",
     twitterCard: "summary_large_image",
   },
   "services-commercial-door-replacement-repair": {
-    ogTitle: "Commercial Door Replacement & Repair Charlotte, NC | Glass and Door Pro",
+    ogTitle: "Commercial Door Replacement & Repair Charlotte, NC | Glass & Door Pro",
     ogDescription:
-      "Commercial door not closing right? Glass panel broken? Hardware failing? Glass and Door Pro repairs and replaces commercial doors for Charlotte businesses. Fast response, honest pricing.",
+      "Commercial door not closing right? Glass panel broken? Hardware failing? Glass & Door Pro repairs and replaces commercial doors for Charlotte businesses. Fast response, honest pricing.",
     twitterCard: "summary_large_image",
   },
   "services-commercial-window-replacement": {
-    ogTitle: "Apartment & Multi-Family Window Replacement Charlotte, NC | Glass and Door Pro",
+    ogTitle: "Apartment & Multi-Family Window Replacement Charlotte, NC | Glass & Door Pro",
     ogDescription:
-      "Window replacement for apartment complexes and multi-family properties in Charlotte. Fast mobilization, project manager-friendly, owner-operated. When your timeline can't wait, call Glass and Door Pro.",
+      "Window replacement for apartment complexes and multi-family properties in Charlotte. Fast mobilization, project manager-friendly, owner-operated. When your timeline can't wait, call Glass & Door Pro.",
     twitterCard: "summary_large_image",
   },
 };
@@ -165,7 +165,7 @@ const servicePageNames: Record<
     serviceType: "Window Installation & Replacement",
     name: "Window Installation & Replacement",
     seoTitle:
-      "Window Installation in Charlotte & Monroe, NC | Replacement Windows | Glass and Door Pro",
+      "Window Installation in Charlotte & Monroe, NC | Replacement Windows | Glass & Door Pro",
     seoDescription:
       "Professional window installation and replacement for homes across Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Owner-operated, honest pricing, same-week appointments. Call (704) 771-6111.",
     description:
@@ -185,7 +185,7 @@ const servicePageNames: Record<
     serviceType: "Door Installation",
     name: "Door Installation",
     seoTitle:
-      "Door Installation in Charlotte, NC | Entry, Patio & Storm Doors | Glass and Door Pro",
+      "Door Installation in Charlotte, NC | Entry, Patio & Storm Doors | Glass & Door Pro",
     seoDescription:
       "Residential door installation for entry doors, patio doors, storm doors, and exterior doors across Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Call (704) 771-6111.",
     description:
@@ -205,7 +205,7 @@ const servicePageNames: Record<
     serviceType: "Window Repair",
     name: "Window Repair",
     seoTitle:
-      "Window Repair in Charlotte, NC | Foggy Glass, Broken Seals & More | Glass and Door Pro",
+      "Window Repair in Charlotte, NC | Foggy Glass, Broken Seals & More | Glass & Door Pro",
     seoDescription:
       "Window repair for broken seals, foggy panes, failed IGUs, broken hardware, and cracked glass. Serving Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Call (704) 771-6111.",
     description:
@@ -224,7 +224,7 @@ const servicePageNames: Record<
   "services-commercial-storefront-glass-installation": {
     serviceType: "Commercial Storefront Glass Installation",
     name: "Commercial Storefront Glass Installation",
-    seoTitle: "Commercial Storefront Glass Installation in Charlotte, NC | Glass and Door Pro",
+    seoTitle: "Commercial Storefront Glass Installation in Charlotte, NC | Glass & Door Pro",
     seoDescription:
       "Professional commercial storefront glass installation for new construction and business buildouts in Charlotte, NC. Aluminum framing, glass systems, and storefront doors. Call (704) 771-6111.",
     description:
@@ -244,7 +244,7 @@ const servicePageNames: Record<
     serviceType: "Commercial Storefront Glass Replacement & Repair",
     name: "Commercial Storefront Glass Replacement & Repair",
     seoTitle:
-      "Commercial Storefront Glass Replacement & Repair in Charlotte, NC | Glass and Door Pro",
+      "Commercial Storefront Glass Replacement & Repair in Charlotte, NC | Glass & Door Pro",
     seoDescription:
       "Emergency storefront glass repair, board-up, and replacement for Charlotte businesses. Broken storefront glass secured and replaced fast. Owner-operated, same-day response. Call (704) 771-6111.",
     description:
@@ -264,7 +264,7 @@ const servicePageNames: Record<
     serviceType: "Commercial Door Installation",
     name: "Commercial Door Installation",
     seoTitle:
-      "Commercial Door Installation in Charlotte, NC | Storefront & Entry Doors | Glass and Door Pro",
+      "Commercial Door Installation in Charlotte, NC | Storefront & Entry Doors | Glass & Door Pro",
     seoDescription:
       "Commercial door installation for new construction, tenant buildouts, and business renovations in Charlotte, NC. Aluminum entry doors, glass storefront doors, and commercial entrance systems. Call (704) 771-6111.",
     description:
@@ -283,7 +283,7 @@ const servicePageNames: Record<
   "services-commercial-door-replacement-repair": {
     serviceType: "Commercial Door Replacement & Repair",
     name: "Commercial Door Replacement & Repair",
-    seoTitle: "Commercial Door Replacement & Repair in Charlotte, NC | Glass and Door Pro",
+    seoTitle: "Commercial Door Replacement & Repair in Charlotte, NC | Glass & Door Pro",
     seoDescription:
       "Commercial door repair and replacement for Charlotte businesses. Broken glass panels, damaged hardware, misaligned frames, and worn closers fixed fast. Owner-operated. Call (704) 771-6111.",
     description:
@@ -302,7 +302,7 @@ const servicePageNames: Record<
   "services-commercial-window-replacement": {
     serviceType: "Apartment & Multi-Family Window Replacement",
     name: "Apartment & Multi-Family Window Replacement",
-    seoTitle: "Apartment & Multi-Family Window Replacement in Charlotte, NC | Glass and Door Pro",
+    seoTitle: "Apartment & Multi-Family Window Replacement in Charlotte, NC | Glass & Door Pro",
     seoDescription:
       "Fast apartment and multi-family window replacement in Charlotte, NC. Wrong windows ordered? Unit damage? Doug mobilizes faster than larger companies — keeping your project on schedule. Call (704) 771-6111.",
     description:
@@ -435,7 +435,7 @@ export function buildGlassLocalBusinessLd(
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "@id": GLASS_BUSINESS_ID,
-    name: "Glass and Door Pro",
+    name: "Glass & Door Pro",
     url: `${GLASS_SITE_URL}/`,
     telephone: "+1-704-771-6111",
     email: "Doug@GlassandDoorPro.com",

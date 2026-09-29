@@ -306,7 +306,7 @@ export function Footer() {
 
   const brandLogo =
     frontendLogoUrl || "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
-  const brandName = companyName || "Glass and Door Pro";
+  const brandName = companyName || "Glass & Door Pro";
   const address = (
     companyAddress || "6135 Park South Drive Suite 542, Charlotte, NC 28210"
   ).replace(/\s*\n\s*/g, ", ");

@@ -29,7 +29,7 @@ test("public service page renders content and non-duplicated schema", async ({ p
 
   await expect(page).toHaveTitle(/door installation/i);
   await expect(page.locator("h1")).toContainText(/door installation/i);
-  await expect(page.locator("body")).toContainText(/Glass and Door Pro/i);
+  await expect(page.locator("body")).toContainText(/Glass & Door Pro/i);
 
   const canonical = page.locator('link[rel="canonical"]');
   await expect(canonical).toHaveAttribute("href", /\/services\/door-installation$/);

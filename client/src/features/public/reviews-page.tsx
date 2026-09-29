@@ -44,7 +44,7 @@ const reviewItems = [
   googleReview(
     "jamie ozment",
     "a month ago",
-    "Doug with Glass and Door Pro is excellent! I broke a piece in my window and I couldn't get my window to open or close. I called Doug on Monday morning and he came out right away. He had all the supplies he needed and sent me texts to let me know the next steps.",
+    "Doug with Glass & Door Pro is excellent! I broke a piece in my window and I couldn't get my window to open or close. I called Doug on Monday morning and he came out right away. He had all the supplies he needed and sent me texts to let me know the next steps.",
   ),
   googleReview(
     "Holly Widders",
@@ -79,7 +79,7 @@ const reviewItems = [
   googleReview(
     "Kimberly Sanders",
     "3 months ago",
-    "We broke a large glass panel out of our shower and Doug from Glass and Door Pro did an amazing job replacing that panel for us. He was able to come give us an estimate and then had the shower glass replaced in no time. Highly recommend Glass and Door Pro!",
+    "We broke a large glass panel out of our shower and Doug from Glass & Door Pro did an amazing job replacing that panel for us. He was able to come give us an estimate and then had the shower glass replaced in no time. Highly recommend Glass & Door Pro!",
   ),
   googleReview(
     "Mike Dickerman",
@@ -104,7 +104,7 @@ const reviewItems = [
   googleReview(
     "Jenny Cornacchione",
     "7 months ago",
-    "Doug helped us to replace a window and install a storm door. He provided exceptional service throughout the entire process, and I highly recommend Glass and Door Pro.",
+    "Doug helped us to replace a window and install a storm door. He provided exceptional service throughout the entire process, and I highly recommend Glass & Door Pro.",
   ),
   googleReview(
     "Andrey Bayrashev",
@@ -149,7 +149,7 @@ const reviewItems = [
   googleReview(
     "Michael Powers",
     "a year ago",
-    "Wonderful experience using Glass and Door Pro's. They are very meticulous and always look to make the job more affordable by offering option to rework if deemed possible.",
+    "Wonderful experience using Glass & Door Pro's. They are very meticulous and always look to make the job more affordable by offering option to rework if deemed possible.",
   ),
   googleReview(
     "Chandra Funderburk",
@@ -179,7 +179,7 @@ const reviewItems = [
   googleReview(
     "Annette Calise",
     "a year ago",
-    "Glass and Door Pro was very professional, knowledgeable and friendly. We received an appointment quickly to fix our shower door. We are very happy with the results. We will use him again.",
+    "Glass & Door Pro was very professional, knowledgeable and friendly. We received an appointment quickly to fix our shower door. We are very happy with the results. We will use him again.",
   ),
   googleReview(
     "Leah Korgaard Offutt",
@@ -285,7 +285,7 @@ const reviewItems = [
   googleReview(
     "Airy McDaniel",
     "4 years ago",
-    "I wish I could figure out how to provide before/after images of the work. He was great, professional, and on time! I will definitely contact Glass and Door Pro in the future! He made my door look like it's brand new.",
+    "I wish I could figure out how to provide before/after images of the work. He was great, professional, and on time! I will definitely contact Glass & Door Pro in the future! He made my door look like it's brand new.",
   ),
   googleReview(
     "Sanjay Balakrishnan",

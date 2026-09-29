@@ -68,7 +68,7 @@ Run `npm run seed:glass-public-cms -- --help` for command-line help.
   railway run npm run dev
   ```
 - Running `npm run dev` directly will fail unless `DATABASE_URL` is already exported in the local shell. Railway provides `DATABASE_URL` in production, but a plain local terminal does not.
-- The current Railway link points to the production environment for `Glass and Door Pro New`, so local runs through `railway run` can access production data. Use that for render verification only, and avoid admin/write actions unless you intentionally want to affect production.
+- The current Railway link points to the production environment for `Glass & Door Pro New`, so local runs through `railway run` can access production data. Use that for render verification only, and avoid admin/write actions unless you intentionally want to affect production.
 
 ### Database Schema
 

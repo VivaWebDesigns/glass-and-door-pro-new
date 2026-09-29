@@ -203,7 +203,7 @@ export function Navbar() {
 
   const brandLogo =
     frontendLogoUrl || "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
-  const brandName = companyName || "Glass and Door Pro";
+  const brandName = companyName || "Glass & Door Pro";
 
   return (
     <nav

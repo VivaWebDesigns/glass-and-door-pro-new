@@ -50,15 +50,16 @@ describe("ensureSystemBranding", () => {
     expect(mockUpsertSetting).not.toHaveBeenCalled();
   });
 
-  it("migrates the former display name in branding and SEO settings", async () => {
+  it("migrates the spelled-out name to the Google Business Profile name", async () => {
     mockGetSetting.mockImplementation(async (key: string) =>
-      key === "company_address" ? "A different admin-managed address" : "Glass & Door Pro",
+      key === "company_address" ? "A different admin-managed address" : "Glass and Door Pro",
     );
     mockGetSeo.mockResolvedValue({
-      siteName: "Glass & Door Pro",
-      organizationName: "Glass & Door Pro",
-      titleSuffix: " | Glass & Door Pro",
-      defaultMetaDescription: "Glass & Door Pro serves Charlotte, NC with frameless shower doors.",
+      siteName: "Glass and Door Pro",
+      organizationName: "Glass and Door Pro",
+      titleSuffix: " | Glass and Door Pro",
+      defaultMetaDescription:
+        "Glass and Door Pro serves Charlotte, NC with frameless shower doors.",
     });
 
     const mod = await import("../services/system-branding.service");
@@ -66,16 +67,15 @@ describe("ensureSystemBranding", () => {
 
     expect(mockUpsertSetting).toHaveBeenCalledWith(
       "company_name",
-      "Glass and Door Pro",
+      "Glass & Door Pro",
       "branding",
       false,
     );
     expect(mockUpsertSeo).toHaveBeenCalledWith({
-      siteName: "Glass and Door Pro",
-      organizationName: "Glass and Door Pro",
-      titleSuffix: " | Glass and Door Pro",
-      defaultMetaDescription:
-        "Glass and Door Pro serves Charlotte, NC with frameless shower doors.",
+      siteName: "Glass & Door Pro",
+      organizationName: "Glass & Door Pro",
+      titleSuffix: " | Glass & Door Pro",
+      defaultMetaDescription: "Glass & Door Pro serves Charlotte, NC with frameless shower doors.",
     });
   });
 });

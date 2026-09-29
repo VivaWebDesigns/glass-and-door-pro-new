@@ -28,7 +28,7 @@ describe("glass SEO helpers", () => {
   it("uses the exact public brand name in LocalBusiness schema", () => {
     expect(buildGlassLocalBusinessLd()).toMatchObject({
       "@type": "LocalBusiness",
-      name: "Glass and Door Pro",
+      name: "Glass & Door Pro",
       url: "https://glassanddoorpro.com/",
     });
   });
@@ -51,7 +51,7 @@ describe("glass SEO helpers", () => {
   it("provides stronger service SEO defaults", () => {
     expect(getGlassServiceSeoOverride("services-window-installation")).toMatchObject({
       title:
-        "Window Installation in Charlotte & Monroe, NC | Replacement Windows | Glass and Door Pro",
+        "Window Installation in Charlotte & Monroe, NC | Replacement Windows | Glass & Door Pro",
     });
   });
 
@@ -59,7 +59,7 @@ describe("glass SEO helpers", () => {
     expect(
       getGlassServiceSeoOverride("services-commercial-storefront-glass-installation"),
     ).toMatchObject({
-      title: "Commercial Storefront Glass Installation in Charlotte, NC | Glass and Door Pro",
+      title: "Commercial Storefront Glass Installation in Charlotte, NC | Glass & Door Pro",
       description: expect.stringContaining("Charlotte, NC"),
     });
   });

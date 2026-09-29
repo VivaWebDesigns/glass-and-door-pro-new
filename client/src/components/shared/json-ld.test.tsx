@@ -27,7 +27,7 @@ const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
   "@id": "https://glassanddoorpro.com/#business",
-  name: "Glass and Door Pro",
+  name: "Glass & Door Pro",
   priceRange: "$$",
 };
 
