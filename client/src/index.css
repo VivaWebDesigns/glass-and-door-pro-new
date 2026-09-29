@@ -394,8 +394,8 @@
   --chart-4: 153 20% 71%;
   --chart-5: 222 25% 35%;
 
-  --font-sans: "Nunito Sans", sans-serif;
-  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+  --font-serif: "Manrope", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
   --public-text-h1: var(--foreground);
   --public-text-h2: var(--foreground);
