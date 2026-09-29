@@ -131,6 +131,7 @@ export default function DocsPage() {
       total: number;
       created: number;
       updated: number;
+      removed: number;
       docs: Doc[];
     }) => {
       await queryClient.invalidateQueries({ queryKey: ["/api/admin/docs"] });
@@ -138,7 +139,7 @@ export default function DocsPage() {
       setSelectedDocId(firstDoc?.id ?? null);
       toast({
         title: "System documentation synced",
-        description: `${payload.total} documents available, ${payload.created} created, ${payload.updated} refreshed.`,
+        description: `${payload.total} documents available, ${payload.created} created, ${payload.updated} refreshed, ${payload.removed} removed.`,
       });
     },
   });

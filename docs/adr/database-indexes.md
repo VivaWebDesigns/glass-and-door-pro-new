@@ -20,7 +20,7 @@ This migration was written while the codebase was still the starter template it 
 ### B-tree Index on `direct_messages(sender_id, created_at)`
 
 - **Index:** `idx_dm_sender_date`
-- **Status:** The `direct_messages` table is still defined in `shared/schema/direct-messages.ts`, but no application code uses it. The index has no current query pattern.
+- **Status:** Superseded. The `direct_messages` table was removed from the schema and is dropped at startup by `server/migrate.ts` (2026-09).
 
 ## Superseded Decisions
 

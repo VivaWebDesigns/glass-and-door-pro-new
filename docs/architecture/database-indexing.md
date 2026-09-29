@@ -47,7 +47,7 @@ cms_forms.id ←── cms_form_submissions.formId          (on delete cascade)
 
 ### Legacy starter tables
 
-`shared/schema/` still defines `conversations`, `direct_messages`, and `guest_messages` (with their indexes) from the starter template, but no server or client code reads or writes them. Older migrations also created starter tables that are no longer in the schema; they have not been dropped, and `server/migrate.ts` still runs an `events` slug backfill on startup.
+The starter messaging tables (`conversations`, `direct_messages`, `guest_messages`) were removed from the schema and are dropped idempotently at startup by `server/migrate.ts`. Older migrations also created other starter tables (e.g. `events`) that are no longer in the schema; those have not been dropped.
 
 ## Migration Strategy
 

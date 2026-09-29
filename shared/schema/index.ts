@@ -19,14 +19,6 @@ export {
   type InsertEmailTemplate,
   type EmailTemplate,
 } from "./email-templates";
-export {
-  conversations,
-  directMessages,
-  insertDirectMessageSchema,
-  type InsertDirectMessage,
-  type DirectMessage,
-  type Conversation,
-} from "./direct-messages";
 export { activityLogs, type ActivityLog } from "./activity-logs";
 export {
   notifications,
@@ -81,12 +73,6 @@ export {
   type SeoSettings,
 } from "./seo-settings";
 export { redirects, insertRedirectSchema, type InsertRedirect, type Redirect } from "./redirects";
-export {
-  guestMessages,
-  insertGuestMessageSchema,
-  type InsertGuestMessage,
-  type GuestMessage,
-} from "./guest-messages";
 export {
   cmsMenus,
   insertCmsMenuSchema,

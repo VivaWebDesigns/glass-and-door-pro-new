@@ -45,7 +45,6 @@ export function securityHeaders(): RequestHandler {
           "'self'",
           "'unsafe-inline'",
           "https://fonts.googleapis.com",
-          "https://unpkg.com",
         ],
         fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
         imgSrc: [
@@ -54,9 +53,6 @@ export function securityHeaders(): RequestHandler {
           "blob:",
           "https://*.r2.cloudflarestorage.com",
           "https://*.r2.dev",
-          "https://*.tile.openstreetmap.org",
-          "https://unpkg.com",
-          "https://*.basemaps.cartocdn.com",
         ],
         connectSrc: [
           "'self'",
@@ -66,8 +62,6 @@ export function securityHeaders(): RequestHandler {
           "https://cloudflareinsights.com",
           "https://*.r2.cloudflarestorage.com",
           "https://*.r2.dev",
-          "https://*.tile.openstreetmap.org",
-          "https://*.basemaps.cartocdn.com",
         ],
         frameSrc: ["'self'", "https://www.googletagmanager.com"],
         objectSrc: ["'none'"],
@@ -106,24 +100,6 @@ export const resetPasswordLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: "Too many password reset attempts. Please try again later." },
-  skip: () => isDev,
-});
-
-export const registerLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 5,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { message: "Too many registration attempts. Please try again later." },
-  skip: () => isDev,
-});
-
-export const guestMessageLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { message: "Too many messages. Please try again later." },
   skip: () => isDev,
 });
 

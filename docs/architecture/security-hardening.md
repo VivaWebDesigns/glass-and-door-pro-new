@@ -2,7 +2,7 @@
 
 ## Authentication
 
-- **JWT tokens** stored in HTTP-only cookies (`corePlatform_token` — cookie name inherited from the starter template)
+- **JWT tokens** stored in HTTP-only cookies (`gdp_token`)
 - Token expiry: 7 days
 - Password hashing: `bcryptjs` with 12 salt rounds
 - Cookie settings: `httpOnly: true`, `secure: true` (production), `sameSite: lax`
@@ -40,9 +40,9 @@ Cloudflare R2, Mailgun, Mailchimp, and GA4 credentials are stored in the `system
 
 Content Security Policy directives are configured in `securityHeaders()`:
 - Scripts: self + two inline-script hashes + Google Tag Manager + Cloudflare Insights
-- Styles: self + unsafe-inline + Google Fonts + unpkg
-- Images: self + data/blob + R2 + OpenStreetMap / CARTO tiles + unpkg
-- Connections: self + Google Analytics / Tag Manager + Cloudflare Insights + R2 + map tiles
+- Styles: self + unsafe-inline + Google Fonts
+- Images: self + data/blob + R2
+- Connections: self + Google Analytics / Tag Manager + Cloudflare Insights + R2
 - Frames: self + Google Tag Manager
 - Media: self + blob + R2
 - Objects: none

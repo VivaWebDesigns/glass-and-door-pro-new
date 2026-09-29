@@ -190,13 +190,6 @@ export function AdminSidebar({ children }: AdminSidebarProps) {
     );
   const isChildRouteActive = (child: NavItem) => {
     if (!child.href) return false;
-    if (child.href === "/admin/cms/blog") {
-      return (
-        location === child.href ||
-        location === "/admin/cms/blog/new" ||
-        /^\/admin\/cms\/blog\/[^/]+$/.test(location)
-      );
-    }
     return isRouteActive(child.href);
   };
   const isNavItemActive = (item: NavItem) =>

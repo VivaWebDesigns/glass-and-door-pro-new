@@ -24,7 +24,7 @@ All rate limiters are **skipped in development** and enforced in production. The
 | `POST /api/auth/reset-password` | 15 min | 10 | Reset token brute-force protection |
 | `ALL /api/*` | 15 min | 300 | General API abuse prevention |
 
-`server/middleware/security.ts` also defines `registerLimiter` and `guestMessageLimiter`, but no route currently uses them (there is no public registration or guest-message endpoint). Public contact/form submissions (`/api/contact`, `/api/forms`) are covered only by the general `/api/*` limiter.
+There is no public registration or guest-message endpoint. Public contact/form submissions (`/api/contact`, `/api/forms`) are covered only by the general `/api/*` limiter.
 
 ## CSRF / Origin Check
 
@@ -46,7 +46,7 @@ Authentication uses JWT tokens stored in HTTP-only cookies:
 
 | Setting | Value | Notes |
 |---|---|---|
-| Cookie name | `corePlatform_token` | Name inherited from the starter template |
+| Cookie name | `gdp_token` | Renamed from the starter's `corePlatform_token` (2026-09) |
 | `httpOnly` | `true` | Prevents JavaScript access (XSS mitigation) |
 | `secure` | `true` in production | Cookies only sent over HTTPS |
 | `sameSite` | `lax` | Prevents cross-site request attachment while allowing top-level navigation |
@@ -61,10 +61,10 @@ Helmet is enabled with the following CSP directives:
 |---|---|---|
 | `default-src` | `'self'` | Baseline restriction |
 | `script-src` | `'self'`, the hashed early-render bootstrap, Google Tag Manager, Cloudflare Insights | App scripts, the narrowly authorized bootstrap, and analytics scripts |
-| `style-src` | `'self'`, `'unsafe-inline'`, Google Fonts, `unpkg.com` | App styles, inline styles (Tiptap/shadcn), Google Fonts; `unpkg.com` is a leftover map-style allowance |
+| `style-src` | `'self'`, `'unsafe-inline'`, Google Fonts | App styles, inline styles (Tiptap/shadcn), Google Fonts |
 | `font-src` | `'self'`, `https://fonts.gstatic.com`, `data:` | Google Fonts, embedded fonts |
-| `img-src` | `'self'`, `data:`, `blob:`, R2, OpenStreetMap, Carto, `unpkg.com` | App images and R2 media; OpenStreetMap/Carto/`unpkg.com` are leftover map-tile allowances |
-| `connect-src` | `'self'`, Google Analytics, Google Tag Manager, Cloudflare Insights, R2, OpenStreetMap, Carto | API calls, analytics, and R2 uploads; OpenStreetMap/Carto are leftover map allowances |
+| `img-src` | `'self'`, `data:`, `blob:`, R2 | App images and R2 media |
+| `connect-src` | `'self'`, Google Analytics, Google Tag Manager, Cloudflare Insights, R2 | API calls, analytics, and R2 uploads |
 | `frame-src` | `'self'`, Google Tag Manager | Same-origin iframes plus the GTM noscript frame |
 | `media-src` | `'self'`, `blob:`, `*.r2.cloudflarestorage.com`, `*.r2.dev` | Audio/video from R2 |
 | `worker-src` | `'self'`, `blob:` | Service workers |

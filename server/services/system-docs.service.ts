@@ -156,6 +156,7 @@ export async function ensureSystemDocs(options: EnsureSystemDocsOptions = {}) {
 
   let created = 0;
   let updated = 0;
+  let removed = 0;
 
   for (const definition of definitions) {
     const absolutePath = path.join(DOCS_ROOT, definition.relativePath);
@@ -186,15 +187,30 @@ export async function ensureSystemDocs(options: EnsureSystemDocsOptions = {}) {
     created += 1;
   }
 
+  // System docs are the ones without an author; admin-created docs always have createdBy set.
+  // Remove system docs whose markdown file no longer exists. Skip if no files were found so a
+  // missing docs/ directory can never wipe the library.
+  if (definitions.length > 0) {
+    const currentSlugs = new Set(definitions.map((definition) => definition.slug));
+    for (const doc of await storage.docs.getAllDocs()) {
+      if (doc.createdBy === null && !currentSlugs.has(doc.slug)) {
+        await storage.docs.deleteDoc(doc.id);
+        removed += 1;
+      }
+    }
+  }
+
   logger.app.info("System documentation synced", {
     total: definitions.length,
     created,
     updated,
+    removed,
   });
 
   return {
     total: definitions.length,
     created,
     updated,
+    removed,
   };
 }

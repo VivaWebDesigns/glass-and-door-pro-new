@@ -11,7 +11,7 @@ import {
 const isDev = process.env.NODE_ENV !== "production";
 const JWT_SECRET = process.env.SESSION_SECRET || (isDev ? "dev-secret-change-me" : "");
 const JWT_EXPIRY = "7d";
-const COOKIE_NAME = "corePlatform_token";
+const COOKIE_NAME = "gdp_token";
 
 export interface JwtPayload {
   userId: string;

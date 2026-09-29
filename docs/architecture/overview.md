@@ -72,7 +72,7 @@ Marketing site and CMS for Glass & Door Pro (Charlotte, NC glass, window, and do
 
 3. **Storage → Database**: Storage classes use Drizzle query builders against PostgreSQL. Table definitions live in `shared/schema/`.
 
-4. **Auth**: JWT tokens are stored in an HTTP-only cookie (`corePlatform_token`, a name inherited from the starter). `authenticateToken` verifies the token and attaches the user to `req.user`; `requireRole()` and `requireAdminPermission()` (content/design) gate admin routes. The first admin is created via `/api/setup`.
+4. **Auth**: JWT tokens are stored in an HTTP-only cookie (`gdp_token`). `authenticateToken` verifies the token and attaches the user to `req.user`; `requireRole()` and `requireAdminPermission()` (content/design) gate admin routes. The first admin is created via `/api/setup`.
 
 5. **Public page rendering**: `CmsHybridPage` renders a published CMS page by slug, or falls back to a hardcoded React page. In production, `server/static.ts` handles legacy 301 redirects and retired-URL 410s, then injects a server-side HTML snapshot from `public-prerender.service.ts` for known public paths; unknown public paths return a real 404.
 
