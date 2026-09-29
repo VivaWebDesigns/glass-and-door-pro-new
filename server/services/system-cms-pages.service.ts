@@ -7,6 +7,7 @@ import {
   updateGlassLocationSearchContent,
 } from "@shared/glass-location-search";
 import { GLASS_HOMEPAGE_SERVICE_CARDS } from "@shared/glass-homepage-services";
+import { GLASS_SERVICE_HEROES, getGlassServiceHeroCtaProps } from "@shared/glass-service-heroes";
 import { glassGoogleReviewDate } from "@shared/glass-review-dates";
 import { isGlassLegalNoindexSlug } from "@shared/glass-seo";
 import {
@@ -476,15 +477,6 @@ const cityPositioningUpdates: Record<
   },
 };
 
-const servicePageCopyReplacements: Record<string, readonly TextReplacement[]> = {
-  "services-commercial-storefront-glass-installation": [
-    [
-      "Storefront glass systems, aluminum framing, and commercial glass doors installed for new construction, tenant buildouts, and commercial renovations across Charlotte. Reliable scheduling, clean execution, and a single point of contact from quote through completion.",
-      "For new construction, tenant buildouts, and renovations.",
-    ],
-  ],
-};
-
 const legacyMonroeBaseReplacements: readonly TextReplacement[] = [
   ["Monroe-Based, Truly Local", "Charlotte-Based, Union County Service"],
   ["Charlotte-Based, Truly Local", "Charlotte-Based, Union County Service"],
@@ -671,6 +663,37 @@ async function ensureCommercialDoorInstallationRelatedServicesBlock() {
   });
 }
 
+// Applies the approved service hero copy and call-first CTA order once. The
+// _system marker keeps later admin edits to these fields from being replaced.
+function applyServiceHeroRefresh(slug: string, content: unknown) {
+  const hero = GLASS_SERVICE_HEROES[slug];
+  if (!hero || !isRecord(content) || !Array.isArray(content.blocks)) return null;
+
+  const systemMeta = isRecord(content._system) ? content._system : {};
+  if (systemMeta.serviceHeroCallFirst2026 === true) return null;
+
+  const heroIndex = content.blocks.findIndex((block) => isRecord(block) && block.type === "hero");
+  const heroBlock = content.blocks[heroIndex];
+  if (!isRecord(heroBlock) || !isRecord(heroBlock.props)) return null;
+
+  const blocks = [...content.blocks];
+  blocks[heroIndex] = {
+    ...heroBlock,
+    props: {
+      ...heroBlock.props,
+      ...(hero.heading ? { heading: hero.heading } : {}),
+      subheading: `<p>${hero.subheading}</p>`,
+      ...getGlassServiceHeroCtaProps(hero.quoteText),
+    },
+  };
+
+  return {
+    ...content,
+    blocks,
+    _system: { ...systemMeta, serviceHeroCallFirst2026: true },
+  };
+}
+
 async function normalizeStoredCmsPages() {
   const pages = await storage.cmsPages.getAllPages();
 
@@ -753,15 +776,12 @@ async function normalizeStoredCmsPages() {
         }
       }
 
-      const serviceCopyReplacements = servicePageCopyReplacements[page.slug];
-      if (serviceCopyReplacements) {
-        const updatedServiceContent = replaceStoredStrings(
-          updates.content ?? page.content,
-          serviceCopyReplacements,
-        );
-        if (updatedServiceContent !== (updates.content ?? page.content)) {
-          updates.content = updatedServiceContent as InsertCmsPage["content"];
-        }
+      const contentWithServiceHero = applyServiceHeroRefresh(
+        page.slug,
+        updates.content ?? page.content,
+      );
+      if (contentWithServiceHero) {
+        updates.content = contentWithServiceHero as InsertCmsPage["content"];
       }
 
       const currentSeoDescription = updates.seoDescription ?? page.seoDescription;

@@ -6,6 +6,7 @@ import {
 } from "@shared/glass-service-areas";
 import { getCmsSlugForPublicPath } from "@shared/glass-seo";
 import { getGlassLocationSearchCopy } from "@shared/glass-location-search";
+import { GLASS_SERVICE_HEROES, getGlassServiceHeroCtaProps } from "@shared/glass-service-heroes";
 
 const mockGetPageBySlug = vi.fn();
 const mockGetAllPages = vi.fn();
@@ -78,13 +79,13 @@ describe("ensureSystemCmsPages", () => {
     }
   });
 
-  it("shortens the commercial storefront hero subheading without touching edited copy", async () => {
+  it("applies the approved service hero copy and call-first CTAs once", async () => {
     mockGetAllPages.mockResolvedValue([
       {
-        id: "storefront-id",
-        slug: "services-commercial-storefront-glass-installation",
-        seoTitle: "Commercial Storefront Glass Installation in Charlotte, NC",
-        seoDescription: "Storefront description",
+        id: "frameless-id",
+        slug: "services-frameless-showers",
+        seoTitle: "Frameless Shower Doors Charlotte NC | Glass & Door Pro",
+        seoDescription: "Frameless description",
         updatedBy: "editor",
         content: {
           blocks: [
@@ -92,8 +93,10 @@ describe("ensureSystemCmsPages", () => {
               id: "hero",
               type: "hero",
               props: {
-                subheading:
-                  "<p>Storefront glass systems, aluminum framing, and commercial glass doors installed for new construction, tenant buildouts, and commercial renovations across Charlotte. Reliable scheduling, clean execution, and a single point of contact from quote through completion.</p>",
+                heading: "Frameless Glass Shower Doors in Charlotte, Monroe & Surrounding NC",
+                subheading: "<p>Admin-edited copy.</p>",
+                ctaText: "Request a Free Quote",
+                backgroundImageUrl: "/keep.webp",
               },
             },
             { id: "intro", type: "rich-text", props: { content: "<p>Keep this copy.</p>" } },
@@ -101,13 +104,14 @@ describe("ensureSystemCmsPages", () => {
         },
       },
       {
-        id: "edited-storefront-id",
-        slug: "services-commercial-storefront-glass-installation",
-        seoTitle: "Commercial Storefront Glass Installation in Charlotte, NC",
-        seoDescription: "Storefront description",
+        id: "already-applied-id",
+        slug: "services-commercial-window-replacement",
+        seoTitle: "Apartment & Multi-Family Window Replacement in Charlotte, NC",
+        seoDescription: "Multi-family description",
         updatedBy: "editor",
         content: {
-          blocks: [{ id: "hero", type: "hero", props: { subheading: "<p>Editor copy.</p>" } }],
+          _system: { serviceHeroCallFirst2026: true },
+          blocks: [{ id: "hero", type: "hero", props: { subheading: "<p>Later edit.</p>" } }],
         },
       },
     ]);
@@ -116,21 +120,21 @@ describe("ensureSystemCmsPages", () => {
     const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
     await ensureSystemCmsPages();
 
-    expect(mockUpdatePage).toHaveBeenCalledTimes(1);
-    expect(mockUpdatePage).toHaveBeenCalledWith("storefront-id", {
-      updatedBy: "editor",
-      content: {
-        blocks: [
-          {
-            id: "hero",
-            type: "hero",
-            props: {
-              subheading: "<p>For new construction, tenant buildouts, and renovations.</p>",
-            },
-          },
-          { id: "intro", type: "rich-text", props: { content: "<p>Keep this copy.</p>" } },
-        ],
-      },
+    const alreadyApplied = mockUpdatePage.mock.calls.find(([id]) => id === "already-applied-id");
+    expect(alreadyApplied?.[1]?.content).toBeUndefined();
+    const update = mockUpdatePage.mock.calls.find(([id]) => id === "frameless-id")?.[1];
+    expect(update.content._system).toEqual({ serviceHeroCallFirst2026: true });
+    expect(update.content.blocks[0].props).toEqual({
+      heading: "Frameless Glass Shower Doors in Charlotte, NC",
+      subheading: `<p>${GLASS_SERVICE_HEROES["services-frameless-showers"].subheading}</p>`,
+      backgroundImageUrl: "/keep.webp",
+      ...getGlassServiceHeroCtaProps("Request a Free Quote"),
+    });
+    expect(update.content.blocks[0].props.ctaText).toBe("Call (704) 771-6111");
+    expect(update.content.blocks[1]).toEqual({
+      id: "intro",
+      type: "rich-text",
+      props: { content: "<p>Keep this copy.</p>" },
     });
   });
 
