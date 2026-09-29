@@ -2110,8 +2110,7 @@ const glassServicePages: GlassServicePageSeed[] = [
       relatedCommercialUrl: "/services/commercial-storefront-glass-installation",
       hero: {
         heading: "Commercial Storefront Glass Installation in Charlotte, NC",
-        subheading:
-          "Storefront glass systems, aluminum framing, and commercial glass doors installed for new construction, tenant buildouts, and commercial renovations across Charlotte. Reliable scheduling, clean execution, and a single point of contact from quote through completion.",
+        subheading: "For new construction, tenant buildouts, and renovations.",
         imageUrl: "/images/glass-door-pro/commercial-hero-1280w.webp",
         imageAlt: "Commercial storefront glass installation for a Charlotte business",
         imagePositionY: 50,

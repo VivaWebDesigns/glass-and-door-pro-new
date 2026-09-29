@@ -127,6 +127,8 @@ const GLASS_CTA_PRIMARY_CLASS =
   "rounded-md border border-white bg-[#1a8ead] px-8 text-white shadow-sm hover:bg-[#167f9b] hover:text-white";
 const GLASS_CTA_SECONDARY_CLASS =
   "rounded-md border border-white bg-transparent px-8 text-white shadow-sm hover:bg-white/10 hover:text-white";
+const GLASS_HERO_CTA_SECONDARY_CLASS =
+  "rounded-md border border-white bg-slate-950/60 px-8 font-semibold text-white shadow-md backdrop-blur-sm hover:bg-slate-950/75 hover:text-white";
 
 function LucideIcon({ name, className }: { name: string; className?: string }) {
   const Icon = LUCIDE_MAP[name] ?? Globe;
@@ -284,7 +286,7 @@ function HeroCtas({ props, config }: { props: Record<string, unknown>; config: H
           modalDescription={props.ctaSecondaryModalDescription}
           size="lg"
           variant="outline"
-          className={`w-full sm:w-auto ${config.usesGlassCtas ? GLASS_CTA_SECONDARY_CLASS : "rounded-full border-white/60 bg-white/10 px-7 text-white shadow-sm backdrop-blur hover:bg-white/20"}`}
+          className={`w-full sm:w-auto ${config.usesGlassCtas ? GLASS_HERO_CTA_SECONDARY_CLASS : "rounded-full border-white/60 bg-white/10 px-7 text-white shadow-sm backdrop-blur hover:bg-white/20"}`}
           testId="hero-cta-secondary"
         />
       )}

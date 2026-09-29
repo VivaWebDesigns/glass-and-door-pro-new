@@ -476,6 +476,15 @@ const cityPositioningUpdates: Record<
   },
 };
 
+const servicePageCopyReplacements: Record<string, readonly TextReplacement[]> = {
+  "services-commercial-storefront-glass-installation": [
+    [
+      "Storefront glass systems, aluminum framing, and commercial glass doors installed for new construction, tenant buildouts, and commercial renovations across Charlotte. Reliable scheduling, clean execution, and a single point of contact from quote through completion.",
+      "For new construction, tenant buildouts, and renovations.",
+    ],
+  ],
+};
+
 const legacyMonroeBaseReplacements: readonly TextReplacement[] = [
   ["Monroe-Based, Truly Local", "Charlotte-Based, Union County Service"],
   ["Charlotte-Based, Truly Local", "Charlotte-Based, Union County Service"],
@@ -741,6 +750,17 @@ async function normalizeStoredCmsPages() {
         );
         if (positionedContent !== (updates.content ?? page.content)) {
           updates.content = positionedContent as InsertCmsPage["content"];
+        }
+      }
+
+      const serviceCopyReplacements = servicePageCopyReplacements[page.slug];
+      if (serviceCopyReplacements) {
+        const updatedServiceContent = replaceStoredStrings(
+          updates.content ?? page.content,
+          serviceCopyReplacements,
+        );
+        if (updatedServiceContent !== (updates.content ?? page.content)) {
+          updates.content = updatedServiceContent as InsertCmsPage["content"];
         }
       }
 

@@ -78,6 +78,62 @@ describe("ensureSystemCmsPages", () => {
     }
   });
 
+  it("shortens the commercial storefront hero subheading without touching edited copy", async () => {
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "storefront-id",
+        slug: "services-commercial-storefront-glass-installation",
+        seoTitle: "Commercial Storefront Glass Installation in Charlotte, NC",
+        seoDescription: "Storefront description",
+        updatedBy: "editor",
+        content: {
+          blocks: [
+            {
+              id: "hero",
+              type: "hero",
+              props: {
+                subheading:
+                  "<p>Storefront glass systems, aluminum framing, and commercial glass doors installed for new construction, tenant buildouts, and commercial renovations across Charlotte. Reliable scheduling, clean execution, and a single point of contact from quote through completion.</p>",
+              },
+            },
+            { id: "intro", type: "rich-text", props: { content: "<p>Keep this copy.</p>" } },
+          ],
+        },
+      },
+      {
+        id: "edited-storefront-id",
+        slug: "services-commercial-storefront-glass-installation",
+        seoTitle: "Commercial Storefront Glass Installation in Charlotte, NC",
+        seoDescription: "Storefront description",
+        updatedBy: "editor",
+        content: {
+          blocks: [{ id: "hero", type: "hero", props: { subheading: "<p>Editor copy.</p>" } }],
+        },
+      },
+    ]);
+    mockGetPageBySlug.mockResolvedValue(null);
+
+    const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
+    await ensureSystemCmsPages();
+
+    expect(mockUpdatePage).toHaveBeenCalledTimes(1);
+    expect(mockUpdatePage).toHaveBeenCalledWith("storefront-id", {
+      updatedBy: "editor",
+      content: {
+        blocks: [
+          {
+            id: "hero",
+            type: "hero",
+            props: {
+              subheading: "<p>For new construction, tenant buildouts, and renovations.</p>",
+            },
+          },
+          { id: "intro", type: "rich-text", props: { content: "<p>Keep this copy.</p>" } },
+        ],
+      },
+    });
+  });
+
   it("preserves later CMS edits after the location copy has been applied", async () => {
     mockGetAllPages.mockResolvedValue([
       {
