@@ -8,6 +8,7 @@ import {
 } from "@shared/glass-location-search";
 import { GLASS_HOMEPAGE_SERVICE_CARDS } from "@shared/glass-homepage-services";
 import { putCallButtonFirst } from "@shared/glass-call-first";
+import { GLASS_DOUG_PORTRAIT } from "@shared/glass-doug-portrait";
 import { GLASS_SERVICE_HEROES, getGlassServiceHeroCtaProps } from "@shared/glass-service-heroes";
 import { glassGoogleReviewDate } from "@shared/glass-review-dates";
 import { isGlassLegalNoindexSlug } from "@shared/glass-seo";
@@ -785,6 +786,41 @@ function applyServiceHeroRefresh(slug: string, content: unknown) {
   };
 }
 
+// Location pages show Doug's portrait beside "Meet Doug Adams" by converting
+// the text-only section into an image-and-text block with the same copy.
+function addDougPortraitToLocationPage(slug: string, content: unknown) {
+  if (!getGlassLocationSearchCopy(slug)) return null;
+  if (!isRecord(content) || !Array.isArray(content.blocks)) return null;
+
+  let changed = false;
+  const blocks = content.blocks.map((block) => {
+    if (
+      !isRecord(block) ||
+      block.type !== "rich-text" ||
+      !isRecord(block.props) ||
+      block.props.title !== "Meet Doug Adams"
+    ) {
+      return block;
+    }
+    changed = true;
+    const { content: body, ...props } = block.props;
+    return {
+      ...block,
+      type: "text-image",
+      props: {
+        ...props,
+        body,
+        imageUrl: GLASS_DOUG_PORTRAIT.url,
+        imageAlt: GLASS_DOUG_PORTRAIT.alt,
+        imagePosition: "left",
+        mobileImagePositionY: GLASS_DOUG_PORTRAIT.positionY,
+      },
+    };
+  });
+
+  return changed ? { ...content, blocks } : null;
+}
+
 async function normalizeStoredCmsPages() {
   const pages = await storage.cmsPages.getAllPages();
 
@@ -902,6 +938,14 @@ async function normalizeStoredCmsPages() {
         if (correctedLocationContent !== (updates.content ?? page.content)) {
           updates.content = correctedLocationContent as InsertCmsPage["content"];
         }
+      }
+
+      const contentWithDougPortrait = addDougPortraitToLocationPage(
+        page.slug,
+        updates.content ?? page.content,
+      );
+      if (contentWithDougPortrait) {
+        updates.content = contentWithDougPortrait as InsertCmsPage["content"];
       }
 
       if (page.slug === "home") {

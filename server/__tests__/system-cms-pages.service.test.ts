@@ -221,6 +221,53 @@ describe("ensureSystemCmsPages", () => {
     );
   });
 
+  it("adds Doug's portrait to the Meet Doug Adams section on location pages", async () => {
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "matthews-id",
+        slug: "service-areas-matthews",
+        seoTitle: "Glass Shower Door Installation in Matthews, NC",
+        seoDescription: "Matthews description",
+        updatedBy: "editor",
+        content: {
+          _system: { showerSearchPositioning2026: true, callFirstButtons2026: true },
+          blocks: [
+            {
+              id: "doug",
+              type: "rich-text",
+              props: {
+                title: "Meet Doug Adams",
+                alignment: "left",
+                content: "<p>I'm Doug.</p>",
+                sectionBackgroundColor: "#f8fafc",
+              },
+            },
+          ],
+        },
+      },
+    ]);
+    mockGetPageBySlug.mockResolvedValue(null);
+
+    const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
+    await ensureSystemCmsPages();
+
+    const update = mockUpdatePage.mock.calls.find(([id]) => id === "matthews-id")?.[1];
+    expect(update.content.blocks[0]).toEqual({
+      id: "doug",
+      type: "text-image",
+      props: {
+        title: "Meet Doug Adams",
+        alignment: "left",
+        body: "<p>I'm Doug.</p>",
+        sectionBackgroundColor: "#f8fafc",
+        imageUrl: "/images/glass-door-pro/doug-adams-portrait.webp",
+        imageAlt: "Doug Adams, owner of Glass & Door Pro",
+        imagePosition: "left",
+        mobileImagePositionY: 30,
+      },
+    });
+  });
+
   it("preserves later CMS edits after the location copy has been applied", async () => {
     mockGetAllPages.mockResolvedValue([
       {
