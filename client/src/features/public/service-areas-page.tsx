@@ -66,15 +66,15 @@ export default function ServiceAreasPage() {
                 size="lg"
                 className="w-full rounded-md border border-white bg-[#1a8ead] px-8 text-white shadow-sm hover:bg-[#167f9b] hover:text-white sm:w-auto"
               >
-                <Link href="/#contact">Request a Free Quote</Link>
+                <a href="tel:+17047716111">Call (704) 771-6111</a>
               </Button>
               <Button
                 asChild
                 size="lg"
                 variant="outline"
-                className="w-full rounded-md border border-white bg-transparent px-8 text-white shadow-sm hover:bg-white/10 hover:text-white sm:w-auto"
+                className="w-full rounded-md border border-white bg-slate-950/60 px-8 font-semibold text-white shadow-md backdrop-blur-sm hover:bg-slate-950/75 hover:text-white sm:w-auto"
               >
-                <a href="tel:+17047716111">Call (704) 771-6111</a>
+                <Link href="/#contact">Request a Free Quote</Link>
               </Button>
             </div>
           </div>
@@ -170,7 +170,7 @@ export default function ServiceAreasPage() {
               size="lg"
               className="w-full rounded-md border border-white bg-[#1a8ead] px-8 text-white shadow-sm hover:bg-[#167f9b] hover:text-white sm:w-auto"
             >
-              <Link href="/#contact">Get Your Free Estimate</Link>
+              <a href="tel:+17047716111">Call (704) 771-6111</a>
             </Button>
             <Button
               asChild
@@ -178,7 +178,7 @@ export default function ServiceAreasPage() {
               variant="outline"
               className="w-full rounded-md border border-white bg-transparent px-8 text-white shadow-sm hover:bg-white/10 hover:text-white sm:w-auto"
             >
-              <a href="tel:+17047716111">Call (704) 771-6111</a>
+              <Link href="/#contact">Get Your Free Estimate</Link>
             </Button>
           </div>
         </section>

@@ -7,6 +7,7 @@ import {
   updateGlassLocationSearchContent,
 } from "@shared/glass-location-search";
 import { GLASS_HOMEPAGE_SERVICE_CARDS } from "@shared/glass-homepage-services";
+import { putCallButtonFirst } from "@shared/glass-call-first";
 import { GLASS_SERVICE_HEROES, getGlassServiceHeroCtaProps } from "@shared/glass-service-heroes";
 import { glassGoogleReviewDate } from "@shared/glass-review-dates";
 import { isGlassLegalNoindexSlug } from "@shared/glass-seo";
@@ -477,6 +478,95 @@ const cityPositioningUpdates: Record<
   },
 };
 
+// Live CMS text that still carried the retired Monroe home base or a merged
+// "Based in Charlotte" paragraph, corrected to match the seed.
+const locationCopyCorrections: Record<string, readonly TextReplacement[]> = {
+  "service-areas-pineville": [
+    [
+      "Do you serve Pineville from Monroe — isn't that far?",
+      "Do you serve Pineville from Charlotte?",
+    ],
+    [
+      "<p>Not at all. Pineville is on the south side of Charlotte and Monroe is on the southeast — it's a straightforward drive and a regular part of our service area. No travel fees for Pineville and no difference in scheduling compared to any other area we serve.</p>",
+      "<p>Yes. Pineville is on the south side of Charlotte and is a regular part of our service area. No travel fees for Pineville and no difference in scheduling compared to any other area we serve.</p>",
+    ],
+  ],
+  "service-areas-stallings": [
+    [
+      "Do you serve Stallings, or is it too far from Monroe?",
+      "Do you serve Stallings, or is it too far from Charlotte?",
+    ],
+    [
+      "<p>Stallings is one of our most regular service areas — it's right next door to Monroe and Indian Trail, and we're out there multiple times a week. No travel fees, no minimum project size for the area.</p>",
+      "<p>Stallings is one of our most regular Union County service areas, and we're out there often. No travel fees, no minimum project size for the area.</p>",
+    ],
+    [
+      " Based in Charlotte. Serving Stallings, Union County, Charlotte, and surrounding areas. Saturday appointments available.</p>",
+      "</p><p>Based in Charlotte. Serving Stallings, Union County, Charlotte, and surrounding areas. Saturday appointments available.</p>",
+    ],
+  ],
+  "service-areas-indian-trail": [
+    [
+      " Based in Charlotte. Serving Indian Trail, Union County, Charlotte, and surrounding areas. Saturday appointments available.Saturday appointments available.</p>",
+      "</p><p>Based in Charlotte. Serving Indian Trail, Union County, Charlotte, and surrounding areas. Saturday appointments available.</p>",
+    ],
+  ],
+  "service-areas-weddington": [
+    ["Weddington is a short drive from Monroe,", "Weddington is a short drive from Charlotte,"],
+  ],
+};
+
+const stateNames: Record<string, string> = { NC: "North Carolina", SC: "South Carolina" };
+
+// Older location hero alt text predates the shower-door positioning copy.
+function getLocationHeroAltReplacement(slug: string): TextReplacement | null {
+  const copy = getGlassLocationSearchCopy(slug);
+  if (!copy) return null;
+  const [city, state] = copy.place.split(", ");
+  return [`Glass and door service area in ${city}, ${stateNames[state]}`, copy.heading];
+}
+
+const homeHeroImageAlt =
+  "Frameless glass shower installed by Glass & Door Pro in the Charlotte, NC area";
+
+function ensureHomeHeroImageAlt(content: unknown) {
+  if (!isRecord(content) || !Array.isArray(content.blocks)) return null;
+  const heroIndex = content.blocks.findIndex((block) => isRecord(block) && block.type === "hero");
+  const heroBlock = content.blocks[heroIndex];
+  if (!isRecord(heroBlock) || !isRecord(heroBlock.props) || heroBlock.props.backgroundImageAlt) {
+    return null;
+  }
+
+  const blocks = [...content.blocks];
+  blocks[heroIndex] = {
+    ...heroBlock,
+    props: { ...heroBlock.props, backgroundImageAlt: homeHeroImageAlt },
+  };
+  return { ...content, blocks };
+}
+
+// Puts the call button first on every hero and CTA block once per page. The
+// _system marker keeps later admin changes to button order.
+function applyCallFirstButtons(content: unknown) {
+  if (!isRecord(content) || !Array.isArray(content.blocks)) return null;
+
+  const systemMeta = isRecord(content._system) ? content._system : {};
+  if (systemMeta.callFirstButtons2026 === true) return null;
+  if (
+    !content.blocks.some((block) => isRecord(block) && ["hero", "cta"].includes(String(block.type)))
+  ) {
+    return null;
+  }
+
+  const blocks = content.blocks.map((block) => {
+    if (!isRecord(block) || typeof block.type !== "string" || !isRecord(block.props)) return block;
+    const props = putCallButtonFirst(block.type, block.props);
+    return props === block.props ? block : { ...block, props };
+  });
+
+  return { ...content, blocks, _system: { ...systemMeta, callFirstButtons2026: true } };
+}
+
 const legacyMonroeBaseReplacements: readonly TextReplacement[] = [
   ["Monroe-Based, Truly Local", "Charlotte-Based, Union County Service"],
   ["Charlotte-Based, Truly Local", "Charlotte-Based, Union County Service"],
@@ -782,6 +872,31 @@ async function normalizeStoredCmsPages() {
       );
       if (contentWithServiceHero) {
         updates.content = contentWithServiceHero as InsertCmsPage["content"];
+      }
+
+      const locationAltReplacement = getLocationHeroAltReplacement(page.slug);
+      const locationCorrections = [
+        ...(locationCopyCorrections[page.slug] ?? []),
+        ...(locationAltReplacement ? [locationAltReplacement] : []),
+      ];
+      if (locationCorrections.length > 0) {
+        const correctedLocationContent = replaceStoredStrings(
+          updates.content ?? page.content,
+          locationCorrections,
+        );
+        if (correctedLocationContent !== (updates.content ?? page.content)) {
+          updates.content = correctedLocationContent as InsertCmsPage["content"];
+        }
+      }
+
+      if (page.slug === "home") {
+        const contentWithHeroAlt = ensureHomeHeroImageAlt(updates.content ?? page.content);
+        if (contentWithHeroAlt) updates.content = contentWithHeroAlt as InsertCmsPage["content"];
+      }
+
+      const contentWithCallFirstButtons = applyCallFirstButtons(updates.content ?? page.content);
+      if (contentWithCallFirstButtons) {
+        updates.content = contentWithCallFirstButtons as InsertCmsPage["content"];
       }
 
       const currentSeoDescription = updates.seoDescription ?? page.seoDescription;

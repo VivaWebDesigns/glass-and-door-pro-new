@@ -110,7 +110,7 @@ describe("ensureSystemCmsPages", () => {
         seoDescription: "Multi-family description",
         updatedBy: "editor",
         content: {
-          _system: { serviceHeroCallFirst2026: true },
+          _system: { serviceHeroCallFirst2026: true, callFirstButtons2026: true },
           blocks: [{ id: "hero", type: "hero", props: { subheading: "<p>Later edit.</p>" } }],
         },
       },
@@ -123,7 +123,10 @@ describe("ensureSystemCmsPages", () => {
     const alreadyApplied = mockUpdatePage.mock.calls.find(([id]) => id === "already-applied-id");
     expect(alreadyApplied?.[1]?.content).toBeUndefined();
     const update = mockUpdatePage.mock.calls.find(([id]) => id === "frameless-id")?.[1];
-    expect(update.content._system).toEqual({ serviceHeroCallFirst2026: true });
+    expect(update.content._system).toEqual({
+      serviceHeroCallFirst2026: true,
+      callFirstButtons2026: true,
+    });
     expect(update.content.blocks[0].props).toEqual({
       heading: "Frameless Glass Shower Doors in Charlotte, NC",
       subheading: `<p>${GLASS_SERVICE_HEROES["services-frameless-showers"].subheading}</p>`,
@@ -136,6 +139,86 @@ describe("ensureSystemCmsPages", () => {
       type: "rich-text",
       props: { content: "<p>Keep this copy.</p>" },
     });
+  });
+
+  it("corrects stale location copy and puts call buttons first once", async () => {
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "pineville-id",
+        slug: "service-areas-pineville",
+        seoTitle: "Glass Shower Door Installation in Pineville, NC",
+        seoDescription: "Pineville description",
+        updatedBy: "editor",
+        content: {
+          _system: { showerSearchPositioning2026: true },
+          blocks: [
+            {
+              id: "hero",
+              type: "hero",
+              props: {
+                backgroundImageAlt: "Glass and door service area in Pineville, North Carolina",
+                ctaText: "Request a Free Quote",
+                ctaAction: "form-modal",
+                ctaSecondaryText: "Call (704) 771-6111",
+                ctaSecondaryAction: "custom-link",
+                ctaSecondaryLink: "tel:+17047716111",
+              },
+            },
+            {
+              id: "faq",
+              type: "faq",
+              props: {
+                items: [{ question: "Do you serve Pineville from Monroe — isn't that far?" }],
+              },
+            },
+          ],
+        },
+      },
+      {
+        id: "edited-order-id",
+        slug: "service-areas-matthews",
+        seoTitle: "Glass Shower Door Installation in Matthews, NC",
+        seoDescription: "Matthews description",
+        updatedBy: "editor",
+        content: {
+          _system: { showerSearchPositioning2026: true, callFirstButtons2026: true },
+          blocks: [
+            {
+              id: "hero",
+              type: "hero",
+              props: {
+                backgroundImageAlt: "Glass Shower Door Installer in Matthews, NC",
+                ctaText: "Request a Free Quote",
+                ctaSecondaryText: "Call (704) 771-6111",
+                ctaSecondaryLink: "tel:+17047716111",
+              },
+            },
+          ],
+        },
+      },
+    ]);
+    mockGetPageBySlug.mockResolvedValue(null);
+
+    const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
+    await ensureSystemCmsPages();
+
+    expect(mockUpdatePage.mock.calls.find(([id]) => id === "edited-order-id")).toBeUndefined();
+    const update = mockUpdatePage.mock.calls.find(([id]) => id === "pineville-id")?.[1];
+    expect(update.content._system).toEqual({
+      showerSearchPositioning2026: true,
+      callFirstButtons2026: true,
+    });
+    expect(update.content.blocks[0].props).toEqual({
+      backgroundImageAlt: "Glass Shower Door Installer in Pineville, NC",
+      ctaText: "Call (704) 771-6111",
+      ctaAction: "custom-link",
+      ctaLink: "tel:+17047716111",
+      ctaSecondaryText: "Request a Free Quote",
+      ctaSecondaryAction: "form-modal",
+    });
+    expect(update.content.blocks[1].props.items[0].question).toBe(
+      "Do you serve Pineville from Charlotte?",
+    );
   });
 
   it("preserves later CMS edits after the location copy has been applied", async () => {
@@ -478,11 +561,15 @@ describe("ensureSystemCmsPages", () => {
         seoTitle: "Glass & Door Services in Charlotte NC",
         seoDescription: "Already clean.",
         content: {
+          _system: { callFirstButtons2026: true },
           blocks: [
             {
               id: "hero",
               type: "hero",
-              props: { heading: "Glass & Door Services Around Charlotte" },
+              props: {
+                heading: "Glass & Door Services Around Charlotte",
+                backgroundImageAlt: "Alt",
+              },
             },
             {
               id: "copy",
@@ -505,12 +592,14 @@ describe("ensureSystemCmsPages", () => {
     expect(mockUpdatePage).toHaveBeenCalledWith("home-id", {
       seoTitle: "Glass and Door Pro | Charlotte Glass, Door & Window Services",
       content: {
+        _system: { callFirstButtons2026: true },
         blocks: [
           {
             id: "hero",
             type: "hero",
             props: {
               heading: "Glass and Door Pro: Charlotte Glass, Door & Window Services",
+              backgroundImageAlt: "Alt",
             },
           },
           {
@@ -903,6 +992,7 @@ describe("ensureSystemCmsPages", () => {
         slug: "services-door-installation",
         seoDescription: "Already clean.",
         content: {
+          _system: { callFirstButtons2026: true },
           blocks: [
             { id: "related", type: "link-list", props: { title: "Related Services" } },
             { id: "cta", type: "cta", props: { heading: "Ready?" } },
@@ -947,7 +1037,11 @@ describe("ensureSystemCmsPages", () => {
   });
 
   it("adds every service page to the homepage service cards without replacing other blocks", async () => {
-    const heroBlock = { id: "hero", type: "hero", props: { heading: "Existing hero" } };
+    const heroBlock = {
+      id: "hero",
+      type: "hero",
+      props: { heading: "Existing hero", backgroundImageAlt: "Existing alt" },
+    };
     const faqBlock = { id: "faq", type: "faq", props: { items: [{ question: "Existing FAQ" }] } };
     mockGetAllPages.mockResolvedValue([
       {

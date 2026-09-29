@@ -9,6 +9,7 @@ import type {
   MenuLocation,
 } from "../shared/schema";
 import { GLASS_HOMEPAGE_SERVICE_CARDS } from "../shared/glass-homepage-services";
+import { putCallButtonFirst } from "../shared/glass-call-first";
 import {
   GLASS_CALL_CTA_LINK,
   GLASS_CALL_CTA_TEXT,
@@ -312,12 +313,12 @@ const glassHomeContent: InsertCmsPage["content"] = {
     {
       id: uid(),
       type: "hero",
-      props: {
+      props: putCallButtonFirst("hero", {
         anchorId: "hero",
         variant: "glass-home",
         heading: "Glass and Door Pro: Charlotte Glass, Door & Window Services",
         subheading:
-          "<p>Specializing in frameless glass showers, windows, and doors for homeowners in Charlotte, NC.</p>",
+          "<p>Frameless shower doors, window installation, door installation, window repair, and commercial glass — owner-operated by Doug Adams with 15+ years of experience.</p>",
         ctaText: "Get a Free Quote",
         ctaLink: "#contact",
         ctaAction: "internal-link",
@@ -330,7 +331,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
         overlayColor: "#0f172a",
         overlayOpacity: 50,
         minHeight: "700",
-      },
+      }),
     },
     {
       id: uid(),
@@ -345,6 +346,8 @@ const glassHomeContent: InsertCmsPage["content"] = {
         imageUrl: "/images/glass-door-pro/family-1280w.webp",
         imageAlt: "Doug Adams, owner of Glass & Door Pro, with his family in Charlotte, NC",
         imagePosition: "left",
+        mobileImagePositionX: 51,
+        mobileImagePositionY: 34,
         sectionBackgroundColor: "#ffffff",
         sectionPaddingTop: "lg",
         sectionPaddingBottom: "lg",
@@ -439,7 +442,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
         sectionBackgroundColor: "#ffffff",
         sectionPaddingTop: "lg",
         sectionPaddingBottom: "lg",
-        items: [...glassReviewItems.slice(0, 2), ...glassReviewItems.slice(11, 17)],
+        items: [...glassReviewItems.slice(0, 2), ...glassReviewItems.slice(11, 16)],
       },
     },
     {
@@ -872,7 +875,7 @@ function block(type: string, props: Record<string, unknown>) {
   return {
     id: uid(),
     type,
-    props,
+    props: putCallButtonFirst(type, props),
   };
 }
 
@@ -1522,10 +1525,14 @@ function expandedServicePageContent(props: {
         primaryText: props.cta.primaryText ?? "Get Your Free Estimate",
         primaryAction: props.cta.primaryAction ?? "form-modal",
         primaryLink: props.cta.primaryLink ?? "",
-        primaryFormSlug: "contact-form",
-        primaryModalTitle: "Request a Free Estimate",
-        primaryModalDescription:
-          "Share a few project details and Doug will follow up with next steps.",
+        ...((props.cta.primaryAction ?? "form-modal") === "form-modal"
+          ? {
+              primaryFormSlug: "contact-form",
+              primaryModalTitle: "Request a Free Estimate",
+              primaryModalDescription:
+                "Share a few project details and Doug will follow up with next steps.",
+            }
+          : {}),
         secondaryText: props.cta.secondaryText ?? "Call (704) 771-6111",
         secondaryAction: props.cta.secondaryAction ?? "custom-link",
         secondaryLink: props.cta.secondaryLink ?? "tel:+17047716111",
@@ -1667,10 +1674,9 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Window Installation",
     slug: "services-window-installation",
-    seoTitle:
-      "Window Installation in Charlotte & Monroe, NC | Replacement Windows | Glass and Door Pro",
+    seoTitle: "Window Installation Charlotte NC | Glass & Door Pro",
     seoDescription:
-      "Professional window installation and replacement for homes across Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Owner-operated, honest pricing, same-week appointments. Call (704) 771-6111.",
+      "Window installation and replacement by Doug with 15+ years of experience. Serving Charlotte, Monroe, Indian Trail, Matthews & Waxhaw.",
     seoKeywords:
       "window installation Charlotte NC, window replacement Monroe NC, residential windows, energy efficient windows",
     ogImageUrl: "/images/glass-door-pro/charming-suburban-home-hero-1920x1080.webp",
@@ -1817,17 +1823,16 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Door Installation",
     slug: "services-door-installation",
-    seoTitle:
-      "Door Installation in Charlotte, NC | Entry, Patio & Storm Doors | Glass and Door Pro",
+    seoTitle: "Door Installation Charlotte NC | Glass & Door Pro",
     seoDescription:
-      "Residential door installation for entry doors, patio doors, storm doors, and exterior doors across Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Call (704) 771-6111.",
+      "Entry, patio, storm and exterior door installation by Doug with 15+ years of experience. Serving Charlotte, Monroe, Indian Trail, Matthews & Waxhaw.",
     seoKeywords:
       "door installation Charlotte NC, entry doors Monroe NC, patio door replacement, exterior door installer",
     ogImageUrl: "/images/glass-door-pro/door-hero.webp",
     content: expandedServicePageContent({
       relatedServicesUrl: "/services/door-installation",
       hero: {
-        heading: "Door Installation in Charlotte & Monroe, NC",
+        heading: "Door Installation in Charlotte, NC",
         imageUrl: "/images/glass-door-pro/door-hero.webp",
         imageAlt: "Residential exterior door installation for a Charlotte area home",
         imagePositionY: 45,
@@ -1967,17 +1972,16 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Window Repair",
     slug: "services-window-repair",
-    seoTitle:
-      "Window Repair in Charlotte, NC | Foggy Glass, Broken Seals & More | Glass and Door Pro",
+    seoTitle: "Window Repair Charlotte NC | Glass & Door Pro",
     seoDescription:
-      "Window repair for broken seals, foggy panes, failed IGUs, broken hardware, and cracked glass. Serving Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Call (704) 771-6111.",
+      "Window repair for foggy glass, broken seals, failed IGUs and cracked panes. Serving Charlotte, Matthews, Indian Trail, Monroe & Waxhaw.",
     seoKeywords:
       "window repair Charlotte NC, broken window glass, foggy window repair, seal failure repair, glass replacement",
     ogImageUrl: "/images/glass-door-pro/broken-glass-hero.webp",
     content: expandedServicePageContent({
       relatedServicesUrl: "/services/window-repair",
       hero: {
-        heading: "Window Repair in Charlotte & Monroe, NC",
+        heading: "Window Repair in Charlotte, NC",
         imageUrl: "/images/glass-door-pro/broken-glass-hero.webp",
         imageAlt: "Broken window glass ready for repair or replacement",
         imagePositionY: 45,
@@ -2269,10 +2273,9 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Commercial Storefront Glass Replacement & Repair",
     slug: "services-commercial-storefront-glass-replacement-repair",
-    seoTitle:
-      "Commercial Storefront Glass Replacement & Repair in Charlotte, NC | Glass and Door Pro",
+    seoTitle: "Storefront Glass Repair Charlotte NC | Glass & Door Pro",
     seoDescription:
-      "Emergency storefront glass repair, board-up, and replacement for Charlotte businesses. Broken storefront glass secured and replaced fast. Owner-operated, same-day response. Call (704) 771-6111.",
+      "Emergency storefront glass repair, board-up and replacement for Charlotte businesses. Fast response for broken commercial glass.",
     seoKeywords:
       "commercial storefront glass replacement Charlotte NC, storefront glass repair, emergency board-up, broken storefront glass",
     ogImageUrl: "/images/glass-door-pro/storefront-glass-replacement-hero.webp",
@@ -2429,10 +2432,9 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Commercial Door Installation",
     slug: "services-commercial-door-installation",
-    seoTitle:
-      "Commercial Door Installation in Charlotte, NC | Storefront & Entry Doors | Glass and Door Pro",
+    seoTitle: "Commercial Door Installation Charlotte NC | Glass & Door Pro",
     seoDescription:
-      "Commercial door installation for new construction, tenant buildouts, and business renovations in Charlotte, NC. Aluminum entry doors, glass storefront doors, and commercial entrance systems. Call (704) 771-6111.",
+      "Commercial door installation for storefront entries, glass doors and entrance systems in Charlotte. Built for GCs, buildouts and business renovations.",
     seoKeywords:
       "commercial door installation Charlotte NC, aluminum entry doors, glass storefront doors, commercial entrance systems",
     ogImageUrl: "/images/glass-door-pro/storefront-door-installation-hero.webp",
@@ -2581,9 +2583,9 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Commercial Door Replacement & Repair",
     slug: "services-commercial-door-replacement-repair",
-    seoTitle: "Commercial Door Replacement & Repair in Charlotte, NC | Glass and Door Pro",
+    seoTitle: "Commercial Door Repair Charlotte NC | Glass & Door Pro",
     seoDescription:
-      "Commercial door repair and replacement for Charlotte businesses. Broken glass panels, damaged hardware, misaligned frames, and worn closers fixed fast. Owner-operated. Call (704) 771-6111.",
+      "Commercial door repair for broken glass, damaged hardware, misaligned frames and worn closers. Fast service for Charlotte businesses.",
     seoKeywords:
       "commercial door replacement Charlotte NC, commercial door repair, door closer repair, commercial door glass replacement",
     ogImageUrl: "/images/glass-door-pro/commercial-door-repair-hero.webp",
@@ -2743,9 +2745,9 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Commercial Window Replacement",
     slug: "services-commercial-window-replacement",
-    seoTitle: "Apartment & Multi-Family Window Replacement in Charlotte, NC | Glass and Door Pro",
+    seoTitle: "Multi-Family Window Replacement Charlotte NC | Glass & Door Pro",
     seoDescription:
-      "Fast apartment and multi-family window replacement in Charlotte, NC. Wrong windows ordered? Unit damage? Doug mobilizes faster than larger companies — keeping your project on schedule. Call (704) 771-6111.",
+      "Fast multi-family window replacement for apartments, unit damage and wrong window orders. Built for Charlotte property managers and project teams.",
     seoKeywords:
       "apartment window replacement Charlotte NC, multi-family window replacement, commercial window replacement, property manager window replacement",
     ogImageUrl: "/images/glass-door-pro/commercial-window-replacement-hero-blue-sky.webp",
@@ -2935,7 +2937,19 @@ function cityPageContent(props: {
   ctaHeading: string;
   ctaBody: string;
   ctaFooter: string;
+  servingAreas?: string;
+  commercialAreas?: string;
 }): InsertCmsPage["content"] {
+  const serviceCards = props.commercialAreas
+    ? props.serviceCards.map((card) =>
+        card.title === "Commercial Services"
+          ? {
+              ...card,
+              description: `Storefront glass, commercial doors, and apartment window replacement for ${props.commercialAreas} businesses.`,
+            }
+          : card,
+      )
+    : props.serviceCards;
   return {
     blocks: [
       serviceHero(props.hero),
@@ -2956,15 +2970,14 @@ function cityPageContent(props: {
       cardsGrid({
         title: props.servicesTitle,
         subtitle: props.servicesIntro,
-        cards: props.serviceCards,
+        cards: serviceCards,
         columns: "3",
         backgroundColor: "#ffffff",
       }),
       block("rich-text", {
         title: "Meet Doug Adams",
         alignment: "left",
-        content:
-          "<p>I'm Doug, and I've been installing glass and doors in the Charlotte area for over 15 years. I started Glass and Door Pro because I wanted to do this the way I think it should be done: one craftsman, one project at a time, with the person who quotes the job actually being the person who shows up to install it.</p><p>Most of what I do is frameless shower doors, windows, and door installation, but I also handle everything from brand-new construction to historic homes — and the tricky, custom projects other contractors don't want to mess with are usually the ones I actually enjoy the most.</p><p>Based in Charlotte. Serving the greater Charlotte metro and surrounding areas. Saturday appointments available.</p>",
+        content: `<p>I'm Doug, and I've been installing glass and doors in the Charlotte area for over 15 years. I started Glass and Door Pro because I wanted to do this the way I think it should be done: one craftsman, one project at a time, with the person who quotes the job actually being the person who shows up to install it.</p><p>Most of what I do is frameless shower doors, windows, and door installation, but I also handle everything from brand-new construction to historic homes — and the tricky, custom projects other contractors don't want to mess with are usually the ones I actually enjoy the most.</p><p>Based in Charlotte. Serving ${props.servingAreas ?? "the greater Charlotte metro and surrounding areas"}. Saturday appointments available.</p>`,
         sectionBackgroundColor: "#f8fafc",
         sectionPaddingTop: "lg",
         sectionPaddingBottom: "lg",
@@ -3066,6 +3079,8 @@ const glassCityPages: GlassCityPageSeed[] = [
       "glass services Monroe NC, frameless shower doors Monroe NC, window installation Monroe NC, door installation Monroe NC, window repair Monroe NC",
     ogImageUrl: "/images/glass-door-pro/city-monroe-hero.webp",
     content: cityPageContent({
+      servingAreas: "Monroe, Union County, and the greater Charlotte area",
+      commercialAreas: "Monroe, Union County, and Charlotte-area",
       hero: {
         heading: "Glass Shower Door Installer in Monroe, NC",
         subheading:
@@ -3338,6 +3353,8 @@ const glassCityPages: GlassCityPageSeed[] = [
       "glass services Indian Trail NC, frameless shower doors Indian Trail NC, window installation Indian Trail NC, door installation Indian Trail NC, window repair Indian Trail NC",
     ogImageUrl: "/images/glass-door-pro/city-indian-trail-hero.webp",
     content: cityPageContent({
+      servingAreas: "Indian Trail, Union County, Charlotte, and surrounding areas",
+      commercialAreas: "Indian Trail, Union County, and greater Charlotte-area",
       hero: {
         heading: "Glass Shower Door Installer in Indian Trail, NC",
         subheading:
@@ -3471,6 +3488,8 @@ const glassCityPages: GlassCityPageSeed[] = [
       "glass services Stallings NC, frameless shower doors Stallings NC, window installation Stallings NC, door installation Stallings NC, window repair Stallings NC",
     ogImageUrl: "/images/glass-door-pro/city-stallings-hero.webp",
     content: cityPageContent({
+      servingAreas: "Stallings, Union County, Charlotte, and surrounding areas",
+      commercialAreas: "Stallings, Union County, and greater Charlotte-area",
       hero: {
         heading: "Glass Shower Door Installer in Stallings, NC",
         subheading:
@@ -3602,6 +3621,8 @@ const glassCityPages: GlassCityPageSeed[] = [
       "glass services Wesley Chapel NC, frameless shower doors Wesley Chapel NC, window installation Wesley Chapel NC, door installation Wesley Chapel NC, window repair Wesley Chapel NC",
     ogImageUrl: "/images/glass-door-pro/city-wesley-chapel-hero.webp",
     content: cityPageContent({
+      servingAreas: "Wesley Chapel, Union County, Charlotte, and surrounding areas",
+      commercialAreas: "Wesley Chapel, Union County, and greater Charlotte-area",
       hero: {
         heading: "Glass Shower Door Installer in Wesley Chapel, NC",
         subheading:
@@ -3611,7 +3632,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       },
       introTitle: "Glass and Door Services Right Here in Wesley Chapel",
       introContent:
-        "<p>Wesley Chapel is one of the fastest-growing areas in Union County — and the homes here reflect a range of eras and upgrade needs. Newer subdivisions where buyers are customizing above builder standard sit alongside established communities where owners are making long-term investments in their properties. Glass and door work in Wesley Chapel tends to involve homeowners who have done their research and want the job done by someone who knows what they're doing.</p><p>Glass and Door Pro is based in Charlotte and keeps Wesley Chapel in our regular service rotation. Doug handles every project personally from the initial measurement through the finished installation. You won't be handed off to a subcontractor, and you won't get a different person showing up than the one who gave you the quote.</p><p>We work throughout Wesley Chapel on frameless glass shower installations, window replacement and repair, and exterior door upgrades. If you're in the middle of a bathroom remodel and want a frameless enclosure to finish it off, or you've got a handful of fogged windows that need addressing, or your front door is due for an upgrade — we handle all of it, and the process is straightforward from first call to finished job.</p>",
+        "<p>Wesley Chapel is one of the fastest-growing areas in Union County — and the homes here reflect a range of eras and upgrade needs. Newer subdivisions where buyers are customizing above builder standard sit alongside established communities where owners are making long-term investments in their properties. Glass and door work in Wesley Chapel tends to involve homeowners who have done their research and want the job done by someone who knows what they're doing.</p><p>Glass and Door Pro is based in Charlotte, which makes Wesley Chapel a short drive and a regular part of our weekly schedule. Doug handles every project personally from the initial measurement through the finished installation. You won't be handed off to a subcontractor, and you won't get a different person showing up than the one who gave you the quote.</p><p>We work throughout Wesley Chapel on frameless glass shower installations, window replacement and repair, and exterior door upgrades. If you're in the middle of a bathroom remodel and want a frameless enclosure to finish it off, or you've got a handful of fogged windows that need addressing, or your front door is due for an upgrade — we handle all of it, and the process is straightforward from first call to finished job.</p>",
       benefitsTitle: "Why Wesley Chapel Homeowners Choose Glass and Door Pro",
       benefits: [
         {
@@ -3736,6 +3757,8 @@ const glassCityPages: GlassCityPageSeed[] = [
       "glass services Waxhaw NC, frameless shower doors Waxhaw NC, window installation Waxhaw NC, door installation Waxhaw NC, window repair Waxhaw NC",
     ogImageUrl: "/images/glass-door-pro/city-waxhaw-hero.webp",
     content: cityPageContent({
+      servingAreas: "Waxhaw, Union County, Charlotte, and surrounding areas",
+      commercialAreas: "Waxhaw, Union County, and greater Charlotte-area",
       hero: {
         heading: "Glass Shower Door Installer in Waxhaw, NC",
         subheading:
@@ -3745,7 +3768,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       },
       introTitle: "Your Glass and Door Company in Waxhaw",
       introContent:
-        "<p>Waxhaw homeowners tend to have high standards for how their homes are finished — it's that kind of community. When someone in Waxhaw is putting in a frameless glass shower, they're not looking for the cheapest option. They want it measured right, installed cleanly, and finished with hardware that matches the rest of the bathroom. That's exactly the kind of work Glass and Door Pro does.</p><p>Doug is based in Charlotte and has been working in Waxhaw for years. He knows the neighborhoods, he knows the home styles, and he's installed glass and doors in enough Waxhaw bathrooms and entryways to know what works and what doesn't. When he comes out for a quote, you're getting real expertise — not a salesperson reading from a product catalog.</p><p>Waxhaw's housing mix means we see everything from custom homes where the finishes need to be exactly right, to more modest properties where the goal is a quality upgrade without overspending. We approach both with the same care. A clear quote, honest advice, and work that holds up.</p>",
+        "<p>Homes in Waxhaw often have the kind of details where clean installation really matters — updated bathrooms, custom finishes, newer construction, and long-term homeowners who want the job done right. Glass and Door Pro helps Waxhaw homeowners with frameless shower doors, window installation, door installation, and window repair, all handled personally by Doug from measurement through final install.</p><p>Doug is based in Charlotte and has been working in Waxhaw for years. He knows the neighborhoods, he knows the home styles, and he's installed glass and doors in enough Waxhaw bathrooms and entryways to know what works and what doesn't. When he comes out for a quote, you're getting real expertise — not a salesperson reading from a product catalog.</p><p>Waxhaw's housing mix means we see everything from custom homes where the finishes need to be exactly right, to more modest properties where the goal is a quality upgrade without overspending. We approach both with the same care. A clear quote, honest advice, and work that holds up.</p>",
       benefitsTitle: "Why Waxhaw Homeowners Choose Glass and Door Pro",
       benefits: [
         {
@@ -3756,7 +3779,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         },
         {
           icon: "MapPin",
-          title: "Charlotte-Based, Regular Waxhaw Service",
+          title: "Charlotte-Based, No Travel Fees",
           description:
             "Waxhaw is a regular part of our weekly schedule from our Charlotte home base, not an occasional out-of-area trip.",
         },
@@ -3823,7 +3846,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         {
           question: "Do you work in Waxhaw regularly, or is it far from your base?",
           answer:
-            "<p>Waxhaw is one of our most consistent service areas. We're based in Charlotte and have clients throughout Waxhaw's neighborhoods. No travel fees, no minimum project size.</p>",
+            "<p>Waxhaw is one of our most consistent service areas. We're based in Charlotte, which is just up the road, and we have clients throughout Waxhaw's neighborhoods. No travel fees, no minimum project size.</p>",
         },
         {
           question: "What are the most popular projects in Waxhaw?",
@@ -3869,6 +3892,8 @@ const glassCityPages: GlassCityPageSeed[] = [
       "glass services Matthews NC, frameless shower doors Matthews NC, window installation Matthews NC, door installation Matthews NC, window repair Matthews NC",
     ogImageUrl: "/images/glass-door-pro/city-matthews-hero.webp",
     content: cityPageContent({
+      servingAreas: "Matthews, Charlotte, Union County, and surrounding areas",
+      commercialAreas: "Matthews, Mecklenburg County, and greater Charlotte-area",
       hero: {
         heading: "Glass Shower Door Installer in Matthews, NC",
         subheading:
@@ -3878,7 +3903,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       },
       introTitle: "Glass and Door Services for Matthews Homeowners",
       introContent:
-        "<p>Matthews has an established character — mature neighborhoods, well-maintained homes, and homeowners who've been in place long enough to know exactly what they want when they're upgrading. Glass and door work in Matthews reflects that. Frameless shower installations going into bathrooms that are being properly remodeled, not just touched up. Window replacements on homes where the original windows are finally past their useful life. Entry door upgrades that make a real difference to a home's appearance.</p><p>Glass and Door Pro serves Matthews regularly. Doug is Charlotte-based, which puts Matthews on the eastern edge of the Charlotte side of his service area — close enough that scheduling is easy and there are no travel fees. He handles every project personally, which Matthews homeowners tend to appreciate. When you call, you're getting the person who will actually do the work.</p><p>Matthews sits in Mecklenburg County, and we work throughout the town — from the neighborhoods near downtown Matthews to the subdivisions along the Mecklenburg-Union County line. If you've been putting off a glass or door project because you weren't sure who to call, Glass and Door Pro is a straightforward choice.</p>",
+        "<p>Matthews has a mix of established neighborhoods, older homes, and updated properties where clean, careful installation matters. Glass and Door Pro helps Matthews homeowners with frameless shower doors, window installation, door installation, and window repair — all handled personally by Doug from measurement through final install.</p><p>Glass and Door Pro serves Matthews regularly. Doug is based in Charlotte, which keeps Matthews within easy reach and allows for straightforward scheduling with no travel fees. When you call, you’re talking to the person who will measure the job, explain the options, and complete the work.</p><p>From neighborhoods near downtown Matthews to homes along the Mecklenburg-Union County line, Doug works throughout the area on bathroom upgrades, aging windows, exterior doors, and repair projects that need honest guidance.</p>",
       benefitsTitle: "Why Matthews Homeowners Choose Glass and Door Pro",
       benefits: [
         {
@@ -3954,7 +3979,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         {
           question: "Do you serve Matthews from Charlotte?",
           answer:
-            "<p>Yes. Matthews is a regular part of our service area — we're out there consistently and don't add travel fees for Mecklenburg County locations. We schedule Matthews visits the same way as any other area we serve.</p>",
+            "<p>Yes. Matthews is a regular part of our service area from our Charlotte home base. We work there consistently and don't add travel fees for Mecklenburg County locations.</p>",
         },
         {
           question: "What glass and door projects are most common in Matthews?",
@@ -4000,6 +4025,8 @@ const glassCityPages: GlassCityPageSeed[] = [
       "glass services Weddington NC, frameless shower doors Weddington NC, window installation Weddington NC, door installation Weddington NC, window repair Weddington NC",
     ogImageUrl: "/images/glass-door-pro/city-weddington-hero.webp",
     content: cityPageContent({
+      servingAreas: "Weddington, Union County, Charlotte, and surrounding areas",
+      commercialAreas: "Weddington, Union County, and greater Charlotte-area",
       hero: {
         heading: "Glass Shower Door Installer in Weddington, NC",
         subheading:
@@ -4009,7 +4036,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       },
       introTitle: "Custom Glass and Door Work in Weddington",
       introContent:
-        "<p>Weddington is one of Union County's most established communities — larger homes, carefully maintained properties, and homeowners who expect quality work to match the quality of what's already there. Glass and door work in Weddington tends toward the custom end: frameless shower enclosures in primary baths that are being properly renovated, entry door replacements that make a statement at the front of the house, and window upgrades across homes where the original windows have simply reached the end of a long life.</p><p>Glass and Door Pro brings that same attention to detail to every Weddington project. Doug measures every job himself, orders materials to the exact specifications of the opening, and does the installation personally. If you're putting a frameless glass enclosure into a primary bath remodel that you've invested real money in, you want it done by someone who cares about the result. That's the work we do.</p><p>Weddington is a short drive from Charlotte, and we've worked throughout the town's neighborhoods for years. No travel fees, consistent availability, and a direct line to the person responsible for the work on every project.</p>",
+        "<p>Weddington is one of Union County's more established communities — larger homes, carefully maintained properties, and homeowners who expect quality work to match the quality of what's already there. Glass and door work in Weddington tends toward the custom end: frameless shower enclosures in primary baths that are being properly renovated, entry door replacements that make a statement at the front of the house, and window upgrades across homes where the original windows have simply reached the end of a long life.</p><p>Glass and Door Pro brings that same attention to detail to every Weddington project. Doug measures every job himself, orders materials to the exact specifications of the opening, and does the installation personally. If you're putting a frameless glass enclosure into a primary bath remodel that you've invested real money in, you want it done by someone who cares about the result. That's the work we do.</p><p>Weddington is a short drive from Charlotte, and we've worked throughout the town's neighborhoods for years. No travel fees, consistent availability, and a direct line to the person responsible for the work on every project.</p>",
       benefitsTitle: "Why Weddington Homeowners Choose Glass and Door Pro",
       benefits: [
         {
@@ -4132,6 +4159,8 @@ const glassCityPages: GlassCityPageSeed[] = [
       "glass services Indian Land SC, frameless shower doors Indian Land SC, window installation Indian Land SC, door installation Indian Land SC, window repair Indian Land SC",
     ogImageUrl: "/images/glass-door-pro/city-indian-land-hero.webp",
     content: cityPageContent({
+      servingAreas: "Indian Land, Lancaster County, Charlotte, Union County, and surrounding areas",
+      commercialAreas: "Indian Land, Lancaster County, and greater Charlotte-area",
       hero: {
         heading: "Glass Shower Door Installer in Indian Land, SC",
         subheading:
@@ -4141,7 +4170,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       },
       introTitle: "Glass and Door Pro — Serving Indian Land Homeowners",
       introContent:
-        "<p>Indian Land has grown into one of the fastest-developing communities in the greater Charlotte area, with new construction happening alongside more established neighborhoods that are ready for upgrades. The housing mix here runs from recent builds where homeowners are customizing above the builder standard to homes that are 10–15 years old and ready for bathroom and window improvements.</p><p>Glass and Door Pro is based in Charlotte, NC, and Indian Land is well within our regular service area. Doug works in Indian Land regularly — there's no border fee, no minimum project requirement, and no difference in how we approach a project here versus anywhere else in our service area. You're getting the same owner-operated, personally managed service that clients across Union County and the Charlotte metro have come to rely on.</p><p>The most common projects we handle in Indian Land are frameless glass shower enclosures for homeowners investing in bathroom upgrades, window replacement for fogged or aging double-pane units, and exterior door installations. Whatever the project, the process is the same: Doug comes out, measures in person, gives you a clear written quote, and does the work himself.</p>",
+        "<p>Indian Land has grown into one of the fastest-developing communities in the greater Charlotte area, with new construction happening alongside more established neighborhoods that are ready for upgrades. The housing mix here runs from recent builds where homeowners are customizing above the builder standard to homes that are 10–15 years old and ready for bathroom and window improvements.</p><p>Glass and Door Pro is based in Charlotte, NC, which puts Indian Land just across the state line and well within our regular service area. Doug works in Indian Land regularly — there's no border fee, no minimum project requirement, and no difference in how we approach a project here versus anywhere else in our service area. You're getting the same owner-operated, personally managed service that clients across Union County and the Charlotte metro have come to rely on.</p><p>The most common projects we handle in Indian Land are frameless glass shower enclosures for homeowners investing in bathroom upgrades, window replacement for fogged or aging double-pane units, and exterior door installations. Whatever the project, the process is the same: Doug comes out, measures in person, gives you a clear written quote, and does the work himself.</p>",
       benefitsTitle: "Why Indian Land Homeowners Choose Glass and Door Pro",
       benefits: [
         {
@@ -4219,7 +4248,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         {
           question: "Do you cross into South Carolina to serve Indian Land?",
           answer:
-            "<p>Yes. Indian Land is a regular part of our service area. We're based in Charlotte, NC, and work in Indian Land consistently. No additional fees for the SC location.</p>",
+            "<p>Yes. Indian Land is a regular part of our service area — we're based in Charlotte, NC, just across the state line, and work in Indian Land consistently. No additional fees for the SC location.</p>",
         },
         {
           question: "What are the most common projects in Indian Land?",
@@ -4266,6 +4295,8 @@ const glassCityPages: GlassCityPageSeed[] = [
       "glass services Fort Mill SC, frameless shower doors Fort Mill SC, window installation Fort Mill SC, door installation Fort Mill SC, window repair Fort Mill SC",
     ogImageUrl: "/images/glass-door-pro/city-fort-mill-hero.webp",
     content: cityPageContent({
+      servingAreas: "Fort Mill, York County, Charlotte, Union County, and surrounding areas",
+      commercialAreas: "Fort Mill, York County, and greater Charlotte-area",
       hero: {
         heading: "Glass Shower Door Installer in Fort Mill, SC",
         subheading:
@@ -4275,7 +4306,7 @@ const glassCityPages: GlassCityPageSeed[] = [
       },
       introTitle: "Local Glass and Door Service for Fort Mill Homeowners",
       introContent:
-        "<p>Fort Mill has become one of the most sought-after communities in the greater Charlotte area — and the homes here reflect that growth. Established neighborhoods mix with significant newer development, and homeowners across Fort Mill are investing in properties that have real value and that they intend to improve. Glass and door work here ranges from frameless shower upgrades in homes that have been owned for a decade or more, to window replacements in newer construction where the builder's spec units are starting to show their limitations.</p><p>Glass and Door Pro is based in Charlotte, NC, and Fort Mill is a regular part of our service schedule. Doug works in Fort Mill the same way he works everywhere — personally, with a clear quote before anything starts, and with himself doing the installation. There's no dispatch, no subcontractors, no variation in the quality of work based on who happened to be available.</p><p>Fort Mill homeowners have a wide range of glass and door needs and we handle all of them. If you've been putting a project off because you weren't sure who to call in this area, Glass and Door Pro is a local, accountable option that shows up when scheduled and finishes what it starts.</p>",
+        "<p>Fort Mill has become one of the most sought-after communities in the greater Charlotte area — and the homes here reflect that growth. Established neighborhoods mix with significant newer development, and homeowners across Fort Mill are investing in properties that have real value and that they intend to improve. Glass and door work here ranges from frameless shower upgrades in homes that have been owned for a decade or more, to window replacements in newer construction where the builder's spec units are starting to show their limitations.</p><p>Glass and Door Pro is based in Charlotte, NC, right across the South Carolina border, and Fort Mill is a regular part of our service schedule. Doug works in Fort Mill the same way he works everywhere — personally, with a clear quote before anything starts, and with himself doing the installation. There's no dispatch, no subcontractors, no variation in the quality of work based on who happened to be available.</p><p>Fort Mill homeowners have a wide range of glass and door needs and we handle all of them. If you've been putting a project off because you weren't sure who to call in this area, Glass and Door Pro is a local, accountable option that shows up when scheduled and finishes what it starts.</p>",
       benefitsTitle: "Why Fort Mill Homeowners Choose Glass and Door Pro",
       benefits: [
         {
@@ -4353,7 +4384,7 @@ const glassCityPages: GlassCityPageSeed[] = [
         {
           question: "Do you serve Fort Mill even though you're based in North Carolina?",
           answer:
-            "<p>Yes. Fort Mill is a regular part of our service area. We're based in Charlotte, NC, and work in Fort Mill and the surrounding York County area consistently. No additional fees or charges for the SC location.</p>",
+            "<p>Yes. Fort Mill is a regular part of our service area. We're based in Charlotte, NC, just across the state line, and work in Fort Mill and the surrounding York County area consistently. No additional fees or charges for the SC location.</p>",
         },
         {
           question: "What glass and door projects are most common in Fort Mill?",
@@ -4400,6 +4431,8 @@ const glassCityPages: GlassCityPageSeed[] = [
       "glass services Pineville NC, frameless shower doors Pineville NC, window installation Pineville NC, door installation Pineville NC, window repair Pineville NC",
     ogImageUrl: "/images/glass-door-pro/city-pineville-hero.webp",
     content: cityPageContent({
+      servingAreas: "Pineville, south Charlotte, Union County, and surrounding areas",
+      commercialAreas: "Pineville, south Charlotte, and greater Charlotte-area",
       hero: {
         heading: "Glass Shower Door Installer in Pineville, NC",
         subheading:
@@ -4987,7 +5020,7 @@ export async function seedGlassPublicCms() {
         content: glassHomeContent,
         seoTitle: "Glass and Door Pro | Charlotte Glass, Door & Window Services",
         seoDescription:
-          "Glass & Door Pro serves Charlotte and Monroe, NC with frameless shower doors, window installation, door replacement, window repair, and commercial glass. Owner-operated with 15+ years of experience.",
+          "Owner-operated glass and door services in Charlotte, NC. Frameless showers, window installation, door installation, window repair and commercial glass by Doug.",
         seoKeywords:
           "glass installation Charlotte NC, frameless shower doors, window repair, door installation, commercial glass",
         ogImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
@@ -5005,7 +5038,7 @@ export async function seedGlassPublicCms() {
       content: glassHomeContent,
       seoTitle: "Glass and Door Pro | Charlotte Glass, Door & Window Services",
       seoDescription:
-        "Glass & Door Pro serves Charlotte and Monroe, NC with frameless shower doors, window installation, door replacement, window repair, and commercial glass. Owner-operated with 15+ years of experience.",
+        "Owner-operated glass and door services in Charlotte, NC. Frameless showers, window installation, door installation, window repair and commercial glass by Doug.",
       seoKeywords:
         "glass installation Charlotte NC, frameless shower doors, window repair, door installation, commercial glass",
       ogImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
