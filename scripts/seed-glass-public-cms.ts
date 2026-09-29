@@ -4700,6 +4700,7 @@ const brandingSettings: Record<string, string> = {
   company_name: "Glass and Door Pro",
   company_address: "6135 Park South Drive\nSuite 542\nCharlotte, NC 28210",
   company_phone_numbers: "(704) 771-6111",
+  company_google_business_url: "https://maps.app.goo.gl/ELmWfCJfcXkiqahA6",
   frontend_body_font: "inter",
   frontend_heading_font: "manrope",
   brand_primary_color: "#0F172A",

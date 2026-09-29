@@ -37,6 +37,14 @@ export async function ensureSystemBranding() {
       ...(currentSeo.titleSuffix === " | Glass & Door Pro"
         ? { titleSuffix: ` | ${GLASS_COMPANY_NAME}` }
         : {}),
+      ...(currentSeo.defaultMetaDescription?.startsWith("Glass & Door Pro serves ")
+        ? {
+            defaultMetaDescription: currentSeo.defaultMetaDescription.replace(
+              "Glass & Door Pro",
+              GLASS_COMPANY_NAME,
+            ),
+          }
+        : {}),
     };
 
     if (Object.keys(updates).length > 0) {

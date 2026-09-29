@@ -58,6 +58,7 @@ describe("ensureSystemBranding", () => {
       siteName: "Glass & Door Pro",
       organizationName: "Glass & Door Pro",
       titleSuffix: " | Glass & Door Pro",
+      defaultMetaDescription: "Glass & Door Pro serves Charlotte, NC with frameless shower doors.",
     });
 
     const mod = await import("../services/system-branding.service");
@@ -73,6 +74,8 @@ describe("ensureSystemBranding", () => {
       siteName: "Glass and Door Pro",
       organizationName: "Glass and Door Pro",
       titleSuffix: " | Glass and Door Pro",
+      defaultMetaDescription:
+        "Glass and Door Pro serves Charlotte, NC with frameless shower doors.",
     });
   });
 });
