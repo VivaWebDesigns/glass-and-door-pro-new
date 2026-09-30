@@ -2,6 +2,15 @@
 
 These project operating notes are standing rules for working in this repository unless the user explicitly overrides them.
 
+## Sync Before Starting
+
+This repo is worked on from two computers with both Claude and Codex, so local `main` is often behind `origin/main`.
+
+1. At the start of every session, before reading or editing code, run `sh .claude/hooks/git-sync.sh` (Claude Code runs it automatically at startup; run it again if its output is not in context). It fast-forwards clean `main` with `git pull --ff-only` and reports when it skipped.
+2. If the sync reports a skip or failure (local changes, another branch, diverged history, offline), stop and explain it to the user before editing. Never resolve divergence by merging, rebasing, resetting, stashing, or force-pushing without explicit approval.
+3. If the sync reports that `package.json` or `package-lock.json` changed, run `npm ci` before building or testing. If schema or migration files changed, mention it; do not push the schema or run migrations unless asked.
+4. Immediately before pushing, run `git pull --rebase` so work pushed from the other computer is included. If the rebase conflicts, run `git rebase --abort` and stop to ask the user; do not resolve conflicts on your own.
+
 ## Project Operating Notes
 
 1. No unpublished work should sit in the worktree.
