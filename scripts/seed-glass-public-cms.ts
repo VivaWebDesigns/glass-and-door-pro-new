@@ -2981,6 +2981,7 @@ function cityPageContent(props: {
         imageUrl: GLASS_DOUG_PORTRAIT.url,
         imageAlt: GLASS_DOUG_PORTRAIT.alt,
         imagePosition: "left",
+        mobileImagePositionX: GLASS_DOUG_PORTRAIT.positionX,
         mobileImagePositionY: GLASS_DOUG_PORTRAIT.positionY,
         body: `<p>I'm Doug, and I've been installing glass and doors in the Charlotte area for over 15 years. I started Glass & Door Pro because I wanted to do this the way I think it should be done: one craftsman, one project at a time, with the person who quotes the job actually being the person who shows up to install it.</p><p>Most of what I do is frameless shower doors, windows, and door installation, but I also handle everything from brand-new construction to historic homes — and the tricky, custom projects other contractors don't want to mess with are usually the ones I actually enjoy the most.</p><p>Based in Charlotte. Serving ${props.servingAreas ?? "the greater Charlotte metro and surrounding areas"}. Saturday appointments available.</p>`,
         sectionBackgroundColor: "#f8fafc",

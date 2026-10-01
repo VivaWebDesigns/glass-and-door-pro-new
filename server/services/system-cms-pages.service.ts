@@ -786,8 +786,8 @@ function applyServiceHeroRefresh(slug: string, content: unknown) {
   };
 }
 
-// Location pages show Doug's portrait beside "Meet Doug Adams" by converting
-// the text-only section into an image-and-text block with the same copy.
+// Use the homepage family photo for new and existing Meet Doug Adams sections,
+// preserving the location page's copy and other section settings.
 function addDougPortraitToLocationPage(slug: string, content: unknown) {
   if (!getGlassLocationSearchCopy(slug)) return null;
   if (!isRecord(content) || !Array.isArray(content.blocks)) return null;
@@ -796,26 +796,27 @@ function addDougPortraitToLocationPage(slug: string, content: unknown) {
   const blocks = content.blocks.map((block) => {
     if (
       !isRecord(block) ||
-      block.type !== "rich-text" ||
+      (block.type !== "rich-text" && block.type !== "text-image") ||
       !isRecord(block.props) ||
       block.props.title !== "Meet Doug Adams"
     ) {
       return block;
     }
-    changed = true;
     const { content: body, ...props } = block.props;
-    return {
+    const updatedBlock = {
       ...block,
       type: "text-image",
       props: {
-        ...props,
-        body,
+        ...(block.type === "rich-text" ? { ...props, body, imagePosition: "left" } : block.props),
         imageUrl: GLASS_DOUG_PORTRAIT.url,
         imageAlt: GLASS_DOUG_PORTRAIT.alt,
-        imagePosition: "left",
+        mobileImagePositionX: GLASS_DOUG_PORTRAIT.positionX,
         mobileImagePositionY: GLASS_DOUG_PORTRAIT.positionY,
       },
     };
+    if (JSON.stringify(updatedBlock) === JSON.stringify(block)) return block;
+    changed = true;
+    return updatedBlock;
   });
 
   return changed ? { ...content, blocks } : null;

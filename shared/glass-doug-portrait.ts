@@ -1,7 +1,7 @@
-// Stand-in portrait of Doug cropped from the homepage family photo; replace
-// the file with an on-the-job photo when one is available.
+// Use the homepage family photo in every location page's Meet Doug Adams section.
 export const GLASS_DOUG_PORTRAIT = {
-  url: "/images/glass-door-pro/doug-adams-portrait.webp",
-  alt: "Doug Adams, owner of Glass & Door Pro",
-  positionY: 30,
+  url: "/images/glass-door-pro/family-1280w.webp",
+  alt: "Doug Adams, owner of Glass & Door Pro, with his family in Charlotte, NC",
+  positionX: 51,
+  positionY: 34,
 } as const;

@@ -221,52 +221,63 @@ describe("ensureSystemCmsPages", () => {
     );
   });
 
-  it("adds Doug's portrait to the Meet Doug Adams section on location pages", async () => {
-    mockGetAllPages.mockResolvedValue([
-      {
-        id: "matthews-id",
-        slug: "service-areas-matthews",
-        seoTitle: "Glass Shower Door Installation in Matthews, NC",
-        seoDescription: "Matthews description",
-        updatedBy: "editor",
-        content: {
-          _system: { showerSearchPositioning2026: true, callFirstButtons2026: true },
-          blocks: [
-            {
-              id: "doug",
-              type: "rich-text",
-              props: {
-                title: "Meet Doug Adams",
-                alignment: "left",
-                content: "<p>I'm Doug.</p>",
-                sectionBackgroundColor: "#f8fafc",
+  it.each(["rich-text", "text-image"])(
+    "uses Doug's family photo for %s Meet Doug Adams sections on location pages",
+    async (type) => {
+      mockGetAllPages.mockResolvedValue([
+        {
+          id: "matthews-id",
+          slug: "service-areas-matthews",
+          seoTitle: "Glass Shower Door Installation in Matthews, NC",
+          seoDescription: "Matthews description",
+          updatedBy: "editor",
+          content: {
+            _system: { showerSearchPositioning2026: true, callFirstButtons2026: true },
+            blocks: [
+              {
+                id: "doug",
+                type,
+                props: {
+                  title: "Meet Doug Adams",
+                  alignment: "left",
+                  ...(type === "rich-text"
+                    ? { content: "<p>I'm Doug.</p>" }
+                    : {
+                        body: "<p>I'm Doug.</p>",
+                        imageUrl: "/images/glass-door-pro/doug-adams-portrait.webp",
+                        imagePosition: "left",
+                        mobileImagePositionY: 30,
+                      }),
+                  sectionBackgroundColor: "#f8fafc",
+                },
               },
-            },
-          ],
+            ],
+          },
         },
-      },
-    ]);
-    mockGetPageBySlug.mockResolvedValue(null);
+      ]);
+      mockGetPageBySlug.mockResolvedValue(null);
 
-    const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
-    await ensureSystemCmsPages();
+      const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
+      await ensureSystemCmsPages();
 
-    const update = mockUpdatePage.mock.calls.find(([id]) => id === "matthews-id")?.[1];
-    expect(update.content.blocks[0]).toEqual({
-      id: "doug",
-      type: "text-image",
-      props: {
-        title: "Meet Doug Adams",
-        alignment: "left",
-        body: "<p>I'm Doug.</p>",
-        sectionBackgroundColor: "#f8fafc",
-        imageUrl: "/images/glass-door-pro/doug-adams-portrait.webp",
-        imageAlt: "Doug Adams, owner of Glass & Door Pro",
-        imagePosition: "left",
-        mobileImagePositionY: 30,
-      },
-    });
-  });
+      const update = mockUpdatePage.mock.calls.find(([id]) => id === "matthews-id")?.[1];
+      expect(update.content.blocks[0]).toEqual({
+        id: "doug",
+        type: "text-image",
+        props: {
+          title: "Meet Doug Adams",
+          alignment: "left",
+          body: "<p>I'm Doug.</p>",
+          sectionBackgroundColor: "#f8fafc",
+          imageUrl: "/images/glass-door-pro/family-1280w.webp",
+          imageAlt: "Doug Adams, owner of Glass & Door Pro, with his family in Charlotte, NC",
+          imagePosition: "left",
+          mobileImagePositionX: 51,
+          mobileImagePositionY: 34,
+        },
+      });
+    },
+  );
 
   it("preserves later CMS edits after the location copy has been applied", async () => {
     mockGetAllPages.mockResolvedValue([
