@@ -786,7 +786,7 @@ function applyServiceHeroRefresh(slug: string, content: unknown) {
   };
 }
 
-// Use Doug's headshot for new and existing Meet Doug Adams sections,
+// Use the homepage family photo for new and existing Meet Doug Adams sections,
 // preserving the location page's copy and other section settings.
 function addDougPortraitToLocationPage(slug: string, content: unknown) {
   if (!getGlassLocationSearchCopy(slug)) return null;
