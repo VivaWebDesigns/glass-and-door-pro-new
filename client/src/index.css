@@ -1071,6 +1071,30 @@
       min-height: 3rem;
     }
 
+    /* Trial on the frameless page: shorter hero that sits above the mobile call bar
+       now that hero buttons are hidden. Roll out to all service pages if approved. */
+    .service-editorial-hero[data-page-slug="services-frameless-showers"] .public-hero-pattern {
+      min-height: max(440px, 72svh) !important;
+    }
+
+    .service-editorial-hero[data-page-slug="services-frameless-showers"]
+      .public-hero-pattern
+      > div:last-child {
+      padding: 4.5rem 1.5rem 2rem;
+    }
+
+    .service-editorial-hero[data-page-slug="services-frameless-showers"] .public-hero-pattern h1 {
+      margin-bottom: 0.875rem;
+      font-size: clamp(1.75rem, 7.65vw, 2rem);
+      line-height: 1.12;
+    }
+
+    .service-editorial-hero[data-page-slug="services-frameless-showers"]
+      .public-hero-pattern
+      [class*="mb-9"] {
+      margin-bottom: 0;
+    }
+
     .service-editorial-shell {
       padding-top: 1.5rem;
       padding-bottom: 4rem;

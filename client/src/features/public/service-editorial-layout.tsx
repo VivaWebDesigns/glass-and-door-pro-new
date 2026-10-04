@@ -86,7 +86,13 @@ function MobilePageGuide({ blocks }: { blocks: BlockInstance[] }) {
   );
 }
 
-export function ServiceEditorialLayout({ blocks }: { blocks: BlockInstance[] }) {
+export function ServiceEditorialLayout({
+  blocks,
+  pageSlug,
+}: {
+  blocks: BlockInstance[];
+  pageSlug?: string;
+}) {
   const hero = blocks[0];
   if (!hero || hero.type !== "hero") {
     return <PublicPageRenderer blocks={blocks} />;
@@ -98,7 +104,7 @@ export function ServiceEditorialLayout({ blocks }: { blocks: BlockInstance[] }) 
 
   return (
     <div className="service-editorial-page">
-      <div className="service-editorial-hero">
+      <div className="service-editorial-hero" data-page-slug={pageSlug}>
         <PublicPageRenderer blocks={[hero]} />
       </div>
       <div className="service-editorial-shell">
