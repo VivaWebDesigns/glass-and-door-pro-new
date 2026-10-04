@@ -21,6 +21,7 @@ import type { MenuItem } from "@shared/schema";
 
 function iconFor(item: MenuItem) {
   const label = item.label.toLowerCase();
+  if (item.url === "/") return House;
   if (label.includes("about")) return FileText;
   if (label.includes("area") || item.url.startsWith("/service-areas")) return MapPin;
   if (label.includes("gallery")) return Images;
@@ -53,8 +54,6 @@ export function MobileNavigation({
   const [open, setOpen] = useState(false);
   const [stack, setStack] = useState<MenuItem[]>([]);
   const [direction, setDirection] = useState(1);
-  const [dragOffset, setDragOffset] = useState(0);
-  const dragStart = useRef<number | null>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const reduceMotion = useReducedMotion();
   const current = stack[stack.length - 1];
@@ -78,7 +77,13 @@ export function MobileNavigation({
     if (next) {
       setStack([]);
       setDirection(1);
-      setDragOffset(0);
+    }
+  }
+
+  function followLink(url: string) {
+    changeOpen(false);
+    if (url === "/") {
+      window.requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: "auto" }));
     }
   }
 
@@ -110,7 +115,7 @@ export function MobileNavigation({
       </>
     );
     const className =
-      "flex min-h-16 w-full items-center gap-4 rounded-lg px-3 py-4 text-left text-foreground transition-colors hover:bg-muted/60 active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset aria-[current=page]:bg-muted/60";
+      "flex min-h-14 w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-foreground transition-colors hover:bg-muted/60 active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset aria-[current=page]:bg-muted/60";
     return (
       <li key={item.id} className="border-b border-border/60 last:border-0">
         {hasChildren ? (
@@ -132,7 +137,7 @@ export function MobileNavigation({
             rel="noopener noreferrer"
             className={className}
             data-testid={`link-mobile-${item.id}`}
-            onClick={() => changeOpen(false)}
+            onClick={() => followLink(item.url)}
           >
             {contents}
           </a>
@@ -142,7 +147,7 @@ export function MobileNavigation({
             className={className}
             aria-current={item.url === currentPath ? "page" : undefined}
             data-testid={`link-mobile-${item.id}`}
-            onClick={() => changeOpen(false)}
+            onClick={() => followLink(item.url)}
           >
             {contents}
           </Link>
@@ -165,48 +170,25 @@ export function MobileNavigation({
         </Button>
       </SheetTrigger>
       <SheetContent
-        side="bottom"
+        side="right"
         aria-describedby={undefined}
         data-testid="mobile-navigation"
         overlayClassName="bg-black/40 backdrop-blur-sm motion-reduce:animate-none"
-        style={
-          dragOffset
-            ? { transform: `translateY(${dragOffset}px)`, animation: "none", transition: "none" }
-            : undefined
-        }
-        className="h-[min(680px,90dvh)] max-h-[90dvh] gap-0 overflow-hidden rounded-t-[28px] border-0 bg-white pb-[env(safe-area-inset-bottom)] shadow-xl duration-300 data-[state=open]:duration-300 motion-reduce:animate-none motion-reduce:transition-none [&>button]:right-5 [&>button]:top-10 [&>button]:flex [&>button]:h-11 [&>button]:w-11 [&>button]:items-center [&>button]:justify-center [&>button]:rounded-full [&>button]:bg-muted [&>button]:opacity-100 [&>button>svg]:h-5 [&>button>svg]:w-5"
+        className="w-[84vw] max-w-[360px] gap-0 overflow-hidden border-0 bg-white pb-[env(safe-area-inset-bottom)] shadow-xl duration-300 data-[state=open]:duration-300 sm:max-w-[360px] motion-reduce:animate-none motion-reduce:transition-none [&>button]:right-3 [&>button]:top-3 [&>button]:flex [&>button]:h-11 [&>button]:w-11 [&>button]:items-center [&>button]:justify-center [&>button]:rounded-full [&>button]:bg-muted [&>button]:opacity-100 [&>button>svg]:h-5 [&>button>svg]:w-5"
       >
-        <div
-          aria-hidden="true"
-          data-testid="mobile-menu-drag-handle"
-          className="flex h-9 shrink-0 touch-none items-center justify-center cursor-grab active:cursor-grabbing"
-          onPointerDown={(event) => {
-            dragStart.current = event.clientY;
-            event.currentTarget.setPointerCapture(event.pointerId);
-          }}
-          onPointerMove={(event) => {
-            if (dragStart.current !== null)
-              setDragOffset(Math.max(0, event.clientY - dragStart.current));
-          }}
-          onPointerUp={(event) => {
-            if (dragStart.current !== null && event.clientY - dragStart.current > 70)
-              changeOpen(false);
-            dragStart.current = null;
-            setDragOffset(0);
-          }}
-          onPointerCancel={() => {
-            dragStart.current = null;
-            setDragOffset(0);
-          }}
-        >
-          <span className="h-1.5 w-12 rounded-full bg-slate-300" />
-        </div>
-        <SheetHeader className="space-y-0 px-6 pt-2 pb-3">
-          <img
-            src={brandLogo}
-            alt={brandName}
-            className="mb-5 h-11 w-auto max-w-[calc(100%-3.5rem)] self-start object-contain"
-          />
+        <SheetHeader className="space-y-0 px-5 pt-14 pb-3">
+          <Link
+            href="/"
+            onClick={() => followLink("/")}
+            className="mb-4 self-start rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={`${brandName} home`}
+          >
+            <img
+              src={brandLogo}
+              alt={brandName}
+              className="h-16 w-auto max-w-full object-contain"
+            />
+          </Link>
           {current && (
             <button
               type="button"
@@ -214,20 +196,22 @@ export function MobileNavigation({
               className="mb-2 flex min-h-11 w-fit items-center gap-2 rounded-md pr-3 text-sm font-medium text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <ArrowLeft aria-hidden="true" className="h-4 w-4" />
-              {stack.length > 1 ? stack[stack.length - 2].label : "Explore"}
+              {stack.length > 1 ? stack[stack.length - 2].label : "Back"}
             </button>
           )}
           <SheetTitle
             ref={titleRef}
             tabIndex={-1}
-            className="text-[32px] font-bold leading-tight tracking-tight outline-none"
+            className={
+              current ? "text-2xl font-bold leading-tight tracking-tight outline-none" : "sr-only"
+            }
           >
-            {current?.label ?? "Explore"}
+            {current?.label ?? "Site navigation"}
           </SheetTitle>
         </SheetHeader>
         <nav
           aria-label="Mobile navigation"
-          className="min-h-0 overflow-y-auto overscroll-contain px-3 pb-6"
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-6"
         >
           <AnimatePresence mode="wait" initial={false} custom={direction}>
             <motion.ul

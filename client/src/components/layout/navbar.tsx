@@ -227,7 +227,7 @@ export function Navbar() {
   }, [publicMenus]);
 
   const mobileItems = useMemo(() => {
-    return (dynamicItems ?? fallbackMobileItems).flatMap((item) => {
+    const navigation = (dynamicItems ?? fallbackMobileItems).flatMap((item) => {
       if (!/^services$/i.test(item.label.trim())) return [item];
       const categories = item.children ?? [];
       const hasResidential = categories.some((child) =>
@@ -237,15 +237,19 @@ export function Navbar() {
         /^commercial(?: services)?$/i.test(child.label.trim()),
       );
       if (!hasResidential || !hasCommercial) return [item];
-      return categories.map((child) => ({
-        ...child,
-        label: /^residential(?: services)?$/i.test(child.label.trim())
-          ? "Residential Services"
-          : /^commercial(?: services)?$/i.test(child.label.trim())
-            ? "Commercial Services"
-            : child.label,
-      }));
+      return [
+        ...categories.map((child) => ({
+          ...child,
+          label: /^residential(?: services)?$/i.test(child.label.trim())
+            ? "Residential Services"
+            : /^commercial(?: services)?$/i.test(child.label.trim())
+              ? "Commercial Services"
+              : child.label,
+        })),
+        { ...item, id: `${item.id}-hub`, label: "All Services", children: [] },
+      ];
     });
+    return [mobileItem("Home", "/"), ...navigation.filter((item) => item.url !== "/")];
   }, [dynamicItems]);
 
   const resourceLinks = allResourceLinks;
