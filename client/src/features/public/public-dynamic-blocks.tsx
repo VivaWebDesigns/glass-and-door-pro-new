@@ -1,6 +1,7 @@
 import { type ElementType } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, Mail, MapPin, Phone, Send } from "lucide-react";
+import { Link } from "wouter";
+import { ChevronRight, Clock, Mail, MapPin, Phone, Send } from "lucide-react";
 import { PublicFormRenderer } from "@/components/forms/public-form-renderer";
 import { CompanyInformationCard } from "@/components/shared/company-information-card";
 import { withContentKeys } from "@/lib/content-keys";
@@ -21,13 +22,78 @@ const CONTACT_ICON_MAP: Record<string, ElementType> = {
   Clock,
 };
 
+type ContactItem = { icon: string; label: string; value: string; href?: string };
+
+// "Charlotte, Pineville, ..." -> "Charlotte and 10 nearby towns" for the compact phone list.
+export function summarizeServiceArea(value: string) {
+  const places = value
+    .split(",")
+    .map((place) => place.trim())
+    .filter(Boolean);
+  if (places.length <= 3) return null;
+  return `${places[0]} and ${places.length - 1} nearby towns`;
+}
+
+// Phones get one compact card with tappable rows instead of four large cards.
+function CompactContactItems({ items }: { items: ContactItem[] }) {
+  return (
+    <Card
+      className="border-none bg-white text-slate-900 shadow-sm md:hidden"
+      data-testid="contact-items-compact"
+    >
+      <ul className="divide-y divide-slate-200">
+        {items.map(
+          withContentKeys((item, _index, itemKey) => {
+            const Icon = CONTACT_ICON_MAP[item.icon] ?? MapPin;
+            const areaSummary = item.icon === "MapPin" ? summarizeServiceArea(item.value) : null;
+            const body = (
+              <>
+                <Icon className="h-[22px] w-[22px] shrink-0 text-[#1a8ead]" aria-hidden="true" />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[15px] font-semibold leading-5 text-slate-900">
+                    {item.label}
+                  </span>
+                  <span className="mt-0.5 block whitespace-pre-line break-words text-sm leading-5 text-slate-600">
+                    {areaSummary ?? item.value}
+                  </span>
+                  {areaSummary && (
+                    <Link
+                      href="/service-areas"
+                      className="mt-1 inline-block text-sm font-semibold text-[#1a8ead]"
+                    >
+                      See all areas
+                    </Link>
+                  )}
+                </span>
+              </>
+            );
+            return (
+              <li key={itemKey}>
+                {item.href ? (
+                  <a
+                    href={item.href}
+                    className="flex min-h-[60px] items-center gap-3.5 px-5 py-3.5 active:bg-[#e8f7fb]"
+                  >
+                    {body}
+                    <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" aria-hidden="true" />
+                  </a>
+                ) : (
+                  <div className="flex min-h-[60px] items-center gap-3.5 px-5 py-3.5">{body}</div>
+                )}
+              </li>
+            );
+          }),
+        )}
+      </ul>
+    </Card>
+  );
+}
+
 export function ContactFormBlock({ props = {} }: { props?: Record<string, unknown> }) {
   const variant = str(props.variant);
 
   if (variant === "split-contact") {
-    const items = arr<{ icon: string; label: string; value: string; href?: string }>(
-      props.contactItems,
-    );
+    const items = arr<ContactItem>(props.contactItems);
     return (
       <section
         className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20"
@@ -65,13 +131,17 @@ export function ContactFormBlock({ props = {} }: { props?: Record<string, unknow
             </CardContent>
           </Card>
           <div className="space-y-4 lg:col-span-2">
+            {items.length > 0 && <CompactContactItems items={items} />}
             {items.length > 0 ? (
               items.map(
                 withContentKeys((item, _index, itemKey) => {
                   const Icon = CONTACT_ICON_MAP[item.icon] ?? MapPin;
                   const content = <span className="whitespace-pre-line">{item.value}</span>;
                   return (
-                    <Card key={itemKey} className="border-none bg-white text-slate-900 shadow-sm">
+                    <Card
+                      key={itemKey}
+                      className="hidden border-none bg-white text-slate-900 shadow-sm md:block"
+                    >
                       <CardContent className="flex gap-4 p-6">
                         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#1a8ead] text-white">
                           <Icon className="h-7 w-7" />
