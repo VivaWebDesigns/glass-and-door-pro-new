@@ -209,7 +209,9 @@ export function publicBrandLogo(value: string | null | undefined, variant: "head
       path,
     );
 
-  return isGlassLogo ? (variant === "footer" ? GLASS_FOOTER_LOGO : GLASS_HEADER_LOGO) : value!;
+  return isGlassLogo
+    ? `${variant === "footer" ? GLASS_FOOTER_LOGO : GLASS_HEADER_LOGO}?v=bevel-2`
+    : value!;
 }
 
 export const DEFAULT_BRANDING_SETTINGS: BrandingSettings = {
