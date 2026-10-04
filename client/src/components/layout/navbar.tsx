@@ -1,9 +1,9 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, ChevronDown, Phone } from "lucide-react";
+import { ChevronDown, Phone } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { MobileNavigation } from "./mobile-navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,6 +38,37 @@ const defaultNavLinks = [
   },
   { label: "Commercial Window Replacement", href: "/services/commercial-window-replacement" },
   { label: "Reviews", href: "/reviews" },
+];
+
+const mobileItem = (label: string, url: string, children: MenuItem[] = []): MenuItem => ({
+  id: `fallback-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+  label,
+  url,
+  openInNewTab: false,
+  children,
+});
+const fallbackMobileItems = [
+  mobileItem("About", "/#about"),
+  mobileItem("Services", "/services", [
+    mobileItem(
+      "Residential",
+      "#",
+      defaultNavLinks
+        .filter((link) => link.href.startsWith("/services/") && !link.href.includes("/commercial-"))
+        .map((link) => mobileItem(link.label, link.href)),
+    ),
+    mobileItem(
+      "Commercial",
+      "#",
+      defaultNavLinks
+        .filter((link) => link.href.includes("/commercial-"))
+        .map((link) => mobileItem(link.label, link.href)),
+    ),
+  ]),
+  mobileItem("Service Areas", "/service-areas"),
+  mobileItem("Gallery", "/gallery"),
+  mobileItem("Reviews", "/reviews"),
+  mobileItem("Contact", "/#contact"),
 ];
 
 const allResourceLinks: { label: string; href: string }[] = [];
@@ -97,9 +128,6 @@ function getServicesOverviewLink(item: Pick<MenuItem, "label" | "url">) {
     href: item.url === "/#services" ? "/services" : normalizedUrl,
   };
 }
-
-const mobileNavButtonClassName =
-  "h-auto min-h-9 w-full min-w-0 justify-start whitespace-normal text-left leading-snug aria-[current=page]:bg-transparent aria-[current=page]:text-accent";
 
 function DynamicDropdown({ item, location: currentPath }: { item: MenuItem; location: string }) {
   const overviewLink = getServicesOverviewLink(item);
@@ -180,7 +208,6 @@ function DynamicDropdown({ item, location: currentPath }: { item: MenuItem; loca
 export function Navbar() {
   const [location] = useLocation();
   const { frontendLogoUrl, companyName } = useBranding();
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   const { data: publicMenus } = useQuery<Partial<Record<PublicMenuLocation, CmsMenu>>>({
     queryKey: ["/api/cms/menus"],
@@ -328,139 +355,12 @@ export function Navbar() {
         </div>
 
         <div className="flex md:hidden items-center gap-2">
-          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger asChild>
-              <Button
-                aria-label="Open navigation menu"
-                size="icon"
-                variant="ghost"
-                className="rounded-full border border-border/70 bg-background/70"
-                data-testid="button-mobile-menu"
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-80 max-w-[calc(100vw-1rem)] overflow-hidden">
-              <SheetHeader className="shrink-0">
-                <SheetTitle>
-                  <img src={brandLogo} alt={brandName} className="h-12 w-auto" />
-                </SheetTitle>
-              </SheetHeader>
-              <div className="mt-6 flex min-h-0 flex-1 flex-col gap-1 overflow-x-hidden overflow-y-auto overscroll-contain pb-8 pr-1">
-                {dynamicItems ? (
-                  flattenItems(dynamicItems).map(({ item, depth }) => {
-                    const overviewLink = getServicesOverviewLink(item);
-                    return item.children && item.children.length > 0 ? (
-                      <div key={item.id}>
-                        <p
-                          className="px-4 pt-3 pb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider"
-                          style={depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined}
-                          data-testid={`text-mobile-group-${item.id}`}
-                        >
-                          {item.label}
-                        </p>
-                        {overviewLink ? (
-                          <Button
-                            asChild
-                            variant="ghost"
-                            className={mobileNavButtonClassName}
-                            style={depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined}
-                            data-testid="link-mobile-services-overview"
-                            aria-current={location === overviewLink.href ? "page" : undefined}
-                          >
-                            <Link href={overviewLink.href} onClick={() => setMobileOpen(false)}>
-                              {overviewLink.label}
-                            </Link>
-                          </Button>
-                        ) : null}
-                      </div>
-                    ) : item.openInNewTab ? (
-                      <Button
-                        key={item.id}
-                        asChild
-                        variant="ghost"
-                        className={mobileNavButtonClassName}
-                        style={depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined}
-                        data-testid={`link-mobile-${item.id}`}
-                      >
-                        <a
-                          href={item.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={() => setMobileOpen(false)}
-                        >
-                          {item.label}
-                        </a>
-                      </Button>
-                    ) : (
-                      <Button
-                        key={item.id}
-                        asChild
-                        variant="ghost"
-                        className={mobileNavButtonClassName}
-                        style={depth > 0 ? { paddingLeft: `${16 + depth * 16}px` } : undefined}
-                        data-testid={`link-mobile-${item.id}`}
-                        aria-current={location === item.url ? "page" : undefined}
-                      >
-                        <Link href={item.url} onClick={() => setMobileOpen(false)}>
-                          {item.label}
-                        </Link>
-                      </Button>
-                    );
-                  })
-                ) : (
-                  <>
-                    {defaultNavLinks.map((link) => (
-                      <Button
-                        key={link.href}
-                        asChild
-                        variant="ghost"
-                        className={mobileNavButtonClassName}
-                        data-testid={`link-mobile-${link.label.toLowerCase()}`}
-                        aria-current={location === link.href ? "page" : undefined}
-                      >
-                        <Link href={link.href} onClick={() => setMobileOpen(false)}>
-                          {link.label}
-                        </Link>
-                      </Button>
-                    ))}
-                    {resourceLinks.length > 0 && (
-                      <>
-                        <p className="px-4 pt-3 pb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                          Resources
-                        </p>
-                        {resourceLinks.map((link) => (
-                          <Button
-                            key={link.href}
-                            asChild
-                            variant="ghost"
-                            className={`${mobileNavButtonClassName} pl-6`}
-                            data-testid={`link-mobile-resource-${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
-                            aria-current={location === link.href ? "page" : undefined}
-                          >
-                            <Link href={link.href} onClick={() => setMobileOpen(false)}>
-                              {link.label}
-                            </Link>
-                          </Button>
-                        ))}
-                      </>
-                    )}
-                    <Button
-                      asChild
-                      variant="ghost"
-                      className={mobileNavButtonClassName}
-                      data-testid="link-mobile-contact"
-                      aria-current={location === "/#contact" ? "page" : undefined}
-                    >
-                      <Link href="/#contact" onClick={() => setMobileOpen(false)}>
-                        Contact
-                      </Link>
-                    </Button>
-                  </>
-                )}
-              </div>
-            </SheetContent>
-          </Sheet>
+          <MobileNavigation
+            items={dynamicItems ?? fallbackMobileItems}
+            brandLogo={brandLogo}
+            brandName={brandName}
+            currentPath={location}
+          />
         </div>
       </div>
     </nav>
