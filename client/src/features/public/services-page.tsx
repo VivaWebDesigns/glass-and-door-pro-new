@@ -11,7 +11,6 @@ import {
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
-import { GLASS_PRIMARY_SERVICE_AREA_NAMES } from "@shared/glass-service-areas";
 
 type ServiceCard = {
   title: string;
@@ -101,12 +100,12 @@ export default function ServicesPage() {
           <div className="mx-auto max-w-7xl">
             <div className="max-w-3xl">
               <h1 className="font-heading text-4xl font-bold leading-tight text-slate-900 sm:text-5xl">
-                Glass and Door Services
+                Glass and Door Services in Charlotte, NC
               </h1>
               <p className="mt-5 text-base leading-8 text-slate-600 sm:text-lg">
-                Frameless showers, residential windows, door installation, window repair, and
-                commercial glass and door services across {GLASS_PRIMARY_SERVICE_AREA_NAMES}, and
-                nearby communities.
+                Frameless showers, windows, and doors for your home, plus storefront glass and
+                commercial doors for your business — measured and installed personally by Doug
+                across Charlotte and nearby towns.
               </p>
             </div>
             {serviceGroups.map((serviceGroup) => (

@@ -1548,8 +1548,9 @@ function expandedServicePageContent(props: {
 const glassServicesContent: InsertCmsPage["content"] = {
   blocks: [
     serviceHero({
-      heading: "Glass and Door Services",
-      subheading: `Frameless showers, residential windows, door installation, window repair, and commercial glass and door services across ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby communities.`,
+      heading: "Glass and Door Services in Charlotte, NC",
+      subheading:
+        "Frameless showers, windows, and doors for your home, plus storefront glass and commercial doors for your business — measured and installed personally by Doug across Charlotte and nearby towns.",
       imageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
       imageAlt: "Frameless glass shower and home glass services in the Charlotte area",
       imagePositionY: 42,
@@ -1557,7 +1558,7 @@ const glassServicesContent: InsertCmsPage["content"] = {
     }),
     cardsGrid({
       title: "Residential Services",
-      subtitle: "Choose the residential project type you need help with.",
+      subtitle: "Showers, windows, and doors for your home.",
       columns: "3",
       backgroundColor: "#ffffff",
       cards: [
@@ -1598,7 +1599,7 @@ const glassServicesContent: InsertCmsPage["content"] = {
     cardsGrid({
       anchorId: "commercial",
       title: "Commercial Services",
-      subtitle: "Choose the commercial project type you need help with.",
+      subtitle: "Storefront glass, doors, and windows for your business.",
       columns: "3",
       backgroundColor: "#ffffff",
       cards: [
