@@ -254,12 +254,13 @@ function HeroHeading({ props, variant }: { props: Record<string, unknown>; varia
   );
 }
 
+// Hidden below md, where MobileCtaBar takes over the call and quote actions.
 function HeroCtas({ props, config }: { props: Record<string, unknown>; config: HeroConfig }) {
   const [location] = useLocation();
   return (
     <div
       data-nosnippet={excludeServiceUtilitySnippets(location) ? "" : undefined}
-      className={`flex flex-col gap-3 sm:flex-row sm:flex-wrap ${config.isSplit ? "sm:justify-start" : "sm:justify-center"}`}
+      className={`hidden gap-3 md:flex md:flex-row md:flex-wrap ${config.isSplit ? "sm:justify-start" : "sm:justify-center"}`}
     >
       {str(props.ctaText) && (
         <FormModalButton

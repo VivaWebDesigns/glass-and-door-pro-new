@@ -6,6 +6,7 @@ import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { useBranding } from "@/components/shared/branding-provider";
 import type { CmsMenu, MenuItem, PublicMenuLocation } from "@shared/schema";
 import { GLASS_PRIMARY_SERVICE_AREAS } from "@shared/glass-service-areas";
+import { MobileCtaBar, showsMobileCtaBar } from "./mobile-cta-bar";
 
 const defaultPlatformLinks = [
   { href: "/services", label: "All Services", testId: "link-footer-services" },
@@ -320,129 +321,135 @@ export function Footer() {
   };
 
   return (
-    <footer className="border-t border-slate-800 bg-slate-900 text-slate-200" data-testid="footer">
-      <div
-        data-nosnippet={excludeServiceUtilitySnippets(location) ? "" : undefined}
-        className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12"
+    <>
+      <footer
+        className={`border-t border-slate-800 bg-slate-900 text-slate-200 ${showsMobileCtaBar(location) ? "pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0" : ""}`}
+        data-testid="footer"
       >
-        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr_0.85fr_1.05fr] lg:gap-12">
-          <div>
-            <div className="mb-5 inline-flex bg-white p-1.5">
-              <img src={brandLogo} alt={brandName} className="h-12 w-auto sm:h-11" />
+        <div
+          data-nosnippet={excludeServiceUtilitySnippets(location) ? "" : undefined}
+          className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12"
+        >
+          <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr_0.85fr_1.05fr] lg:gap-12">
+            <div>
+              <div className="mb-5 inline-flex bg-white p-1.5">
+                <img src={brandLogo} alt={brandName} className="h-12 w-auto sm:h-11" />
+              </div>
+              <p className="max-w-md text-sm leading-7 text-slate-400">
+                Specializing in frameless glass shower doors, residential window replacements and
+                repairs, door installations, and commercial glass replacements and installations in
+                the greater Charlotte area.
+              </p>
             </div>
-            <p className="max-w-md text-sm leading-7 text-slate-400">
-              Specializing in frameless glass shower doors, residential window replacements and
-              repairs, door installations, and commercial glass replacements and installations in
-              the greater Charlotte area.
-            </p>
-          </div>
 
-          {legacyFooterItems ? (
-            legacyFooterItems.map((item) =>
-              item.children && item.children.length > 0 ? (
-                <DynamicFooterColumn key={item.id} item={item} />
-              ) : (
-                <div key={item.id}>
-                  <ul className="space-y-2.5 sm:space-y-3 text-sm">
-                    <li>
-                      {item.openInNewTab ? (
-                        <a
-                          href={normalizeFooterMenuUrl(item)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-semibold text-slate-400 transition-colors hover:text-white"
-                          data-testid={`link-footer-${item.id}`}
-                        >
-                          {item.label}
-                        </a>
-                      ) : (
-                        <Link
-                          href={normalizeFooterMenuUrl(item)}
-                          className="font-semibold text-slate-400 transition-colors hover:text-white"
-                          data-testid={`link-footer-${item.id}`}
-                        >
-                          {item.label}
-                        </Link>
-                      )}
-                    </li>
+            {legacyFooterItems ? (
+              legacyFooterItems.map((item) =>
+                item.children && item.children.length > 0 ? (
+                  <DynamicFooterColumn key={item.id} item={item} />
+                ) : (
+                  <div key={item.id}>
+                    <ul className="space-y-2.5 sm:space-y-3 text-sm">
+                      <li>
+                        {item.openInNewTab ? (
+                          <a
+                            href={normalizeFooterMenuUrl(item)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-semibold text-slate-400 transition-colors hover:text-white"
+                            data-testid={`link-footer-${item.id}`}
+                          >
+                            {item.label}
+                          </a>
+                        ) : (
+                          <Link
+                            href={normalizeFooterMenuUrl(item)}
+                            className="font-semibold text-slate-400 transition-colors hover:text-white"
+                            data-testid={`link-footer-${item.id}`}
+                          >
+                            {item.label}
+                          </Link>
+                        )}
+                      </li>
+                    </ul>
+                  </div>
+                ),
+              )
+            ) : (
+              <>
+                <div>
+                  <h4 className="mb-4 text-base font-bold text-white">Services</h4>
+                  <ul className="space-y-2.5 text-sm sm:space-y-3">
+                    {servicesLinks.map((link) => (
+                      <li key={link.testId}>
+                        <FooterTextLink link={link} />
+                      </li>
+                    ))}
                   </ul>
                 </div>
-              ),
-            )
-          ) : (
-            <>
-              <div>
-                <h4 className="mb-4 text-base font-bold text-white">Services</h4>
-                <ul className="space-y-2.5 text-sm sm:space-y-3">
-                  {servicesLinks.map((link) => (
+
+                <div>
+                  <h4 className="mb-4 text-base font-bold text-white">Service Areas</h4>
+                  <ul className="space-y-2.5 text-sm sm:space-y-3">
+                    {serviceAreaLinks.map((link) => (
+                      <li key={link.testId}>
+                        <FooterTextLink link={link} />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="mb-4 text-base font-bold text-white">Contact Info</h4>
+                  <ul className="space-y-3">
+                    <ContactInfoItem icon={MapPin}>{address}</ContactInfoItem>
+                    <ContactInfoItem icon={Phone}>
+                      <a href={phoneLink} className="transition-colors hover:text-white">
+                        {phone}
+                      </a>
+                    </ContactInfoItem>
+                    <ContactInfoItem icon={Mail}>
+                      <a href={emailLink.href} className="transition-colors hover:text-white">
+                        {emailLink.label}
+                      </a>
+                    </ContactInfoItem>
+                    <ContactInfoItem icon={Clock}>Mon-Sat: 7am - 7pm</ContactInfoItem>
+                  </ul>
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="mt-10 border-t border-slate-800 pt-8 text-sm text-slate-500">
+            <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+              <p className="text-center md:text-left" data-testid="text-copyright">
+                &copy; {new Date().getFullYear()} {brandName}. All rights reserved.{" "}
+                <span className="inline-block whitespace-nowrap">
+                  <span aria-hidden="true">&middot;</span> Website by{" "}
+                  <a
+                    href="https://vivawebdesigns.com/"
+                    target="_blank"
+                    rel="noopener"
+                    className="text-slate-400 transition-colors hover:text-slate-200 focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+                    data-testid="link-footer-viva-web-designs"
+                  >
+                    Viva Web Designs
+                  </a>
+                </span>
+              </p>
+              <nav aria-label="Legal links">
+                <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+                  {legalLinks.map((link) => (
                     <li key={link.testId}>
                       <FooterTextLink link={link} />
                     </li>
                   ))}
                 </ul>
-              </div>
-
-              <div>
-                <h4 className="mb-4 text-base font-bold text-white">Service Areas</h4>
-                <ul className="space-y-2.5 text-sm sm:space-y-3">
-                  {serviceAreaLinks.map((link) => (
-                    <li key={link.testId}>
-                      <FooterTextLink link={link} />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="mb-4 text-base font-bold text-white">Contact Info</h4>
-                <ul className="space-y-3">
-                  <ContactInfoItem icon={MapPin}>{address}</ContactInfoItem>
-                  <ContactInfoItem icon={Phone}>
-                    <a href={phoneLink} className="transition-colors hover:text-white">
-                      {phone}
-                    </a>
-                  </ContactInfoItem>
-                  <ContactInfoItem icon={Mail}>
-                    <a href={emailLink.href} className="transition-colors hover:text-white">
-                      {emailLink.label}
-                    </a>
-                  </ContactInfoItem>
-                  <ContactInfoItem icon={Clock}>Mon-Sat: 7am - 7pm</ContactInfoItem>
-                </ul>
-              </div>
-            </>
-          )}
-        </div>
-
-        <div className="mt-10 border-t border-slate-800 pt-8 text-sm text-slate-500">
-          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <p className="text-center md:text-left" data-testid="text-copyright">
-              &copy; {new Date().getFullYear()} {brandName}. All rights reserved.{" "}
-              <span className="inline-block whitespace-nowrap">
-                <span aria-hidden="true">&middot;</span> Website by{" "}
-                <a
-                  href="https://vivawebdesigns.com/"
-                  target="_blank"
-                  rel="noopener"
-                  className="text-slate-400 transition-colors hover:text-slate-200 focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
-                  data-testid="link-footer-viva-web-designs"
-                >
-                  Viva Web Designs
-                </a>
-              </span>
-            </p>
-            <nav aria-label="Legal links">
-              <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-                {legalLinks.map((link) => (
-                  <li key={link.testId}>
-                    <FooterTextLink link={link} />
-                  </li>
-                ))}
-              </ul>
-            </nav>
+              </nav>
+            </div>
           </div>
         </div>
-      </div>
-    </footer>
+      </footer>
+      <MobileCtaBar />
+    </>
   );
 }
