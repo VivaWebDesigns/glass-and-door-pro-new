@@ -37,7 +37,8 @@ export default function HomePage() {
               Owner-operated service for frameless showers, window installation, door repair, and
               commercial glass projects.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            {/* Hidden below md, where MobileCtaBar takes over. */}
+            <div className="mt-8 hidden gap-3 md:flex md:flex-row">
               <Button asChild size="lg">
                 <a href="tel:+17047716111">
                   <Phone className="mr-2 h-5 w-5" />

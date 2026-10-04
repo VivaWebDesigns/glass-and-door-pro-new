@@ -320,7 +320,7 @@ export function Navbar() {
           <Button
             asChild
             size="sm"
-            className="bg-[#1a8ead] text-white hover:bg-[#167f9b] hover:text-white"
+            className="border-[#1a8ead] bg-[#1a8ead] text-white hover:border-[#167f9b] hover:bg-[#167f9b] hover:text-white"
             data-testid="link-header-quote"
           >
             <Link href="/#contact">Get a Free Quote</Link>

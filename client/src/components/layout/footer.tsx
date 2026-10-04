@@ -231,7 +231,7 @@ function FooterTextLink({ link }: { link: FooterLegalLink }) {
 function ContactInfoItem({ icon: Icon, children }: { icon: typeof MapPin; children: ReactNode }) {
   return (
     <li className="flex items-start gap-3 text-sm leading-6 text-slate-400">
-      <Icon className="mt-0.5 h-5 w-5 shrink-0 text-cyan-500" aria-hidden="true" />
+      <Icon className="mt-0.5 h-5 w-5 shrink-0 text-[#5ec4e0]" aria-hidden="true" />
       <span>{children}</span>
     </li>
   );

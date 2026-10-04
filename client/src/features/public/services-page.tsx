@@ -1,5 +1,13 @@
 import { Link } from "wouter";
-import { BadgeCheck, Building2, DoorOpen, Grid3X3, Wrench, type LucideIcon } from "lucide-react";
+import {
+  ArrowRight,
+  BadgeCheck,
+  Building2,
+  DoorOpen,
+  Grid3X3,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
@@ -113,17 +121,18 @@ export default function ServicesPage() {
                       <Link
                         key={service.href}
                         href={service.href}
-                        className="group rounded-lg bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
+                        className="group rounded-lg bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md hover:ring-[#1a8ead]/40"
                       >
-                        <Icon className="h-8 w-8 text-primary" aria-hidden="true" />
+                        <Icon className="h-9 w-9 text-[#1a8ead]" aria-hidden="true" />
                         <h3 className="mt-4 text-lg font-semibold text-slate-900">
                           {service.title}
                         </h3>
                         <p className="mt-2 text-sm leading-6 text-slate-600">
                           {service.description}
                         </p>
-                        <span className="mt-5 inline-flex text-sm font-semibold text-primary group-hover:underline">
+                        <span className="mt-5 inline-flex items-center text-sm font-semibold text-[#1a8ead] group-hover:text-[#167f9b]">
                           View service
+                          <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden="true" />
                         </span>
                       </Link>
                     );

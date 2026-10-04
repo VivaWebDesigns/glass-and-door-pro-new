@@ -60,7 +60,8 @@ export default function ServiceAreasPage() {
               with frameless showers, window installation, door installation, window repair, and
               commercial glass services.
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-start">
+            {/* Hidden below md, where MobileCtaBar takes over. */}
+            <div className="hidden gap-3 md:flex md:flex-row md:flex-wrap md:justify-start">
               <Button
                 asChild
                 size="lg"
@@ -93,11 +94,11 @@ export default function ServiceAreasPage() {
                 {serviceAreas.map(([name, href, description]) => (
                   <div
                     key={href}
-                    className="public-section-card-hover h-full overflow-hidden rounded-lg border-border/70 border-none bg-white text-center shadow-sm"
+                    className="public-section-card-hover relative h-full overflow-hidden rounded-lg border-border/70 border-none bg-white text-center shadow-sm"
                   >
                     <div className="flex h-full flex-col px-4 pb-5 pt-6 sm:px-6 sm:pb-6 sm:pt-8">
-                      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 ring-1 ring-accent/20">
-                        <MapPin className="h-8 w-8 text-primary" aria-hidden="true" />
+                      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
+                        <MapPin className="h-9 w-9 text-[#1a8ead]" aria-hidden="true" />
                       </div>
                       <h3 className="mb-2 text-base font-semibold leading-snug break-words">
                         {name}
@@ -106,7 +107,7 @@ export default function ServiceAreasPage() {
                       <div className="mt-auto pt-5">
                         <Link
                           href={href}
-                          className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                          className="inline-flex items-center text-sm font-semibold text-[#1a8ead] transition-colors hover:text-[#167f9b] after:absolute after:inset-0 after:content-['']"
                         >
                           View area
                           <ArrowRight className="ml-1.5 h-4 w-4" />

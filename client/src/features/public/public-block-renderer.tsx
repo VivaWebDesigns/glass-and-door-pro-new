@@ -730,16 +730,18 @@ function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
             withContentKeys((card, i, itemKey) => (
               <Card
                 key={itemKey}
-                className={`public-section-card-hover h-full overflow-hidden rounded-lg border-border/70 text-center shadow-sm ${variant === "service-links" ? "border-none bg-white" : ""}`}
+                className={`public-section-card-hover relative h-full overflow-hidden rounded-lg border-border/70 text-center shadow-sm ${variant === "service-links" ? "border-none bg-white" : ""}`}
               >
                 <CardContent className="public-service-card-content flex h-full flex-col px-4 pb-5 pt-6 sm:px-6 sm:pb-6 sm:pt-8">
                   <div
-                    className={`mx-auto mb-4 flex items-center justify-center rounded-full bg-accent/10 ring-1 ring-accent/20 ${variant === "service-links" ? "h-16 w-16" : "h-12 w-12"}`}
+                    className={`mx-auto mb-4 flex items-center justify-center ${variant === "service-links" ? "h-16 w-16" : "h-12 w-12"}`}
                   >
                     <LucideIcon
                       name={card.icon || "Globe"}
                       className={
-                        variant === "service-links" ? "h-8 w-8 text-primary" : "h-6 w-6 text-accent"
+                        variant === "service-links"
+                          ? "h-9 w-9 text-[#1a8ead]"
+                          : "h-7 w-7 text-[#1a8ead]"
                       }
                     />
                   </div>
@@ -755,7 +757,7 @@ function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
                         href={card.link}
                         target={card.openInNewTab ? "_blank" : undefined}
                         rel={card.openInNewTab ? "noopener noreferrer" : undefined}
-                        className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                        className="inline-flex items-center text-sm font-semibold text-[#1a8ead] transition-colors hover:text-[#167f9b] after:absolute after:inset-0 after:content-['']"
                       >
                         {card.buttonText || "Learn More"}
                         <ArrowRight className="ml-1.5 h-4 w-4" />
