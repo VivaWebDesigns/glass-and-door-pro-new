@@ -4,6 +4,7 @@ import { excludeServiceUtilitySnippets } from "@shared/glass-search-snippets";
 import { useQuery } from "@tanstack/react-query";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { useBranding } from "@/components/shared/branding-provider";
+import { publicBrandLogo } from "@/lib/branding";
 import type { CmsMenu, MenuItem, PublicMenuLocation } from "@shared/schema";
 import { GLASS_PRIMARY_SERVICE_AREAS } from "@shared/glass-service-areas";
 import { MobileCtaBar, showsMobileCtaBar } from "./mobile-cta-bar";
@@ -305,8 +306,7 @@ export function Footer() {
     return links.length > 0 ? links : defaultLegalLinks;
   }, [publicMenus]) as FooterLegalLink[];
 
-  const brandLogo =
-    frontendLogoUrl || "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
+  const brandLogo = publicBrandLogo(frontendLogoUrl, "footer");
   const brandName = companyName || "Glass & Door Pro";
   const address = (
     companyAddress || "6135 Park South Drive Suite 542, Charlotte, NC 28210"
@@ -332,7 +332,7 @@ export function Footer() {
         >
           <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr_0.85fr_1.05fr] lg:gap-12">
             <div>
-              <div className="mb-5 inline-flex bg-white p-1.5">
+              <div className="mb-5 inline-flex">
                 <img src={brandLogo} alt={brandName} className="h-12 w-auto sm:h-11" />
               </div>
               <p className="max-w-md text-sm leading-7 text-slate-400">

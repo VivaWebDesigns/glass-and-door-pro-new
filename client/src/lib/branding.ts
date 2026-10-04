@@ -194,8 +194,26 @@ export const BRANDING_SERIF_FONT_OPTIONS = BRANDING_FONT_OPTIONS.filter(
   (option) => option.category === "serif",
 );
 
+const GLASS_HEADER_LOGO = "/images/glass-door-pro/brand/logo-header.svg";
+const GLASS_FOOTER_LOGO = "/images/glass-door-pro/brand/logo-footer.svg";
+
+export function publicBrandLogo(value: string | null | undefined, variant: "header" | "footer") {
+  // Existing saved branding settings can still point to the original raster logo.
+  const path = value?.split(/[?#]/)[0];
+  const isGlassLogo =
+    !path ||
+    path === GLASS_HEADER_LOGO ||
+    path === GLASS_FOOTER_LOGO ||
+    path === "/images/glass-door-pro/logo.png" ||
+    /^\/images\/glass-door-pro\/brand\/logo-(?:full|header-\d+x\d+)-white-bg\.(?:png|webp)$/.test(
+      path,
+    );
+
+  return isGlassLogo ? (variant === "footer" ? GLASS_FOOTER_LOGO : GLASS_HEADER_LOGO) : value!;
+}
+
 export const DEFAULT_BRANDING_SETTINGS: BrandingSettings = {
-  frontendLogoUrl: "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp",
+  frontendLogoUrl: GLASS_HEADER_LOGO,
   faviconUrl: "/favicon-32x32.png?v=large-2",
   companyName: "Glass & Door Pro",
   companyAddress: "6135 Park South Drive\nSuite 542\nCharlotte, NC 28210",

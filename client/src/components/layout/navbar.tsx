@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useBranding } from "@/components/shared/branding-provider";
+import { publicBrandLogo } from "@/lib/branding";
 import type { CmsMenu, MenuItem, PublicMenuLocation } from "@shared/schema";
 import { excludeServiceUtilitySnippets } from "@shared/glass-search-snippets";
 
@@ -254,8 +255,7 @@ export function Navbar() {
 
   const resourceLinks = allResourceLinks;
 
-  const brandLogo =
-    frontendLogoUrl || "/images/glass-door-pro/brand/logo-header-900x260-white-bg.webp";
+  const brandLogo = publicBrandLogo(frontendLogoUrl, "header");
   const brandName = companyName || "Glass & Door Pro";
 
   return (
