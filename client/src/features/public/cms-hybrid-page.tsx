@@ -266,7 +266,7 @@ function CmsPageBody({ page }: { page: CmsPage }) {
     return <LocationServiceLayout blocks={blocks} galleryBlock={hiddenServiceAreaGallery} />;
   }
   if (isGlassServicePageSlug(page.slug)) {
-    return <ServiceEditorialLayout blocks={blocks} pageSlug={page.slug} />;
+    return <ServiceEditorialLayout blocks={blocks} />;
   }
   return <PublicPageRenderer blocks={blocks} />;
 }
