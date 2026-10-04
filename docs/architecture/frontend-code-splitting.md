@@ -23,7 +23,7 @@ See [the homepage bundle audit](../homepage-bundle-audit.md) for measured before
 
 - **`client/src/features/`** — Page-level components grouped by domain (admin, auth, public)
 - **`client/src/components/`** — Shared and reusable components (forms, layout, shared editors/SEO, UI primitives)
-- **`client/src/lib/`** — Utilities, query client config, analytics/consent, sanitization
+- **`client/src/lib/`** — Utilities, query client config, lead tracking, sanitization
 
 ## Query Freshness Strategy
 

@@ -33,14 +33,14 @@ Marketing site and CMS for Glass & Door Pro (Charlotte, NC glass, window, and do
 │       │   ├── auth/                # Auth UI helpers
 │       │   ├── forms/               # Public form renderer + modal button
 │       │   ├── layout/              # Navbar, footer, page layout
-│       │   ├── shared/              # Branding provider, SEO/JSON-LD, editors, cookie consent
+│       │   ├── shared/              # Branding provider, SEO/JSON-LD, editors
 │       │   └── ui/                  # shadcn/ui primitives
 │       ├── features/
 │       │   ├── admin/               # Admin dashboard, CMS builder, forms, users, settings, docs, backups
 │       │   ├── auth/                # Login, forgot/reset password, first-admin setup
 │       │   └── public/              # Home, services, service areas, gallery, reviews, contact, CMS hybrid pages
 │       ├── hooks/                   # Custom React hooks (SEO, editor locks, unsaved changes)
-│       └── lib/                     # Query client, analytics/consent, sanitization, structured data
+│       └── lib/                     # Query client, lead tracking, sanitization, structured data
 ├── server/
 │   ├── index.ts                     # Express app bootstrap, middleware pipeline
 │   ├── db.ts                        # Drizzle + pg Pool connection

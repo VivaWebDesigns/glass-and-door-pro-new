@@ -692,14 +692,10 @@ function HeadTagAdditionsTab({ settings }: { settings: SettingsData }) {
               card is still the right place for your structured GA4 configuration. Use this area
               when you specifically need to paste a raw vendor head tag.
             </p>
+            <p className="mt-2">Tags pasted here load directly on the public site.</p>
             <p className="mt-2">
-              Tags pasted here load directly on the public site and are not automatically gated by
-              cookie-consent preferences.
-            </p>
-            <p className="mt-2">
-              For GA4, enter the measurement ID in the integration card instead of pasting the full
-              Google script snippet here. That keeps analytics aligned with the site&apos;s consent
-              flow.
+              Don&apos;t paste the Google Analytics snippet here: GA4 already loads through the
+              site&apos;s Google Tag Manager container.
             </p>
           </div>
 

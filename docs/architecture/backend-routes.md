@@ -48,7 +48,6 @@ All admin routes require an authenticated user and are registered under `/api/ad
 | `/api/health/ready` | GET | Readiness probe (checks DB connectivity) |
 | `/api/health/metrics` | GET | Request metrics (dev or when `METRICS_ENABLED=true`) |
 | `/api/branding` | GET | Public branding settings (logo, company info, fonts, colors) |
-| `/api/runtime-integrations` | GET | Public GA4 measurement ID |
 | `/api/seo/global` | GET | Global SEO settings |
 | `/robots.txt` | GET | Dynamic robots.txt |
 | `/sitemap.xml` | GET | Dynamic XML sitemap from published, indexable CMS pages |

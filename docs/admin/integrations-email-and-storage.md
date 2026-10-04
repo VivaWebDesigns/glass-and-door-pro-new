@@ -29,13 +29,9 @@ Mailchimp is configured as a shared audience integration.
 - Form-specific Mailchimp tags are controlled in the Forms system rather than in global settings.
 - The directory application flow can tag applicants separately from newsletter or inquiry forms.
 
-## Analytics And Consent Readiness
+## Analytics
 
-The public consent system now stores essential, preferences, analytics, and marketing choices for 60 days.
-
-- Essential cookies stay on.
-- Non-essential scripts should only load after the relevant consent has been granted.
-- The integration area now has a clean home for future direct GA4 configuration, but public tracking should remain gated by consent.
+The public site has no cookie consent banner. GA4 and other tags load through the Google Tag Manager container in `client/index.html`; lead and call-bar events are pushed to the `dataLayer` for GTM to forward.
 
 ## Operational Advice
 

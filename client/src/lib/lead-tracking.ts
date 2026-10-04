@@ -1,3 +1,9 @@
+declare global {
+  interface Window {
+    dataLayer?: Array<Record<string, unknown> | unknown[]>;
+  }
+}
+
 export const GLASS_DOOR_PRO_LEAD_SUCCESS_EVENT = "glass_door_pro_lead_success";
 
 const LEAD_EVENT_STORAGE_PREFIX = "glassDoorPro_lead_event:";
