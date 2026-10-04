@@ -52,6 +52,6 @@ The starter messaging tables (`conversations`, `direct_messages`, `guest_message
 ## Migration Strategy
 
 - Migrations are stored in `migrations/` (journal metadata in `migrations/meta/`)
-- Production migrations run automatically on startup via `server/migrate.ts`; if the database has tables but no Drizzle journal, startup migrations are skipped (schema assumed to be provisioned via push)
+- Migrations run automatically on startup via `server/migrate.ts`, tracked in `drizzle.__drizzle_migrations`. Existing databases were built with push plus startup code, so the runner records a one-time baseline at `0020_event_slugs` (`MIGRATION_BASELINE`) instead of re-running older files; only migrations added after `0020` run there. An empty database runs every migration.
 - Schema changes use `npm run db:push` for development
 - Migration files are numbered sequentially (0000, 0001, etc.)
