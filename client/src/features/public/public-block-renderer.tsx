@@ -306,7 +306,14 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
   return (
     <section
       id={str(props.anchorId) || undefined}
-      className={`public-hero-pattern relative flex items-center overflow-hidden ${config.isSplit ? "justify-start text-left" : "justify-center text-center"}`}
+      className={`public-hero-pattern relative flex items-center overflow-hidden ${
+        config.isSplit
+          ? "justify-start text-left"
+          : config.variant === "glass-home"
+            ? // Homepage hero: left-aligned on phones, centered from md up.
+              "justify-start text-left md:justify-center md:text-center"
+            : "justify-center text-center"
+      }`}
       style={{
         minHeight: config.minHeightStyle,
         ...(config.sectionBackgroundColor
