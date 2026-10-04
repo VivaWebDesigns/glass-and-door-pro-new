@@ -125,8 +125,11 @@ const LUCIDE_MAP: Record<string, React.ElementType> = {
 
 const GLASS_CTA_PRIMARY_CLASS =
   "rounded-md border border-white bg-[#1a8ead] px-8 text-white shadow-sm hover:bg-[#167f9b] hover:text-white";
-const GLASS_CTA_SECONDARY_CLASS =
-  "rounded-md border border-white bg-transparent px-8 text-white shadow-sm hover:bg-white/10 hover:text-white";
+// Solid white primary for the dark-blue closing CTA band.
+const GLASS_CTA_ON_BLUE_PRIMARY_CLASS =
+  "rounded-md border border-white bg-white px-8 font-semibold text-[#0f6f85] shadow-sm hover:bg-[#e8f7fb] hover:text-[#0f6f85]";
+const GLASS_CTA_ON_BLUE_SECONDARY_CLASS =
+  "rounded-md !border-white bg-transparent px-8 font-semibold text-white shadow-sm hover:bg-white/10 hover:text-white";
 const GLASS_HERO_CTA_SECONDARY_CLASS =
   "rounded-md border border-white bg-slate-950/60 px-8 font-semibold text-white shadow-md backdrop-blur-sm hover:bg-slate-950/75 hover:text-white";
 
@@ -615,7 +618,7 @@ function getCtaStyle(props: Record<string, unknown>) {
     variant === "glass-service" ||
     (variant === "dark" && str(props.secondaryText).toLowerCase() === "back to home");
   const backgroundClass = isGlassService
-    ? "bg-[#1a8ead] text-white"
+    ? "bg-[#0f6f85] text-white"
     : (CTA_VARIANT_CLASSES[variant] ?? "bg-muted/40 border");
   return {
     variant,
@@ -640,7 +643,12 @@ function CtaButtons({
   return (
     <div
       data-nosnippet={excludeServiceUtilitySnippets(location) ? "" : undefined}
-      className="flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap"
+      className={
+        // Glass CTA buttons are hidden below md, where MobileCtaBar takes over.
+        isGlassService
+          ? "hidden justify-center gap-3 md:flex md:flex-row md:flex-wrap"
+          : "flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap"
+      }
     >
       {str(props.primaryText) && (
         <FormModalButton
@@ -653,7 +661,7 @@ function CtaButtons({
           modalDescription={props.primaryModalDescription}
           size="lg"
           variant={primaryVariant}
-          className={`w-full sm:w-auto ${isGlassService ? GLASS_CTA_PRIMARY_CLASS : "rounded-full"}`}
+          className={`w-full sm:w-auto ${isGlassService ? GLASS_CTA_ON_BLUE_PRIMARY_CLASS : "rounded-full"}`}
           testId="cta-primary"
         />
       )}
@@ -668,7 +676,7 @@ function CtaButtons({
           modalDescription={props.secondaryModalDescription}
           size="lg"
           variant="outline"
-          className={`w-full sm:w-auto ${isGlassService ? GLASS_CTA_SECONDARY_CLASS : "rounded-full"}`}
+          className={`w-full sm:w-auto ${isGlassService ? GLASS_CTA_ON_BLUE_SECONDARY_CLASS : "rounded-full"}`}
           testId="cta-secondary"
         />
       )}
@@ -682,14 +690,14 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
   return (
     <div
       className={`px-4 py-10 text-center sm:px-8 sm:py-16 ${containerClass}`}
-      style={isGlassService ? { backgroundColor: "#1a8ead", color: "#ffffff" } : undefined}
+      style={isGlassService ? { backgroundColor: "#0f6f85", color: "#ffffff" } : undefined}
     >
       <h2 className="mb-3 text-2xl font-heading font-bold leading-tight sm:text-3xl md:text-4xl">
         {str(props.heading) || "Ready to Get Started?"}
       </h2>
       {subheading && (
         <div
-          className={`mb-8 mx-auto max-w-xl text-sm leading-relaxed sm:text-base [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:opacity-80 [&_p]:m-0 ${variant === "light" ? "text-muted-foreground [&_a]:text-primary" : "opacity-80 [&_a]:text-current"}`}
+          className={`mx-auto max-w-xl text-sm leading-relaxed sm:text-base [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:opacity-80 [&_p]:m-0 ${isGlassService ? "mb-0 text-white/90 md:mb-8 [&_a]:text-current [&_p+p]:mt-3" : `mb-8 ${variant === "light" ? "text-muted-foreground [&_a]:text-primary" : "opacity-80 [&_a]:text-current"}`}`}
           dangerouslySetInnerHTML={{ __html: sanitizeHtml(subheading) }}
         />
       )}

@@ -9,6 +9,7 @@ import type {
   MenuLocation,
 } from "../shared/schema";
 import { GLASS_HOMEPAGE_SERVICE_CARDS } from "../shared/glass-homepage-services";
+import { GLASS_CTA_HOURS_LINE } from "../shared/glass-quote-cta";
 import { putCallButtonFirst } from "../shared/glass-call-first";
 import { GLASS_DOUG_PORTRAIT } from "../shared/glass-doug-portrait";
 import {
@@ -819,10 +820,10 @@ const glassReviewsContent: InsertCmsPage["content"] = {
       ctaAction: "custom-link",
       ctaLink: "https://share.google/XGkNPblei2YGTC8FB",
       ctaOpenInNewTab: true,
-      ctaSecondaryText: "Request a Free Estimate",
+      ctaSecondaryText: "Get a Free Quote",
       ctaSecondaryAction: "form-modal",
       ctaSecondaryFormSlug: "contact-form",
-      ctaSecondaryModalTitle: "Request a Free Estimate",
+      ctaSecondaryModalTitle: "Get a Free Quote",
       ctaSecondaryModalDescription:
         "Share a few project details and Doug will follow up with next steps.",
       backgroundImageUrl: "/images/glass-door-pro/reviews-hero-1920w.webp",
@@ -893,7 +894,7 @@ function glassServiceHeroProps(slug: string) {
     secondaryAction: "form-modal",
     secondaryLink: "",
     secondaryFormSlug: "contact-form",
-    secondaryModalTitle: "Request a Free Quote",
+    secondaryModalTitle: "Get a Free Quote",
     secondaryModalDescription:
       "Tell us a little about your project and Doug will follow up with next steps.",
   };
@@ -920,11 +921,11 @@ function serviceHero(props: {
     layout: "split",
     heading: props.heading,
     subheading: `<p>${props.subheading}</p>`,
-    ctaText: props.primaryText ?? "Request a Free Quote",
+    ctaText: props.primaryText ?? "Get a Free Quote",
     ctaAction: props.primaryAction ?? "form-modal",
     ctaLink: props.primaryLink ?? "",
     ctaFormSlug: "contact-form",
-    ctaModalTitle: "Request a Free Quote",
+    ctaModalTitle: "Get a Free Quote",
     ctaModalDescription:
       "Tell us a little about your project and Doug will follow up with next steps.",
     ctaSecondaryText: props.secondaryText ?? "Call (704) 771-6111",
@@ -1017,10 +1018,10 @@ function serviceCtaBlock(heading: string, subheading: string) {
     variant: "glass-service",
     heading,
     subheading: `<p>${subheading}</p>`,
-    primaryText: "Get Your Free Estimate",
+    primaryText: "Get a Free Quote",
     primaryAction: "form-modal",
     primaryFormSlug: "contact-form",
-    primaryModalTitle: "Request a Free Estimate",
+    primaryModalTitle: "Get a Free Quote",
     primaryModalDescription: "Share a few project details and Doug will follow up with next steps.",
     secondaryText: "Back to Home",
     secondaryAction: "internal-link",
@@ -1037,12 +1038,12 @@ function quoteCtaBlock(
   return block("cta", {
     variant: "glass-service",
     heading,
-    subheading: `<p>${body}</p><p><strong>${footerLine}</strong></p>`,
-    primaryText: "Get Your Free Estimate",
+    subheading: `<p>${body}</p><p>${footerLine}</p>`,
+    primaryText: "Get a Free Quote",
     primaryAction: options.primaryAction ?? "form-modal",
     primaryLink: options.primaryLink,
     primaryFormSlug: "contact-form",
-    primaryModalTitle: "Request a Free Estimate",
+    primaryModalTitle: "Get a Free Quote",
     primaryModalDescription: "Share a few project details and Doug will follow up with next steps.",
     secondaryText: "Call (704) 771-6111",
     secondaryAction: "custom-link",
@@ -1466,7 +1467,7 @@ function expandedServicePageContent(props: {
     blocks: [
       serviceHero({
         ...props.hero,
-        primaryText: props.hero.primaryText ?? "Request a Free Quote",
+        primaryText: props.hero.primaryText ?? "Get a Free Quote",
         primaryAction: props.hero.primaryAction ?? "form-modal",
         primaryLink: props.hero.primaryLink ?? "",
         secondaryText: props.hero.secondaryText,
@@ -1523,13 +1524,13 @@ function expandedServicePageContent(props: {
         variant: "glass-service",
         heading: props.cta.heading,
         subheading: `<p>${props.cta.body}</p><p><strong>${props.cta.footerLine}</strong></p>`,
-        primaryText: props.cta.primaryText ?? "Get Your Free Estimate",
+        primaryText: props.cta.primaryText ?? "Get a Free Quote",
         primaryAction: props.cta.primaryAction ?? "form-modal",
         primaryLink: props.cta.primaryLink ?? "",
         ...((props.cta.primaryAction ?? "form-modal") === "form-modal"
           ? {
               primaryFormSlug: "contact-form",
-              primaryModalTitle: "Request a Free Estimate",
+              primaryModalTitle: "Get a Free Quote",
               primaryModalDescription:
                 "Share a few project details and Doug will follow up with next steps.",
             }
@@ -1554,7 +1555,7 @@ const glassServicesContent: InsertCmsPage["content"] = {
       imageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
       imageAlt: "Frameless glass shower and home glass services in the Charlotte area",
       imagePositionY: 42,
-      primaryText: "Request a Free Quote",
+      primaryText: "Get a Free Quote",
     }),
     cardsGrid({
       title: "Residential Services",
@@ -1656,7 +1657,7 @@ const glassServicesContent: InsertCmsPage["content"] = {
     quoteCtaBlock(
       "Ready to Get Started?",
       "Call, text, or fill out the form for a free quote. Doug will review the project personally and give you clear next steps.",
-      `Mon-Sat: 7am - 7pm | Serving ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby areas`,
+      GLASS_CTA_HOURS_LINE,
     ),
   ],
 };
@@ -2268,7 +2269,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         heading: "Have a Commercial Storefront Project in Charlotte?",
         body: "Call or submit a project inquiry and Doug will follow up directly. We work with GCs, project managers, and business owners — and we respond fast.",
         footerLine: "Mon–Sat, 7am–7pm | Charlotte, NC and surrounding metro area",
-        primaryText: "Request a Commercial Quote",
+        primaryText: "Get a Free Quote",
       },
     }),
   },
@@ -2425,7 +2426,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         secondaryAction: "form-modal",
         secondaryLink: "",
         secondaryFormSlug: "contact-form",
-        secondaryModalTitle: "Request a Free Quote",
+        secondaryModalTitle: "Get a Free Quote",
         secondaryModalDescription:
           "Tell us a little about your project and Doug will follow up with next steps.",
       },
@@ -2578,7 +2579,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         heading: "Commercial Door Project in Charlotte?",
         body: "Call or submit a project inquiry and Doug will follow up directly. We work with GCs, project managers, and business owners — and we respond fast.",
         footerLine: "Mon–Sat, 7am–7pm | Charlotte, NC and surrounding metro area",
-        primaryText: "Request a Commercial Quote",
+        primaryText: "Get a Free Quote",
       },
     }),
   },
@@ -2738,7 +2739,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         secondaryAction: "form-modal",
         secondaryLink: "",
         secondaryFormSlug: "contact-form",
-        secondaryModalTitle: "Request a Free Quote",
+        secondaryModalTitle: "Get a Free Quote",
         secondaryModalDescription:
           "Tell us a little about your project and Doug will follow up with next steps.",
       },
@@ -2900,7 +2901,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         secondaryAction: "form-modal",
         secondaryLink: "",
         secondaryFormSlug: "contact-form",
-        secondaryModalTitle: "Request a Free Quote",
+        secondaryModalTitle: "Get a Free Quote",
         secondaryModalDescription:
           "Tell us a little about your project and Doug will follow up with next steps.",
       },

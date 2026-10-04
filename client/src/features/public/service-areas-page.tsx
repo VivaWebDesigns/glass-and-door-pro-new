@@ -75,7 +75,7 @@ export default function ServiceAreasPage() {
                 variant="outline"
                 className="w-full rounded-md border border-white bg-slate-950/60 px-8 font-semibold text-white shadow-md backdrop-blur-sm hover:bg-slate-950/75 hover:text-white sm:w-auto"
               >
-                <Link href="/#contact">Request a Free Quote</Link>
+                <Link href="/#contact">Get a Free Quote</Link>
               </Button>
             </div>
           </div>
@@ -179,7 +179,7 @@ export default function ServiceAreasPage() {
               variant="outline"
               className="w-full rounded-md border border-white bg-transparent px-8 text-white shadow-sm hover:bg-white/10 hover:text-white sm:w-auto"
             >
-              <Link href="/#contact">Get Your Free Estimate</Link>
+              <Link href="/#contact">Get a Free Quote</Link>
             </Button>
           </div>
         </section>

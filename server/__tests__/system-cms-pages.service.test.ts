@@ -5,6 +5,7 @@ import {
   GLASS_PRIMARY_SERVICE_AREAS,
 } from "@shared/glass-service-areas";
 import { getCmsSlugForPublicPath } from "@shared/glass-seo";
+import { GLASS_CTA_HOURS_LINE } from "@shared/glass-quote-cta";
 import { getGlassLocationSearchCopy } from "@shared/glass-location-search";
 import { GLASS_SERVICE_HEROES, getGlassServiceHeroCtaProps } from "@shared/glass-service-heroes";
 
@@ -131,7 +132,7 @@ describe("ensureSystemCmsPages", () => {
       heading: "Frameless Glass Shower Doors in Charlotte, NC",
       subheading: `<p>${GLASS_SERVICE_HEROES["services-frameless-showers"].subheading}</p>`,
       backgroundImageUrl: "/keep.webp",
-      ...getGlassServiceHeroCtaProps("Request a Free Quote"),
+      ...getGlassServiceHeroCtaProps("Get a Free Quote"),
     });
     expect(update.content.blocks[0].props.ctaText).toBe("Call (704) 771-6111");
     expect(update.content.blocks[1]).toEqual({
@@ -202,18 +203,24 @@ describe("ensureSystemCmsPages", () => {
     const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
     await ensureSystemCmsPages();
 
-    expect(mockUpdatePage.mock.calls.find(([id]) => id === "edited-order-id")).toBeUndefined();
+    // The admin's button order is kept; only the quote label is unified.
+    const editedOrder = mockUpdatePage.mock.calls.find(([id]) => id === "edited-order-id")?.[1];
+    expect(editedOrder.content.blocks[0].props).toMatchObject({
+      ctaText: "Get a Free Quote",
+      ctaSecondaryText: "Call (704) 771-6111",
+    });
     const update = mockUpdatePage.mock.calls.find(([id]) => id === "pineville-id")?.[1];
     expect(update.content._system).toEqual({
       showerSearchPositioning2026: true,
       callFirstButtons2026: true,
+      quoteCtaRefresh2026: true,
     });
     expect(update.content.blocks[0].props).toEqual({
       backgroundImageAlt: "Glass Shower Door Installer in Pineville, NC",
       ctaText: "Call (704) 771-6111",
       ctaAction: "custom-link",
       ctaLink: "tel:+17047716111",
-      ctaSecondaryText: "Request a Free Quote",
+      ctaSecondaryText: "Get a Free Quote",
       ctaSecondaryAction: "form-modal",
     });
     expect(update.content.blocks[1].props.items[0].question).toBe(
@@ -424,7 +431,7 @@ describe("ensureSystemCmsPages", () => {
       {
         ...pages[1].content.blocks[1],
         props: {
-          subheading: `<p><strong>Mon-Sat: 7am - 7pm | Serving ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby areas</strong></p>`,
+          subheading: `<p>${GLASS_CTA_HOURS_LINE}</p>`,
         },
       },
       pages[1].content.blocks[2],

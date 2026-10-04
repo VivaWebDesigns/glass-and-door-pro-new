@@ -15,27 +15,27 @@ export const GLASS_SERVICE_HEROES: Record<string, GlassServiceHero> = {
     heading: "Frameless Glass Shower Doors in Charlotte, NC",
     subheading:
       "Custom frameless shower doors and enclosures for bathroom remodels and upgrades across the Charlotte area. Measured and installed personally by Doug — no subcontractors.",
-    quoteText: "Request a Free Quote",
+    quoteText: "Get a Free Quote",
   },
   "services-window-installation": {
     subheading:
       "Replacement windows for single openings, full rooms, and whole-home upgrades across the Charlotte area. Measured, fitted, and installed personally by Doug — the same person who gives you the quote.",
-    quoteText: "Request a Free Quote",
+    quoteText: "Get a Free Quote",
   },
   "services-door-installation": {
     subheading:
       "Entry, patio, and storm doors installed level, plumb, and weather-tight across the Charlotte area. Doug handles every door personally, from measurement through installation.",
-    quoteText: "Request a Free Quote",
+    quoteText: "Get a Free Quote",
   },
   "services-window-repair": {
     subheading:
       "Foggy glass, broken seals, cracked panes, and stuck sashes repaired across the Charlotte area — often without replacing the whole window. Doug gives you a straight answer on repair versus replacement.",
-    quoteText: "Request a Free Quote",
+    quoteText: "Get a Free Quote",
   },
   "services-commercial-storefront-glass-installation": {
     subheading:
       "Aluminum storefront framing, fixed glass panels, and storefront doors installed for new construction, tenant buildouts, and renovations across Charlotte. One point of contact from quote through completion.",
-    quoteText: "Request a Commercial Quote",
+    quoteText: "Get a Free Quote",
   },
   "services-commercial-storefront-glass-replacement-repair": {
     subheading:
@@ -45,7 +45,7 @@ export const GLASS_SERVICE_HEROES: Record<string, GlassServiceHero> = {
   "services-commercial-door-installation": {
     subheading:
       "Aluminum entry doors, glass storefront doors, and commercial entrance systems installed for new construction, tenant buildouts, and business renovations across Charlotte. Direct contact with the person doing the work — from scope through installation.",
-    quoteText: "Request a Commercial Quote",
+    quoteText: "Get a Free Quote",
   },
   "services-commercial-door-replacement-repair": {
     subheading:
@@ -69,7 +69,7 @@ export function getGlassServiceHeroCtaProps(quoteText: string) {
     ctaSecondaryAction: "form-modal",
     ctaSecondaryLink: "",
     ctaSecondaryFormSlug: "contact-form",
-    ctaSecondaryModalTitle: "Request a Free Quote",
+    ctaSecondaryModalTitle: "Get a Free Quote",
     ctaSecondaryModalDescription:
       "Tell us a little about your project and Doug will follow up with next steps.",
   };

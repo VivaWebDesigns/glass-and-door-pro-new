@@ -26,6 +26,7 @@ import {
   GLASS_PRIVACY_POLICY_LEGACY_MARKER,
 } from "@shared/glass-privacy-policy";
 import type { InsertCmsPage } from "@shared/schema";
+import { applyQuoteCtaRefresh } from "@shared/glass-quote-cta";
 
 function id() {
   return randomUUID();
@@ -957,6 +958,11 @@ async function normalizeStoredCmsPages() {
       const contentWithCallFirstButtons = applyCallFirstButtons(updates.content ?? page.content);
       if (contentWithCallFirstButtons) {
         updates.content = contentWithCallFirstButtons as InsertCmsPage["content"];
+      }
+
+      const contentWithQuoteCta = applyQuoteCtaRefresh(updates.content ?? page.content);
+      if (contentWithQuoteCta) {
+        updates.content = contentWithQuoteCta as InsertCmsPage["content"];
       }
 
       const currentSeoDescription = updates.seoDescription ?? page.seoDescription;

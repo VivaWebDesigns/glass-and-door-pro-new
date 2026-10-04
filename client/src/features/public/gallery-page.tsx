@@ -198,10 +198,10 @@ const blocks: BlockInstance[] = [
       heading: "Ready to Start Your Project?",
       subheading:
         "<p>See something you like? Tell us about your glass, shower, window, door, or commercial project and Doug will follow up with next steps.</p>",
-      primaryText: "Get Your Free Estimate",
+      primaryText: "Get a Free Quote",
       primaryAction: "form-modal",
       primaryFormSlug: "contact-form",
-      primaryModalTitle: "Request a Free Estimate",
+      primaryModalTitle: "Get a Free Quote",
       primaryModalDescription:
         "Share a few project details and Doug will follow up with next steps.",
       secondaryText: "Back to Home",

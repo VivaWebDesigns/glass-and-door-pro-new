@@ -345,10 +345,10 @@ const blocks: BlockInstance[] = [
       ctaAction: "custom-link",
       ctaLink: "https://share.google/XGkNPblei2YGTC8FB",
       ctaOpenInNewTab: true,
-      ctaSecondaryText: "Request a Free Estimate",
+      ctaSecondaryText: "Get a Free Quote",
       ctaSecondaryAction: "form-modal",
       ctaSecondaryFormSlug: "contact-form",
-      ctaSecondaryModalTitle: "Request a Free Estimate",
+      ctaSecondaryModalTitle: "Get a Free Quote",
       ctaSecondaryModalDescription:
         "Share a few project details and Doug will follow up with next steps.",
       backgroundImageUrl: "/images/glass-door-pro/reviews-hero-1920w.webp",
