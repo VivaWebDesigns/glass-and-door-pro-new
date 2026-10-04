@@ -45,7 +45,7 @@ export function MobileCtaBar() {
       <a
         href={phone.href}
         onClick={() => trackMobileCta("call")}
-        className="flex h-[50px] flex-[1.15] items-center justify-center gap-2 rounded-lg bg-[#0f6f85] text-[15px] font-semibold text-white active:bg-[#0c5c6e]"
+        className="flex h-[50px] flex-[1.15] items-center justify-center gap-2 rounded-lg bg-[#1a8ead] text-[15px] font-semibold text-white active:bg-[#167f9b]"
         data-testid="mobile-cta-call"
       >
         <Phone className="h-[18px] w-[18px]" aria-hidden="true" />
@@ -55,7 +55,7 @@ export function MobileCtaBar() {
       <Link
         href="/#contact"
         onClick={() => trackMobileCta("quote")}
-        className="flex h-[50px] flex-1 items-center justify-center gap-2 rounded-lg border-[1.5px] border-[#0f6f85] bg-white text-[15px] font-semibold text-[#0f6f85] active:bg-[#e8f7fb]"
+        className="flex h-[50px] flex-1 items-center justify-center gap-2 rounded-lg border-[1.5px] border-[#1a8ead] bg-white text-[15px] font-semibold text-[#1a8ead] active:bg-[#e8f7fb]"
         data-testid="mobile-cta-quote"
       >
         <FileText className="h-[18px] w-[18px]" aria-hidden="true" />
