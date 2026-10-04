@@ -226,6 +226,28 @@ export function Navbar() {
     return items.length > 0 ? items : null;
   }, [publicMenus]);
 
+  const mobileItems = useMemo(() => {
+    return (dynamicItems ?? fallbackMobileItems).flatMap((item) => {
+      if (!/^services$/i.test(item.label.trim())) return [item];
+      const categories = item.children ?? [];
+      const hasResidential = categories.some((child) =>
+        /^residential(?: services)?$/i.test(child.label.trim()),
+      );
+      const hasCommercial = categories.some((child) =>
+        /^commercial(?: services)?$/i.test(child.label.trim()),
+      );
+      if (!hasResidential || !hasCommercial) return [item];
+      return categories.map((child) => ({
+        ...child,
+        label: /^residential(?: services)?$/i.test(child.label.trim())
+          ? "Residential Services"
+          : /^commercial(?: services)?$/i.test(child.label.trim())
+            ? "Commercial Services"
+            : child.label,
+      }));
+    });
+  }, [dynamicItems]);
+
   const resourceLinks = allResourceLinks;
 
   const brandLogo =
@@ -356,7 +378,7 @@ export function Navbar() {
 
         <div className="flex md:hidden items-center gap-2">
           <MobileNavigation
-            items={dynamicItems ?? fallbackMobileItems}
+            items={mobileItems}
             brandLogo={brandLogo}
             brandName={brandName}
             currentPath={location}
