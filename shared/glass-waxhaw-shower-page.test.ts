@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildWaxhawShowerPageContent,
-  linkWaxhawCommercialCardToServicesHub,
+  linkLocationCommercialCardToServicesHub,
 } from "./glass-waxhaw-shower-page";
 
 function currentWaxhawContent() {
@@ -146,13 +146,13 @@ describe("buildWaxhawShowerPageContent", () => {
       ],
     };
 
-    const linked = linkWaxhawCommercialCardToServicesHub(content) as typeof content;
+    const linked = linkLocationCommercialCardToServicesHub(content) as typeof content;
     expect(linked.blocks[0].props.cards[1]).toMatchObject({
       title: "Commercial & Other Services",
       link: "/services",
       buttonText: "See all our services",
     });
-    expect(linkWaxhawCommercialCardToServicesHub(linked)).toBeNull();
+    expect(linkLocationCommercialCardToServicesHub(linked)).toBeNull();
   });
 
   it("leaves unrecognized content untouched", () => {

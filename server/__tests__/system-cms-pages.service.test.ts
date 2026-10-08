@@ -143,6 +143,58 @@ describe("ensureSystemCmsPages", () => {
     );
   });
 
+  it("points city page commercial cards at the services hub once", async () => {
+    const servicesBlock = {
+      id: "services",
+      type: "cards-grid",
+      props: {
+        title: "Our Services in Matthews, NC",
+        cards: [
+          { title: "Window Repair", link: "/services/window-repair" },
+          {
+            title: "Commercial Services",
+            link: "/services/commercial-storefront-glass-installation",
+            buttonText: "Learn more about commercial services",
+          },
+        ],
+      },
+    };
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "matthews-id",
+        slug: "service-areas-matthews",
+        seoTitle: getGlassLocationSearchCopy("service-areas-matthews")?.title,
+        seoDescription: getGlassLocationSearchCopy("service-areas-matthews")?.description,
+        updatedBy: "editor",
+        content: { _system: { showerSearchPositioning2026: true }, blocks: [servicesBlock] },
+      },
+      {
+        id: "matthews-applied-id",
+        slug: "service-areas-matthews",
+        seoTitle: getGlassLocationSearchCopy("service-areas-matthews")?.title,
+        seoDescription: getGlassLocationSearchCopy("service-areas-matthews")?.description,
+        updatedBy: "editor",
+        content: {
+          _system: { showerSearchPositioning2026: true, servicesHubLink2026: true },
+          blocks: [servicesBlock],
+        },
+      },
+    ]);
+    mockGetPageBySlug.mockResolvedValue(null);
+
+    const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
+    await ensureSystemCmsPages();
+
+    const update = mockUpdatePage.mock.calls.find(([id]) => id === "matthews-id")?.[1];
+    expect(update?.content._system.servicesHubLink2026).toBe(true);
+    expect(update?.content.blocks[0].props.cards[1]).toEqual({
+      title: "Commercial & Other Services",
+      link: "/services",
+      buttonText: "See all our services",
+    });
+    expect(mockUpdatePage.mock.calls.some(([id]) => id === "matthews-applied-id")).toBe(false);
+  });
+
   it("applies the approved service hero copy and call-first CTAs once", async () => {
     mockGetAllPages.mockResolvedValue([
       {

@@ -2949,7 +2949,7 @@ function cityPageContent(props: {
 }): InsertCmsPage["content"] {
   const serviceCards = props.commercialAreas
     ? props.serviceCards.map((card) =>
-        card.title === "Commercial Services"
+        card.title === "Commercial & Other Services"
           ? {
               ...card,
               description: `Storefront glass, commercial doors, and apartment window replacement for ${props.commercialAreas} businesses.`,
@@ -3071,11 +3071,11 @@ const cityServiceCards: GlassCard[] = [
   },
   {
     icon: "Building2",
-    title: "Commercial Services",
+    title: "Commercial & Other Services",
     description:
       "Storefront glass, commercial doors, and apartment window replacement for Charlotte-area businesses.",
-    link: "/services/commercial-storefront-glass-installation",
-    buttonText: "Learn more about commercial services",
+    link: "/services",
+    buttonText: "See all our services",
   },
 ];
 

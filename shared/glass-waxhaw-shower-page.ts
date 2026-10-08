@@ -238,25 +238,28 @@ function linkCommercialCardToServicesHub(card: unknown) {
 }
 
 /**
- * Points the Waxhaw "Other Services" commercial card at the services hub
+ * Points a location page's commercial service card at the services hub
  * instead of the storefront glass page. Returns null when nothing changes.
  */
-export function linkWaxhawCommercialCardToServicesHub(
+export function linkLocationCommercialCardToServicesHub(
   content: InsertCmsPage["content"],
 ): InsertCmsPage["content"] | null {
   if (!isRecord(content) || !Array.isArray(content.blocks)) return null;
   let changed = false;
   const blocks = content.blocks.map((block: unknown) => {
     if (!isRecord(block) || block.type !== "cards-grid" || !isRecord(block.props)) return block;
-    if (block.props.title !== otherServicesTitle || !Array.isArray(block.props.cards)) {
+    const props = block.props;
+    if (
+      typeof props.title !== "string" ||
+      !/^(Our|Other) Services in /i.test(props.title.trim()) ||
+      !Array.isArray(props.cards)
+    ) {
       return block;
     }
-    const cards = block.props.cards.map(linkCommercialCardToServicesHub);
-    if (cards.every((card, index) => card === (block.props as { cards: unknown[] }).cards[index])) {
-      return block;
-    }
+    const cards = props.cards.map(linkCommercialCardToServicesHub);
+    if (cards.every((card, index) => card === (props.cards as unknown[])[index])) return block;
     changed = true;
-    return { ...block, props: { ...block.props, cards } };
+    return { ...block, props: { ...props, cards } };
   });
   return changed ? ({ ...content, blocks } as InsertCmsPage["content"]) : null;
 }
