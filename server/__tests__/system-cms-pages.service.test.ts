@@ -1336,4 +1336,39 @@ describe("ensureSystemCmsPages", () => {
       homeUpdate.content.blocks[0].props.items.map((item: { name: string }) => item.name),
     ).toEqual(["Lisa M", "Konstantin Kozhemyakov", "Noah Clark"]);
   });
+
+  it("fills town-page reviews blocks with the current Google reviews", async () => {
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "matthews-id",
+        slug: "service-areas-matthews",
+        seoTitle: "Glass Shower Door Installation in Matthews, NC",
+        seoDescription: "Matthews description",
+        updatedBy: "editor",
+        content: {
+          _system: { showerSearchPositioning2026: true, callFirstButtons2026: true },
+          blocks: [
+            {
+              id: "reviews",
+              type: "testimonials",
+              props: {
+                title: "What Our Clients Say",
+                items: [{ name: "Thomas F.", quote: "Doug was great." }],
+              },
+            },
+          ],
+        },
+      },
+    ]);
+    mockGetPageBySlug.mockResolvedValue(null);
+
+    const mod = await import("../services/system-cms-pages.service");
+    await mod.ensureSystemCmsPages();
+
+    const update = mockUpdatePage.mock.calls.find(([id]) => id === "matthews-id")?.[1];
+    const names = update.content.blocks[0].props.items.map((item: { name: string }) => item.name);
+    expect(names.slice(0, 2)).toEqual(["Lisa M", "Konstantin Kozhemyakov"]);
+    expect(names.length).toBeGreaterThan(2);
+    expect(names.at(-1)).toBe("Thomas F.");
+  });
 });

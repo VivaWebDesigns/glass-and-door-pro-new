@@ -3012,6 +3012,7 @@ function cityPageContent(props: {
         sectionPaddingTop: "md",
         sectionPaddingBottom: "md",
         items: [
+          ...GLASS_NEW_GOOGLE_REVIEWS,
           {
             quote:
               "Doug was great. He's extremely detailed in his work. Will definitely use him again when I'm ready to upgrade the other shower door. Highly recommend!",

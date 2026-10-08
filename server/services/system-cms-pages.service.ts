@@ -302,7 +302,12 @@ function ensureHomepageServiceCards(content: unknown) {
   return { ...content, blocks };
 }
 
-function ensureGoogleReviewItems(content: unknown, homepage: boolean) {
+// Town pages' reviews blocks have no "reviews" anchor, so they match any testimonials block.
+function ensureGoogleReviewItems(
+  content: unknown,
+  homepage: boolean,
+  { anyTestimonialsBlock = false } = {},
+) {
   if (!isRecord(content) || !Array.isArray(content.blocks)) return null;
 
   const testimonialIndex = content.blocks.findIndex(
@@ -310,7 +315,7 @@ function ensureGoogleReviewItems(content: unknown, homepage: boolean) {
       isRecord(block) &&
       block.type === "testimonials" &&
       isRecord(block.props) &&
-      block.props.anchorId === "reviews",
+      (anyTestimonialsBlock || block.props.anchorId === "reviews"),
   );
   if (testimonialIndex < 0) return null;
 
@@ -1057,6 +1062,12 @@ async function normalizeStoredCmsPages() {
       }
 
       if (getGlassLocationSearchCopy(page.slug)) {
+        // Town pages show the current Google reviews, like the homepage and Reviews page.
+        const contentWithReviews = ensureGoogleReviewItems(updates.content ?? page.content, false, {
+          anyTestimonialsBlock: true,
+        });
+        if (contentWithReviews) updates.content = contentWithReviews as InsertCmsPage["content"];
+
         const locationContent = updates.content ?? page.content;
         const locationMeta =
           isRecord(locationContent) && isRecord(locationContent._system)
