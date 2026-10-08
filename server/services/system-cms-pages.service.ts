@@ -31,6 +31,7 @@ import {
   WAXHAW_SHOWER_PAGE_SLUG,
   WAXHAW_SHOWER_SEO_KEYWORDS,
   buildWaxhawShowerPageContent,
+  linkWaxhawCommercialCardToServicesHub,
 } from "@shared/glass-waxhaw-shower-page";
 
 function id() {
@@ -1039,9 +1040,30 @@ async function normalizeStoredCmsPages() {
           if (isRecord(rebuiltWaxhawContent) && rebuiltWaxhawContent !== waxhawContent) {
             updates.content = {
               ...rebuiltWaxhawContent,
-              _system: { ...waxhawSystemMeta, waxhawShowerPage2026: true },
+              _system: {
+                ...waxhawSystemMeta,
+                waxhawShowerPage2026: true,
+                waxhawServicesHubLink2026: true,
+              },
             };
             updates.seoKeywords = WAXHAW_SHOWER_SEO_KEYWORDS;
+          }
+        }
+
+        const currentWaxhawContent = updates.content ?? page.content;
+        const currentWaxhawMeta =
+          isRecord(currentWaxhawContent) && isRecord(currentWaxhawContent._system)
+            ? currentWaxhawContent._system
+            : {};
+        if (currentWaxhawMeta.waxhawServicesHubLink2026 !== true) {
+          const linkedContent = linkWaxhawCommercialCardToServicesHub(
+            currentWaxhawContent as InsertCmsPage["content"],
+          );
+          if (isRecord(linkedContent)) {
+            updates.content = {
+              ...linkedContent,
+              _system: { ...currentWaxhawMeta, waxhawServicesHubLink2026: true },
+            };
           }
         }
       }

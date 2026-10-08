@@ -225,6 +225,42 @@ const ctaHeading = "Ready for a New Glass Shower Door in Waxhaw?";
 const ctaSubheading =
   "<p>Call, text or fill out the form for a free quote. Doug will come out personally and give you a clear written estimate.</p><p><strong>Mon–Sat, 7am–7pm | Charlotte-based, serving Waxhaw and Union County</strong></p>";
 
+const COMMERCIAL_CARD_LINK = "/services/commercial-storefront-glass-installation";
+
+function linkCommercialCardToServicesHub(card: unknown) {
+  if (!isRecord(card) || card.link !== COMMERCIAL_CARD_LINK) return card;
+  return {
+    ...card,
+    title: "Commercial & Other Services",
+    link: "/services",
+    buttonText: "See all our services",
+  };
+}
+
+/**
+ * Points the Waxhaw "Other Services" commercial card at the services hub
+ * instead of the storefront glass page. Returns null when nothing changes.
+ */
+export function linkWaxhawCommercialCardToServicesHub(
+  content: InsertCmsPage["content"],
+): InsertCmsPage["content"] | null {
+  if (!isRecord(content) || !Array.isArray(content.blocks)) return null;
+  let changed = false;
+  const blocks = content.blocks.map((block: unknown) => {
+    if (!isRecord(block) || block.type !== "cards-grid" || !isRecord(block.props)) return block;
+    if (block.props.title !== otherServicesTitle || !Array.isArray(block.props.cards)) {
+      return block;
+    }
+    const cards = block.props.cards.map(linkCommercialCardToServicesHub);
+    if (cards.every((card, index) => card === (block.props as { cards: unknown[] }).cards[index])) {
+      return block;
+    }
+    changed = true;
+    return { ...block, props: { ...block.props, cards } };
+  });
+  return changed ? ({ ...content, blocks } as InsertCmsPage["content"]) : null;
+}
+
 type Block = { id?: unknown; type?: unknown; props?: Record<string, unknown> };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -276,9 +312,9 @@ export function buildWaxhawShowerPageContent(
       )
     : [];
   const serviceCards = Array.isArray(services.props?.cards)
-    ? (services.props.cards as unknown[]).filter(
-        (card) => !isRecord(card) || card.link !== "/services/frameless-showers",
-      )
+    ? (services.props.cards as unknown[])
+        .filter((card) => !isRecord(card) || card.link !== "/services/frameless-showers")
+        .map(linkCommercialCardToServicesHub)
     : [];
 
   const nextBlocks = [

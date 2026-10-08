@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { buildWaxhawShowerPageContent } from "./glass-waxhaw-shower-page";
+import {
+  buildWaxhawShowerPageContent,
+  linkWaxhawCommercialCardToServicesHub,
+} from "./glass-waxhaw-shower-page";
 
 function currentWaxhawContent() {
   return {
@@ -28,6 +31,11 @@ function currentWaxhawContent() {
           cards: [
             { title: "Frameless Showers", link: "/services/frameless-showers" },
             { title: "Window Installation", link: "/services/window-installation" },
+            {
+              title: "Commercial Services",
+              link: "/services/commercial-storefront-glass-installation",
+              buttonText: "Learn more about commercial services",
+            },
           ],
         },
       },
@@ -99,6 +107,11 @@ describe("buildWaxhawShowerPageContent", () => {
     expect(byId.intro.props.content).toContain("Cureton");
     expect(byId.services.props.cards).toEqual([
       { title: "Window Installation", link: "/services/window-installation" },
+      {
+        title: "Commercial & Other Services",
+        link: "/services",
+        buttonText: "See all our services",
+      },
     ]);
     expect(byId.gallery.props.images[0].url).toBe(
       "/images/glass-door-pro/gallery/frameless-showers/09.webp",
@@ -111,6 +124,35 @@ describe("buildWaxhawShowerPageContent", () => {
   it("produces the same page when applied twice", () => {
     const once = buildWaxhawShowerPageContent(currentWaxhawContent());
     expect(buildWaxhawShowerPageContent(once)).toEqual(once);
+  });
+
+  it("points an already rebuilt page's commercial card at the services hub", () => {
+    const content = {
+      blocks: [
+        {
+          id: "services",
+          type: "cards-grid",
+          props: {
+            title: "Other Services in Waxhaw",
+            cards: [
+              { title: "Window Repair", link: "/services/window-repair" },
+              {
+                title: "Commercial Services",
+                link: "/services/commercial-storefront-glass-installation",
+              },
+            ],
+          },
+        },
+      ],
+    };
+
+    const linked = linkWaxhawCommercialCardToServicesHub(content) as typeof content;
+    expect(linked.blocks[0].props.cards[1]).toMatchObject({
+      title: "Commercial & Other Services",
+      link: "/services",
+      buttonText: "See all our services",
+    });
+    expect(linkWaxhawCommercialCardToServicesHub(linked)).toBeNull();
   });
 
   it("leaves unrecognized content untouched", () => {
