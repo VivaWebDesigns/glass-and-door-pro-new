@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   buildCityShowerPageContent,
   linkLocationCommercialCardToServicesHub,
+  getCityShowerPageCopy,
 } from "./glass-city-shower-pages";
+import { GLASS_PRIMARY_SERVICE_AREAS } from "./glass-service-areas";
+import { getCmsSlugForPublicPath } from "./glass-seo";
+import { getGlassLocationSearchCopy } from "./glass-location-search";
 
 const WAXHAW = "service-areas-waxhaw";
 const buildWaxhawShowerPageContent = (content: unknown) =>
@@ -208,9 +212,18 @@ describe("buildCityShowerPageContent", () => {
     expect(JSON.stringify(rewritten)).not.toContain("Waxhaw");
   });
 
+  it("has shower copy for every city page that keeps its search intro", () => {
+    for (const { href } of GLASS_PRIMARY_SERVICE_AREAS) {
+      const slug = getCmsSlugForPublicPath(href) ?? "";
+      const copy = getCityShowerPageCopy(slug);
+      expect(copy, slug).not.toBeNull();
+      expect(copy?.introContent).toContain(getGlassLocationSearchCopy(slug)?.intro);
+    }
+  });
+
   it("leaves pages without shower copy untouched", () => {
     const content = currentWaxhawContent();
-    expect(buildCityShowerPageContent("service-areas-matthews", content as never)).toBe(content);
+    expect(buildCityShowerPageContent("home", content as never)).toBe(content);
   });
 
   it("leaves unrecognized content untouched", () => {
