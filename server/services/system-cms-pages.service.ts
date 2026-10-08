@@ -27,6 +27,11 @@ import {
 } from "@shared/glass-privacy-policy";
 import type { InsertCmsPage } from "@shared/schema";
 import { applyQuoteCtaRefresh } from "@shared/glass-quote-cta";
+import {
+  WAXHAW_SHOWER_PAGE_SLUG,
+  WAXHAW_SHOWER_SEO_KEYWORDS,
+  buildWaxhawShowerPageContent,
+} from "@shared/glass-waxhaw-shower-page";
 
 function id() {
   return randomUUID();
@@ -1020,6 +1025,24 @@ async function normalizeStoredCmsPages() {
             ...locationContent,
             _system: { ...locationSystemMeta, showerSearchPositioning2026: true },
           };
+        }
+      }
+
+      if (page.slug === WAXHAW_SHOWER_PAGE_SLUG) {
+        const waxhawContent = updates.content ?? page.content;
+        const waxhawSystemMeta =
+          isRecord(waxhawContent) && isRecord(waxhawContent._system) ? waxhawContent._system : {};
+        if (waxhawSystemMeta.waxhawShowerPage2026 !== true) {
+          const rebuiltWaxhawContent = buildWaxhawShowerPageContent(
+            waxhawContent as InsertCmsPage["content"],
+          );
+          if (isRecord(rebuiltWaxhawContent) && rebuiltWaxhawContent !== waxhawContent) {
+            updates.content = {
+              ...rebuiltWaxhawContent,
+              _system: { ...waxhawSystemMeta, waxhawShowerPage2026: true },
+            };
+            updates.seoKeywords = WAXHAW_SHOWER_SEO_KEYWORDS;
+          }
         }
       }
 

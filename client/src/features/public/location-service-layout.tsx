@@ -103,6 +103,19 @@ export function LocationServiceLayout({
   );
   const image = firstGalleryImage(galleryBlock);
 
+  if (!serviceBlock && localIntroBlock) {
+    return (
+      <IntroFirstLocationLayout
+        hero={hero}
+        introBlock={localIntroBlock}
+        blocks={pageBlocks.filter((block) => block.id !== localIntroBlock.id)}
+        whyBlockId={whyBlock?.id}
+        closingCta={closingCta}
+        image={image}
+      />
+    );
+  }
+
   return (
     <div className="location-service-page">
       <div className="location-service-hero">
@@ -136,6 +149,67 @@ export function LocationServiceLayout({
             <PublicPageRenderer blocks={remainingBlocks} />
           </div>
         ) : null}
+      </div>
+      {closingCta ? (
+        <div className="location-service-closing-cta">
+          <PublicPageRenderer blocks={[closingCta]} />
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+// Pages without an "Our Services in" grid lead with the local intro and keep
+// the remaining sections in their stored order.
+function IntroFirstLocationLayout({
+  hero,
+  introBlock,
+  blocks,
+  whyBlockId,
+  closingCta,
+  image,
+}: {
+  hero: BlockInstance;
+  introBlock: BlockInstance;
+  blocks: BlockInstance[];
+  whyBlockId?: string;
+  closingCta?: BlockInstance;
+  image: { url: string; alt: string } | null;
+}) {
+  const groups: Array<{ proof: boolean; blocks: BlockInstance[] }> = [];
+  for (const block of blocks) {
+    const proof = block.id === whyBlockId;
+    const last = groups.at(-1);
+    if (last && !proof && !last.proof) last.blocks.push(block);
+    else groups.push({ proof, blocks: [block] });
+  }
+
+  return (
+    <div className="location-service-page">
+      <div className="location-service-hero">
+        <PublicPageRenderer blocks={[hero]} />
+      </div>
+      <div className="location-service-shell">
+        <MobilePageGuide blocks={[introBlock, ...blocks]} />
+        <div className="location-service-primary-grid">
+          <div className="location-service-local-intro location-service-local-intro--primary">
+            {image ? <img src={image.url} alt={image.alt} loading="lazy" decoding="async" /> : null}
+            <div className="location-service-local-copy">
+              <PublicPageRenderer blocks={[introBlock]} />
+            </div>
+          </div>
+          <DesktopPageGuide blocks={[introBlock, ...blocks]} />
+        </div>
+        {groups.map((group) => (
+          <div
+            key={group.blocks[0].id}
+            className={
+              group.proof ? "location-service-proof-list" : "location-service-supporting-content"
+            }
+          >
+            <PublicPageRenderer blocks={group.blocks} />
+          </div>
+        ))}
       </div>
       {closingCta ? (
         <div className="location-service-closing-cta">

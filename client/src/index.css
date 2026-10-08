@@ -160,6 +160,15 @@
     padding-block: 0;
   }
 
+  .location-service-local-intro--primary {
+    border-top: 0;
+    padding-block: 0;
+  }
+
+  .location-service-local-intro--primary > img {
+    aspect-ratio: 16 / 10;
+  }
+
   .location-service-local-copy .public-prose {
     color: #475569;
     font-size: 1rem;
@@ -221,6 +230,10 @@
   @media (min-width: 768px) {
     .location-service-local-intro {
       grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    }
+
+    .location-service-local-intro--primary {
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 

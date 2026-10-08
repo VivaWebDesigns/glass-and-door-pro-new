@@ -80,6 +80,69 @@ describe("ensureSystemCmsPages", () => {
     }
   });
 
+  it("rebuilds the Waxhaw page around shower doors once", async () => {
+    const waxhawBlocks = [
+      { id: "hero", type: "hero", props: { heading: "Glass Shower Door Installer in Waxhaw, NC" } },
+      { id: "intro", type: "rich-text", props: { title: "Your Glass and Door Company in Waxhaw" } },
+      {
+        id: "why",
+        type: "cards-grid",
+        props: { title: "Why Waxhaw Homeowners Choose Glass & Door Pro", cards: [] },
+      },
+      { id: "services", type: "cards-grid", props: { title: "Our Services in Waxhaw, NC" } },
+      { id: "faq", type: "faq", props: { title: "Frequently Asked Questions — Waxhaw, NC" } },
+      { id: "cta", type: "cta", props: { heading: "Ready to Get Started in Waxhaw?" } },
+    ];
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "waxhaw-id",
+        slug: "service-areas-waxhaw",
+        seoTitle: "Glass Shower Door Installation in Waxhaw, NC",
+        seoDescription: getGlassLocationSearchCopy("service-areas-waxhaw")?.description,
+        updatedBy: "editor",
+        content: { _system: { showerSearchPositioning2026: true }, blocks: waxhawBlocks },
+      },
+      {
+        id: "waxhaw-applied-id",
+        slug: "service-areas-waxhaw",
+        seoTitle: "Glass Shower Door Installation in Waxhaw, NC",
+        seoDescription: getGlassLocationSearchCopy("service-areas-waxhaw")?.description,
+        updatedBy: "editor",
+        content: {
+          _system: { showerSearchPositioning2026: true, waxhawShowerPage2026: true },
+          blocks: waxhawBlocks,
+        },
+      },
+    ]);
+    mockGetPageBySlug.mockResolvedValue(null);
+
+    const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
+    await ensureSystemCmsPages();
+
+    const update = mockUpdatePage.mock.calls.find(([id]) => id === "waxhaw-id")?.[1];
+    expect(update?.content._system).toMatchObject({
+      showerSearchPositioning2026: true,
+      waxhawShowerPage2026: true,
+    });
+    expect(update?.seoKeywords).toContain("glass shower door installation Waxhaw NC");
+    expect(update?.content.blocks.map((block: { id: string }) => block.id)).toEqual([
+      "hero",
+      "intro",
+      "waxhaw-shower-door-styles",
+      "waxhaw-shower-door-options",
+      "waxhaw-shower-door-process",
+      "why",
+      "faq",
+      "services",
+      "cta",
+    ]);
+
+    const appliedUpdate = mockUpdatePage.mock.calls.find(([id]) => id === "waxhaw-applied-id")?.[1];
+    expect(appliedUpdate?.content?.blocks?.[1]?.props?.title).not.toBe(
+      "Custom Glass Shower Doors in Waxhaw, NC",
+    );
+  });
+
   it("applies the approved service hero copy and call-first CTAs once", async () => {
     mockGetAllPages.mockResolvedValue([
       {
