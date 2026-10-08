@@ -28,11 +28,10 @@ import {
 import type { InsertCmsPage } from "@shared/schema";
 import { applyQuoteCtaRefresh } from "@shared/glass-quote-cta";
 import {
-  WAXHAW_SHOWER_PAGE_SLUG,
-  WAXHAW_SHOWER_SEO_KEYWORDS,
-  buildWaxhawShowerPageContent,
+  buildCityShowerPageContent,
+  getCityShowerPageCopy,
   linkLocationCommercialCardToServicesHub,
-} from "@shared/glass-waxhaw-shower-page";
+} from "@shared/glass-city-shower-pages";
 
 function id() {
   return randomUUID();
@@ -1029,24 +1028,30 @@ async function normalizeStoredCmsPages() {
         }
       }
 
-      if (page.slug === WAXHAW_SHOWER_PAGE_SLUG) {
-        const waxhawContent = updates.content ?? page.content;
-        const waxhawSystemMeta =
-          isRecord(waxhawContent) && isRecord(waxhawContent._system) ? waxhawContent._system : {};
-        if (waxhawSystemMeta.waxhawShowerPage2026 !== true) {
-          const rebuiltWaxhawContent = buildWaxhawShowerPageContent(
-            waxhawContent as InsertCmsPage["content"],
+      const cityShowerCopy = getCityShowerPageCopy(page.slug);
+      if (cityShowerCopy) {
+        const cityContent = updates.content ?? page.content;
+        const citySystemMeta =
+          isRecord(cityContent) && isRecord(cityContent._system) ? cityContent._system : {};
+        // Waxhaw shipped first under its own flag.
+        if (
+          citySystemMeta.cityShowerPage2026 !== true &&
+          citySystemMeta.waxhawShowerPage2026 !== true
+        ) {
+          const rebuiltCityContent = buildCityShowerPageContent(
+            page.slug,
+            cityContent as InsertCmsPage["content"],
           );
-          if (isRecord(rebuiltWaxhawContent) && rebuiltWaxhawContent !== waxhawContent) {
+          if (isRecord(rebuiltCityContent) && rebuiltCityContent !== cityContent) {
             updates.content = {
-              ...rebuiltWaxhawContent,
+              ...rebuiltCityContent,
               _system: {
-                ...waxhawSystemMeta,
-                waxhawShowerPage2026: true,
+                ...citySystemMeta,
+                cityShowerPage2026: true,
                 servicesHubLink2026: true,
               },
             };
-            updates.seoKeywords = WAXHAW_SHOWER_SEO_KEYWORDS;
+            updates.seoKeywords = cityShowerCopy.seoKeywords;
           }
         }
       }

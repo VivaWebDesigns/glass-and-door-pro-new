@@ -122,7 +122,7 @@ describe("ensureSystemCmsPages", () => {
     const update = mockUpdatePage.mock.calls.find(([id]) => id === "waxhaw-id")?.[1];
     expect(update?.content._system).toMatchObject({
       showerSearchPositioning2026: true,
-      waxhawShowerPage2026: true,
+      cityShowerPage2026: true,
     });
     expect(update?.seoKeywords).toContain("glass shower door installation Waxhaw NC");
     expect(update?.content.blocks.map((block: { id: string }) => block.id)).toEqual([

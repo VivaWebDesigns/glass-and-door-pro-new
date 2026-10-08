@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
-  buildWaxhawShowerPageContent,
+  buildCityShowerPageContent,
   linkLocationCommercialCardToServicesHub,
-} from "./glass-waxhaw-shower-page";
+} from "./glass-city-shower-pages";
+
+const WAXHAW = "service-areas-waxhaw";
+const buildWaxhawShowerPageContent = (content: unknown) =>
+  buildCityShowerPageContent(WAXHAW, content as never);
 
 function currentWaxhawContent() {
   return {
@@ -74,7 +78,7 @@ function titles(content: unknown) {
   );
 }
 
-describe("buildWaxhawShowerPageContent", () => {
+describe("buildCityShowerPageContent", () => {
   it("leads with shower door sections and moves other services to the bottom", () => {
     const content = buildWaxhawShowerPageContent(currentWaxhawContent());
 
@@ -153,6 +157,60 @@ describe("buildWaxhawShowerPageContent", () => {
       buttonText: "See all our services",
     });
     expect(linkLocationCommercialCardToServicesHub(linked)).toBeNull();
+  });
+
+  it("rebuilds Charlotte with its own copy and keeps the business address", () => {
+    const base = currentWaxhawContent();
+    const charlotte = {
+      ...base,
+      blocks: base.blocks.map((block) =>
+        block.id === "areas"
+          ? {
+              ...block,
+              props: { ...block.props, title: "Charlotte Neighborhoods and Areas We Serve" },
+            }
+          : block.id === "why"
+            ? {
+                ...block,
+                props: {
+                  ...block.props,
+                  title: "Why Charlotte Homeowners Choose Glass & Door Pro",
+                },
+              }
+            : block,
+      ),
+    };
+    const content = buildCityShowerPageContent("areas-served-charlotte-nc", charlotte as never) as {
+      blocks: Array<{ id: string; props: Record<string, unknown> }>;
+    };
+    const byId = Object.fromEntries(content.blocks.map((block) => [block.id, block]));
+
+    expect(byId.intro.props.title).toBe("Custom Glass Shower Doors in Charlotte, NC");
+    expect(byId.intro.props.content).toContain("6135 Park South Drive");
+    expect(byId["charlotte-shower-door-styles"]).toBeDefined();
+    expect(byId.areas.props.title).toBe("Charlotte Neighborhoods We Serve");
+    expect(byId.services.props.title).toBe("Other Services in Charlotte");
+    expect(byId.cta.props.heading).toBe("Ready for a New Glass Shower Door in Charlotte?");
+    expect((byId.gallery.props.images as Array<{ url: string }>)[0].url).toBe(
+      "/images/glass-door-pro/gallery/frameless-showers/01.webp",
+    );
+    const rewritten = [
+      "intro",
+      "charlotte-shower-door-styles",
+      "charlotte-shower-door-options",
+      "charlotte-shower-door-process",
+      "why",
+      "areas",
+      "faq",
+      "services",
+      "cta",
+    ].map((id) => byId[id]);
+    expect(JSON.stringify(rewritten)).not.toContain("Waxhaw");
+  });
+
+  it("leaves pages without shower copy untouched", () => {
+    const content = currentWaxhawContent();
+    expect(buildCityShowerPageContent("service-areas-matthews", content as never)).toBe(content);
   });
 
   it("leaves unrecognized content untouched", () => {

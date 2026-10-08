@@ -23,9 +23,9 @@ import { GLASS_NEW_GOOGLE_REVIEWS } from "../shared/glass-new-reviews";
 import { isGlassLegalNoindexSlug } from "../shared/glass-seo";
 import { updateGlassLocationSearchContent } from "../shared/glass-location-search";
 import {
-  WAXHAW_SHOWER_SEO_KEYWORDS,
-  buildWaxhawShowerPageContent,
-} from "../shared/glass-waxhaw-shower-page";
+  buildCityShowerPageContent,
+  getCityShowerPageCopy,
+} from "../shared/glass-city-shower-pages";
 import {
   GLASS_COMMERCIAL_LINKED_SERVICE_AREA_CONTENT,
   GLASS_LINKED_SERVICE_AREA_CONTENT,
@@ -3765,134 +3765,133 @@ const glassCityPages: GlassCityPageSeed[] = [
     seoTitle: "Glass Shower Door Installation in Waxhaw, NC",
     seoDescription:
       "Custom glass shower door installation in Waxhaw, NC. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.",
-    seoKeywords: WAXHAW_SHOWER_SEO_KEYWORDS,
+    seoKeywords:
+      "glass services Waxhaw NC, frameless shower doors Waxhaw NC, window installation Waxhaw NC, door installation Waxhaw NC, window repair Waxhaw NC",
     ogImageUrl: "/images/glass-door-pro/city-waxhaw-hero.webp",
-    content: buildWaxhawShowerPageContent(
-      cityPageContent({
-        servingAreas: "Waxhaw, Union County, Charlotte, and surrounding areas",
-        commercialAreas: "Waxhaw, Union County, and greater Charlotte-area",
-        hero: {
-          heading: "Glass Shower Door Installer in Waxhaw, NC",
-          subheading:
-            "Custom glass shower door installation in Waxhaw, NC. Doug personally measures and installs every door. 15+ years of experience and Saturday appointments available.",
-          imageUrl: "/images/glass-door-pro/city-waxhaw-hero.webp",
-          imagePositionY: 45,
+    content: cityPageContent({
+      servingAreas: "Waxhaw, Union County, Charlotte, and surrounding areas",
+      commercialAreas: "Waxhaw, Union County, and greater Charlotte-area",
+      hero: {
+        heading: "Glass Shower Door Installer in Waxhaw, NC",
+        subheading:
+          "Custom glass shower door installation in Waxhaw, NC. Doug personally measures and installs every door. 15+ years of experience and Saturday appointments available.",
+        imageUrl: "/images/glass-door-pro/city-waxhaw-hero.webp",
+        imagePositionY: 45,
+      },
+      introTitle: "Your Glass and Door Company in Waxhaw",
+      introContent:
+        "<p>Homes in Waxhaw often have the kind of details where clean installation really matters — updated bathrooms, custom finishes, newer construction, and long-term homeowners who want the job done right. Glass & Door Pro helps Waxhaw homeowners with frameless shower doors, window installation, door installation, and window repair, all handled personally by Doug from measurement through final install.</p><p>Doug is based in Charlotte and has been working in Waxhaw for years. He knows the neighborhoods, he knows the home styles, and he's installed glass and doors in enough Waxhaw bathrooms and entryways to know what works and what doesn't. When he comes out for a quote, you're getting real expertise — not a salesperson reading from a product catalog.</p><p>Waxhaw's housing mix means we see everything from custom homes where the finishes need to be exactly right, to more modest properties where the goal is a quality upgrade without overspending. We approach both with the same care. A clear quote, honest advice, and work that holds up.</p>",
+      benefitsTitle: "Why Waxhaw Homeowners Choose Glass & Door Pro",
+      benefits: [
+        {
+          icon: "BadgeCheck",
+          title: "Attention to Detail",
+          description:
+            "Waxhaw homes are well-maintained and finished carefully. We bring the same standard to every installation — precise measurements, clean hardware installation, and a finished result that looks right.",
         },
-        introTitle: "Your Glass and Door Company in Waxhaw",
-        introContent:
-          "<p>Homes in Waxhaw often have the kind of details where clean installation really matters — updated bathrooms, custom finishes, newer construction, and long-term homeowners who want the job done right. Glass & Door Pro helps Waxhaw homeowners with frameless shower doors, window installation, door installation, and window repair, all handled personally by Doug from measurement through final install.</p><p>Doug is based in Charlotte and has been working in Waxhaw for years. He knows the neighborhoods, he knows the home styles, and he's installed glass and doors in enough Waxhaw bathrooms and entryways to know what works and what doesn't. When he comes out for a quote, you're getting real expertise — not a salesperson reading from a product catalog.</p><p>Waxhaw's housing mix means we see everything from custom homes where the finishes need to be exactly right, to more modest properties where the goal is a quality upgrade without overspending. We approach both with the same care. A clear quote, honest advice, and work that holds up.</p>",
-        benefitsTitle: "Why Waxhaw Homeowners Choose Glass & Door Pro",
-        benefits: [
-          {
-            icon: "BadgeCheck",
-            title: "Attention to Detail",
-            description:
-              "Waxhaw homes are well-maintained and finished carefully. We bring the same standard to every installation — precise measurements, clean hardware installation, and a finished result that looks right.",
-          },
-          {
-            icon: "MapPin",
-            title: "Charlotte-Based, No Travel Fees",
-            description:
-              "Waxhaw is a regular part of our weekly schedule from our Charlotte home base, not an occasional out-of-area trip.",
-          },
-          {
-            icon: "Droplets",
-            title: "Custom Frameless Shower Installations",
-            description:
-              "From standard single-door enclosures to more complex configurations with multiple panels, we measure and install frameless glass that fits the space perfectly.",
-          },
-          {
-            icon: "Wrench",
-            title: "Honest on Repair vs. Replace",
-            description:
-              "We don't recommend replacement when repair makes sense. If your windows can be fixed with a glass-only IGU swap, we'll price that option first.",
-          },
-          {
-            icon: "Palette",
-            title: "Hardware That Matches Your Home",
-            description:
-              "We offer a range of finishes and help you select hardware that coordinates with your existing fixtures and home style — not just whatever is in stock.",
-          },
-          {
-            icon: "CalendarDays",
-            title: "Saturday Appointments Are Standard",
-            description:
-              "We work Mon–Sat, 7am–7pm. Saturday availability is built into our regular schedule for Waxhaw homeowners who can't do weekday appointments.",
-          },
-        ],
-        servicesTitle: "Our Services in Waxhaw, NC",
-        servicesIntro: "",
-        serviceCards: cityServiceCards,
-        areasTitle: "Neighborhoods and Areas We Serve in and Around Waxhaw",
-        areasIntro:
-          "We work throughout Waxhaw and the surrounding southern Union County area, including:",
-        areas: [
-          "Downtown Waxhaw and the historic district",
-          "Cureton and Cureton West",
-          "Millbridge and nearby communities",
-          "Providence Downs South area",
-          "The neighborhoods along Waxhaw-Indian Trail Road",
-          "Waxhaw-Marvin Road corridor",
-          "The communities off New Town Road and Kensington Drive",
-          "Rea Road extension and nearby residential areas",
-        ],
-        areasClosing:
-          "Not seeing your neighborhood? We serve all of Waxhaw — call (704) 771-6111 and we'll confirm.",
-        galleryTitle: "Our Work in the Waxhaw Area",
-        gallery: [
-          {
-            url: "/images/glass-door-pro/gallery-shower2-1280w.webp",
-            alt: "Modern frameless shower door installed by Glass & Door Pro in the Waxhaw area",
-          },
-          {
-            url: "/images/glass-door-pro/gallery-door2-1280w.webp",
-            alt: "Custom wooden entry door installed by Glass & Door Pro in the Waxhaw area",
-          },
-          {
-            url: "/images/glass-door-pro/gallery-windows-1280w.webp",
-            alt: "Replacement windows installed by Glass & Door Pro in the Waxhaw, NC area",
-          },
-        ],
-        faqTitle: "Frequently Asked Questions — Waxhaw, NC",
-        faqs: [
-          {
-            question: "Do you work in Waxhaw regularly, or is it far from your base?",
-            answer:
-              "<p>Waxhaw is one of our most consistent service areas. We're based in Charlotte, which is just up the road, and we have clients throughout Waxhaw's neighborhoods. No travel fees, no minimum project size.</p>",
-          },
-          {
-            question: "What are the most popular projects in Waxhaw?",
-            answer:
-              "<p>Custom frameless shower enclosures are the top request — Waxhaw homeowners tend to invest in their bathrooms and want glass work that reflects that. Entry door upgrades are also very common, particularly for homes in Waxhaw's higher-end subdivisions where the front elevation matters. Window replacement and repair round out the most frequent calls.</p>",
-          },
-          {
-            question:
-              "Can you install a frameless shower in a master bath that has a non-standard configuration?",
-            answer:
-              "<p>Yes. Non-standard shower configurations — angled walls, knee walls, offset drains, unusual proportions — are something we encounter regularly. Doug measures every opening on-site and custom-orders the glass panels to fit. There's no standard template we're trying to force your shower into.</p>",
-          },
-          {
-            question: "How do I know if my windows need replacement or just repair?",
-            answer:
-              "<p>The most common sign that repair (rather than replacement) is appropriate is fogging between the panes with an otherwise sound frame and operating sash. If the window opens, closes, and locks correctly but is fogged, IGU replacement is usually the right call. If the frame is damaged, the window doesn't operate correctly, or the window is old enough that repair costs approach replacement costs, we'll tell you replacement makes more sense.</p>",
-          },
-          {
-            question: "Are you licensed and insured to work in Waxhaw?",
-            answer:
-              "<p>Yes. Glass & Door Pro is licensed and insured to work throughout Union County, including Waxhaw, Monroe, Indian Trail, Weddington, and surrounding communities.</p>",
-          },
-          {
-            question: "Do you do commercial glass work in Waxhaw?",
-            answer:
-              "<p>Yes. We handle commercial glass and door work for Waxhaw businesses — storefront glass, commercial door installation and repair, and commercial window replacement for multi-family properties. See our full commercial services at glassanddoorpro.com/services.</p>",
-          },
-        ],
-        ctaHeading: "Ready to Get Started in Waxhaw?",
-        ctaBody:
-          "Call, text, or fill out the form for a free quote. Doug will come out personally and give you a clear, written estimate.",
-        ctaFooter: "Mon–Sat, 7am–7pm | Charlotte-based, serving Waxhaw and Union County",
-      }),
-    ),
+        {
+          icon: "MapPin",
+          title: "Charlotte-Based, No Travel Fees",
+          description:
+            "Waxhaw is a regular part of our weekly schedule from our Charlotte home base, not an occasional out-of-area trip.",
+        },
+        {
+          icon: "Droplets",
+          title: "Custom Frameless Shower Installations",
+          description:
+            "From standard single-door enclosures to more complex configurations with multiple panels, we measure and install frameless glass that fits the space perfectly.",
+        },
+        {
+          icon: "Wrench",
+          title: "Honest on Repair vs. Replace",
+          description:
+            "We don't recommend replacement when repair makes sense. If your windows can be fixed with a glass-only IGU swap, we'll price that option first.",
+        },
+        {
+          icon: "Palette",
+          title: "Hardware That Matches Your Home",
+          description:
+            "We offer a range of finishes and help you select hardware that coordinates with your existing fixtures and home style — not just whatever is in stock.",
+        },
+        {
+          icon: "CalendarDays",
+          title: "Saturday Appointments Are Standard",
+          description:
+            "We work Mon–Sat, 7am–7pm. Saturday availability is built into our regular schedule for Waxhaw homeowners who can't do weekday appointments.",
+        },
+      ],
+      servicesTitle: "Our Services in Waxhaw, NC",
+      servicesIntro: "",
+      serviceCards: cityServiceCards,
+      areasTitle: "Neighborhoods and Areas We Serve in and Around Waxhaw",
+      areasIntro:
+        "We work throughout Waxhaw and the surrounding southern Union County area, including:",
+      areas: [
+        "Downtown Waxhaw and the historic district",
+        "Cureton and Cureton West",
+        "Millbridge and nearby communities",
+        "Providence Downs South area",
+        "The neighborhoods along Waxhaw-Indian Trail Road",
+        "Waxhaw-Marvin Road corridor",
+        "The communities off New Town Road and Kensington Drive",
+        "Rea Road extension and nearby residential areas",
+      ],
+      areasClosing:
+        "Not seeing your neighborhood? We serve all of Waxhaw — call (704) 771-6111 and we'll confirm.",
+      galleryTitle: "Our Work in the Waxhaw Area",
+      gallery: [
+        {
+          url: "/images/glass-door-pro/gallery-shower2-1280w.webp",
+          alt: "Modern frameless shower door installed by Glass & Door Pro in the Waxhaw area",
+        },
+        {
+          url: "/images/glass-door-pro/gallery-door2-1280w.webp",
+          alt: "Custom wooden entry door installed by Glass & Door Pro in the Waxhaw area",
+        },
+        {
+          url: "/images/glass-door-pro/gallery-windows-1280w.webp",
+          alt: "Replacement windows installed by Glass & Door Pro in the Waxhaw, NC area",
+        },
+      ],
+      faqTitle: "Frequently Asked Questions — Waxhaw, NC",
+      faqs: [
+        {
+          question: "Do you work in Waxhaw regularly, or is it far from your base?",
+          answer:
+            "<p>Waxhaw is one of our most consistent service areas. We're based in Charlotte, which is just up the road, and we have clients throughout Waxhaw's neighborhoods. No travel fees, no minimum project size.</p>",
+        },
+        {
+          question: "What are the most popular projects in Waxhaw?",
+          answer:
+            "<p>Custom frameless shower enclosures are the top request — Waxhaw homeowners tend to invest in their bathrooms and want glass work that reflects that. Entry door upgrades are also very common, particularly for homes in Waxhaw's higher-end subdivisions where the front elevation matters. Window replacement and repair round out the most frequent calls.</p>",
+        },
+        {
+          question:
+            "Can you install a frameless shower in a master bath that has a non-standard configuration?",
+          answer:
+            "<p>Yes. Non-standard shower configurations — angled walls, knee walls, offset drains, unusual proportions — are something we encounter regularly. Doug measures every opening on-site and custom-orders the glass panels to fit. There's no standard template we're trying to force your shower into.</p>",
+        },
+        {
+          question: "How do I know if my windows need replacement or just repair?",
+          answer:
+            "<p>The most common sign that repair (rather than replacement) is appropriate is fogging between the panes with an otherwise sound frame and operating sash. If the window opens, closes, and locks correctly but is fogged, IGU replacement is usually the right call. If the frame is damaged, the window doesn't operate correctly, or the window is old enough that repair costs approach replacement costs, we'll tell you replacement makes more sense.</p>",
+        },
+        {
+          question: "Are you licensed and insured to work in Waxhaw?",
+          answer:
+            "<p>Yes. Glass & Door Pro is licensed and insured to work throughout Union County, including Waxhaw, Monroe, Indian Trail, Weddington, and surrounding communities.</p>",
+        },
+        {
+          question: "Do you do commercial glass work in Waxhaw?",
+          answer:
+            "<p>Yes. We handle commercial glass and door work for Waxhaw businesses — storefront glass, commercial door installation and repair, and commercial window replacement for multi-family properties. See our full commercial services at glassanddoorpro.com/services.</p>",
+        },
+      ],
+      ctaHeading: "Ready to Get Started in Waxhaw?",
+      ctaBody:
+        "Call, text, or fill out the form for a free quote. Doug will come out personally and give you a clear, written estimate.",
+      ctaFooter: "Mon–Sat, 7am–7pm | Charlotte-based, serving Waxhaw and Union County",
+    }),
   },
   {
     title: "Matthews, NC",
@@ -5163,10 +5162,13 @@ export async function seedGlassPublicCms() {
       pageType: "area",
       status: "published",
       template: "full-width",
-      content: updateGlassLocationSearchContent(cityPage.slug, cityPage.content),
+      content: buildCityShowerPageContent(
+        cityPage.slug,
+        updateGlassLocationSearchContent(cityPage.slug, cityPage.content),
+      ),
       seoTitle: cityPage.seoTitle,
       seoDescription: cityPage.seoDescription,
-      seoKeywords: cityPage.seoKeywords,
+      seoKeywords: getCityShowerPageCopy(cityPage.slug)?.seoKeywords ?? cityPage.seoKeywords,
       ogImageUrl: cityPage.ogImageUrl,
       canonicalUrl: `https://glassanddoorpro.com${cityPage.path}`,
       publishedAt: new Date(),
