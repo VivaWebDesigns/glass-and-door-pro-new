@@ -1294,6 +1294,7 @@ describe("ensureSystemCmsPages", () => {
               { name: "Frankie23 “Patricia”", quote: "Removed review" },
               { name: "Noah Clark", quote: "Existing Noah review" },
               { name: "Tapan Patel", quote: "Removed review" },
+              { name: "RTrish", quote: "Removed review" },
             ]),
           ],
         },
@@ -1317,16 +1318,17 @@ describe("ensureSystemCmsPages", () => {
     const reviewsUpdate = mockUpdatePage.mock.calls.find(([id]) => id === "reviews-id")?.[1];
     const reviewItems = reviewsUpdate.content.blocks[0].props.items;
     expect(reviewItems.slice(0, 5).map((item: { name: string }) => item.name)).toEqual([
-      "Lisa M",
-      "Konstantin Kozhemyakov",
-      "van orcutt",
-      "Jeff Zwally",
-      "Chuck Preslar",
+      "Yuriy Kobzyev",
+      "L M",
+      "Danielle O'Keeffe",
+      "Mariela Salgado",
+      "Mark Evans",
     ]);
     expect(reviewItems.map((item: { name: string }) => item.name)).not.toContain(
       "Frankie23 “Patricia”",
     );
     expect(reviewItems.map((item: { name: string }) => item.name)).not.toContain("Tapan Patel");
+    expect(reviewItems.map((item: { name: string }) => item.name)).not.toContain("RTrish");
     expect(reviewItems.find((item: { name: string }) => item.name === "Noah Clark")).toMatchObject({
       reviewDate: "2026-07-07",
     });
@@ -1334,7 +1336,7 @@ describe("ensureSystemCmsPages", () => {
     const homeUpdate = mockUpdatePage.mock.calls.find(([id]) => id === "home-id")?.[1];
     expect(
       homeUpdate.content.blocks[0].props.items.map((item: { name: string }) => item.name),
-    ).toEqual(["Lisa M", "Konstantin Kozhemyakov", "Noah Clark"]);
+    ).toEqual(["Yuriy Kobzyev", "L M", "Noah Clark"]);
   });
 
   it("fills town-page reviews blocks with the current Google reviews", async () => {
@@ -1367,7 +1369,7 @@ describe("ensureSystemCmsPages", () => {
 
     const update = mockUpdatePage.mock.calls.find(([id]) => id === "matthews-id")?.[1];
     const names = update.content.blocks[0].props.items.map((item: { name: string }) => item.name);
-    expect(names.slice(0, 2)).toEqual(["Lisa M", "Konstantin Kozhemyakov"]);
+    expect(names.slice(0, 2)).toEqual(["Yuriy Kobzyev", "L M"]);
     expect(names.length).toBeGreaterThan(2);
     expect(names.at(-1)).toBe("Thomas F.");
   });

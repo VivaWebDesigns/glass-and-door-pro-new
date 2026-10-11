@@ -14,6 +14,28 @@ function googleReview(name: string, quote: string) {
 }
 
 export const GLASS_NEW_GOOGLE_REVIEWS = [
+  googleReview("Yuriy Kobzyev", "great glass door installation company"),
+  googleReview(
+    "L M",
+    "Doug is the owner of the business. When I contacted him. He was responsive on the weekend to do a job I needed to have competed the same day. He gave me options and advice. He was on time. His work was excellent and clean. Would highly recommend him! Thank you Doug!",
+  ),
+  googleReview(
+    "Danielle O'Keeffe",
+    "Doug’s professionalism and experience was so evident in the glass work he completed for me. He responds quickly to requests, is entirely dependable, completes the job beautifully, and is a knowledgeable and trustworthy consultant. I highly recommend Doug and Glass & Door Pro!",
+  ),
+  googleReview("Mariela Salgado", "Good job"),
+  googleReview(
+    "Mark Evans",
+    "The owner, Doug, was exceptional to work with. He knows his business and made the process extremely easy. Arrived when he said he would. Charged what he quoted. Left nothing to clean up. The repairs were perfect. If you need window or door work done on your home, you will be very pleased that you had the work done by Glass & Door Pro.",
+  ),
+  googleReview(
+    "Andrianna Demers",
+    "Doug gave us a free estimate, came the same day to confirm and did a great job. No surprise fees, no mess left behind, true professionalism and no delays. We highly recommend this business.",
+  ),
+  googleReview(
+    "Lena S",
+    "Was impressed how fast the replacement was done. Would definitely recommend this company. Very responsive answer phone calls quickly and real person not AI. Had to replace shuttered half of glass sliding door",
+  ),
   googleReview(
     "Lisa M",
     "I couldn't ask for better service! I had 3 window panes replaced. One of them being a half round that was not perfectly half round. The half round had some issues because of the not so perfect shape and they stuck to it until it was right. Great customer service, I had no complaints. This company serviced my area that doesn't get too many service people due to location. I would refer this company to anyone who needs replacement!",
@@ -36,10 +58,6 @@ export const GLASS_NEW_GOOGLE_REVIEWS = [
     "Great experience, made sure the job was done correctly and explained different options allowing us to make an informed decision.",
   ),
   googleReview(
-    "RTrish",
-    "Called to request a sliding glass door repair. Doug responded quickly. He was very courteous, prompt and had the issue fixed in a timely manner. Thankfully, the screen was just off track. All went well, but it did seem a little pricey.",
-  ),
-  googleReview(
     "Mike O'Sullivan",
     "My custom double-pain glass window needed to be replaced. Everything was done exactly on time, and the glass was carefully installed. Good as new!",
   ),
@@ -60,4 +78,5 @@ export const RETIRED_GLASS_GOOGLE_REVIEW_NAMES = new Set([
   "Frankie23 “Patricia”",
   "Tapan Patel",
   "Chris Jones",
+  "RTrish",
 ]);
