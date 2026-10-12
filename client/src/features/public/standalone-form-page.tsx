@@ -30,7 +30,7 @@ export default function StandaloneFormPage() {
         </div>
 
         <section className="rounded-2xl border bg-white p-6 shadow-sm md:p-8">
-          <PublicFormRenderer slug={slug} compact />
+          <PublicFormRenderer slug={slug} compact headingLevel="h1" />
         </section>
       </div>
     </main>

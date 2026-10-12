@@ -77,6 +77,7 @@ const blocks: BlockInstance[] = [
     type: "section-header",
     props: {
       title: "Gallery",
+      sectionHeadingLevel: "h1",
       subtitle: "Explore our work by category.",
       alignment: "center",
       sectionBackgroundColor: "#ffffff",

@@ -249,9 +249,13 @@ function CmsPageBody({ page }: { page: CmsPage }) {
   const hiddenServiceAreaGallery = parsedBlocks.find((block) =>
     shouldHideServiceAreaWorkGallery(page.slug, block),
   );
-  const blocks = parsedBlocks.filter(
-    (block) => !shouldHideServiceAreaWorkGallery(page.slug, block),
-  );
+  const blocks = parsedBlocks
+    .filter((block) => !shouldHideServiceAreaWorkGallery(page.slug, block))
+    .map((block, index) =>
+      page.slug === "gallery" && index === 0 && block.type === "section-header"
+        ? { ...block, props: { ...block.props, sectionHeadingLevel: "h1" } }
+        : block,
+    );
 
   if (blocks.length === 0) {
     return (

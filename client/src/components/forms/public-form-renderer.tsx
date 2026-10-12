@@ -24,6 +24,7 @@ interface PublicFormRendererProps {
   slug: string;
   className?: string;
   showHeader?: boolean;
+  headingLevel?: "h1" | "h3";
   descriptionOverride?: string;
   buttonTextOverride?: string;
   submitButtonClassName?: string;
@@ -654,18 +655,21 @@ function PublicFormHeader({
   name,
   description,
   showName,
+  headingLevel,
 }: {
   name: string;
   description: string;
   showName: boolean;
+  headingLevel: "h1" | "h3";
 }) {
   const descriptionNode = description ? (
     <p className="text-sm public-supporting-copy">{description}</p>
   ) : null;
   if (!showName) return descriptionNode;
+  const Heading = headingLevel;
   return (
     <div className="space-y-1">
-      <h3 className="font-semibold public-heading-3">{name}</h3>
+      <Heading className="font-semibold public-heading-3">{name}</Heading>
       {descriptionNode}
     </div>
   );
@@ -773,6 +777,7 @@ function LoadedPublicForm({
   slug,
   className,
   showHeader = true,
+  headingLevel = "h3",
   descriptionOverride,
   buttonTextOverride,
   submitButtonClassName,
@@ -832,7 +837,12 @@ function LoadedPublicForm({
 
   return (
     <div className={cn("space-y-4", className)} data-testid={`public-form-${slug}`}>
-      <PublicFormHeader name={form.name} description={description} showName={showHeader} />
+      <PublicFormHeader
+        name={form.name}
+        description={description}
+        showName={showHeader}
+        headingLevel={headingLevel}
+      />
 
       {pages.length > 1 ? (
         <FormStepProgress page={activePage} pageIndex={currentPageIndex} pageCount={pages.length} />
