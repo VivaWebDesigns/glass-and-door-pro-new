@@ -430,7 +430,10 @@ function buildLinkListHtml(title: string, links: PrerenderLink[], id?: string) {
     ...normalizedLinks.map((link) =>
       [
         `<li>`,
+        // Keep email links usable in raw HTML; Cloudflare's obfuscated URL is a 404 for crawlers.
+        /^mailto:/i.test(link.href) ? "<!--email_off-->" : "",
         `<a href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a>`,
+        /^mailto:/i.test(link.href) ? "<!--/email_off-->" : "",
         link.description ? `<p>${escapeHtml(truncate(link.description, 180))}</p>` : "",
         `</li>`,
       ].join(""),

@@ -440,6 +440,10 @@ describe("public-prerender.service", () => {
                   url: "/services/commercial-storefront-glass-installation",
                   description: "Storefront installation for Charlotte businesses.",
                 },
+                {
+                  label: "Email Doug",
+                  url: "mailto:Doug@GlassandDoorPro.com",
+                },
               ],
             },
           },
@@ -470,6 +474,9 @@ describe("public-prerender.service", () => {
     expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/monroe">Monroe service area</a>');
     expect(snapshot?.bodyHtml).toContain('<nav class="seo-prerender-footer"');
     expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/indian-trail">Indian Trail</a>');
+    expect(snapshot?.bodyHtml).toContain(
+      '<!--email_off--><a href="mailto:Doug@GlassandDoorPro.com">Email Doug</a><!--/email_off-->',
+    );
   });
 
   it("keeps CMS internals out of the home prerender body", async () => {
