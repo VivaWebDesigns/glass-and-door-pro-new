@@ -164,7 +164,8 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
     }
 
     const publicPath = getCmsPublicPath(page.slug);
-    const canonical = page.canonicalUrl || (publicPath === "/" ? origin : `${origin}${publicPath}`);
+    const canonical = new URL(page.canonicalUrl || `${origin.replace(/\/+$/, "")}${publicPath}`)
+      .href;
     setLink("canonical", canonical);
 
     if (page.noindex) {

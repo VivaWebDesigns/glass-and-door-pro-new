@@ -76,6 +76,61 @@ const cmsPage: CmsPage = {
 };
 
 describe("public-prerender.service", () => {
+  it.each([null, "https://glassanddoorpro.com"])(
+    "uses the crawled root URL for the homepage canonical with override %s",
+    async (canonicalUrl) => {
+      mockGetSeo.mockResolvedValue(seoSettings);
+      mockGetPageBySlug.mockResolvedValue({ ...cmsPage, slug: "home", canonicalUrl });
+      const { getPublicHtmlSnapshot, injectPublicHtmlSnapshot } =
+        await import("../services/public-prerender.service");
+      const snapshot = await getPublicHtmlSnapshot("/");
+      expect(snapshot?.canonicalUrl).toBe("https://glassanddoorpro.com/");
+      expect(injectPublicHtmlSnapshot("<head><!--APP_DYNAMIC_HEAD--></head>", snapshot)).toContain(
+        '<link rel="canonical" href="https://glassanddoorpro.com/" />',
+      );
+    },
+  );
+
+  it("keeps anchored body copy and image captions out of heading tags", async () => {
+    mockGetSeo.mockResolvedValue(seoSettings);
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      slug: "home",
+      content: {
+        blocks: [
+          {
+            type: "rich-text",
+            props: {
+              anchorId: "intro",
+              content: "Welcome to our local glass installation business.",
+            },
+          },
+          {
+            type: "image",
+            props: { anchorId: "project", imageAlt: "A finished frameless shower in Charlotte." },
+          },
+          {
+            type: "rich-text",
+            props: {
+              anchorId: "showers",
+              title: "Frameless Showers",
+              content: "Custom shower glass for your home.",
+            },
+          },
+        ],
+      },
+    });
+    const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
+    const snapshot = await getPublicHtmlSnapshot("/");
+    expect(snapshot?.bodyHtml).toContain(
+      '<section id="intro"><p>Welcome to our local glass installation business.</p>',
+    );
+    expect(snapshot?.bodyHtml).toContain(
+      '<section id="project"><p>A finished frameless shower in Charlotte.</p>',
+    );
+    expect(snapshot?.bodyHtml).toContain('<section id="showers"><h2>Frameless Showers</h2>');
+  });
+
   it.each(Object.entries(heroPages))(
     "preloads the matching mobile hero on %s",
     async (path, image) => {

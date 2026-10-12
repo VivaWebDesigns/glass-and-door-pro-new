@@ -326,10 +326,18 @@ function collectAnchoredSections(content: unknown) {
       if (!props || typeof props !== "object") return null;
       const anchorId = sanitizeAnchorId((props as { anchorId?: unknown }).anchorId);
       if (!anchorId) return null;
+      const record = props as Record<string, unknown>;
+      const heading = [record.heading, record.title, record.formTitle, record.introTitle].find(
+        (value): value is string => typeof value === "string" && Boolean(value.trim()),
+      );
       const fragments = uniqueFragments(collectTextFragments(props)).slice(0, 3);
-      return fragments.length > 0 ? { anchorId, fragments } : null;
+      return fragments.length > 0
+        ? { anchorId, heading: heading ? stripHtml(heading) : "", fragments }
+        : null;
     })
-    .filter((section): section is { anchorId: string; fragments: string[] } => Boolean(section));
+    .filter((section): section is { anchorId: string; heading: string; fragments: string[] } =>
+      Boolean(section),
+    );
 }
 
 function isServiceAreaPageSlug(slug: string) {
@@ -671,14 +679,15 @@ function buildSimplePageBody(
   title: string,
   description: string,
   fragments: string[] = [],
-  anchoredSections: Array<{ anchorId: string; fragments: string[] }> = [],
+  anchoredSections: Array<{ anchorId: string; heading: string; fragments: string[] }> = [],
   extraHtml: string[] = [],
 ) {
   const paragraphs = uniqueFragments([description, ...fragments])
     .filter((fragment) => fragment && fragment.toLowerCase() !== title.trim().toLowerCase())
     .slice(0, 8);
   const anchoredHtml = anchoredSections.map((section) => {
-    const [heading, ...body] = section.fragments;
+    const heading = section.heading;
+    const body = section.fragments.filter((fragment) => fragment !== heading);
     return [
       `<section id="${escapeHtml(section.anchorId)}">`,
       heading ? `<h2>${escapeHtml(heading)}</h2>` : "",
@@ -762,9 +771,8 @@ function buildCmsSnapshot(
     truncate(uniqueFragments(collectTextFragments(normalizedVisiblePage.content)).join(" "), 180) ||
     DEFAULT_DESCRIPTION;
   const publicPath = getCmsPublicPath(normalizedVisiblePage.slug);
-  const canonicalUrl =
-    normalizedVisiblePage.canonicalUrl ||
-    (publicPath === "/" ? siteUrl : `${siteUrl}${publicPath}`);
+  const canonicalUrl = new URL(normalizedVisiblePage.canonicalUrl || `${siteUrl}${publicPath}`)
+    .href;
   const faqItems = extractFaqItems(normalizedVisiblePage.content);
   const bodyHtml = buildSimplePageBody(
     getPrerenderHeading(normalizedVisiblePage),
@@ -839,7 +847,7 @@ function buildFallbackSnapshot(
   return {
     title: buildHeadTitle(fallback.title, seo),
     description: fallback.description,
-    canonicalUrl: pathname === "/" ? siteUrl : `${siteUrl}${pathname}`,
+    canonicalUrl: `${siteUrl}${pathname}`,
     ogImageUrl: absoluteUrl(seo?.defaultOgImageUrl, siteUrl) || null,
     robots: fallback.noindex ? "noindex,follow" : null,
     bodyHtml: buildSimplePageBody(
