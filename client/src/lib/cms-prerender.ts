@@ -18,29 +18,24 @@ export function isValidCmsPage(data: unknown): data is CmsPage {
 }
 
 export function bootstrapCmsPrerenderPage() {
-  if (typeof window === "undefined") return;
-  if (window.__CMS_PRERENDER_PAGE__) return;
+  // The script's id also exposes the <script> element as window.__CMS_PRERENDER_PAGE__,
+  // so check for a parsed page rather than any value.
+  if (typeof window === "undefined" || isValidCmsPage(window.__CMS_PRERENDER_PAGE__)) return;
 
   const payload = document.getElementById("__CMS_PRERENDER_PAGE__")?.textContent;
   if (!payload) return;
 
   try {
-    const page = JSON.parse(payload);
-    if (isValidCmsPage(page)) {
-      window.__CMS_PRERENDER_PAGE__ = page;
-    }
+    const page: unknown = JSON.parse(payload);
+    if (isValidCmsPage(page)) window.__CMS_PRERENDER_PAGE__ = page;
   } catch {
-    // Ignore malformed embedded payloads and let the CMS API fetch handle the page.
+    // A malformed payload falls back to the public CMS API.
   }
 }
 
 export function getPrerenderedCmsPage(slug: string): CmsPage | undefined {
   if (typeof window === "undefined") return undefined;
-
-  if (!window.__CMS_PRERENDER_PAGE__) {
-    bootstrapCmsPrerenderPage();
-  }
-
+  bootstrapCmsPrerenderPage();
   const page = window.__CMS_PRERENDER_PAGE__;
-  return page?.slug === slug && page.status === "published" ? page : undefined;
+  return isValidCmsPage(page) && page.slug === slug && page.status === "published" ? page : undefined;
 }
