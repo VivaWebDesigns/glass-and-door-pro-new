@@ -21,6 +21,8 @@ export function buildDefaultRobotsTxt(seoSettings?: SeoSettings | null) {
     lines.push("Allow: /api/seo/global");
     lines.push("Allow: /api/cms/menus");
     lines.push("Allow: /api/cms/pages/by-slug/");
+    // Public pages load their contact forms from here while rendering.
+    lines.push("Allow: /api/forms/");
     lines.push("Disallow: /api");
     if (siteUrl) {
       lines.push("");

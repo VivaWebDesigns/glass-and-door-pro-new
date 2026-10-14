@@ -35,6 +35,8 @@ describe("buildDefaultRobotsTxt", () => {
       "allow",
     );
 
+    expect(mostSpecificRule(robotsTxt, "/api/forms/contact-form")).toBe("allow");
+
     expect(mostSpecificRule(robotsTxt, "/api/auth/me")).toBe("disallow");
     expect(mostSpecificRule(robotsTxt, "/api/admin/cms/pages")).toBe("disallow");
     expect(mostSpecificRule(robotsTxt, "/api/setup/status")).toBe("disallow");
