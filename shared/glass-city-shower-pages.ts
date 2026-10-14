@@ -202,6 +202,20 @@ const waxhawCopy: CityShowerPageCopy = {
     "<p>Call, text or fill out the form for a free quote. Doug will come out personally and give you a clear written estimate.</p><p><strong>Mon–Sat, 7am–7pm | Charlotte-based, serving Waxhaw and Union County</strong></p>",
 };
 
+// The towns past Charlotte on the Charlotte page, limited to Glass & Door Pro's city pages.
+export const CHARLOTTE_NEARBY_AREAS = [
+  "Matthews and Pineville",
+  "Union County: Indian Trail, Stallings, Monroe, Waxhaw, Weddington, and Wesley Chapel",
+  "Across the SC line: Fort Mill and Indian Land",
+];
+// What the live Charlotte page listed before it was limited to the city pages.
+export const CHARLOTTE_PREVIOUS_NEARBY_AREAS = [
+  "Matthews, Mint Hill, Pineville",
+  "Huntersville, Cornelius, and Davidson",
+  "Concord and Harrisburg",
+  "Across the SC line: Fort Mill, Indian Land, Tega Cay, Rock Hill",
+];
+
 const charlotteCopy: CityShowerPageCopy = {
   key: "charlotte",
   city: "Charlotte",
@@ -268,10 +282,7 @@ const charlotteCopy: CityShowerPageCopy = {
       "East Charlotte: Cotswold, Elizabeth, Matthews-adjacent",
       "North Charlotte: NoDa, Optimist Park, Plaza Hills",
       "Uptown and South End",
-      "Matthews, Mint Hill, Pineville",
-      "Huntersville, Cornelius, and Davidson",
-      "Concord and Harrisburg",
-      "Across the SC line: Fort Mill, Indian Land, Tega Cay, Rock Hill",
+      ...CHARLOTTE_NEARBY_AREAS,
     ],
     'Not seeing your neighborhood? We almost certainly cover it. Call <a href="tel:+17047716111">(704) 771-6111</a> and we\'ll let you know.',
   ),

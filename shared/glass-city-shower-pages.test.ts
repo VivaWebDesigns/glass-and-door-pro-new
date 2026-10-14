@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildCityShowerPageContent,
+  CHARLOTTE_NEARBY_AREAS,
   linkLocationCommercialCardToServicesHub,
   getCityShowerPageCopy,
 } from "./glass-city-shower-pages";
@@ -204,12 +205,30 @@ describe("buildCityShowerPageContent", () => {
       "charlotte-shower-door-options",
       "charlotte-shower-door-process",
       "why",
-      "areas",
       "faq",
       "services",
       "cta",
     ].map((id) => byId[id]);
+    // Waxhaw template copy must not leak in; the areas list names Waxhaw as a nearby town.
     expect(JSON.stringify(rewritten)).not.toContain("Waxhaw");
+  });
+
+  it("lists every other city page, and only city pages, as Charlotte's nearby towns", () => {
+    const listed = CHARLOTTE_NEARBY_AREAS.join(" ");
+    for (const { label } of GLASS_PRIMARY_SERVICE_AREAS) {
+      if (label !== "Charlotte") expect(listed).toContain(label);
+    }
+    for (const town of [
+      "Mint Hill",
+      "Huntersville",
+      "Cornelius",
+      "Davidson",
+      "Concord",
+      "Tega Cay",
+      "Rock Hill",
+    ]) {
+      expect(listed).not.toContain(town);
+    }
   });
 
   it("has shower copy for every city page that keeps its search intro", () => {

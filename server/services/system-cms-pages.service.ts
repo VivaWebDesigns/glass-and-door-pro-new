@@ -29,6 +29,8 @@ import type { InsertCmsPage } from "@shared/schema";
 import { applyQuoteCtaRefresh } from "@shared/glass-quote-cta";
 import {
   buildCityShowerPageContent,
+  CHARLOTTE_NEARBY_AREAS,
+  CHARLOTTE_PREVIOUS_NEARBY_AREAS,
   getCityShowerPageCopy,
   linkLocationCommercialCardToServicesHub,
 } from "@shared/glass-city-shower-pages";
@@ -1058,6 +1060,26 @@ async function normalizeStoredCmsPages() {
             };
             updates.seoKeywords = cityShowerCopy.seoKeywords;
           }
+        }
+      }
+
+      if (page.slug === "areas-served-charlotte-nc") {
+        // Limit the Charlotte page's nearby towns to the city pages, once; other edits are kept.
+        const charlotteContent = updates.content ?? page.content;
+        const charlotteMeta =
+          isRecord(charlotteContent) && isRecord(charlotteContent._system)
+            ? charlotteContent._system
+            : {};
+        const toItems = (areas: string[]) => areas.map((area) => `<li>${area}</li>`).join("");
+        const before = JSON.stringify(charlotteContent);
+        const previousItems = JSON.stringify(toItems(CHARLOTTE_PREVIOUS_NEARBY_AREAS)).slice(1, -1);
+        if (charlotteMeta.charlotteNearbyAreas2026 !== true && before.includes(previousItems)) {
+          const nextItems = JSON.stringify(toItems(CHARLOTTE_NEARBY_AREAS)).slice(1, -1);
+          const rebuilt = JSON.parse(before.replace(previousItems, nextItems));
+          updates.content = {
+            ...rebuilt,
+            _system: { ...charlotteMeta, charlotteNearbyAreas2026: true },
+          } as InsertCmsPage["content"];
         }
       }
 
