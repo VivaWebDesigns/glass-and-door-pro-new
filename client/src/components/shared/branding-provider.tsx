@@ -19,6 +19,40 @@ function resolveFaviconUrl(value: string | null | undefined) {
   return value;
 }
 
+/** Maps the /api/branding payload (also embedded in the page HTML) to BrandingSettings. */
+export function brandingFromPayload(
+  payload: Partial<Record<keyof BrandingSettings, string | null>> | null | undefined,
+): BrandingSettings {
+  return {
+    frontendLogoUrl: payload?.frontendLogoUrl ?? null,
+    faviconUrl: payload?.faviconUrl ?? null,
+    companyName: payload?.companyName ?? null,
+    companyAddress: payload?.companyAddress ?? null,
+    companyPhoneNumbers: payload?.companyPhoneNumbers ?? null,
+    companyGoogleBusinessUrl: payload?.companyGoogleBusinessUrl ?? null,
+    bodyFont: payload?.bodyFont ?? null,
+    headingFont: payload?.headingFont ?? null,
+    primaryColor: payload?.primaryColor ?? null,
+    secondaryColor: payload?.secondaryColor ?? null,
+    tertiaryColor: payload?.tertiaryColor ?? null,
+    quaternaryColor: payload?.quaternaryColor ?? "#A8623A",
+    h1Color: payload?.h1Color ?? null,
+    h2Color: payload?.h2Color ?? null,
+    h3ToH6Color: payload?.h3ToH6Color ?? null,
+    bodyTextColor: payload?.bodyTextColor ?? null,
+    headingSubtextColor: payload?.headingSubtextColor ?? null,
+    supportingCopyColor: payload?.supportingCopyColor ?? null,
+    helperTextColor: payload?.helperTextColor ?? null,
+    metaTextColor: payload?.metaTextColor ?? null,
+    linkColor: payload?.linkColor ?? null,
+    linkHoverColor: payload?.linkHoverColor ?? null,
+    inverseTextColor: payload?.inverseTextColor ?? null,
+    primaryTextColor: payload?.primaryTextColor ?? null,
+    secondaryTextColor: payload?.secondaryTextColor ?? null,
+    tertiaryTextColor: payload?.tertiaryTextColor ?? null,
+  };
+}
+
 export function BrandingProvider({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const { data } = useQuery<BrandingSettings>({
@@ -28,35 +62,7 @@ export function BrandingProvider({ children }: { children: React.ReactNode }) {
       if (!response.ok) {
         return DEFAULT_BRANDING_SETTINGS;
       }
-      const payload = await response.json();
-      return {
-        frontendLogoUrl: payload?.frontendLogoUrl ?? null,
-        faviconUrl: payload?.faviconUrl ?? null,
-        companyName: payload?.companyName ?? null,
-        companyAddress: payload?.companyAddress ?? null,
-        companyPhoneNumbers: payload?.companyPhoneNumbers ?? null,
-        companyGoogleBusinessUrl: payload?.companyGoogleBusinessUrl ?? null,
-        bodyFont: payload?.bodyFont ?? null,
-        headingFont: payload?.headingFont ?? null,
-        primaryColor: payload?.primaryColor ?? null,
-        secondaryColor: payload?.secondaryColor ?? null,
-        tertiaryColor: payload?.tertiaryColor ?? null,
-        quaternaryColor: payload?.quaternaryColor ?? "#A8623A",
-        h1Color: payload?.h1Color ?? null,
-        h2Color: payload?.h2Color ?? null,
-        h3ToH6Color: payload?.h3ToH6Color ?? null,
-        bodyTextColor: payload?.bodyTextColor ?? null,
-        headingSubtextColor: payload?.headingSubtextColor ?? null,
-        supportingCopyColor: payload?.supportingCopyColor ?? null,
-        helperTextColor: payload?.helperTextColor ?? null,
-        metaTextColor: payload?.metaTextColor ?? null,
-        linkColor: payload?.linkColor ?? null,
-        linkHoverColor: payload?.linkHoverColor ?? null,
-        inverseTextColor: payload?.inverseTextColor ?? null,
-        primaryTextColor: payload?.primaryTextColor ?? null,
-        secondaryTextColor: payload?.secondaryTextColor ?? null,
-        tertiaryTextColor: payload?.tertiaryTextColor ?? null,
-      } satisfies BrandingSettings;
+      return brandingFromPayload(await response.json());
     },
     staleTime: 60_000,
   });

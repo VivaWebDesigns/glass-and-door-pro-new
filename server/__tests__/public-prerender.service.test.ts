@@ -700,3 +700,21 @@ describe("public-prerender.service", () => {
     expect(headHtml).not.toContain("</script<");
   });
 });
+
+describe("public bootstrap payload", () => {
+  it("embeds branding and menus safely for the first client render", async () => {
+    const { injectPublicHtmlSnapshot } = await import("../services/public-prerender.service");
+    const template =
+      '<html><head><!--APP_DYNAMIC_HEAD--></head><body><!--APP_PRERENDER_CONTENT--><div id="root"></div></body></html>';
+    const bootstrap = {
+      branding: { companyName: "Name </script> here", companyPhoneNumbers: "(704) 555-0100" },
+      menus: { main_navigation: { name: "Main", items: [] } },
+    };
+    const html = injectPublicHtmlSnapshot(template, null, null, bootstrap);
+    const payload = html.match(/<script id="__PUBLIC_BOOTSTRAP__" type="application\/json">([\s\S]*?)<\/script>/)?.[1];
+    expect(payload).toBeDefined();
+    expect(payload).not.toContain("<");
+    expect(JSON.parse(payload!)).toEqual(bootstrap);
+    expect(injectPublicHtmlSnapshot(template, null)).not.toContain("__PUBLIC_BOOTSTRAP__");
+  });
+});

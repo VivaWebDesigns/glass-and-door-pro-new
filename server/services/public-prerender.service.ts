@@ -925,11 +925,22 @@ function getStaticHeroPreload(page: CmsPage | undefined, fallbackImage?: string)
   return `<link rel="preload" as="image" href="${escapeHtml(image)}" fetchpriority="high" />`;
 }
 
+/** Branding and menus the client seeds its query cache with, so the first render has them. */
+export type PublicBootstrapData = { branding: unknown; menus: unknown };
+
+function buildBootstrapScript(bootstrap?: PublicBootstrapData | null) {
+  return bootstrap
+    ? `<script id="__PUBLIC_BOOTSTRAP__" type="application/json">${serializeJsonForHtml(bootstrap)}</script>`
+    : "";
+}
+
 export function injectPublicHtmlSnapshot(
   template: string,
   snapshot: PublicHtmlSnapshot | null,
   customHeadHtml?: string | null,
+  bootstrap?: PublicBootstrapData | null,
 ) {
+  const bootstrapScript = buildBootstrapScript(bootstrap);
   const normalizedTemplate = template
     .replace(/\s*<meta name="description"[^>]*>\s*/i, "\n")
     .replace(/\s*<meta property="og:title"[^>]*>\s*/i, "\n")
@@ -947,7 +958,7 @@ export function injectPublicHtmlSnapshot(
   if (!snapshot) {
     return normalizedTemplate
       .replace("<!--APP_DYNAMIC_HEAD-->", () => customHeadHtml || "")
-      .replace("<!--APP_PRERENDER_CONTENT-->", () => "");
+      .replace("<!--APP_PRERENDER_CONTENT-->", () => bootstrapScript);
   }
 
   const headParts = [
@@ -986,6 +997,6 @@ export function injectPublicHtmlSnapshot(
     .replace(
       "<!--APP_PRERENDER_CONTENT-->",
       () =>
-        `${prerenderPayload}${snapshot.bodyHtml ? `<div id="seo-prerender">${snapshot.bodyHtml}</div>` : ""}`,
+        `${bootstrapScript}${prerenderPayload}${snapshot.bodyHtml ? `<div id="seo-prerender">${snapshot.bodyHtml}</div>` : ""}`,
     );
 }

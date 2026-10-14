@@ -6,6 +6,7 @@ import {
   getPublicHtmlSnapshot,
   injectPublicHtmlSnapshot,
 } from "./services/public-prerender.service";
+import { getPublicBranding, getPublicMenuMap } from "./services/public-bootstrap.service";
 
 const LEGACY_PUBLIC_REDIRECTS: Record<string, string> = {
   "/about": "/#about",
@@ -133,7 +134,15 @@ export function serveStatic(app: Express) {
       res.status(404).type("text").set("Cache-Control", "no-cache").send("Not found");
       return;
     }
-    const customHeadHtml = shouldInjectPublicHead ? await getPublicHeadAdditions() : null;
+    const [customHeadHtml, bootstrap] = shouldInjectPublicHead
+      ? await Promise.all([
+          getPublicHeadAdditions(),
+          Promise.all([getPublicBranding(), getPublicMenuMap()]).then(
+            ([branding, menus]) => ({ branding, menus }),
+            () => null,
+          ),
+        ])
+      : [null, null];
 
     res.setHeader(
       "Cache-Control",
@@ -141,6 +150,6 @@ export function serveStatic(app: Express) {
         ? "private, no-store, max-age=0"
         : "no-cache",
     );
-    res.type("html").send(injectPublicHtmlSnapshot(template, snapshot, customHeadHtml));
+    res.type("html").send(injectPublicHtmlSnapshot(template, snapshot, customHeadHtml, bootstrap));
   });
 }

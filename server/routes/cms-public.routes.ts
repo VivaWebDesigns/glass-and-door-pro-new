@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { asyncHandler } from "../middleware/error-handler";
 import { storage } from "../storage";
+import { getPublicMenuMap } from "../services/public-bootstrap.service";
 import { paramString } from "../utils/params";
-import { PUBLIC_MENU_LOCATIONS, type CmsMenu, type PublicMenuLocation } from "@shared/schema";
+import { PUBLIC_MENU_LOCATIONS, type PublicMenuLocation } from "@shared/schema";
 import { verifyCmsPreviewToken } from "../utils/cms-preview-token";
 
 const router = Router();
@@ -60,16 +61,7 @@ router.get(
 router.get(
   "/menus",
   asyncHandler(async (_req, res) => {
-    const menus = await storage.cmsMenus.getAll();
-    const menuMap: Partial<Record<PublicMenuLocation, CmsMenu>> = {};
-    for (const menu of menus) {
-      const location = menu.location as PublicMenuLocation;
-      if (!PUBLIC_MENU_LOCATIONS.includes(location) || menuMap[location]) {
-        continue;
-      }
-      menuMap[location] = menu;
-    }
-    res.json(menuMap);
+    res.json(await getPublicMenuMap());
   }),
 );
 
