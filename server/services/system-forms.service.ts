@@ -70,9 +70,14 @@ const SYSTEM_FORMS: ManagedSystemForm[] = [
       }),
       field("email", "email", "Email", "email", {
         placeholder: "you@example.com",
-        helpText: "Optional",
-        required: false,
+        required: true,
         width: "half",
+      }),
+      field("service-address", "serviceAddress", "Service Address", "address", {
+        required: true,
+        helpText:
+          "Enter the street, city, state, and ZIP where the work is needed. Address line 2 is optional.",
+        config: { showStreet2: true, showCountry: false, addressLayout: "compact" },
       }),
       field("subject", "subject", "Subject", "text", {
         placeholder: "What is this about?",
@@ -84,7 +89,7 @@ const SYSTEM_FORMS: ManagedSystemForm[] = [
       }),
     ],
     settings: settings({
-      schemaVersion: 3,
+      schemaVersion: 4,
       submitButtonText: "Send Message",
       successMessage: "Thanks for reaching out. We'll get back to you soon.",
       mailchimpEnabled: false,
@@ -116,7 +121,34 @@ export async function ensureSystemForms() {
         const upgradedFields =
           existingSchemaVersion >= 2
             ? existingFields.filter((existingField) => existingField.key !== "contactPreference")
-            : systemForm.fields;
+            : [...systemForm.fields];
+        if (existingSchemaVersion < 4) {
+          for (const key of ["phone", "email", "serviceAddress"]) {
+            const index = upgradedFields.findIndex(
+              (entry) =>
+                entry.key === key || (key === "serviceAddress" && entry.type === "address"),
+            );
+            const defaultField = systemForm.fields.find((entry) => entry.key === key)!;
+            if (index < 0) {
+              const messageIndex = upgradedFields.findIndex(
+                (entry) => entry.key === "subject" || entry.key === "message",
+              );
+              upgradedFields.splice(
+                messageIndex < 0 ? upgradedFields.length : messageIndex,
+                0,
+                defaultField,
+              );
+            } else {
+              upgradedFields[index] = {
+                ...upgradedFields[index],
+                required: true,
+                ...(key === "email" && upgradedFields[index].helpText === "Optional"
+                  ? { helpText: "" }
+                  : {}),
+              };
+            }
+          }
+        }
 
         await storage.forms.update(existing.id, {
           name: existing.name || systemForm.name,

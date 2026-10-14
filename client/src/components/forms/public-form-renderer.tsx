@@ -159,14 +159,13 @@ function validatePageFields(fields: CmsFormField[], values: FormValues) {
 
     if (field.type === "address") {
       const record = objectValue(value);
-      if (
-        !text(record.street) &&
-        !text(record.city) &&
-        !text(record.state) &&
-        !text(record.postalCode) &&
-        !text(record.country)
-      ) {
-        return `${field.label} is required`;
+      for (const [key, label] of [
+        ["street", "street address"],
+        ["city", "city"],
+        ["state", "state"],
+        ["postalCode", "ZIP / postal code"],
+      ]) {
+        if (!text(record[key])) return `${field.label}: ${label} is required`;
       }
       continue;
     }
@@ -510,13 +509,14 @@ function renderFieldInput(
           value={text(record.street)}
           onChange={(event) => setValue({ ...record, street: event.target.value })}
           placeholder="Street address"
+          required={field.required}
         />
         {field.config?.showStreet2 ? (
           <Input
             aria-label={`${field.label}: Address line 2`}
             value={text(record.street2)}
             onChange={(event) => setValue({ ...record, street2: event.target.value })}
-            placeholder="Address line 2"
+            placeholder="Address line 2 (optional)"
           />
         ) : null}
         <Input
@@ -524,18 +524,21 @@ function renderFieldInput(
           value={text(record.city)}
           onChange={(event) => setValue({ ...record, city: event.target.value })}
           placeholder="City"
+          required={field.required}
         />
         <Input
           aria-label={`${field.label}: State / Province`}
           value={text(record.state)}
           onChange={(event) => setValue({ ...record, state: event.target.value })}
           placeholder="State / Province"
+          required={field.required}
         />
         <Input
           aria-label={`${field.label}: Postal code`}
           value={text(record.postalCode)}
           onChange={(event) => setValue({ ...record, postalCode: event.target.value })}
           placeholder="Postal code"
+          required={field.required}
         />
         {field.config?.showCountry !== false ? (
           <Input
@@ -575,6 +578,7 @@ function renderFieldInput(
       value={text(value)}
       onChange={(event) => setValue(event.target.value)}
       placeholder={field.placeholder}
+      required={field.required}
       autoPrependHttps={field.type === "website"}
     />
   );
@@ -724,7 +728,12 @@ function PublicFormField({
   const showHelpText = !isStructuralField(field.type) && Boolean(field.helpText);
   return (
     <div className={cn("space-y-1.5", fieldSpanClass(field, compact))}>
-      {showLabel ? <Label htmlFor={fieldId}>{field.label}</Label> : null}
+      {showLabel ? (
+        <Label htmlFor={fieldId}>
+          {field.label}
+          {field.required ? " *" : ""}
+        </Label>
+      ) : null}
       {renderFieldInput(field, value, onChange, compact, fieldId)}
       {showHelpText ? <p className="text-xs public-helper-text">{field.helpText}</p> : null}
     </div>

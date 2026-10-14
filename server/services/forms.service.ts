@@ -147,15 +147,15 @@ function validateField(field: CmsFormField, raw: unknown) {
       country: stringValue(value.country),
     };
 
-    if (
-      field.required &&
-      !normalized.street &&
-      !normalized.city &&
-      !normalized.state &&
-      !normalized.postalCode &&
-      !normalized.country
-    ) {
-      return { error: `${field.label} is required` };
+    if (field.required) {
+      for (const [key, label] of [
+        ["street", "street address"],
+        ["city", "city"],
+        ["state", "state"],
+        ["postalCode", "ZIP / postal code"],
+      ] as const) {
+        if (!normalized[key]) return { error: `${field.label}: ${label} is required` };
+      }
     }
 
     return { value: normalized };
