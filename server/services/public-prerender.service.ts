@@ -11,7 +11,6 @@ import {
   buildGlassServiceLdForCmsPage,
   getCmsPublicPath,
   getCmsSlugForPublicPath,
-  getGlassCityPageArea,
   getGlassServiceSeoOverride,
   getGlassServiceSocialMetadata,
   isGlassLegalNoindexSlug,
@@ -551,22 +550,6 @@ function buildHeadTitle(
     : formatBrandFirstTitle(rawTitle, titleSuffix, siteName);
 }
 
-function buildOrganizationSchema(seo: SeoSettings | null, siteUrl: string) {
-  if (!seo?.organizationName && !seo?.siteName) return null;
-  return {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: seo?.organizationName || seo?.siteName || "Glass & Door Pro",
-    url: siteUrl,
-    logo: seo?.organizationLogoUrl
-      ? {
-          "@type": "ImageObject",
-          url: absoluteUrl(seo.organizationLogoUrl, siteUrl),
-        }
-      : undefined,
-  };
-}
-
 export async function getPublicHeadAdditions(): Promise<string | null> {
   const headHtml = await storage.settings.getSetting("public_head_html");
   const normalized = normalizeHeadMarkup(headHtml);
@@ -793,7 +776,6 @@ function buildCmsSnapshot(
     normalizedVisiblePage.slug === "home"
       ? null
       : buildBreadcrumbSchema(buildGlassBreadcrumbItems(normalizedVisiblePage, siteUrl));
-  const cityArea = getGlassCityPageArea(normalizedVisiblePage.slug);
 
   return {
     title: getGlassLocationSearchCopy(normalizedVisiblePage.slug)
@@ -816,9 +798,8 @@ function buildCmsSnapshot(
     bodyHtml,
     cmsPage: normalizedVisiblePage,
     jsonLd: [
-      normalizedVisiblePage.slug === "home" ? buildOrganizationSchema(seo, siteUrl) : null,
       normalizedVisiblePage.slug === "home" ? buildWebsiteSchema(seo, siteUrl) : null,
-      buildGlassLocalBusinessLd(siteUrl, cityArea),
+      buildGlassLocalBusinessLd(siteUrl),
       buildGlassServiceLdForCmsPage(normalizedVisiblePage, siteUrl),
       breadcrumbs,
       buildFaqPageSchema(faqItems),
@@ -834,8 +815,14 @@ function buildFallbackSnapshot(
   const fallback = FALLBACK_STATIC_PAGES[pathname];
   if (!fallback) return null;
   const fallbackJsonLd = [
-    buildOrganizationSchema(seo, siteUrl),
+    buildGlassLocalBusinessLd(siteUrl),
     buildWebsiteSchema(seo, siteUrl),
+    pathname !== "/" && pathname !== "/service-areas"
+      ? buildBreadcrumbSchema([
+          { name: "Home", url: absoluteUrl("/", siteUrl) },
+          { name: fallback.title, url: absoluteUrl(pathname, siteUrl) },
+        ])
+      : null,
     ...(pathname === "/service-areas"
       ? [
           buildBreadcrumbSchema([

@@ -386,7 +386,7 @@ describe("public-prerender.service", () => {
     expect(mockGetPageBySlug).toHaveBeenCalledWith("services-frameless-showers");
     expect(snapshot?.title).toBe("Frameless Shower Doors Charlotte NC | Glass & Door Pro");
     expect(snapshot?.jsonLd?.map((schema) => schema["@type"])).toEqual([
-      "LocalBusiness",
+      "HomeAndConstructionBusiness",
       "Service",
       "BreadcrumbList",
       "FAQPage",
@@ -525,9 +525,8 @@ describe("public-prerender.service", () => {
       "<h1>Glass &amp; Door Pro: Charlotte Glass, Door &amp; Window Services</h1>",
     );
     expect(snapshot?.jsonLd?.map((schema) => schema["@type"])).toEqual([
-      "Organization",
       "WebSite",
-      "LocalBusiness",
+      "HomeAndConstructionBusiness",
     ]);
     expect(snapshot?.jsonLd?.find((schema) => schema["@type"] === "WebSite")).toMatchObject({
       name: "Glass & Door Pro",
@@ -576,7 +575,8 @@ describe("public-prerender.service", () => {
     expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/pineville">Pineville</a>');
     expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/waxhaw">Waxhaw</a>');
     expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/monroe">Monroe</a>');
-    expect(snapshot?.jsonLd?.some((schema) => schema["@type"] === "BreadcrumbList")).toBe(false);
+    const breadcrumb = snapshot?.jsonLd?.find((schema) => schema["@type"] === "BreadcrumbList");
+    expect((breadcrumb?.itemListElement as unknown[]) ?? []).toHaveLength(2);
     expect(snapshot?.jsonLd?.some((schema) => schema["@type"] === "ItemList")).toBe(false);
   });
 

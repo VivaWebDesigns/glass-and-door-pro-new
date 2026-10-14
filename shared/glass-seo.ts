@@ -7,6 +7,8 @@ export type JsonLdObject = Record<string, unknown>;
 export const GLASS_SITE_URL = "https://glassanddoorpro.com";
 export const GLASS_BUSINESS_ID = `${GLASS_SITE_URL}/#business`;
 export const GLASS_DEFAULT_OG_IMAGE = "/images/glass-door-pro/brand/logo-og-1200x630-white-bg.png";
+export const GLASS_LOGO = "/images/glass-door-pro/brand/logo-full-white-bg.png";
+export const GLASS_GOOGLE_PROFILE_URL = "https://www.google.com/search?kgmid=/g/11nmlbmmkm";
 export const GLASS_LEGAL_NOINDEX_SLUGS = ["privacy-policy", "terms-of-service"] as const;
 
 export function isGlassLegalNoindexSlug(slug: string) {
@@ -111,7 +113,6 @@ const glassServiceAreas = [
   ["Monroe", "North Carolina"],
   ["Indian Trail", "North Carolina"],
   ["Matthews", "North Carolina"],
-  ["Mint Hill", "North Carolina"],
   ["Waxhaw", "North Carolina"],
   ["Weddington", "North Carolina"],
   ["Wesley Chapel", "North Carolina"],
@@ -119,12 +120,6 @@ const glassServiceAreas = [
   ["Pineville", "North Carolina"],
   ["Fort Mill", "South Carolina"],
   ["Indian Land", "South Carolina"],
-  ["Huntersville", "North Carolina"],
-  ["Cornelius", "North Carolina"],
-  ["Davidson", "North Carolina"],
-  ["Concord", "North Carolina"],
-  ["Tega Cay", "South Carolina"],
-  ["Rock Hill", "South Carolina"],
 ] as const;
 
 function city(name: string, state = "North Carolina") {
@@ -422,24 +417,20 @@ export function isGlassServicePageSlug(slug: string) {
   return Boolean(servicePageNames[slug]);
 }
 
-export function getGlassCityPageArea(slug: string) {
-  const data = cityPageData[slug];
-  return data ? { city: data.city, state: data.state } : null;
-}
-
-export function buildGlassLocalBusinessLd(
-  siteUrl = GLASS_SITE_URL,
-  area?: { city: string; state: string } | null,
-): JsonLdObject {
+// The same business record on every page; a city page's city goes on its Service instead.
+export function buildGlassLocalBusinessLd(siteUrl = GLASS_SITE_URL): JsonLdObject {
   return {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": "HomeAndConstructionBusiness",
+    additionalType: "https://www.wikidata.org/wiki/Q664283",
     "@id": GLASS_BUSINESS_ID,
     name: "Glass & Door Pro",
     url: `${GLASS_SITE_URL}/`,
     telephone: "+1-704-771-6111",
     email: "Doug@GlassandDoorPro.com",
+    logo: absoluteGlassUrl(GLASS_LOGO, siteUrl),
     image: absoluteGlassUrl(GLASS_DEFAULT_OG_IMAGE, siteUrl),
+    sameAs: [GLASS_GOOGLE_PROFILE_URL],
     priceRange: "$$",
     address: {
       "@type": "PostalAddress",
@@ -449,6 +440,7 @@ export function buildGlassLocalBusinessLd(
       postalCode: "28210",
       addressCountry: "US",
     },
+    geo: { "@type": "GeoCoordinates", latitude: 35.1475, longitude: -80.8432 },
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",
@@ -457,7 +449,7 @@ export function buildGlassLocalBusinessLd(
         closes: "19:00",
       },
     ],
-    areaServed: area ? city(area.city, area.state) : buildGlassServiceAreaServed(),
+    areaServed: buildGlassServiceAreaServed(),
   };
 }
 

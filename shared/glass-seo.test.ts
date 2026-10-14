@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   buildGlassLocalBusinessLd,
   buildGlassServiceLdForCmsPage,
-  getGlassCityPageArea,
   getGlassServiceSeoOverride,
   isGlassServicePageSlug,
 } from "./glass-seo";
@@ -25,12 +24,17 @@ describe("glass SEO helpers", () => {
     expect(isGlassServicePageSlug("services")).toBe(false);
   });
 
-  it("uses the exact public brand name in LocalBusiness schema", () => {
-    expect(buildGlassLocalBusinessLd()).toMatchObject({
-      "@type": "LocalBusiness",
+  it("uses the exact public brand name in the business schema", () => {
+    const business = buildGlassLocalBusinessLd();
+    expect(business).toMatchObject({
+      "@type": "HomeAndConstructionBusiness",
+      additionalType: "https://www.wikidata.org/wiki/Q664283",
       name: "Glass & Door Pro",
       url: "https://glassanddoorpro.com/",
+      logo: "https://glassanddoorpro.com/images/glass-door-pro/brand/logo-full-white-bg.png",
+      sameAs: ["https://www.google.com/search?kgmid=/g/11nmlbmmkm"],
     });
+    expect(business.areaServed).toHaveLength(11);
   });
 
   it("adds service-level areaServed to non-frameless service pages", () => {
@@ -92,9 +96,8 @@ describe("glass SEO helpers", () => {
     ).toHaveLength(9);
   });
 
-  it("uses city-specific business and service schema for new service-area pages", () => {
-    const cityArea = getGlassCityPageArea("service-areas-indian-land");
-    const businessSchema = buildGlassLocalBusinessLd(undefined, cityArea);
+  it("keeps the business record site-wide and puts the city on service-area page schema", () => {
+    const businessSchema = buildGlassLocalBusinessLd();
     const serviceSchema = buildGlassServiceLdForCmsPage({
       slug: "service-areas-indian-land",
       seoDescription: "Indian Land service area",
@@ -123,11 +126,12 @@ describe("glass SEO helpers", () => {
     expect(
       (serviceSchema?.hasOfferCatalog as { itemListElement: unknown[] }).itemListElement,
     ).toHaveLength(9);
-    expect(businessSchema.areaServed).toMatchObject({
+    expect(serviceSchema?.areaServed).toMatchObject({
       "@type": "City",
       name: "Indian Land",
       containedInPlace: { "@type": "State", name: "South Carolina" },
     });
+    expect(businessSchema.areaServed).toHaveLength(11);
     expect(businessSchema.openingHoursSpecification).toEqual([
       expect.objectContaining({ opens: "07:00", closes: "19:00" }),
     ]);

@@ -14,14 +14,12 @@ import { JsonLd } from "@/components/shared/json-ld";
 import {
   buildBreadcrumbLd,
   buildFaqPageLd,
-  buildOrganizationLd,
   buildWebSiteLd,
   extractFaqItems,
 } from "@/lib/structured-data";
 import { formatBrandFirstTitle, formatBrandLastTitle } from "@shared/seo-title";
 import {
   buildGlassBreadcrumbItems,
-  getGlassCityPageArea,
   buildGlassLocalBusinessLd,
   buildGlassServiceLdForCmsPage,
   getGlassServiceSeoOverride,
@@ -194,14 +192,12 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
   const breadcrumbs = isHome ? null : buildBreadcrumbLd(buildGlassBreadcrumbItems(page, origin));
 
   const faqItems = extractFaqItems(page.content);
-  const cityArea = getGlassCityPageArea(page.slug);
 
   return (
     <JsonLd
       schemas={[
-        isHome && globalSeo ? buildOrganizationLd(globalSeo) : null,
         isHome && globalSeo ? buildWebSiteLd(globalSeo) : null,
-        buildGlassLocalBusinessLd(origin, cityArea),
+        buildGlassLocalBusinessLd(origin),
         buildGlassServiceLdForCmsPage(page, origin),
         breadcrumbs,
         buildFaqPageLd(faqItems),
