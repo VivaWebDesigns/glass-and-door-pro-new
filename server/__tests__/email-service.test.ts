@@ -114,7 +114,8 @@ describe("Email service", () => {
         senderEmail: "jane@example.com",
         senderPhone: "(704) 555-0123",
         subject: "Shower <script>alert(1)</script>",
-        messageBody: "First line with $&\n<img src=x onerror=alert(1)>",
+        messageBody:
+          "First line with $&\n<img src=x onerror=alert(1)>\nService Address: 123 Example St, Unit 4, Charlotte, NC, 28202\nPreferred Timeline: Next week",
       },
       "https://glassanddoorpro.com/admin",
     );
@@ -127,6 +128,9 @@ describe("Email service", () => {
     expect(payload.html).toContain("First line with $&amp;<br>&lt;img src=x onerror=alert(1)&gt;");
     expect(payload.html).not.toContain("<script>alert(1)</script>");
     expect(payload.html).not.toContain("<img src=x onerror=alert(1)>");
+    expect(payload.html).toContain(
+      "Service Address: 123 Example St, Unit 4, Charlotte, NC, 28202<br>Preferred Timeline: Next week",
+    );
 
     vi.unstubAllGlobals();
   });

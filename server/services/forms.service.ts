@@ -328,9 +328,7 @@ async function handleContactFormEffects(
     return;
   }
 
-  const contactMessage = [`Phone: ${phone}`, `Email: ${email || "Not provided"}`, "", message].join(
-    "\n",
-  );
+  const contactMessage = buildSubmissionSummary(form, data);
 
   await storage.contacts.createMessage({
     name,
@@ -355,7 +353,7 @@ async function handleContactFormEffects(
       senderEmail: email,
       senderPhone: phone,
       subject,
-      messageBody: message,
+      messageBody: contactMessage,
     },
     `${baseUrl ?? process.env.APP_URL ?? ""}/admin`,
   ).catch((err) => {
@@ -377,8 +375,8 @@ function formatSubmissionValue(value: unknown): string {
   if (typeof value === "object") {
     const record = objectValue(value);
     const normalized = Object.values(record)
-      .map((item) => stringValue(item))
-      .filter(Boolean);
+      .map((item) => formatSubmissionValue(item))
+      .filter((item) => item && item !== "—");
     return normalized.length > 0 ? normalized.join(", ") : "—";
   }
   return String(value);

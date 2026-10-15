@@ -5,9 +5,12 @@ const mockCreate = vi.fn();
 const mockUpdate = vi.fn();
 const mockGetPublicBySlug = vi.fn();
 const mockCreateSubmission = vi.fn();
+const mockCreateMessage = vi.fn();
+const mockSendContactFormEmail = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("../storage", () => ({
   storage: {
+    contacts: { createMessage: mockCreateMessage },
     forms: {
       getBySlug: mockGetBySlug,
       create: mockCreate,
@@ -19,7 +22,7 @@ vi.mock("../storage", () => ({
 }));
 
 vi.mock("../services/email.service", () => ({
-  sendContactFormEmail: vi.fn(),
+  sendContactFormEmail: mockSendContactFormEmail,
   sendManagedFormSubmissionEmail: vi.fn(),
 }));
 vi.mock("../services/mailchimp.service", () => ({ syncContactToMailchimp: vi.fn() }));
@@ -37,6 +40,48 @@ vi.mock("../utils/logger", () => ({
 describe("ensureSystemForms", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  it("includes service address and custom fields in contact notifications and saved messages", async () => {
+    mockGetBySlug.mockResolvedValue(undefined);
+    const { ensureSystemForms } = await import("../services/system-forms.service");
+    await ensureSystemForms();
+    const form = { ...mockCreate.mock.calls.at(-1)?.[0], id: "contact-form-id" };
+    form.fields = [
+      ...form.fields,
+      { id: "timeline", key: "timeline", label: "Preferred Timeline", type: "text" },
+    ];
+    mockGetPublicBySlug.mockResolvedValue(form);
+    mockCreateSubmission.mockImplementation(async (payload) => ({ id: "entry", ...payload }));
+    const { submitManagedFormBySlug } = await import("../services/forms.service");
+    await submitManagedFormBySlug("contact-form", {
+      name: "Example Customer",
+      phone: "7045550123",
+      email: "customer@example.com",
+      subject: "Window repair",
+      message: "Replace the broken glass",
+      timeline: "Next week",
+      serviceAddress: {
+        street: "123 Example St",
+        street2: "Unit 4",
+        city: "Charlotte",
+        state: "NC",
+        postalCode: "28202",
+      },
+    });
+    const summary = mockSendContactFormEmail.mock.calls[0][1].messageBody;
+    for (const value of [
+      "Example Customer",
+      "7045550123",
+      "customer@example.com",
+      "Window repair",
+      "Replace the broken glass",
+      "Service Address: 123 Example St, Unit 4, Charlotte, NC, 28202",
+      "Preferred Timeline: Next week",
+    ]) {
+      expect(summary).toContain(value);
+    }
+    expect(mockCreateMessage.mock.calls[0][0].message).toBe(summary);
   });
 
   it("preserves edited fields while upgrading existing system forms", async () => {
