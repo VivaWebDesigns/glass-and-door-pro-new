@@ -668,16 +668,16 @@ function buildSimplePageBody(
   anchoredSections: Array<{ anchorId: string; heading: string; fragments: string[] }> = [],
   extraHtml: string[] = [],
 ) {
-  const paragraphs = uniqueFragments([description, ...fragments])
-    .filter((fragment) => fragment && fragment.toLowerCase() !== title.trim().toLowerCase())
-    .slice(0, 8);
+  const paragraphs = uniqueFragments([description, ...fragments]).filter(
+    (fragment) => fragment && fragment.toLowerCase() !== title.trim().toLowerCase(),
+  );
   const anchoredHtml = anchoredSections.map((section) => {
     const heading = section.heading;
     const body = section.fragments.filter((fragment) => fragment !== heading);
     return [
       `<section id="${escapeHtml(section.anchorId)}">`,
       heading ? `<h2>${escapeHtml(heading)}</h2>` : "",
-      ...body.map((paragraph) => `<p>${escapeHtml(truncate(paragraph, 340))}</p>`),
+      ...body.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`),
       `</section>`,
     ].join("");
   });
@@ -686,7 +686,7 @@ function buildSimplePageBody(
     `<main class="seo-prerender-content">`,
     `<article>`,
     `<h1>${escapeHtml(title)}</h1>`,
-    ...paragraphs.map((paragraph) => `<p>${escapeHtml(truncate(paragraph, 340))}</p>`),
+    ...paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`),
     ...anchoredHtml,
     ...extraHtml,
     `</article>`,

@@ -76,6 +76,39 @@ const cmsPage: CmsPage = {
 };
 
 describe("public-prerender.service", () => {
+  it("keeps complete CMS copy available to readers without JavaScript", async () => {
+    const comparison = `${"Custom shower layouts depend on the opening. ".repeat(12)}Compare the full enclosure options with Doug.`;
+    mockGetSeo.mockResolvedValue(seoSettings);
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      slug: "services-frameless-showers",
+      content: {
+        blocks: [
+          ...Array.from({ length: 10 }, (_, index) => ({
+            type: "rich-text",
+            props: { content: `<p>Shower project detail ${index + 1}.</p>` },
+          })),
+          {
+            type: "rich-text",
+            props: {
+              anchorId: "enclosure-options",
+              title: "Enclosure options",
+              content: comparison,
+            },
+          },
+        ],
+      },
+    });
+    const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
+    const snapshot = await getPublicHtmlSnapshot("/services/frameless-showers");
+
+    expect(snapshot?.bodyHtml).toContain("Shower project detail 10.");
+    expect(snapshot?.bodyHtml).toContain(`<p>${comparison}</p>`);
+    expect(snapshot?.bodyHtml).toContain(
+      `<section id="enclosure-options"><h2>Enclosure options</h2><p>${comparison}</p></section>`,
+    );
+  });
+
   it.each([null, "https://glassanddoorpro.com"])(
     "uses the crawled root URL for the homepage canonical with override %s",
     async (canonicalUrl) => {
@@ -711,7 +744,9 @@ describe("public bootstrap payload", () => {
       menus: { main_navigation: { name: "Main", items: [] } },
     };
     const html = injectPublicHtmlSnapshot(template, null, null, bootstrap);
-    const payload = html.match(/<script id="__PUBLIC_BOOTSTRAP__" type="application\/json">([\s\S]*?)<\/script>/)?.[1];
+    const payload = html.match(
+      /<script id="__PUBLIC_BOOTSTRAP__" type="application\/json">([\s\S]*?)<\/script>/,
+    )?.[1];
     expect(payload).toBeDefined();
     expect(payload).not.toContain("<");
     expect(JSON.parse(payload!)).toEqual(bootstrap);
