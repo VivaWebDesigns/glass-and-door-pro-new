@@ -95,6 +95,12 @@ export function ServiceEditorialLayout({ blocks }: { blocks: BlockInstance[] }) 
   const contentBlocks = prepareSectionAnchorBlocks(blocks.slice(1));
   const closingCta = contentBlocks.at(-1)?.type === "cta" ? contentBlocks.at(-1) : undefined;
   const editorialBlocks = closingCta ? contentBlocks.slice(0, -1) : contentBlocks;
+  const featuredIndex = editorialBlocks.findIndex(
+    (block) => block.props.variant === "featured-project",
+  );
+  const leadingBlocks =
+    featuredIndex >= 0 ? editorialBlocks.slice(0, featuredIndex) : editorialBlocks;
+  const featuredBlock = featuredIndex >= 0 ? editorialBlocks[featuredIndex] : undefined;
 
   return (
     <div className="service-editorial-page">
@@ -105,10 +111,22 @@ export function ServiceEditorialLayout({ blocks }: { blocks: BlockInstance[] }) 
         <MobilePageGuide blocks={editorialBlocks} />
         <div className="service-editorial-grid">
           <div className="service-editorial-content">
-            <PublicPageRenderer blocks={editorialBlocks} />
+            <PublicPageRenderer blocks={leadingBlocks} />
           </div>
           <DesktopPageGuide blocks={editorialBlocks} hero={hero} />
         </div>
+        {featuredBlock && (
+          <>
+            <div className="service-editorial-content mt-14 border-t border-slate-200 pt-10">
+              <PublicPageRenderer blocks={[featuredBlock]} />
+            </div>
+            <div className="service-editorial-grid">
+              <div className="service-editorial-content border-t border-slate-200 pt-10">
+                <PublicPageRenderer blocks={editorialBlocks.slice(featuredIndex + 1)} />
+              </div>
+            </div>
+          </>
+        )}
       </div>
       {closingCta ? (
         <div className="service-editorial-closing-cta">

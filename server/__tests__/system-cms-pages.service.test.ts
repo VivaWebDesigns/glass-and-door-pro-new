@@ -36,6 +36,51 @@ vi.mock("../utils/logger", () => ({
 }));
 
 describe("ensureSystemCmsPages", () => {
+  it("adds the SouthPark feature before the shower gallery once and preserves later CMS edits", async () => {
+    const content = {
+      _system: { serviceHeroCallFirst2026: true, callFirstButtons2026: true },
+      blocks: [
+        { id: "intro", type: "rich-text", props: { content: "<p>Keep the introduction.</p>" } },
+        {
+          id: "gallery",
+          type: "image-grid",
+          props: { title: "Our Frameless Shower Work", images: [] },
+        },
+      ],
+    };
+    mockGetAllPages.mockResolvedValue([
+      { id: "showers", slug: "services-frameless-showers", content, updatedBy: "editor" },
+    ]);
+    mockGetPageBySlug.mockResolvedValue(null);
+    const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
+    await ensureSystemCmsPages();
+    const update = mockUpdatePage.mock.calls.find(([id]) => id === "showers")?.[1];
+    expect(update.content.blocks.map((block: { id: string }) => block.id)).toEqual([
+      "intro",
+      "southpark-shower-project",
+      "gallery",
+    ]);
+    expect(update.content.blocks[0]).toEqual(content.blocks[0]);
+    expect(update.content.blocks[2]).toEqual(content.blocks[1]);
+    expect(update.content.blocks[1].props.imageUrl).toContain(
+      "southpark-half-wall-shower-2026.png",
+    );
+
+    mockUpdatePage.mockClear();
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "showers",
+        slug: "services-frameless-showers",
+        updatedBy: "editor",
+        content: { ...content, _system: { ...content._system, southparkProject2026: true } },
+      },
+    ]);
+    await ensureSystemCmsPages();
+    expect(
+      mockUpdatePage.mock.calls.some(([id, changes]) => id === "showers" && changes.content),
+    ).toBe(false);
+  });
+
   it("updates all location CMS records once without replacing their other blocks", async () => {
     const pages = GLASS_PRIMARY_SERVICE_AREAS.map(({ href }) => {
       const slug = getCmsSlugForPublicPath(href);

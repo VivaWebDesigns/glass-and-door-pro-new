@@ -550,6 +550,44 @@ function RichTextBlock({ props }: { props: Record<string, unknown> }) {
 }
 
 function TextImageBlock({ props }: { props: Record<string, unknown> }) {
+  if (str(props.variant) === "featured-project") {
+    return (
+      <div className="py-4" data-testid="featured-project">
+        <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-[#1a8ead]">
+          {str(props.eyebrow)}
+        </p>
+        <h2 className="mb-7 font-heading text-3xl font-bold leading-tight text-slate-800 lg:text-4xl">
+          {str(props.heading) || str(props.title)}
+        </h2>
+        <div className="grid items-start gap-7 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-10">
+          <img
+            src={str(props.imageUrl)}
+            alt={str(props.imageAlt)}
+            width={1204}
+            height={1600}
+            loading="lazy"
+            decoding="async"
+            className="h-auto w-full rounded-lg"
+          />
+          <div>
+            <div
+              className="public-prose prose prose-sm max-w-none text-slate-600 [&_h3]:mt-6 [&_h3]:text-xl [&_p]:leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(str(props.body)) }}
+            />
+            <FormModalButton
+              label={str(props.ctaText)}
+              action="form-modal"
+              formSlug="contact-form"
+              modalTitle="Get a Free Quote"
+              modalDescription="Tell us about your shower project and Doug will follow up with next steps."
+              className="mt-6 min-h-12 bg-[#1a8ead] px-5 text-white hover:bg-[#167f9b]"
+              testId="southpark-project-quote"
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
   const imageRight = str(props.imagePosition) !== "left";
   const hasImage = !!str(props.imageUrl);
   const mobileImageStyles = getMobileImageStyles(props);

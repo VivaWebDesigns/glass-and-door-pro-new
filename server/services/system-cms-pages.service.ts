@@ -10,6 +10,7 @@ import { GLASS_HOMEPAGE_SERVICE_CARDS } from "@shared/glass-homepage-services";
 import { putCallButtonFirst } from "@shared/glass-call-first";
 import { GLASS_DOUG_PORTRAIT } from "@shared/glass-doug-portrait";
 import { GLASS_SERVICE_HEROES, getGlassServiceHeroCtaProps } from "@shared/glass-service-heroes";
+import { GLASS_SOUTHPARK_PROJECT_BLOCK } from "@shared/glass-southpark-project";
 import { glassGoogleReviewDate } from "@shared/glass-review-dates";
 import { isGlassLegalNoindexSlug } from "@shared/glass-seo";
 import {
@@ -937,6 +938,36 @@ async function normalizeStoredCmsPages() {
       );
       if (contentWithServiceHero) {
         updates.content = contentWithServiceHero as InsertCmsPage["content"];
+      }
+
+      // Add the approved project once; later CMS edits or removal remain authoritative.
+      if (page.slug === "services-frameless-showers") {
+        const content = updates.content ?? page.content;
+        if (isRecord(content) && Array.isArray(content.blocks)) {
+          const meta = isRecord(content._system) ? content._system : {};
+          const galleryIndex = content.blocks.findIndex(
+            (block) =>
+              isRecord(block) &&
+              block.type === "image-grid" &&
+              isRecord(block.props) &&
+              block.props.title === "Our Frameless Shower Work",
+          );
+          if (meta.southparkProject2026 !== true && galleryIndex >= 0) {
+            const blocks = [...content.blocks];
+            if (
+              !blocks.some(
+                (block) => isRecord(block) && block.id === GLASS_SOUTHPARK_PROJECT_BLOCK.id,
+              )
+            ) {
+              blocks.splice(galleryIndex, 0, GLASS_SOUTHPARK_PROJECT_BLOCK);
+            }
+            updates.content = {
+              ...content,
+              blocks,
+              _system: { ...meta, southparkProject2026: true },
+            } as InsertCmsPage["content"];
+          }
+        }
       }
 
       const locationAltReplacement = getLocationHeroAltReplacement(page.slug);
