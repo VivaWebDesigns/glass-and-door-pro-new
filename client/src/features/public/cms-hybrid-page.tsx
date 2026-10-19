@@ -273,6 +273,10 @@ function CmsPageBody({ page }: { page: CmsPage }) {
 }
 
 export function CmsPageView({ page, globalSeo, previewLabel }: CmsPageViewProps) {
+  useEffect(() => {
+    window.dispatchEvent(new Event("glass:page-ready"));
+  }, [page.slug]);
+
   return (
     <div className="public-page-shell min-h-screen flex flex-col" data-testid="cms-public-page">
       <CmsPageSeo page={page} globalSeo={globalSeo} />

@@ -13,9 +13,72 @@
     <!-- End Google Tag Manager -->
     <!--APP_DYNAMIC_HEAD-->
     <script>
-      document.documentElement.classList.add("js");
+      (() => {
+        document.documentElement.classList.add("js");
+        const retryKey = "__glass_asset_retry";
+        let assetFailed = false;
+        const isBuildAsset = (url) => {
+          const asset = new URL(url, location.href);
+          return asset.origin === location.origin && /^\/assets\/.+\.(?:css|js)$/.test(asset.pathname);
+        };
+        const showRecovery = () => {
+          const show = () => document.getElementById("app-recovery")?.removeAttribute("hidden");
+          if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", show, { once: true });
+          else show();
+        };
+        const recover = () => {
+          if (assetFailed) return;
+          assetFailed = true;
+          const page = new URL(location.href);
+          if (page.searchParams.has(retryKey)) {
+            showRecovery();
+            return;
+          }
+          page.searchParams.set(retryKey, "1");
+          location.replace(page.href);
+        };
+        const checkStylesheets = () => {
+          if (document.readyState !== "complete") return;
+          const missing = [...document.querySelectorAll('link[rel="stylesheet"]')].some(
+            (link) => isBuildAsset(link.href) && !link.sheet,
+          );
+          if (missing) recover();
+        };
+        window.addEventListener("error", (event) => {
+          const asset = event.target;
+          if (asset instanceof HTMLLinkElement && isBuildAsset(asset.href)) recover();
+          if (asset instanceof HTMLScriptElement && isBuildAsset(asset.src)) recover();
+        }, true);
+        window.addEventListener("vite:preloadError", (event) => {
+          event.preventDefault();
+          recover();
+        });
+        window.addEventListener("pageshow", checkStylesheets);
+        window.addEventListener("pageshow", () => {
+          setTimeout(() => {
+            if (!document.querySelector("#root > *")) recover();
+          }, 8000);
+        });
+        document.addEventListener("visibilitychange", () => {
+          if (!document.hidden) checkStylesheets();
+        });
+        window.addEventListener("glass:page-ready", () => {
+          if (assetFailed) return;
+          document.getElementById("app-recovery")?.setAttribute("hidden", "");
+          const page = new URL(location.href);
+          if (!page.searchParams.has(retryKey)) return;
+          page.searchParams.delete(retryKey);
+          history.replaceState(history.state, "", page.pathname + page.search + page.hash);
+        });
+      })();
     </script>
     <style>
+      #app-recovery { display: none; }
+      .js #app-recovery:not([hidden]) {
+        display: block; position: fixed; inset: 0; z-index: 9999; padding: 20vh 24px;
+        background: #fff; color: #0f2340; text-align: center; font: 18px/1.5 system-ui, sans-serif;
+      }
+      .js #app-recovery a { color: inherit; text-decoration: underline; }
       .js #seo-prerender {
         display: none;
       }
@@ -33,6 +96,7 @@
     <!-- End Google Tag Manager (noscript) -->
     <!--APP_PRERENDER_CONTENT-->
     <div id="root"></div>
+    <div id="app-recovery" hidden role="alert">This page could not finish loading.<br /><a href="">Reload page</a></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
