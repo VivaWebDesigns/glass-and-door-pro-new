@@ -1,3 +1,4 @@
+import { getRemoteFontStylesheet } from "@shared/branding-fonts";
 import { createContext, useContext, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
@@ -70,6 +71,22 @@ export function BrandingProvider({ children }: { children: React.ReactNode }) {
   const branding = useMemo(() => data ?? DEFAULT_BRANDING_SETTINGS, [data]);
   const pathname = location.split(/[?#]/)[0] || "/";
   const isAdminRoute = pathname.startsWith("/admin");
+
+  useEffect(() => {
+    const href = getRemoteFontStylesheet([branding.bodyFont, branding.headingFont]);
+    let link = document.head.querySelector<HTMLLinkElement>("link[data-selected-branding-fonts]");
+    if (!href) {
+      link?.remove();
+      return;
+    }
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.dataset.selectedBrandingFonts = "true";
+      document.head.appendChild(link);
+    }
+    if (link.href !== href) link.href = href;
+  }, [branding.bodyFont, branding.headingFont]);
 
   useEffect(() => {
     const root = document.documentElement;

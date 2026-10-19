@@ -1,3 +1,4 @@
+import { getRemoteFontStylesheet } from "@shared/branding-fonts";
 import { getGlassLocationSearchCopy } from "@shared/glass-location-search";
 import {
   DESKTOP_HERO_MEDIA,
@@ -941,6 +942,11 @@ export function injectPublicHtmlSnapshot(
   bootstrap?: PublicBootstrapData | null,
 ) {
   const bootstrapScript = buildBootstrapScript(bootstrap);
+  const branding = bootstrap?.branding as { bodyFont?: string; headingFont?: string } | undefined;
+  const fontStylesheet = getRemoteFontStylesheet([branding?.bodyFont, branding?.headingFont]);
+  const fontHead = fontStylesheet
+    ? `<link rel="stylesheet" data-selected-branding-fonts="true" href="${escapeHtml(fontStylesheet)}" />`
+    : "";
   const normalizedTemplate = template
     .replace(/\s*<meta name="description"[^>]*>\s*/i, "\n")
     .replace(/\s*<meta property="og:title"[^>]*>\s*/i, "\n")
@@ -957,11 +963,12 @@ export function injectPublicHtmlSnapshot(
 
   if (!snapshot) {
     return normalizedTemplate
-      .replace("<!--APP_DYNAMIC_HEAD-->", () => customHeadHtml || "")
+      .replace("<!--APP_DYNAMIC_HEAD-->", () => [fontHead, customHeadHtml].filter(Boolean).join("\n"))
       .replace("<!--APP_PRERENDER_CONTENT-->", () => bootstrapScript);
   }
 
   const headParts = [
+    fontHead,
     getStaticHeroPreload(snapshot.cmsPage, snapshot.heroImageUrl),
     `<meta name="description" content="${escapeHtml(snapshot.description)}" />`,
     `<meta property="og:title" content="${escapeHtml(snapshot.ogTitle || snapshot.title)}" />`,

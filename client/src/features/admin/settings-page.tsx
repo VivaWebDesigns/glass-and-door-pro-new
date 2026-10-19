@@ -1,3 +1,4 @@
+import { FontPreviewLoader } from "@/components/shared/font-preview-loader";
 import { useEffect, useRef, useState, type ChangeEvent, type ElementType } from "react";
 import { useQuery, useMutation, type UseMutationResult } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -1749,6 +1750,7 @@ export function BrandingTab({
         </TabsContent>
 
         <TabsContent value="typography" className="space-y-6">
+          <FontPreviewLoader />
           <BrandingTypographyCard
             headingFont={headingFont}
             setHeadingFont={setHeadingFont}
