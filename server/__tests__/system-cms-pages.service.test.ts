@@ -778,7 +778,10 @@ describe("ensureSystemCmsPages", () => {
     });
   });
 
-  it("updates only known legacy homepage brand signals", async () => {
+  it.each([
+    "Glass & Door Services Around Charlotte",
+    "Glass & Door Pro: Charlotte Glass, Door & Window Services",
+  ])("updates known homepage hero defaults from %s", async (heading) => {
     mockGetAllPages.mockResolvedValue([
       {
         id: "home-id",
@@ -792,7 +795,10 @@ describe("ensureSystemCmsPages", () => {
               id: "hero",
               type: "hero",
               props: {
-                heading: "Glass & Door Services Around Charlotte",
+                heading,
+                overlayColor: "#0f172a",
+                overlayOpacity: 50,
+                backgroundImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
                 backgroundImageAlt: "Alt",
               },
             },
@@ -823,7 +829,10 @@ describe("ensureSystemCmsPages", () => {
             id: "hero",
             type: "hero",
             props: {
-              heading: "Glass & Door Pro: Charlotte Glass, Door & Window Services",
+              heading: "Glass, Door & Window Services Across Greater Charlotte",
+              overlayColor: "#000000",
+              overlayOpacity: 28,
+              backgroundImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
               backgroundImageAlt: "Alt",
             },
           },

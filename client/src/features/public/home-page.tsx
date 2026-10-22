@@ -31,7 +31,7 @@ export default function HomePage() {
               Glass & Door Pro
             </p>
             <h1 className="max-w-3xl text-4xl font-bold tracking-normal sm:text-5xl">
-              Glass & Door Pro: Charlotte Glass, Door & Window Services
+              Glass, Door & Window Services Across Greater Charlotte
             </h1>
             <p className="mt-5 max-w-2xl text-lg text-slate-200">
               Owner-operated service for frameless showers, window installation, door repair, and

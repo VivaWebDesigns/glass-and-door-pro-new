@@ -366,12 +366,16 @@ const businessHoursReplacements = [
 
 const homepageContentReplacements = [
   [
-    "Glass & Door Services Around Charlotte",
     "Glass & Door Pro: Charlotte Glass, Door & Window Services",
+    "Glass, Door & Window Services Across Greater Charlotte",
+  ],
+  [
+    "Glass & Door Services Around Charlotte",
+    "Glass, Door & Window Services Across Greater Charlotte",
   ],
   [
     "We've got your glass & door needs covered.",
-    "Glass & Door Pro: Charlotte Glass, Door & Window Services",
+    "Glass, Door & Window Services Across Greater Charlotte",
   ],
   [
     "From entry doors to patio doors, we options to enhance your home's security and style.",
@@ -541,18 +545,27 @@ function getLocationHeroAltReplacement(slug: string): TextReplacement | null {
 const homeHeroImageAlt =
   "Frameless glass shower installed by Glass & Door Pro in the Charlotte, NC area";
 
-function ensureHomeHeroImageAlt(content: unknown) {
+function ensureHomeHeroDefaults(content: unknown) {
   if (!isRecord(content) || !Array.isArray(content.blocks)) return null;
   const heroIndex = content.blocks.findIndex((block) => isRecord(block) && block.type === "hero");
   const heroBlock = content.blocks[heroIndex];
-  if (!isRecord(heroBlock) || !isRecord(heroBlock.props) || heroBlock.props.backgroundImageAlt) {
+  if (!isRecord(heroBlock) || !isRecord(heroBlock.props)) {
     return null;
   }
+
+  const props = { ...heroBlock.props };
+  if (!props.backgroundImageAlt) props.backgroundImageAlt = homeHeroImageAlt;
+  // Migrate the original homepage overlay while preserving later CMS customization.
+  if (props.overlayColor === "#0f172a" && props.overlayOpacity === 50) {
+    props.overlayColor = "#000000";
+    props.overlayOpacity = 28;
+  }
+  if (JSON.stringify(props) === JSON.stringify(heroBlock.props)) return null;
 
   const blocks = [...content.blocks];
   blocks[heroIndex] = {
     ...heroBlock,
-    props: { ...heroBlock.props, backgroundImageAlt: homeHeroImageAlt },
+    props,
   };
   return { ...content, blocks };
 }
@@ -1017,7 +1030,7 @@ async function normalizeStoredCmsPages() {
       }
 
       if (page.slug === "home") {
-        const contentWithHeroAlt = ensureHomeHeroImageAlt(updates.content ?? page.content);
+        const contentWithHeroAlt = ensureHomeHeroDefaults(updates.content ?? page.content);
         if (contentWithHeroAlt) updates.content = contentWithHeroAlt as InsertCmsPage["content"];
       }
 

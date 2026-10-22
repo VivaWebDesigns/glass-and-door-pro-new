@@ -322,7 +322,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
       props: putCallButtonFirst("hero", {
         anchorId: "hero",
         variant: "glass-home",
-        heading: "Glass & Door Pro: Charlotte Glass, Door & Window Services",
+        heading: "Glass, Door & Window Services Across Greater Charlotte",
         subheading:
           "<p>Frameless shower doors, window installation, door installation, window repair, and commercial glass — owner-operated by Doug Adams with 15+ years of experience.</p>",
         ctaText: "Get a Free Quote",
@@ -334,8 +334,8 @@ const glassHomeContent: InsertCmsPage["content"] = {
         backgroundImageAlt:
           "Frameless glass shower installed by Glass & Door Pro in the Charlotte, NC area",
         videoBackgroundUrl: "/videos/glass-door-pro/hero-video.mp4",
-        overlayColor: "#0f172a",
-        overlayOpacity: 50,
+        overlayColor: "#000000",
+        overlayOpacity: 28,
         minHeight: "700",
       }),
     },
