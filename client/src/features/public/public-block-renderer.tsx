@@ -239,7 +239,7 @@ function HeroBackdrop({ config }: { config: HeroConfig }) {
       ) : (
         <>
           <div className="absolute inset-0" style={config.overlayStyle} />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-background/35 to-transparent" />
+          <div className="hero-bottom-fade pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-background/35 to-transparent" />
         </>
       )}
     </>

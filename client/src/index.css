@@ -1223,3 +1223,17 @@
     font-size: clamp(27px, 8.7vw, 36px);
   }
 }
+
+@media (min-width: 768px) {
+  .service-editorial-hero .public-hero-pattern {
+    align-items: flex-end;
+  }
+  .service-editorial-hero .public-hero-pattern > .relative.z-10 {
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+  .service-editorial-hero .hero-bottom-fade {
+    height: 70%;
+    background: linear-gradient(to top, rgba(7, 14, 13, 0.55), transparent);
+  }
+}
