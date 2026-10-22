@@ -791,11 +791,27 @@ function applyServiceHeroRefresh(slug: string, content: unknown) {
   if (!hero || !isRecord(content) || !Array.isArray(content.blocks)) return null;
 
   const systemMeta = isRecord(content._system) ? content._system : {};
-  if (systemMeta.serviceHeroLocation2026 === true) return null;
 
   const heroIndex = content.blocks.findIndex((block) => isRecord(block) && block.type === "hero");
   const heroBlock = content.blocks[heroIndex];
   if (!isRecord(heroBlock) || !isRecord(heroBlock.props)) return null;
+
+  // Refresh only the previously approved descriptions; preserve subsequent editor changes.
+  if (systemMeta.serviceHeroLocation2026 === true) {
+    const previousDescriptions = new Set([
+      "<p>Custom glass shower doors and enclosures, measured and installed to fit your bathroom.</p>",
+      "<p>Entry, patio, and storm doors installed for a secure fit and reliable weather protection.</p>",
+      "<p>Repair foggy glass, cracked panes, broken seals, and stuck sashes—often without replacing the whole window.</p>",
+      "<p>Aluminum framing, glass panels, and storefront doors installed for new construction, buildouts, and renovations.</p>",
+    ]);
+    if (!previousDescriptions.has(String(heroBlock.props.subheading))) return null;
+    const blocks = [...content.blocks];
+    blocks[heroIndex] = {
+      ...heroBlock,
+      props: { ...heroBlock.props, subheading: `<p>${hero.subheading}</p>` },
+    };
+    return { ...content, blocks };
+  }
 
   const blocks = [...content.blocks];
   blocks[heroIndex] = {

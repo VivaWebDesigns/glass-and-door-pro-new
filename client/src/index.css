@@ -1233,7 +1233,12 @@
     padding-bottom: 64px;
   }
   .service-editorial-hero .hero-bottom-fade {
-    height: 70%;
-    background: linear-gradient(to top, rgba(7, 14, 13, 0.55), transparent);
+    height: 100%;
+    background: linear-gradient(
+      to right,
+      rgba(7, 14, 13, 0.22),
+      rgba(7, 14, 13, 0.08) 40%,
+      transparent 75%
+    );
   }
 }

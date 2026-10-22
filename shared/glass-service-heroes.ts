@@ -14,7 +14,7 @@ export const GLASS_SERVICE_HEROES: Record<string, GlassServiceHero> = {
   "services-frameless-showers": {
     heading: "Frameless Shower Doors",
     subheading:
-      "Custom glass shower doors and enclosures, measured and installed to fit your bathroom.",
+      "Custom frameless shower doors and enclosures, measured to suit your bathroom’s layout. From a simple door replacement to a full enclosure for a remodel, each installation is fitted to your space.",
     quoteText: "Get a Free Quote",
   },
   "services-window-installation": {
@@ -26,19 +26,19 @@ export const GLASS_SERVICE_HEROES: Record<string, GlassServiceHero> = {
   "services-door-installation": {
     heading: "Door Installation",
     subheading:
-      "Entry, patio, and storm doors installed for a secure fit and reliable weather protection.",
+      "Entry, patio, and storm doors installed for a secure fit, smooth operation, and reliable weather protection. Replace an aging door or complete a renovation with an installation measured and fitted to your opening.",
     quoteText: "Get a Free Quote",
   },
   "services-window-repair": {
     heading: "Window Repair",
     subheading:
-      "Repair foggy glass, cracked panes, broken seals, and stuck sashes—often without replacing the whole window.",
+      "Repair foggy glass, cracked panes, broken seals, and stuck sashes to restore clarity and everyday function. Where the frame and window remain sound, targeted repairs can address the problem without replacing the entire unit.",
     quoteText: "Get a Free Quote",
   },
   "services-commercial-storefront-glass-installation": {
     heading: "Storefront Glass Installation",
     subheading:
-      "Aluminum framing, glass panels, and storefront doors installed for new construction, buildouts, and renovations.",
+      "Aluminum framing, glass panels, and storefront doors installed for new construction, tenant buildouts, and renovations. Create a complete storefront entrance or update an existing opening with a system fitted to your business’s space.",
     quoteText: "Get a Free Quote",
   },
   "services-commercial-storefront-glass-replacement-repair": {

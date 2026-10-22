@@ -312,6 +312,51 @@ describe("ensureSystemCmsPages", () => {
     });
   });
 
+  it.each([
+    [
+      "<p>Entry, patio, and storm doors installed for a secure fit and reliable weather protection.</p>",
+      true,
+    ],
+    ["<p>Custom editor description.</p>", false],
+  ])(
+    "refreshes deployed hero descriptions while preserving editor copy: %s",
+    async (subheading, refresh) => {
+      mockGetAllPages.mockResolvedValue([
+        {
+          id: "door-copy",
+          slug: "services-door-installation",
+          content: {
+            _system: {
+              serviceHeroLocation2026: true,
+              serviceHeroCallFirst2026: true,
+              callFirstButtons2026: true,
+            },
+            blocks: [
+              {
+                id: "hero",
+                type: "hero",
+                props: { heading: "Keep title", backgroundImageUrl: "/keep.webp", subheading },
+              },
+            ],
+          },
+        },
+      ]);
+      mockGetPageBySlug.mockResolvedValue(null);
+      const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
+      await ensureSystemCmsPages();
+      const update = mockUpdatePage.mock.calls.find(([id]) => id === "door-copy")?.[1];
+      if (refresh) {
+        expect(update.content.blocks[0].props).toEqual({
+          heading: "Keep title",
+          backgroundImageUrl: "/keep.webp",
+          subheading: `<p>${GLASS_SERVICE_HEROES["services-door-installation"].subheading}</p>`,
+        });
+      } else {
+        expect(update?.content?.blocks[0].props.subheading ?? subheading).toBe(subheading);
+      }
+    },
+  );
+
   it("corrects stale location copy and puts call buttons first once", async () => {
     mockGetAllPages.mockResolvedValue([
       {
