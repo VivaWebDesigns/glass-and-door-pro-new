@@ -1,3 +1,4 @@
+import { HOME_SOCIAL_IMAGE } from "@shared/glass-hero-images";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Navbar } from "@/components/layout/navbar";
@@ -133,7 +134,9 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
     const origin =
       globalSeo?.siteUrl || (typeof window !== "undefined" ? window.location.origin : "");
     const effectiveOgImage = absoluteUrl(
-      page.ogImageUrl || globalSeo?.defaultOgImageUrl || "",
+      page.slug === "home"
+        ? HOME_SOCIAL_IMAGE
+        : page.ogImageUrl || globalSeo?.defaultOgImageUrl || "",
       origin,
     );
 

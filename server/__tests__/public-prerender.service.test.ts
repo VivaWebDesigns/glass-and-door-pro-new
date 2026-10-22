@@ -579,6 +579,9 @@ describe("public-prerender.service", () => {
     expect(snapshot?.bodyHtml).not.toContain("cc1dbbbe");
     expect(snapshot?.bodyHtml).not.toContain("hero</p>");
     expect(snapshot?.bodyHtml).not.toContain("#contact");
+    expect(snapshot?.ogImageUrl).toBe(
+      "https://glassanddoorpro.com/images/glass-door-pro/home-exterior-share.jpg",
+    );
     expect(snapshot?.bodyHtml).not.toContain("glass-home");
     expect(snapshot?.bodyHtml).not.toContain("internal-link");
   });

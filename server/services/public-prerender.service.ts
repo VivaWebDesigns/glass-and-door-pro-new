@@ -1,3 +1,4 @@
+import { HOME_SOCIAL_IMAGE } from "@shared/glass-hero-images";
 import { getRemoteFontStylesheet } from "@shared/branding-fonts";
 import { getGlassLocationSearchCopy } from "@shared/glass-location-search";
 import {
@@ -789,7 +790,12 @@ function buildCmsSnapshot(
     ogTitle: socialOverride?.ogTitle || null,
     ogDescription: socialOverride?.ogDescription || null,
     ogImageUrl:
-      absoluteUrl(normalizedVisiblePage.ogImageUrl || seo?.defaultOgImageUrl, siteUrl) || null,
+      absoluteUrl(
+        normalizedVisiblePage.slug === "home"
+          ? HOME_SOCIAL_IMAGE
+          : normalizedVisiblePage.ogImageUrl || seo?.defaultOgImageUrl,
+        siteUrl,
+      ) || null,
     twitterSite: socialOverride?.twitterSite || null,
     robots: normalizedVisiblePage.noindex
       ? isGlassLegalNoindexSlug(normalizedVisiblePage.slug)

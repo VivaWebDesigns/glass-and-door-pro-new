@@ -1,3 +1,4 @@
+export const HOME_SOCIAL_IMAGE = "/images/glass-door-pro/home-exterior-share.jpg";
 export const HOME_MOBILE_HERO_IMAGE = "/images/glass-door-pro/home-exterior-mobile.webp";
 
 export const MOBILE_HERO_MEDIA = "(max-width: 640px)";

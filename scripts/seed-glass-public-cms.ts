@@ -1,3 +1,4 @@
+import { HOME_SOCIAL_IMAGE } from "../shared/glass-hero-images";
 import { randomUUID } from "crypto";
 import { pathToFileURL } from "url";
 import type { storage as storageInstance } from "../server/storage";
@@ -5037,7 +5038,7 @@ export async function seedGlassPublicCms() {
           "Owner-operated glass and door services in Charlotte, NC. Frameless showers, window installation, door installation, window repair and commercial glass by Doug.",
         seoKeywords:
           "glass installation Charlotte NC, frameless shower doors, window repair, door installation, commercial glass",
-        ogImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
+        ogImageUrl: HOME_SOCIAL_IMAGE,
         publishedAt: new Date(),
       });
       console.log(`  [updated] home page (${existingHome.id})`);
@@ -5055,7 +5056,7 @@ export async function seedGlassPublicCms() {
         "Owner-operated glass and door services in Charlotte, NC. Frameless showers, window installation, door installation, window repair and commercial glass by Doug.",
       seoKeywords:
         "glass installation Charlotte NC, frameless shower doors, window repair, door installation, commercial glass",
-      ogImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
+      ogImageUrl: HOME_SOCIAL_IMAGE,
       publishedAt: new Date(),
     });
     console.log(`  [created] home page (${page.id})`);
