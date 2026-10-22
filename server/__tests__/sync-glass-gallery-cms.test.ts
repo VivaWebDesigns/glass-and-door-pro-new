@@ -45,7 +45,7 @@ describe("mergeNewGalleryImages", () => {
     }
     const second = mergeNewGalleryImages(first.content);
 
-    expect(first.addedImages).toBe(10);
+    expect(first.addedImages).toBe(11);
     expect(first.replacedImages).toBe(0);
     expect(first.removedImages).toBe(0);
     expect(first.movedImages).toBe(0);
@@ -59,11 +59,11 @@ describe("mergeNewGalleryImages", () => {
     const imageCounts = first.content.blocks
       .filter((block) => block.type === "image-grid")
       .map((block) => (block.props.images as unknown[]).length);
-    expect(imageCounts).toEqual([3, 4, 3, 4]);
+    expect(imageCounts).toEqual([4, 4, 3, 4]);
 
     const cardsBlock = first.content.blocks.find((block) => block.type === "cards-grid");
     expect(cardsBlock?.props.cards).toEqual([
-      { title: "Frameless Showers", buttonText: "3 Photos" },
+      { title: "Frameless Showers", buttonText: "4 Photos" },
       { title: "Windows", buttonText: "4 Photos" },
       { title: "Doors", buttonText: "3 Photos" },
       { title: "Commercial Glass", buttonText: "4 Photos" },
@@ -91,7 +91,7 @@ describe("mergeNewGalleryImages", () => {
       (image) => image.url,
     );
 
-    expect(merged.addedImages).toBe(9);
+    expect(merged.addedImages).toBe(10);
     expect(merged.replacedImages).toBe(1);
     expect(urls).toContain(
       "/images/glass-door-pro/gallery/commercial-glass/commercial-double-glass-door-installation.webp",

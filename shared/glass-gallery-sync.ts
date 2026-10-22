@@ -46,6 +46,11 @@ const NEW_GALLERY_CATEGORIES: GalleryCategory[] = [
     cardTitle: "Frameless Showers",
     images: [
       {
+        url: "/images/glass-door-pro/gallery/frameless-showers/frameless-shower-enclosure-gold-hardware.webp",
+        alt: "Frameless glass shower enclosure with brushed gold hinges and clamps installed by Glass & Door Pro",
+        caption: "Frameless Shower Enclosure with Gold Hardware",
+      },
+      {
         url: "/images/glass-door-pro/gallery/frameless-showers/frameless-shower-enclosure-installation.webp",
         alt: "Frameless glass shower enclosure with a half wall installed by Glass & Door Pro",
         caption: "Frameless Shower Enclosure Installation",

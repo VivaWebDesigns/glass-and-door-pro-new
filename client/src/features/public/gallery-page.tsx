@@ -4,6 +4,10 @@ import { PublicPageRenderer } from "@/features/public/public-block-renderer";
 import type { BlockInstance } from "@/features/admin/cms/builder/block-registry";
 
 const framelessShowerImages = [
+  [
+    "frameless-shower-enclosure-gold-hardware.webp",
+    "Frameless Shower Enclosure with Gold Hardware",
+  ],
   ["frameless-shower-enclosure-installation.webp", "Frameless Shower Enclosure Installation"],
   ["18.webp", "Frameless Shower Door Installation"],
   ["03.webp", "Frameless Shower Install - SouthPark"],
