@@ -9,9 +9,7 @@ interface GalleryImage {
 
 type CmsGalleryImage = Omit<GalleryImage, "legacyUrls">;
 
-const RETIRED_GALLERY_URLS = new Set([
-  "/images/glass-door-pro/gallery/doors/05.webp",
-]);
+const RETIRED_GALLERY_URLS = new Set(["/images/glass-door-pro/gallery/doors/05.webp"]);
 
 const GALLERY_CATEGORY_MOVES = [
   {
@@ -46,6 +44,11 @@ const NEW_GALLERY_CATEGORIES: GalleryCategory[] = [
     cardTitle: "Frameless Showers",
     images: [
       {
+        url: "/images/glass-door-pro/gallery/frameless-showers/frameless-shower-enclosure-installation.webp",
+        alt: "Frameless glass shower enclosure with a half wall installed by Glass & Door Pro",
+        caption: "Frameless Shower Enclosure Installation",
+      },
+      {
         url: "/images/glass-door-pro/gallery/frameless-showers/18.webp",
         alt: "Frameless shower door installation by Glass & Door Pro",
         caption: "Frameless Shower Door Installation",
@@ -78,6 +81,11 @@ const NEW_GALLERY_CATEGORIES: GalleryCategory[] = [
     cardTitle: "Doors",
     images: [
       {
+        url: "/images/glass-door-pro/gallery/doors/storm-door-installation.webp",
+        alt: "White full-view storm door installation by Glass & Door Pro",
+        caption: "Storm Door Installation",
+      },
+      {
         url: "/images/glass-door-pro/gallery/doors/06.webp",
         alt: "Sliding patio door installation by Glass & Door Pro",
         caption: "Sliding Patio Door Installation",
@@ -88,6 +96,11 @@ const NEW_GALLERY_CATEGORIES: GalleryCategory[] = [
     anchorId: "commercial-glass",
     cardTitle: "Commercial Glass",
     images: [
+      {
+        url: "/images/glass-door-pro/gallery/commercial-glass/commercial-storefront-glass-installation.webp",
+        alt: "Commercial storefront glass and entry door installation by Glass & Door Pro",
+        caption: "Commercial Storefront Glass Installation",
+      },
       {
         url: "/images/glass-door-pro/gallery/commercial-glass/commercial-double-glass-door-installation.webp",
         alt: "Commercial double glass door installation by Glass & Door Pro",
@@ -157,9 +170,7 @@ export function mergeNewGalleryImages(content: unknown) {
 
   for (const move of GALLERY_CATEGORY_MOVES) {
     const imageBlocks = nextContent.blocks.filter((item) => item.type === "image-grid");
-    const targetBlock = imageBlocks.find(
-      (block) => block.props.anchorId === move.toAnchorId,
-    );
+    const targetBlock = imageBlocks.find((block) => block.props.anchorId === move.toAnchorId);
     if (!targetBlock) {
       throw new Error(`Gallery image block not found: ${move.toAnchorId}`);
     }
@@ -175,9 +186,7 @@ export function mergeNewGalleryImages(content: unknown) {
       block.props.images = retainedImages;
     }
 
-    const targetImages = Array.isArray(targetBlock.props.images)
-      ? targetBlock.props.images
-      : [];
+    const targetImages = Array.isArray(targetBlock.props.images) ? targetBlock.props.images : [];
     const targetIndex = targetImages.findIndex(
       (image) => galleryImageUrl(image) === move.image.url,
     );
@@ -195,17 +204,13 @@ export function mergeNewGalleryImages(content: unknown) {
 
   for (const category of NEW_GALLERY_CATEGORIES) {
     const imageBlock = nextContent.blocks.find(
-      (block) =>
-        block.type === "image-grid" &&
-        block.props.anchorId === category.anchorId,
+      (block) => block.type === "image-grid" && block.props.anchorId === category.anchorId,
     );
     if (!imageBlock) {
       throw new Error(`Gallery image block not found: ${category.anchorId}`);
     }
 
-    const currentImages = Array.isArray(imageBlock.props.images)
-      ? imageBlock.props.images
-      : [];
+    const currentImages = Array.isArray(imageBlock.props.images) ? imageBlock.props.images : [];
     const existingUrls = new Set(currentImages.map(galleryImageUrl).filter(Boolean));
     const missingImages: CmsGalleryImage[] = [];
     for (const image of category.images) {
@@ -242,9 +247,7 @@ export function mergeNewGalleryImages(content: unknown) {
 
     const imageCount = (imageBlock.props.images as unknown[]).length;
     const cardsBlock = nextContent.blocks.find((block) => block.type === "cards-grid");
-    const cards = cardsBlock && Array.isArray(cardsBlock.props.cards)
-      ? cardsBlock.props.cards
-      : [];
+    const cards = cardsBlock && Array.isArray(cardsBlock.props.cards) ? cardsBlock.props.cards : [];
     const categoryCard = cards.find(
       (card) =>
         card &&
@@ -294,7 +297,7 @@ export async function syncGlassGalleryCms() {
     content: page.content as Record<string, unknown>,
     status: page.status,
     changedBy: page.updatedBy ?? page.createdBy ?? undefined,
-    changeNote: "Synchronized July 2026 gallery updates",
+    changeNote: "Synchronized gallery updates",
   });
   await storage.cmsPages.updatePage(page.id, { content: merged.content });
 

@@ -4,6 +4,7 @@ import { PublicPageRenderer } from "@/features/public/public-block-renderer";
 import type { BlockInstance } from "@/features/admin/cms/builder/block-registry";
 
 const framelessShowerImages = [
+  ["frameless-shower-enclosure-installation.webp", "Frameless Shower Enclosure Installation"],
   ["18.webp", "Frameless Shower Door Installation"],
   ["03.webp", "Frameless Shower Install - SouthPark"],
   ["01.webp", "Frameless Shower Install - Myers Park"],
@@ -47,6 +48,7 @@ const windowImages = [
 }));
 
 const doorImages = [
+  ["storm-door-installation.webp", "Storm Door Installation"],
   ["06.webp", "Sliding Patio Door Installation"],
   ["01.webp", "Decorative Entry Door Installation"],
   ["03.webp", "Glass Door Replacement - Cornelius"],
@@ -58,6 +60,7 @@ const doorImages = [
 }));
 
 const commercialGlassImages = [
+  ["commercial-storefront-glass-installation.webp", "Commercial Storefront Glass Installation"],
   ["commercial-glass-entry-door-installation.webp", "Commercial Glass Entry Door Installation"],
   ["commercial-double-glass-door-installation.webp", "Commercial Double Glass Door Installation"],
   ["07.webp", "Commercial Glass Door Installation"],
