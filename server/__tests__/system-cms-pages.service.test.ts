@@ -1384,6 +1384,43 @@ describe("ensureSystemCmsPages", () => {
     ).toEqual(["Yuriy Kobzyev", "L M", "Noah Clark"]);
   });
 
+  it("adds new gallery photo batches to the gallery page on startup", async () => {
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "gallery-id",
+        slug: "gallery",
+        updatedBy: "editor",
+        content: {
+          blocks: [
+            {
+              id: "categories",
+              type: "cards-grid",
+              props: { cards: [{ title: "Doors", buttonText: "1 Photos" }] },
+            },
+            ...["frameless-showers", "windows", "doors", "commercial-glass"].map((anchorId) => ({
+              id: anchorId,
+              type: "image-grid",
+              props: { anchorId, images: [{ url: `/existing/${anchorId}.webp` }] },
+            })),
+          ],
+        },
+      },
+    ]);
+    mockGetPageBySlug.mockResolvedValue(null);
+
+    const mod = await import("../services/system-cms-pages.service");
+    await mod.ensureSystemCmsPages();
+
+    const update = mockUpdatePage.mock.calls.find(([id]) => id === "gallery-id")?.[1];
+    const doors = update.content.blocks.find(
+      (block: { props: { anchorId?: string } }) => block.props.anchorId === "doors",
+    );
+    expect(doors.props.images[0].url).toBe(
+      "/images/glass-door-pro/gallery/doors/storm-door-installation.webp",
+    );
+    expect(update.content.blocks[0].props.cards[0].buttonText).toBe("3 Photos");
+  });
+
   it("fills town-page reviews blocks with the current Google reviews", async () => {
     mockGetAllPages.mockResolvedValue([
       {

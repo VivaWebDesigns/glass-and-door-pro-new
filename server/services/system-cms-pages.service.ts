@@ -35,6 +35,8 @@ import {
   getCityShowerPageCopy,
   linkLocationCommercialCardToServicesHub,
 } from "@shared/glass-city-shower-pages";
+import { mergeNewGalleryImages } from "@shared/glass-gallery-sync";
+import { logger } from "../utils/logger";
 
 function id() {
   return randomUUID();
@@ -898,6 +900,27 @@ async function normalizeStoredCmsPages() {
         );
         if (contentWithHomepageCorrections !== (updates.content ?? page.content)) {
           updates.content = contentWithHomepageCorrections as InsertCmsPage["content"];
+        }
+      }
+
+      if (page.slug === "gallery") {
+        // New gallery photo batches land on deploy; a page without image grids is left alone.
+        try {
+          const merged = mergeNewGalleryImages(updates.content ?? page.content);
+          if (
+            merged.addedImages +
+              merged.replacedImages +
+              merged.removedImages +
+              merged.movedImages +
+              merged.updatedCounts >
+            0
+          ) {
+            updates.content = merged.content as InsertCmsPage["content"];
+          }
+        } catch (error) {
+          logger.app.warn("Skipped gallery photo sync", {
+            error: error instanceof Error ? error.message : String(error),
+          });
         }
       }
 

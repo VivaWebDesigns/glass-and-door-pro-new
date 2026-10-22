@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mergeNewGalleryImages } from "../../scripts/sync-glass-gallery-cms";
+import { mergeNewGalleryImages } from "@shared/glass-gallery-sync";
 
 function galleryFixture() {
   return {
