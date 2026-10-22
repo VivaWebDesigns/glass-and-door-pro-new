@@ -1112,7 +1112,7 @@
 /* Homepage mobile art direction: clear architecture above a shaded editorial caption. */
 @media (max-width: 640px) {
   section.home-cinematic-hero {
-    min-height: max(620px, calc(100svh - 140px)) !important;
+    min-height: max(440px, 72svh) !important;
     align-items: flex-end;
   }
   .home-cinematic-hero .home-mobile-hero-shade {
@@ -1126,7 +1126,7 @@
   }
   .home-cinematic-hero > .relative.z-10 {
     width: 100%;
-    padding: 20rem 20px 28px;
+    padding: 4.5rem 20px 28px;
   }
   .home-cinematic-hero h1.home-mobile-heading {
     margin: 0 0 16px;
