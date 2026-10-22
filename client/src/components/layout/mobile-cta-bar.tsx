@@ -40,6 +40,7 @@ export function MobileCtaBar() {
     <div
       className="fixed inset-x-0 bottom-0 z-[998] flex gap-2.5 border-t border-slate-200 bg-white px-3 pt-2.5 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-6px_20px_rgba(15,23,42,0.08)] md:hidden"
       data-nosnippet={excludeServiceUtilitySnippets(location) ? "" : undefined}
+      data-home-hero={location === "/" ? "true" : undefined}
       data-testid="mobile-cta-bar"
     >
       <a

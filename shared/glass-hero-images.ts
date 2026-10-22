@@ -1,3 +1,5 @@
+export const HOME_MOBILE_HERO_IMAGE = "/images/glass-door-pro/home-exterior-mobile.webp";
+
 export const MOBILE_HERO_MEDIA = "(max-width: 640px)";
 export const DESKTOP_HERO_MEDIA = "(min-width: 641px)";
 
@@ -26,7 +28,8 @@ const mobileHeroImages = new Set([
   "/images/glass-door-pro/broken-glass-hero.webp",
 ]);
 
-export function getMobileHeroImageUrl(imageUrl: string): string | undefined {
+export function getMobileHeroImageUrl(imageUrl: string, variant?: string): string | undefined {
+  if (variant === "glass-home") return HOME_MOBILE_HERO_IMAGE;
   return mobileHeroImages.has(imageUrl)
     ? imageUrl.replace(/\.webp$/, "-mobile-1280w.webp")
     : undefined;

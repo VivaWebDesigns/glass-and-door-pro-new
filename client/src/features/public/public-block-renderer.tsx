@@ -170,7 +170,10 @@ function getHeroConfig(props: Record<string, unknown>) {
     usesGlassCtas: isGlassService || variant === "glass-reviews",
     isSplit: str(props.layout) === "split" || isGlassService,
     background: resolveCmsAssetUrl(str(props.backgroundImageUrl)),
-    mobileBackground: getMobileHeroImageUrl(resolveCmsAssetUrl(str(props.backgroundImageUrl))),
+    mobileBackground: getMobileHeroImageUrl(
+      resolveCmsAssetUrl(str(props.backgroundImageUrl)),
+      variant,
+    ),
     backgroundAlt: str(props.backgroundImageAlt) || str(props.imageAlt),
     backgroundWidth: num(props.backgroundImageWidth as number, 0) || undefined,
     backgroundHeight: num(props.backgroundImageHeight as number, 0) || undefined,
@@ -194,7 +197,11 @@ function HeroBackdrop({ config }: { config: HeroConfig }) {
       {background && (
         <img
           src={background}
-          alt={config.backgroundAlt}
+          alt={
+            isMobileHeroViewport && config.variant === "glass-home"
+              ? "White brick home with black-framed windows and a glass entry door"
+              : config.backgroundAlt
+          }
           width={config.backgroundWidth}
           height={config.backgroundHeight}
           loading="eager"
@@ -216,7 +223,9 @@ function HeroBackdrop({ config }: { config: HeroConfig }) {
           <source src={config.videoBackground} type="video/mp4" />
         </video>
       )}
-      {config.isGlassReviews ? (
+      {isMobileHeroViewport && config.variant === "glass-home" ? (
+        <div className="absolute inset-0 home-mobile-hero-shade" />
+      ) : config.isGlassReviews ? (
         <>
           <div
             className="absolute inset-0"
@@ -238,6 +247,19 @@ function HeroBackdrop({ config }: { config: HeroConfig }) {
 }
 
 function HeroHeading({ props, variant }: { props: Record<string, unknown>; variant: string }) {
+  const isMobile = useMobileHeroViewport();
+  if (variant === "glass-home" && isMobile) {
+    return (
+      <h1 className="home-mobile-heading">
+        <span className="home-mobile-location">Greater Charlotte</span>{" "}
+        <span className="home-mobile-title">
+          Shower Doors{" "}
+          <br />
+          Windows · Doors
+        </span>
+      </h1>
+    );
+  }
   const accentHeading = str(props.accentHeading);
   return (
     <h1
@@ -301,12 +323,16 @@ function HeroCtas({ props, config }: { props: Record<string, unknown>; config: H
 function HeroBlock({ props }: { props: Record<string, unknown> }) {
   const config = getHeroConfig(props);
   const badge = str(props.badge);
-  const subheading = str(props.subheading);
+  const isMobile = useMobileHeroViewport();
+  const subheading =
+    config.variant === "glass-home" && isMobile
+      ? "Expert installation and repair across Greater Charlotte. Work directly with Doug, from first call to final fit."
+      : str(props.subheading);
 
   return (
     <section
       id={str(props.anchorId) || undefined}
-      className={`public-hero-pattern relative flex items-center overflow-hidden ${
+      className={`public-hero-pattern ${config.variant === "glass-home" ? "home-cinematic-hero" : ""} relative flex items-center overflow-hidden ${
         config.isSplit
           ? "justify-start text-left"
           : config.variant === "glass-home"

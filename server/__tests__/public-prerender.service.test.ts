@@ -171,7 +171,16 @@ describe("public-prerender.service", () => {
         mockGetPageBySlug.mockResolvedValue({
           ...cmsPage,
           content: {
-            blocks: [{ id: "hero", type: "hero", props: { backgroundImageUrl: image } }],
+            blocks: [
+              {
+                id: "hero",
+                type: "hero",
+                props: {
+                  backgroundImageUrl: image,
+                  variant: path === "/" ? "glass-home" : undefined,
+                },
+              },
+            ],
           },
         });
       }
@@ -180,7 +189,7 @@ describe("public-prerender.service", () => {
       const snapshot = await getPublicHtmlSnapshot(path);
       const head = injectPublicHtmlSnapshot("<head><!--APP_DYNAMIC_HEAD--></head>", snapshot);
       expect(head).toContain(
-        `href="${getMobileHeroImageUrl(image)}" media="(max-width: 640px)" fetchpriority="high"`,
+        `href="${getMobileHeroImageUrl(image, path === "/" ? "glass-home" : undefined)}" media="(max-width: 640px)" fetchpriority="high"`,
       );
       expect(head).toContain(`href="${image}" media="(min-width: 641px)" fetchpriority="high"`);
       expect(head.match(/rel="preload"/g)).toHaveLength(2);

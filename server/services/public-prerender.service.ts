@@ -904,19 +904,21 @@ export async function getPublicHtmlSnapshot(
 // uploaded/external assets are left to the renderer rather than risking a wasted preload.
 function getStaticHeroPreload(page: CmsPage | undefined, fallbackImage?: string) {
   let image: unknown = fallbackImage;
+  let variant: string | undefined;
   if (page) {
     const content = page.content;
     if (!content || typeof content !== "object" || Array.isArray(content)) return "";
     const blocks = (content as Record<string, unknown>).blocks;
     if (!Array.isArray(blocks) || blocks[0]?.type !== "hero") return "";
     image = blocks[0]?.props?.backgroundImageUrl;
+    variant = blocks[0]?.props?.variant;
   }
   if (
     typeof image !== "string" ||
     !/^\/images\/glass-door-pro\/[a-zA-Z0-9/_-]+\.(webp|png|jpe?g|avif)$/.test(image)
   )
     return "";
-  const mobileImage = getMobileHeroImageUrl(image);
+  const mobileImage = getMobileHeroImageUrl(image, variant);
   if (mobileImage) {
     return [
       `<link rel="preload" as="image" href="${escapeHtml(mobileImage)}" media="${MOBILE_HERO_MEDIA}" fetchpriority="high" />`,
