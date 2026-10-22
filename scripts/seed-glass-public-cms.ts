@@ -891,6 +891,7 @@ function glassServiceHeroProps(slug: string) {
   if (!hero) throw new Error(`Missing service hero copy for ${slug}`);
   return {
     ...(hero.heading ? { heading: hero.heading } : {}),
+    locationHeading: "Greater Charlotte",
     subheading: hero.subheading,
     primaryText: GLASS_CALL_CTA_TEXT,
     primaryAction: "custom-link",
@@ -906,6 +907,7 @@ function glassServiceHeroProps(slug: string) {
 }
 
 function serviceHero(props: {
+  locationHeading?: string;
   heading: string;
   subheading: string;
   imageUrl: string;
@@ -925,6 +927,7 @@ function serviceHero(props: {
     variant: "glass-service",
     layout: "split",
     heading: props.heading,
+    ...(props.locationHeading ? { locationHeading: props.locationHeading } : {}),
     subheading: `<p>${props.subheading}</p>`,
     ctaText: props.primaryText ?? "Get a Free Quote",
     ctaAction: props.primaryAction ?? "form-modal",

@@ -791,7 +791,7 @@ function applyServiceHeroRefresh(slug: string, content: unknown) {
   if (!hero || !isRecord(content) || !Array.isArray(content.blocks)) return null;
 
   const systemMeta = isRecord(content._system) ? content._system : {};
-  if (systemMeta.serviceHeroCallFirst2026 === true) return null;
+  if (systemMeta.serviceHeroLocation2026 === true) return null;
 
   const heroIndex = content.blocks.findIndex((block) => isRecord(block) && block.type === "hero");
   const heroBlock = content.blocks[heroIndex];
@@ -803,6 +803,7 @@ function applyServiceHeroRefresh(slug: string, content: unknown) {
     props: {
       ...heroBlock.props,
       ...(hero.heading ? { heading: hero.heading } : {}),
+      locationHeading: "Greater Charlotte",
       subheading: `<p>${hero.subheading}</p>`,
       ...getGlassServiceHeroCtaProps(hero.quoteText),
     },
@@ -811,7 +812,7 @@ function applyServiceHeroRefresh(slug: string, content: unknown) {
   return {
     ...content,
     blocks,
-    _system: { ...systemMeta, serviceHeroCallFirst2026: true },
+    _system: { ...systemMeta, serviceHeroCallFirst2026: true, serviceHeroLocation2026: true },
   };
 }
 

@@ -253,9 +253,18 @@ function HeroHeading({ props, variant }: { props: Record<string, unknown>; varia
       <h1 className="home-mobile-heading">
         <span className="home-mobile-location">Greater Charlotte</span>{" "}
         <span className="home-mobile-title">
-          Shower Doors{" "}
-          <br />
+          Shower Doors <br />
           Windows · Doors
+        </span>
+      </h1>
+    );
+  }
+  if (str(props.locationHeading)) {
+    return (
+      <h1 className="service-location-heading">
+        <span className="service-location-label">{str(props.locationHeading)}</span>{" "}
+        <span className="service-location-title">
+          {renderPublicDisplayText(str(props.heading))}
         </span>
       </h1>
     );

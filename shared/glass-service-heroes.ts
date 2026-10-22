@@ -12,49 +12,57 @@ type GlassServiceHero = {
 
 export const GLASS_SERVICE_HEROES: Record<string, GlassServiceHero> = {
   "services-frameless-showers": {
-    heading: "Frameless Glass Shower Doors in Charlotte, NC",
+    heading: "Frameless Shower Doors",
     subheading:
-      "Custom frameless shower doors and enclosures for bathroom remodels and upgrades across the Charlotte area. Measured and installed personally by Doug — no subcontractors.",
+      "Custom glass shower doors and enclosures, measured and installed to fit your bathroom.",
     quoteText: "Get a Free Quote",
   },
   "services-window-installation": {
+    heading: "Window Installation & Replacement",
     subheading:
-      "Replacement windows for single openings, full rooms, and whole-home upgrades across the Charlotte area. Measured, fitted, and installed personally by Doug — the same person who gives you the quote.",
+      "New and replacement windows fitted for single rooms, whole-home upgrades, and everything in between.",
     quoteText: "Get a Free Quote",
   },
   "services-door-installation": {
+    heading: "Door Installation",
     subheading:
-      "Entry, patio, and storm doors installed level, plumb, and weather-tight across the Charlotte area. Doug handles every door personally, from measurement through installation.",
+      "Entry, patio, and storm doors installed for a secure fit and reliable weather protection.",
     quoteText: "Get a Free Quote",
   },
   "services-window-repair": {
+    heading: "Window Repair",
     subheading:
-      "Foggy glass, broken seals, cracked panes, and stuck sashes repaired across the Charlotte area — often without replacing the whole window. Doug gives you a straight answer on repair versus replacement.",
+      "Repair foggy glass, cracked panes, broken seals, and stuck sashes—often without replacing the whole window.",
     quoteText: "Get a Free Quote",
   },
   "services-commercial-storefront-glass-installation": {
+    heading: "Storefront Glass Installation",
     subheading:
-      "Aluminum storefront framing, fixed glass panels, and storefront doors installed for new construction, tenant buildouts, and renovations across Charlotte. One point of contact from quote through completion.",
+      "Aluminum framing, glass panels, and storefront doors installed for new construction, buildouts, and renovations.",
     quoteText: "Get a Free Quote",
   },
   "services-commercial-storefront-glass-replacement-repair": {
+    heading: "Storefront Glass Replacement & Repair",
     subheading:
-      "Broken storefront glass boarded up, secured, and permanently replaced for Charlotte businesses — whether it's vandalism, an accident, or a failed panel. One call handles the whole job.",
+      "Board-up and glass replacement to secure your storefront and restore damaged windows and doors.",
     quoteText: "Request a Quote",
   },
   "services-commercial-door-installation": {
+    heading: "Commercial Door Installation",
     subheading:
-      "Aluminum entry doors, glass storefront doors, and commercial entrance systems installed for new construction, tenant buildouts, and business renovations across Charlotte. Direct contact with the person doing the work — from scope through installation.",
+      "Aluminum and glass entrance systems installed for new construction, business renovations, and tenant buildouts.",
     quoteText: "Get a Free Quote",
   },
   "services-commercial-door-replacement-repair": {
+    heading: "Commercial Door Replacement & Repair",
     subheading:
-      "Broken glass, failed hardware, misaligned frames, and doors that won't close or lock — repaired or replaced fast for Charlotte businesses. Honest assessments and same-week scheduling.",
+      "Repair or replace damaged glass, worn hardware, and misaligned doors to keep your entrance secure and working properly.",
     quoteText: "Request a Quote",
   },
   "services-commercial-window-replacement": {
+    heading: "Apartment & Multi-Family Window Replacement",
     subheading:
-      "Window replacement for apartment and multi-family projects across Charlotte — wrong windows ordered, units damaged mid-construction, or a deadline that can't move. Doug mobilizes fast and handles each project personally.",
+      "Window replacement for apartment and multi-family projects, including damaged units and construction setbacks.",
     quoteText: "Request a Quote",
   },
 };

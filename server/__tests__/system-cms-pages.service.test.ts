@@ -38,7 +38,11 @@ vi.mock("../utils/logger", () => ({
 describe("ensureSystemCmsPages", () => {
   it("adds the SouthPark feature before the shower gallery once and preserves later CMS edits", async () => {
     const content = {
-      _system: { serviceHeroCallFirst2026: true, callFirstButtons2026: true },
+      _system: {
+        serviceHeroCallFirst2026: true,
+        serviceHeroLocation2026: true,
+        callFirstButtons2026: true,
+      },
       blocks: [
         { id: "intro", type: "rich-text", props: { content: "<p>Keep the introduction.</p>" } },
         {
@@ -271,7 +275,11 @@ describe("ensureSystemCmsPages", () => {
         seoDescription: "Multi-family description",
         updatedBy: "editor",
         content: {
-          _system: { serviceHeroCallFirst2026: true, callFirstButtons2026: true },
+          _system: {
+            serviceHeroCallFirst2026: true,
+            serviceHeroLocation2026: true,
+            callFirstButtons2026: true,
+          },
           blocks: [{ id: "hero", type: "hero", props: { subheading: "<p>Later edit.</p>" } }],
         },
       },
@@ -286,10 +294,12 @@ describe("ensureSystemCmsPages", () => {
     const update = mockUpdatePage.mock.calls.find(([id]) => id === "frameless-id")?.[1];
     expect(update.content._system).toEqual({
       serviceHeroCallFirst2026: true,
+      serviceHeroLocation2026: true,
       callFirstButtons2026: true,
     });
     expect(update.content.blocks[0].props).toEqual({
-      heading: "Frameless Glass Shower Doors in Charlotte, NC",
+      heading: "Frameless Shower Doors",
+      locationHeading: "Greater Charlotte",
       subheading: `<p>${GLASS_SERVICE_HEROES["services-frameless-showers"].subheading}</p>`,
       backgroundImageUrl: "/keep.webp",
       ...getGlassServiceHeroCtaProps("Get a Free Quote"),
