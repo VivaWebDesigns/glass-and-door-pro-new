@@ -1108,7 +1108,7 @@ async function normalizeStoredCmsPages() {
         locationCopy &&
         (locationSystemMeta.showerSearchPositioning2026 !== true ||
           (page.slug === "service-areas-weddington" &&
-            locationSystemMeta.weddingtonHero2026 !== true))
+            locationSystemMeta.weddingtonHeroCopy2026 !== true))
       ) {
         updates.seoTitle = locationCopy.title;
         updates.seoDescription = locationCopy.description;
@@ -1122,7 +1122,9 @@ async function normalizeStoredCmsPages() {
             _system: {
               ...locationSystemMeta,
               showerSearchPositioning2026: true,
-              ...(page.slug === "service-areas-weddington" ? { weddingtonHero2026: true } : {}),
+              ...(page.slug === "service-areas-weddington"
+                ? { weddingtonHero2026: true, weddingtonHeroCopy2026: true }
+                : {}),
             },
           };
         }

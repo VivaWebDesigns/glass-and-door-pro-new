@@ -22,7 +22,10 @@ export function getGlassLocationSearchCopy(slug: string) {
     place,
     title: `Glass Shower Door Installation in ${place}`,
     heading: `Glass Shower Door Installer in ${place}`,
-    subheading: `<p>Custom glass shower door installation in ${place}. Doug personally measures and installs every door. 15+ years of experience and Saturday appointments available.</p>`,
+    subheading:
+      slug === "service-areas-weddington"
+        ? "<p>Custom frameless shower doors and enclosures, measured and fitted to your bathroom. Serving Weddington homeowners with 15+ years of installation experience.</p>"
+        : `<p>Custom glass shower door installation in ${place}. Doug personally measures and installs every door. 15+ years of experience and Saturday appointments available.</p>`,
     description: `Custom glass shower door installation in ${place}. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.`,
     intro: `Glass & Door Pro installs custom glass shower doors in ${place}. Doug personally measures each opening and installs the finished door himself.`,
   };

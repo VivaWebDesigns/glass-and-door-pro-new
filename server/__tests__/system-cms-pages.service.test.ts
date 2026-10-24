@@ -142,7 +142,7 @@ describe("ensureSystemCmsPages", () => {
         id: "weddington",
         slug: "service-areas-weddington",
         content: {
-          _system: { showerSearchPositioning2026: true },
+          _system: { showerSearchPositioning2026: true, weddingtonHero2026: true },
           blocks: [
             {
               id: "hero",
@@ -161,12 +161,14 @@ describe("ensureSystemCmsPages", () => {
     await ensureSystemCmsPages();
     const update = mockUpdatePage.mock.calls.find(([id]) => id === "weddington")?.[1];
     expect(update.content).toMatchObject({
-      _system: { weddingtonHero2026: true },
+      _system: { weddingtonHero2026: true, weddingtonHeroCopy2026: true },
       blocks: [
         {
           props: {
             heading: "Glass Shower Door Installer",
             locationHeading: "Frameless Showers · Weddington, NC",
+            subheading:
+              "<p>Custom frameless shower doors and enclosures, measured and fitted to your bathroom. Serving Weddington homeowners with 15+ years of installation experience.</p>",
             backgroundImageUrl: "/keep.webp",
           },
         },
