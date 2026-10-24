@@ -341,6 +341,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
   return (
     <section
       id={str(props.anchorId) || undefined}
+      data-location-heading={str(props.locationHeading) || undefined}
       className={`public-hero-pattern ${config.variant === "glass-home" ? "home-cinematic-hero" : ""} relative flex items-center overflow-hidden ${
         config.isSplit
           ? "justify-start text-left"

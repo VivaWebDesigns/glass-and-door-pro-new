@@ -1242,3 +1242,26 @@
     );
   }
 }
+
+/* Weddington trial: retain the location photo with a gentle shade behind the caption. */
+.location-service-hero [data-location-heading] .hero-bottom-fade {
+  height: 65%;
+  background: linear-gradient(to top, rgba(7, 14, 13, 0.38), transparent);
+}
+@media (max-width: 640px) {
+  .location-service-hero [data-location-heading] .service-location-label {
+    letter-spacing: 0.15em;
+    font-size: 10px;
+  }
+}
+@media (min-width: 768px) {
+  .location-service-hero [data-location-heading] .hero-bottom-fade {
+    height: 100%;
+    background: linear-gradient(
+      to right,
+      rgba(7, 14, 13, 0.22),
+      rgba(7, 14, 13, 0.08) 40%,
+      transparent 75%
+    );
+  }
+}

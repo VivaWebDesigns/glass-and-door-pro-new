@@ -43,13 +43,25 @@ export function updateGlassLocationSearchContent(
     if (!isRecord(block) || !isRecord(block.props)) return block;
 
     if (block.type === "hero" && typeof block.props.heading === "string") {
-      if (block.props.heading === copy.heading && block.props.subheading === copy.subheading) {
+      const isWeddington = slug === "service-areas-weddington";
+      const heading = isWeddington ? "Glass Shower Door Installer" : copy.heading;
+      const locationHeading = isWeddington ? "Frameless Showers · Weddington, NC" : undefined;
+      if (
+        block.props.heading === heading &&
+        block.props.subheading === copy.subheading &&
+        (!isWeddington || block.props.locationHeading === locationHeading)
+      ) {
         return block;
       }
       changed = true;
       return {
         ...block,
-        props: { ...block.props, heading: copy.heading, subheading: copy.subheading },
+        props: {
+          ...block.props,
+          heading,
+          subheading: copy.subheading,
+          ...(locationHeading ? { locationHeading } : {}),
+        },
       };
     }
 

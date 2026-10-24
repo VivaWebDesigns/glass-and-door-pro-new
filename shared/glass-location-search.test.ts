@@ -18,6 +18,31 @@ describe("location shower search copy", () => {
     expect(getGlassLocationSearchCopy("service-areas")).toBeNull();
   });
 
+  it("applies the Weddington trial hierarchy without changing the target phrase", () => {
+    const content = {
+      blocks: [
+        {
+          id: "hero",
+          type: "hero",
+          props: { heading: "Old heading", backgroundImageUrl: "/keep.webp" },
+        },
+      ],
+    };
+    const updated = updateGlassLocationSearchContent("service-areas-weddington", content);
+    expect(updated).toMatchObject({
+      blocks: [
+        {
+          props: {
+            heading: "Glass Shower Door Installer",
+            locationHeading: "Frameless Showers · Weddington, NC",
+            backgroundImageUrl: "/keep.webp",
+          },
+        },
+      ],
+    });
+    expect(updateGlassLocationSearchContent("service-areas-weddington", updated)).toBe(updated);
+  });
+
   it("changes the hero and opening paragraph once while retaining other content", () => {
     const original = {
       blocks: [

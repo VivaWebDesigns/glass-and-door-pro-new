@@ -729,7 +729,11 @@ function getPrerenderHeading(page: Pick<CmsPage, "slug" | "title" | "content">) 
         : null;
     if (Array.isArray(blocks)) {
       const hero = blocks.find((block) => block?.type === "hero");
-      if (typeof hero?.props?.heading === "string") return hero.props.heading;
+      if (typeof hero?.props?.heading === "string") {
+        return typeof hero.props.locationHeading === "string"
+          ? `${hero.props.locationHeading} ${hero.props.heading}`
+          : hero.props.heading;
+      }
     }
   }
 

@@ -120,13 +120,58 @@ describe("ensureSystemCmsPages", () => {
         content: {
           _system: { showerSearchPositioning2026: true },
           blocks: [
-            { props: { heading: copy?.heading } },
+            {
+              props: {
+                heading:
+                  page.slug === "service-areas-weddington"
+                    ? "Glass Shower Door Installer"
+                    : copy?.heading,
+              },
+            },
             { props: { content: expect.stringContaining("<p>Keep this local copy.</p>") } },
             { props: { title: "Existing services" } },
           ],
         },
       });
     }
+  });
+
+  it("applies the Weddington trial to a page with existing location positioning", async () => {
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "weddington",
+        slug: "service-areas-weddington",
+        content: {
+          _system: { showerSearchPositioning2026: true },
+          blocks: [
+            {
+              id: "hero",
+              type: "hero",
+              props: {
+                heading: "Glass Shower Door Installer in Weddington, NC",
+                backgroundImageUrl: "/keep.webp",
+              },
+            },
+          ],
+        },
+      },
+    ]);
+    mockGetPageBySlug.mockResolvedValue(null);
+    const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
+    await ensureSystemCmsPages();
+    const update = mockUpdatePage.mock.calls.find(([id]) => id === "weddington")?.[1];
+    expect(update.content).toMatchObject({
+      _system: { weddingtonHero2026: true },
+      blocks: [
+        {
+          props: {
+            heading: "Glass Shower Door Installer",
+            locationHeading: "Frameless Showers · Weddington, NC",
+            backgroundImageUrl: "/keep.webp",
+          },
+        },
+      ],
+    });
   });
 
   it("rebuilds the Waxhaw page around shower doors once", async () => {

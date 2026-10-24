@@ -1104,7 +1104,12 @@ async function normalizeStoredCmsPages() {
       const locationCopy = getGlassLocationSearchCopy(page.slug);
       const locationSystemMeta =
         isRecord(page.content) && isRecord(page.content._system) ? page.content._system : {};
-      if (locationCopy && locationSystemMeta.showerSearchPositioning2026 !== true) {
+      if (
+        locationCopy &&
+        (locationSystemMeta.showerSearchPositioning2026 !== true ||
+          (page.slug === "service-areas-weddington" &&
+            locationSystemMeta.weddingtonHero2026 !== true))
+      ) {
         updates.seoTitle = locationCopy.title;
         updates.seoDescription = locationCopy.description;
         const locationContent = updateGlassLocationSearchContent(
@@ -1114,7 +1119,11 @@ async function normalizeStoredCmsPages() {
         if (isRecord(locationContent)) {
           updates.content = {
             ...locationContent,
-            _system: { ...locationSystemMeta, showerSearchPositioning2026: true },
+            _system: {
+              ...locationSystemMeta,
+              showerSearchPositioning2026: true,
+              ...(page.slug === "service-areas-weddington" ? { weddingtonHero2026: true } : {}),
+            },
           };
         }
       }
