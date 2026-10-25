@@ -1,4 +1,4 @@
-import { HOME_SOCIAL_IMAGE, HOME_MOBILE_HERO_IMAGE } from "../shared/glass-hero-images";
+import { HOME_SOCIAL_IMAGE, HOME_DESKTOP_HERO_IMAGE } from "../shared/glass-hero-images";
 import { randomUUID } from "crypto";
 import { pathToFileURL } from "url";
 import type { storage as storageInstance } from "../server/storage";
@@ -334,7 +334,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
         ctaAction: "internal-link",
         ctaSecondaryText: "",
         ctaSecondaryLink: "",
-        backgroundImageUrl: HOME_MOBILE_HERO_IMAGE,
+        backgroundImageUrl: HOME_DESKTOP_HERO_IMAGE,
         backgroundImageAlt: "White brick home with black-framed windows and a glass entry door",
         videoBackgroundUrl: "",
         overlayColor: "#000000",

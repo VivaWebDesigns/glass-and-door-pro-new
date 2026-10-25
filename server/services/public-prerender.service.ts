@@ -842,7 +842,7 @@ function getFallbackLinkSections(pathname: string) {
 
 function getPrerenderHeading(page: Pick<CmsPage, "slug" | "title" | "content">) {
   if (page.slug === "home") {
-    return "Glass, Door & Window Services Across Greater Charlotte";
+    return "Greater Charlotte Shower Doors, Windows & Doors";
   }
 
   if (getGlassLocationSearchCopy(page.slug)) {

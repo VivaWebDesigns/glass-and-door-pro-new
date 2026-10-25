@@ -167,8 +167,8 @@ function getHeroConfig(props: Record<string, unknown>) {
     variant,
     isGlassService,
     isGlassReviews: variant === "glass-reviews",
-    usesGlassCtas: isGlassService || variant === "glass-reviews",
-    isSplit: str(props.layout) === "split" || isGlassService,
+    usesGlassCtas: isGlassService || variant === "glass-reviews" || variant === "glass-home",
+    isSplit: str(props.layout) === "split" || isGlassService || variant === "glass-home",
     background: resolveCmsAssetUrl(str(props.backgroundImageUrl)),
     mobileBackground: getMobileHeroImageUrl(
       resolveCmsAssetUrl(str(props.backgroundImageUrl)),
@@ -248,11 +248,13 @@ function HeroBackdrop({ config }: { config: HeroConfig }) {
 
 function HeroHeading({ props, variant }: { props: Record<string, unknown>; variant: string }) {
   const isMobile = useMobileHeroViewport();
-  if (variant === "glass-home" && isMobile) {
+  if (variant === "glass-home") {
     return (
-      <h1 className="home-mobile-heading">
-        <span className="home-mobile-location">Greater Charlotte</span>{" "}
-        <span className="home-mobile-title">
+      <h1 className={isMobile ? "home-mobile-heading" : "service-location-heading"}>
+        <span className={isMobile ? "home-mobile-location" : "service-location-label"}>
+          Greater Charlotte
+        </span>{" "}
+        <span className={isMobile ? "home-mobile-title" : "service-location-title"}>
           Shower Doors <br />
           Windows · Doors
         </span>
@@ -332,9 +334,8 @@ function HeroCtas({ props, config }: { props: Record<string, unknown>; config: H
 function HeroBlock({ props }: { props: Record<string, unknown> }) {
   const config = getHeroConfig(props);
   const badge = str(props.badge);
-  const isMobile = useMobileHeroViewport();
   const subheading =
-    config.variant === "glass-home" && isMobile
+    config.variant === "glass-home"
       ? "Expert installation and repair across Greater Charlotte. Work directly with Doug, from first call to final fit."
       : str(props.subheading);
 
@@ -376,16 +377,19 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
         )}
         <HeroCtas props={props} config={config} />
       </div>
-      {config.isSplit && config.background && !config.isGlassService && (
-        <div className="hidden md:block absolute right-0 top-0 bottom-0 w-1/3">
-          <img
-            src={config.background}
-            alt=""
-            className="w-full h-full object-cover"
-            style={{ objectPosition: config.objectPosition }}
-          />
-        </div>
-      )}
+      {config.isSplit &&
+        config.background &&
+        !config.isGlassService &&
+        config.variant !== "glass-home" && (
+          <div className="hidden md:block absolute right-0 top-0 bottom-0 w-1/3">
+            <img
+              src={config.background}
+              alt=""
+              className="w-full h-full object-cover"
+              style={{ objectPosition: config.objectPosition }}
+            />
+          </div>
+        )}
     </section>
   );
 }

@@ -1265,3 +1265,25 @@
     );
   }
 }
+
+/* Desktop homepage follows the service hero hierarchy while retaining its mobile art direction. */
+@media (min-width: 768px) {
+  section.home-cinematic-hero {
+    min-height: 620px !important;
+    align-items: flex-end;
+  }
+  .home-cinematic-hero > .relative.z-10 {
+    max-width: 42rem;
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+  .home-cinematic-hero .hero-bottom-fade {
+    height: 100%;
+    background: linear-gradient(
+      to right,
+      rgba(7, 14, 13, 0.22),
+      rgba(7, 14, 13, 0.08) 40%,
+      transparent 75%
+    );
+  }
+}
