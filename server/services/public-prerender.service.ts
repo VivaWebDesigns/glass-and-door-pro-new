@@ -315,32 +315,6 @@ function sanitizeAnchorId(value: unknown) {
   return /^[A-Za-z][A-Za-z0-9_-]*$/.test(trimmed) ? trimmed : "";
 }
 
-function collectAnchoredSections(content: unknown) {
-  if (!content || typeof content !== "object") return [];
-  const blocks = (content as { blocks?: unknown }).blocks;
-  if (!Array.isArray(blocks)) return [];
-
-  return blocks
-    .map((block) => {
-      if (!block || typeof block !== "object") return null;
-      const props = (block as { props?: unknown }).props;
-      if (!props || typeof props !== "object") return null;
-      const anchorId = sanitizeAnchorId((props as { anchorId?: unknown }).anchorId);
-      if (!anchorId) return null;
-      const record = props as Record<string, unknown>;
-      const heading = [record.heading, record.title, record.formTitle, record.introTitle].find(
-        (value): value is string => typeof value === "string" && Boolean(value.trim()),
-      );
-      const fragments = uniqueFragments(collectTextFragments(props)).slice(0, 3);
-      return fragments.length > 0
-        ? { anchorId, heading: heading ? stripHtml(heading) : "", fragments }
-        : null;
-    })
-    .filter((section): section is { anchorId: string; heading: string; fragments: string[] } =>
-      Boolean(section),
-    );
-}
-
 function isServiceAreaPageSlug(slug: string) {
   return slug.startsWith("service-areas-") || slug.startsWith("areas-served-");
 }
@@ -459,72 +433,252 @@ function buildSeoFooterHtml() {
   ].join("");
 }
 
-function collectLinksFromHtml(value: string): PrerenderLink[] {
-  const sanitized = sanitizeRichHtml(value);
-  const links: PrerenderLink[] = [];
-  const linkPattern = /<a\b[^>]*\bhref=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
-  let match: RegExpExecArray | null;
-  while ((match = linkPattern.exec(sanitized))) {
-    const label = stripHtml(match[2]);
-    if (isSafePrerenderHref(match[1]) && label) {
-      links.push({ href: match[1], label });
-    }
-  }
-  return links;
+type CmsBlock = { type?: string; props?: Record<string, unknown> };
+
+function cmsBlocks(content: unknown): CmsBlock[] {
+  if (!content || typeof content !== "object") return [];
+  const blocks = (content as { blocks?: unknown }).blocks;
+  return Array.isArray(blocks)
+    ? (blocks as unknown[]).filter((block): block is CmsBlock =>
+        Boolean(block && typeof block === "object"),
+      )
+    : [];
 }
 
-function collectCmsLinks(value: unknown, key?: string): PrerenderLink[] {
-  if (!value) return [];
-  if (typeof value === "string") {
-    return key && PUBLIC_TEXT_KEYS.has(key) ? collectLinksFromHtml(value) : [];
-  }
-  if (Array.isArray(value)) {
-    return value.flatMap((entry) => collectCmsLinks(entry, key));
-  }
-  if (typeof value !== "object") return [];
-
-  const record = value as Record<string, unknown>;
-  const links: PrerenderLink[] = [];
-
-  if (
-    isSafePrerenderHref(record.url) ||
-    isSafePrerenderHref(record.href) ||
-    isSafePrerenderHref(record.link)
-  ) {
-    const href = (record.url || record.href || record.link) as string;
-    const label =
-      typeof record.label === "string"
-        ? record.label
-        : typeof record.title === "string"
-          ? record.title
-          : typeof record.name === "string"
-            ? record.name
-            : "";
-    const description =
-      typeof record.description === "string"
-        ? record.description
-        : typeof record.subtitle === "string"
-          ? record.subtitle
-          : undefined;
-    if (label) {
-      links.push({ href, label, description });
-    }
-  }
-
-  for (const [entryKey, entry] of Object.entries(record)) {
-    if (NON_CONTENT_KEYS.has(entryKey) && !["href", "link", "url"].includes(entryKey)) continue;
-    links.push(...collectCmsLinks(entry, entryKey));
-  }
-
-  return links;
+function textProp(props: Record<string, unknown> | undefined, key: string) {
+  const value = props?.[key];
+  return typeof value === "string" ? value.trim() : "";
 }
 
-function buildCmsLinksHtml(content: unknown) {
-  return buildLinkListHtml(
-    "Related Links",
-    uniquePrerenderLinks(collectCmsLinks(content)),
-    "seo-prerender-related-links",
-  );
+function arrayProp<T = Record<string, unknown>>(
+  props: Record<string, unknown> | undefined,
+  key: string,
+): T[] {
+  const value = props?.[key];
+  return Array.isArray(value) ? (value as T[]) : [];
+}
+
+function headingHtml(level: 1 | 2 | 3, value: string) {
+  const text = stripHtml(value);
+  return text ? `<h${level}>${escapeHtml(text)}</h${level}>` : "";
+}
+
+function paragraphHtml(value: string) {
+  const text = stripHtml(value);
+  return text ? `<p>${escapeHtml(text)}</p>` : "";
+}
+
+function emailSafeLink(anchor: string, href: string) {
+  // Keep email links usable in raw HTML; Cloudflare's obfuscated URL is a 404 for crawlers.
+  return /^mailto:/i.test(href) ? `<!--email_off-->${anchor}<!--/email_off-->` : anchor;
+}
+
+function linkHtml(href: unknown, label: string) {
+  const text = stripHtml(label);
+  if (!text) return "";
+  if (!isSafePrerenderHref(href)) return escapeHtml(text);
+  const trimmed = href.trim();
+  return emailSafeLink(`<a href="${escapeHtml(trimmed)}">${escapeHtml(text)}</a>`, trimmed);
+}
+
+function linkedHeadingHtml(href: unknown, label: string) {
+  const link = linkHtml(href, label);
+  return link ? `<h3>${link}</h3>` : "";
+}
+
+function richHtml(value: string) {
+  const sanitized = sanitizeRichHtml(value)
+    .replace(/<a href="(mailto:[^"]*)"[^>]*>[\s\S]*?<\/a>/gi, (anchor, href: string) =>
+      emailSafeLink(anchor, href),
+    )
+    .trim();
+  if (!sanitized) return "";
+  return /^<(p|ul|ol|h[2-4]|blockquote)\b/i.test(sanitized) ? sanitized : `<p>${sanitized}</p>`;
+}
+
+function sectionHeadingHtml(props: Record<string, unknown>, heading = textProp(props, "title")) {
+  return [headingHtml(2, heading), paragraphHtml(textProp(props, "subtitle"))].join("");
+}
+
+function renderCmsBlockForSeo(block: CmsBlock, h1: { text: string; used: boolean }) {
+  const props = block.props ?? {};
+  const title = textProp(props, "title");
+  const heading = textProp(props, "heading") || title;
+
+  switch (block.type) {
+    case "hero": {
+      const subheading = paragraphHtml(
+        textProp(props, "subheading") || textProp(props, "subtitle"),
+      );
+      if (h1.used) return [headingHtml(2, heading), subheading].join("");
+      h1.used = true;
+      // The page H1 can be rewritten (home, location pages); keep the hero's own heading too.
+      const keepHeroHeading = !h1.text.toLowerCase().includes(stripHtml(heading).toLowerCase());
+      return [
+        headingHtml(1, h1.text),
+        keepHeroHeading ? headingHtml(2, heading) : "",
+        subheading,
+      ].join("");
+    }
+
+    case "section-header":
+      return [
+        headingHtml(textProp(props, "headingLevel") === "h3" ? 3 : 2, title),
+        paragraphHtml(textProp(props, "subtitle")),
+      ].join("");
+
+    case "rich-text":
+    case "callout-box":
+      return [sectionHeadingHtml(props), richHtml(textProp(props, "content"))].join("");
+
+    case "text-image":
+      return [sectionHeadingHtml(props, heading), richHtml(textProp(props, "body"))].join("");
+
+    case "link-list":
+      return [
+        sectionHeadingHtml(props),
+        ...arrayProp<{ label?: string; description?: string; url?: string }>(props, "links").map(
+          (link) =>
+            [
+              linkedHeadingHtml(link.url, link.label || ""),
+              paragraphHtml(link.description || ""),
+            ].join(""),
+        ),
+      ].join("");
+
+    case "cards-grid":
+      return [
+        sectionHeadingHtml(props),
+        ...arrayProp<{ title?: string; description?: string; link?: string }>(props, "cards").map(
+          (card) =>
+            [
+              linkedHeadingHtml(card.link, card.title || ""),
+              paragraphHtml(card.description || ""),
+            ].join(""),
+        ),
+      ].join("");
+
+    case "feature-list":
+    case "icon-grid":
+    case "benefit-stack":
+      return [
+        sectionHeadingHtml(props),
+        ...[
+          ...arrayProp<{ title?: string; description?: string }>(props, "items"),
+          ...arrayProp<{ title?: string; description?: string }>(props, "features"),
+        ].map((item) =>
+          [headingHtml(3, item.title || ""), paragraphHtml(item.description || "")].join(""),
+        ),
+      ].join("");
+
+    case "objection-busters":
+      return [
+        sectionHeadingHtml(props),
+        ...arrayProp<{ concern?: string; response?: string }>(props, "items").map((item) =>
+          [headingHtml(3, item.concern || ""), paragraphHtml(item.response || "")].join(""),
+        ),
+      ].join("");
+
+    case "two-column-text":
+      return [
+        sectionHeadingHtml(props),
+        ...(["left", "right"] as const).map((side) =>
+          [
+            headingHtml(3, textProp(props, `${side}Heading`)),
+            richHtml(textProp(props, `${side}Body`)),
+            ...arrayProp<{ text?: string }>(props, `${side}Items`).map((item) =>
+              paragraphHtml(item.text || ""),
+            ),
+          ].join(""),
+        ),
+      ].join("");
+
+    case "stats-bar":
+      return arrayProp<{ value?: string; label?: string }>(props, "items")
+        .map(
+          (item) =>
+            `<p><strong>${escapeHtml(item.value || "")}</strong> ${escapeHtml(item.label || "")}</p>`,
+        )
+        .join("");
+
+    case "testimonials":
+      return [
+        sectionHeadingHtml(props),
+        ...arrayProp<{ quote?: string; name?: string }>(props, "items").map((item) =>
+          item.quote
+            ? `<blockquote>${paragraphHtml(item.quote)}${item.name ? `<cite>${escapeHtml(item.name)}</cite>` : ""}</blockquote>`
+            : "",
+        ),
+      ].join("");
+
+    case "faq":
+      return [
+        sectionHeadingHtml(props, title || "Frequently Asked Questions"),
+        ...arrayProp<{ question?: string; answer?: string }>(props, "items").map((item) =>
+          [headingHtml(3, item.question || ""), richHtml(item.answer || "")].join(""),
+        ),
+      ].join("");
+
+    case "contact-info": {
+      const items = arrayProp<{ label?: string; value?: string; url?: string }>(props, "items")
+        .map((item) => {
+          const value = isSafePrerenderHref(item.url)
+            ? linkHtml(item.url, item.value || "")
+            : escapeHtml(item.value || "");
+          return `<p><strong>${escapeHtml(item.label || "")}</strong>: ${value}</p>`;
+        })
+        .join("");
+      return [sectionHeadingHtml(props), items ? `<address>${items}</address>` : ""].join("");
+    }
+
+    case "cta":
+      return [headingHtml(2, heading), paragraphHtml(textProp(props, "subheading"))].join("");
+
+    case "divider":
+    case "video-embed":
+    case "raw-html":
+      return sectionHeadingHtml(props);
+
+    default: {
+      // GDP-specific blocks without a dedicated case still contribute their public copy.
+      const headingText = stripHtml(heading).toLowerCase();
+      const fragments = uniqueFragments(collectTextFragments(props)).filter(
+        (fragment) => fragment.toLowerCase() !== headingText,
+      );
+      return [headingHtml(2, heading), ...fragments.map(paragraphHtml)].join("");
+    }
+  }
+}
+
+function buildCmsBodyHtml(page: CmsPage, h1Text: string, description: string) {
+  const h1 = { text: h1Text, used: false };
+  const rendered = cmsBlocks(page.content)
+    .map((block) => {
+      const html = renderCmsBlockForSeo(block, h1);
+      const anchorId = sanitizeAnchorId(block.props?.anchorId);
+      return html && anchorId ? `<section id="${escapeHtml(anchorId)}">${html}</section>` : html;
+    })
+    .filter(Boolean)
+    .join("");
+
+  if (!rendered) {
+    return buildSimplePageBody(
+      h1Text,
+      description,
+      uniqueFragments(collectTextFragments(page.content)),
+      [buildSeoFooterHtml()],
+    );
+  }
+
+  return [
+    `<main class="seo-prerender-content">`,
+    `<article>`,
+    h1.used ? "" : headingHtml(1, h1Text),
+    rendered,
+    buildSeoFooterHtml(),
+    `</article>`,
+    `</main>`,
+  ].join("");
 }
 
 function absoluteUrl(path: string | null | undefined, siteUrl: string) {
@@ -629,24 +783,6 @@ function extractFaqItems(pageContent: unknown): Array<{ question: string; answer
   return items;
 }
 
-function buildFaqBodyHtml(items: Array<{ question: string; answer: string }>) {
-  if (items.length === 0) return "";
-
-  return [
-    `<section class="seo-prerender-faqs" aria-labelledby="seo-prerender-faqs-heading">`,
-    `<h2 id="seo-prerender-faqs-heading">Frequently Asked Questions</h2>`,
-    ...items.map((item) =>
-      [
-        `<article class="seo-prerender-faq">`,
-        `<h3>${escapeHtml(item.question)}</h3>`,
-        sanitizeRichHtml(item.answer),
-        `</article>`,
-      ].join(""),
-    ),
-    `</section>`,
-  ].join("");
-}
-
 function buildFaqPageSchema(items: Array<{ question: string; answer: string }>) {
   if (items.length === 0) return null;
   return {
@@ -667,29 +803,17 @@ function buildSimplePageBody(
   title: string,
   description: string,
   fragments: string[] = [],
-  anchoredSections: Array<{ anchorId: string; heading: string; fragments: string[] }> = [],
   extraHtml: string[] = [],
 ) {
   const paragraphs = uniqueFragments([description, ...fragments]).filter(
     (fragment) => fragment && fragment.toLowerCase() !== title.trim().toLowerCase(),
   );
-  const anchoredHtml = anchoredSections.map((section) => {
-    const heading = section.heading;
-    const body = section.fragments.filter((fragment) => fragment !== heading);
-    return [
-      `<section id="${escapeHtml(section.anchorId)}">`,
-      heading ? `<h2>${escapeHtml(heading)}</h2>` : "",
-      ...body.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`),
-      `</section>`,
-    ].join("");
-  });
 
   return [
     `<main class="seo-prerender-content">`,
     `<article>`,
     `<h1>${escapeHtml(title)}</h1>`,
     ...paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`),
-    ...anchoredHtml,
     ...extraHtml,
     `</article>`,
     `</main>`,
@@ -766,16 +890,10 @@ function buildCmsSnapshot(
   const canonicalUrl = new URL(normalizedVisiblePage.canonicalUrl || `${siteUrl}${publicPath}`)
     .href;
   const faqItems = extractFaqItems(normalizedVisiblePage.content);
-  const bodyHtml = buildSimplePageBody(
+  const bodyHtml = buildCmsBodyHtml(
+    normalizedVisiblePage,
     getPrerenderHeading(normalizedVisiblePage),
     description,
-    uniqueFragments(collectTextFragments(normalizedVisiblePage.content)),
-    collectAnchoredSections(normalizedVisiblePage.content),
-    [
-      buildCmsLinksHtml(normalizedVisiblePage.content),
-      buildFaqBodyHtml(faqItems),
-      buildSeoFooterHtml(),
-    ].filter(Boolean),
   );
 
   const breadcrumbs =
@@ -854,7 +972,6 @@ function buildFallbackSnapshot(
     bodyHtml: buildSimplePageBody(
       fallback.title,
       fallback.body,
-      [],
       [],
       [
         ...getFallbackLinkSections(pathname).map((section) =>
@@ -975,7 +1092,9 @@ export function injectPublicHtmlSnapshot(
 
   if (!snapshot) {
     return normalizedTemplate
-      .replace("<!--APP_DYNAMIC_HEAD-->", () => [fontHead, customHeadHtml].filter(Boolean).join("\n"))
+      .replace("<!--APP_DYNAMIC_HEAD-->", () =>
+        [fontHead, customHeadHtml].filter(Boolean).join("\n"),
+      )
       .replace("<!--APP_PRERENDER_CONTENT-->", () => bootstrapScript);
   }
 

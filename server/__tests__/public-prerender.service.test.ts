@@ -451,7 +451,9 @@ describe("public-prerender.service", () => {
     expect(html).not.toContain('"priceRange":"$"');
     expect(html).toContain('id="__CMS_PRERENDER_PAGE__" type="application/json"');
     expect(html).toContain('"slug":"services-frameless-showers"');
-    expect(snapshot?.bodyHtml).toContain('class="seo-prerender-faqs"');
+    expect(snapshot?.bodyHtml).toContain(
+      "<h2>Frequently Asked Questions</h2><h3>How long does installation take?</h3>",
+    );
     expect(snapshot?.bodyHtml).toContain("How long does installation take?");
     expect(html).toContain("Most frameless shower installations are completed in 2-4 hours.");
   });
@@ -509,11 +511,15 @@ describe("public-prerender.service", () => {
 
     const snapshot = await getPublicHtmlSnapshot("/services/commercial-door-replacement-repair");
 
-    expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/charlotte">Charlotte</a>');
+    expect(snapshot?.bodyHtml).toContain(
+      '<a href="/service-areas/charlotte" rel="noopener noreferrer">Charlotte</a>',
+    );
     expect(snapshot?.bodyHtml).toContain(
       '<a href="/services/commercial-storefront-glass-installation">Commercial Storefront Glass Installation</a>',
     );
-    expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/monroe">Monroe service area</a>');
+    expect(snapshot?.bodyHtml).toContain(
+      '<a href="/service-areas/monroe" rel="noopener noreferrer">Monroe service area</a>',
+    );
     expect(snapshot?.bodyHtml).toContain('<nav class="seo-prerender-footer"');
     expect(snapshot?.bodyHtml).toContain('<a href="/service-areas/indian-trail">Indian Trail</a>');
     expect(snapshot?.bodyHtml).toContain(
