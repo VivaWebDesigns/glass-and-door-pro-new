@@ -293,7 +293,7 @@ describe("public-prerender.service", () => {
       },
       seoTitle: "Glass Shower Door Installation in Waxhaw, NC",
       seoDescription:
-        "Custom glass shower door installation in Waxhaw, NC. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.",
+        "Custom frameless glass shower doors and enclosures, measured and installed for your Waxhaw bathroom. Call (704) 771-6111 for a free quote.",
     });
     const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
     const snapshot = await getPublicHtmlSnapshot("/service-areas/waxhaw");

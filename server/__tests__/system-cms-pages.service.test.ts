@@ -140,6 +140,8 @@ describe("ensureSystemCmsPages", () => {
         id: "weddington",
         slug: "service-areas-weddington",
         seoTitle: "Glass Shower Door Installation in Weddington, NC",
+        seoDescription:
+          "Custom glass shower door installation in Weddington, NC. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.",
         content: {
           _system: {
             showerSearchPositioning2026: true,
@@ -166,6 +168,9 @@ describe("ensureSystemCmsPages", () => {
     const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
     await ensureSystemCmsPages();
     const update = mockUpdatePage.mock.calls.find(([id]) => id === "weddington")?.[1];
+    expect(update.seoDescription).toBe(
+      getGlassLocationSearchCopy("service-areas-weddington")?.description,
+    );
     expect(update.seoTitle).toBe("Frameless Glass Shower Door Installer in Weddington");
     expect(update.content).toMatchObject({
       _system: { weddingtonHero2026: true, weddingtonHeroCopy2026: true, locationHero2026: true },

@@ -23,7 +23,7 @@ export function getGlassLocationSearchCopy(slug: string) {
     title: `Frameless Glass Shower Door Installer in ${place.split(",")[0]}`,
     heading: `Glass Shower Door Installer in ${place}`,
     subheading: `<p>Custom frameless shower doors and enclosures, measured and fitted to your bathroom. Serving ${place.split(",")[0]} homeowners with 15+ years of installation experience.</p>`,
-    description: `Custom glass shower door installation in ${place}. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.`,
+    description: `Custom frameless glass shower doors and enclosures, measured and installed for your ${place.split(",")[0]} bathroom. Call (704) 771-6111 for a free quote.`,
     intro: `Glass & Door Pro installs custom glass shower doors in ${place}. Doug personally measures each opening and installs the finished door himself.`,
   };
 }

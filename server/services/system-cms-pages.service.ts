@@ -1134,6 +1134,15 @@ async function normalizeStoredCmsPages() {
         updates.seoTitle = locationCopy.title;
       }
 
+      // Replace the previous location snippet while retaining any later custom descriptions.
+      if (
+        locationCopy &&
+        page.seoDescription ===
+          `Custom glass shower door installation in ${locationCopy.place}. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.`
+      ) {
+        updates.seoDescription = locationCopy.description;
+      }
+
       // Rename the deployed location H1 without overwriting later copy or styling edits.
       if (locationCopy) {
         const content = updates.content ?? page.content;

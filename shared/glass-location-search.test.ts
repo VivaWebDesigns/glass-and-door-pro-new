@@ -14,7 +14,9 @@ describe("location shower search copy", () => {
       expect(copy?.title).toBe(
         `Frameless Glass Shower Door Installer in ${copy?.place.split(",")[0]}`,
       );
-      expect(copy?.description).toContain(`installation in ${copy?.place}.`);
+      expect(copy?.description).toBe(
+        `Custom frameless glass shower doors and enclosures, measured and installed for your ${copy?.place.split(",")[0]} bathroom. Call (704) 771-6111 for a free quote.`,
+      );
       expect(copy?.description).toContain("(704) 771-6111");
     }
     expect(getGlassLocationSearchCopy("service-areas")).toBeNull();

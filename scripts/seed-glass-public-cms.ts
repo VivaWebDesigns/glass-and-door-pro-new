@@ -5175,7 +5175,8 @@ export async function seedGlassPublicCms() {
         updateGlassLocationSearchContent(cityPage.slug, cityPage.content),
       ),
       seoTitle: getGlassLocationSearchCopy(cityPage.slug)?.title ?? cityPage.seoTitle,
-      seoDescription: cityPage.seoDescription,
+      seoDescription:
+        getGlassLocationSearchCopy(cityPage.slug)?.description ?? cityPage.seoDescription,
       seoKeywords: getCityShowerPageCopy(cityPage.slug)?.seoKeywords ?? cityPage.seoKeywords,
       ogImageUrl: cityPage.ogImageUrl,
       canonicalUrl: `https://glassanddoorpro.com${cityPage.path}`,
