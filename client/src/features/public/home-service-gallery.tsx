@@ -38,7 +38,7 @@ export function HomeServiceGallery({ props }: { props: Record<string, unknown> }
       <header className="home-services-header">
         <p className="home-services-eyebrow">Services</p>
         <h2>
-          <span>Made for your home.</span> <span>Built for your business.</span>
+          <span>Made for your home.</span> <span>Installed with care.</span>
         </h2>
         <p className="home-services-intro">
           Custom glass and door solutions for every space — from beautiful bathroom upgrades to
