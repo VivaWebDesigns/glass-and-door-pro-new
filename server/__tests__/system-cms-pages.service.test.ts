@@ -946,7 +946,7 @@ describe("ensureSystemCmsPages", () => {
                 overlayOpacity: 50,
                 backgroundImageUrl:
                   heading === "Glass, Door & Window Services Across Greater Charlotte"
-                    ? "/images/glass-door-pro/home-exterior-mobile.webp"
+                    ? "/images/glass-door-pro/home-exterior-desktop.webp"
                     : "/images/glass-door-pro/gallery-shower1-1280w.webp",
                 backgroundImageAlt:
                   heading === "Glass, Door & Window Services Across Greater Charlotte"
@@ -985,7 +985,7 @@ describe("ensureSystemCmsPages", () => {
               videoBackgroundUrl: "",
               overlayColor: "#000000",
               overlayOpacity: 28,
-              backgroundImageUrl: "/images/glass-door-pro/home-exterior-desktop.webp",
+              backgroundImageUrl: "/images/glass-door-pro/home-exterior-desktop-v2.webp",
               backgroundImageAlt:
                 "White brick home with black-framed windows and a glass entry door",
             },

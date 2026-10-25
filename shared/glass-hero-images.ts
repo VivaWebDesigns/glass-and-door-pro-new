@@ -1,4 +1,4 @@
-export const HOME_DESKTOP_HERO_IMAGE = "/images/glass-door-pro/home-exterior-desktop.webp";
+export const HOME_DESKTOP_HERO_IMAGE = "/images/glass-door-pro/home-exterior-desktop-v2.webp";
 export const HOME_SOCIAL_IMAGE = "/images/glass-door-pro/home-exterior-share.jpg";
 export const HOME_MOBILE_HERO_IMAGE = "/images/glass-door-pro/home-exterior-mobile.webp";
 

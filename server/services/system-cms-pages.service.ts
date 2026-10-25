@@ -560,7 +560,10 @@ function ensureHomeHeroDefaults(content: unknown) {
     props.backgroundImageUrl = HOME_DESKTOP_HERO_IMAGE;
     props.backgroundImageAlt = "White brick home with black-framed windows and a glass entry door";
   }
-  if (props.backgroundImageUrl === HOME_MOBILE_HERO_IMAGE) {
+  if (
+    props.backgroundImageUrl === HOME_MOBILE_HERO_IMAGE ||
+    props.backgroundImageUrl === "/images/glass-door-pro/home-exterior-desktop.webp"
+  ) {
     props.backgroundImageUrl = HOME_DESKTOP_HERO_IMAGE;
   }
   if (!props.backgroundImageAlt) props.backgroundImageAlt = homeHeroImageAlt;
