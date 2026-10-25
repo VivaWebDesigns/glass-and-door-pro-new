@@ -7,7 +7,10 @@ import {
   getGlassLocationSearchCopy,
   updateGlassLocationSearchContent,
 } from "@shared/glass-location-search";
-import { GLASS_HOMEPAGE_SERVICE_CARDS } from "@shared/glass-homepage-services";
+import {
+  GLASS_HOMEPAGE_SERVICE_CARDS,
+  GLASS_HOMEPAGE_SERVICES_LAYOUT,
+} from "@shared/glass-homepage-services";
 import { putCallButtonFirst } from "@shared/glass-call-first";
 import { GLASS_DOUG_PORTRAIT } from "@shared/glass-doug-portrait";
 import { GLASS_SERVICE_HEROES, getGlassServiceHeroCtaProps } from "@shared/glass-service-heroes";
@@ -286,10 +289,14 @@ function ensureHomepageServiceCards(content: unknown) {
   const serviceBlock = content.blocks[serviceBlockIndex];
   if (!isRecord(serviceBlock) || !isRecord(serviceBlock.props)) return null;
 
-  const currentCards = Array.isArray(serviceBlock.props.cards) ? serviceBlock.props.cards : [];
+  const serviceProps = serviceBlock.props;
+  const currentCards = Array.isArray(serviceProps.cards) ? serviceProps.cards : [];
   const currentLinks = currentCards.map((card) => (isRecord(card) ? card.link : undefined));
   const expectedLinks = GLASS_HOMEPAGE_SERVICE_CARDS.map((card) => card.link);
   if (
+    Object.entries(GLASS_HOMEPAGE_SERVICES_LAYOUT).every(
+      ([key, value]) => serviceProps[key] === value,
+    ) &&
     currentLinks.length === expectedLinks.length &&
     currentLinks.every((link, index) => link === expectedLinks[index])
   ) {
@@ -301,7 +308,12 @@ function ensureHomepageServiceCards(content: unknown) {
     ...serviceBlock,
     props: {
       ...serviceBlock.props,
-      cards: GLASS_HOMEPAGE_SERVICE_CARDS,
+      cards:
+        currentLinks.length === expectedLinks.length &&
+        currentLinks.every((link, index) => link === expectedLinks[index])
+          ? currentCards
+          : GLASS_HOMEPAGE_SERVICE_CARDS,
+      ...GLASS_HOMEPAGE_SERVICES_LAYOUT,
     },
   };
 

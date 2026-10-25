@@ -1,3 +1,12 @@
+export const GLASS_HOMEPAGE_SERVICES_LAYOUT = {
+  variant: "home-service-gallery",
+  title: "Made for your home. Built for your business.",
+  sectionEyebrow: "Services",
+  subtitle:
+    "Custom glass and door solutions for every space — from beautiful bathroom upgrades to reliable commercial storefronts. Quality work, expert installation, lasting results.",
+  sectionBackgroundColor: "#ffffff",
+} as const;
+
 export const GLASS_HOMEPAGE_SERVICE_CARDS = [
   {
     icon: "Droplets",

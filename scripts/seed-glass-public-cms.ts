@@ -9,7 +9,10 @@ import type {
   MenuItem,
   MenuLocation,
 } from "../shared/schema";
-import { GLASS_HOMEPAGE_SERVICE_CARDS } from "../shared/glass-homepage-services";
+import {
+  GLASS_HOMEPAGE_SERVICE_CARDS,
+  GLASS_HOMEPAGE_SERVICES_LAYOUT,
+} from "../shared/glass-homepage-services";
 import { GLASS_CTA_HOURS_LINE } from "../shared/glass-quote-cta";
 import { putCallButtonFirst } from "../shared/glass-call-first";
 import { GLASS_DOUG_PORTRAIT } from "../shared/glass-doug-portrait";
@@ -376,6 +379,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
         sectionPaddingTop: "lg",
         sectionPaddingBottom: "lg",
         cards: GLASS_HOMEPAGE_SERVICE_CARDS,
+        ...GLASS_HOMEPAGE_SERVICES_LAYOUT,
       },
     },
     {

@@ -86,6 +86,7 @@ import { sanitizeHtml } from "@/lib/sanitize-html";
 import { ReviewSourceBadge } from "@/components/shared/review-source-badge";
 import { withContentKeys } from "@/lib/content-keys";
 import { getMobileHeroImageUrl } from "@shared/glass-hero-images";
+import { HomeServiceGallery } from "./home-service-gallery";
 import { useMobileHeroViewport } from "@/hooks/use-mobile-hero-viewport";
 
 export type { BlockInstance, BuilderContent };
@@ -792,6 +793,7 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
 }
 
 function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
+  if (props.variant === "home-service-gallery") return <HomeServiceGallery props={props} />;
   const cols = str(props.columns) || "3";
   const colsClass =
     cols === "2"
