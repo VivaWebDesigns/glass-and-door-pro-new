@@ -1,3 +1,4 @@
+import { HOME_MOBILE_HERO_IMAGE } from "@shared/glass-hero-images";
 import { randomUUID } from "crypto";
 import { storage } from "../storage";
 import { normalizeSeoDescription } from "@shared/seo-description";
@@ -554,6 +555,11 @@ function ensureHomeHeroDefaults(content: unknown) {
   }
 
   const props = { ...heroBlock.props };
+  if (props.videoBackgroundUrl === "/videos/glass-door-pro/hero-video.mp4") {
+    props.videoBackgroundUrl = "";
+    props.backgroundImageUrl = HOME_MOBILE_HERO_IMAGE;
+    props.backgroundImageAlt = "White brick home with black-framed windows and a glass entry door";
+  }
   if (!props.backgroundImageAlt) props.backgroundImageAlt = homeHeroImageAlt;
   // Migrate the original homepage overlay while preserving later CMS customization.
   if (props.overlayColor === "#0f172a" && props.overlayOpacity === 50) {

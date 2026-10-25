@@ -1,4 +1,4 @@
-import { HOME_SOCIAL_IMAGE } from "../shared/glass-hero-images";
+import { HOME_SOCIAL_IMAGE, HOME_MOBILE_HERO_IMAGE } from "../shared/glass-hero-images";
 import { randomUUID } from "crypto";
 import { pathToFileURL } from "url";
 import type { storage as storageInstance } from "../server/storage";
@@ -334,10 +334,9 @@ const glassHomeContent: InsertCmsPage["content"] = {
         ctaAction: "internal-link",
         ctaSecondaryText: "",
         ctaSecondaryLink: "",
-        backgroundImageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
-        backgroundImageAlt:
-          "Frameless glass shower installed by Glass & Door Pro in the Charlotte, NC area",
-        videoBackgroundUrl: "/videos/glass-door-pro/hero-video.mp4",
+        backgroundImageUrl: HOME_MOBILE_HERO_IMAGE,
+        backgroundImageAlt: "White brick home with black-framed windows and a glass entry door",
+        videoBackgroundUrl: "",
         overlayColor: "#000000",
         overlayOpacity: 28,
         minHeight: "700",
