@@ -22,7 +22,10 @@ import { GLASS_PRIVACY_POLICY_HTML } from "../shared/glass-privacy-policy";
 import { glassGoogleReviewDate } from "../shared/glass-review-dates";
 import { GLASS_NEW_GOOGLE_REVIEWS } from "../shared/glass-new-reviews";
 import { isGlassLegalNoindexSlug } from "../shared/glass-seo";
-import { updateGlassLocationSearchContent } from "../shared/glass-location-search";
+import {
+  getGlassLocationSearchCopy,
+  updateGlassLocationSearchContent,
+} from "../shared/glass-location-search";
 import {
   buildCityShowerPageContent,
   getCityShowerPageCopy,
@@ -5171,7 +5174,7 @@ export async function seedGlassPublicCms() {
         cityPage.slug,
         updateGlassLocationSearchContent(cityPage.slug, cityPage.content),
       ),
-      seoTitle: cityPage.seoTitle,
+      seoTitle: getGlassLocationSearchCopy(cityPage.slug)?.title ?? cityPage.seoTitle,
       seoDescription: cityPage.seoDescription,
       seoKeywords: getCityShowerPageCopy(cityPage.slug)?.seoKeywords ?? cityPage.seoKeywords,
       ogImageUrl: cityPage.ogImageUrl,

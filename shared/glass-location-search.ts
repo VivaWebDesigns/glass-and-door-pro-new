@@ -20,7 +20,7 @@ export function getGlassLocationSearchCopy(slug: string) {
 
   return {
     place,
-    title: `Glass Shower Door Installation in ${place}`,
+    title: `Frameless Glass Shower Door Installer in ${place.split(",")[0]}`,
     heading: `Glass Shower Door Installer in ${place}`,
     subheading: `<p>Custom frameless shower doors and enclosures, measured and fitted to your bathroom. Serving ${place.split(",")[0]} homeowners with 15+ years of installation experience.</p>`,
     description: `Custom glass shower door installation in ${place}. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.`,

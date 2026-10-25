@@ -1126,6 +1126,14 @@ async function normalizeStoredCmsPages() {
         }
       }
 
+      // Update the previous location search title without changing descriptions or hero copy.
+      if (
+        locationCopy &&
+        page.seoTitle === `Glass Shower Door Installation in ${locationCopy.place}`
+      ) {
+        updates.seoTitle = locationCopy.title;
+      }
+
       // Rename the deployed location H1 without overwriting later copy or styling edits.
       if (locationCopy) {
         const content = updates.content ?? page.content;

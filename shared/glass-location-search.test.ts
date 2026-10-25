@@ -11,7 +11,9 @@ describe("location shower search copy", () => {
     for (const area of GLASS_PRIMARY_SERVICE_AREAS) {
       const copy = getGlassLocationSearchCopy(getCmsSlugForPublicPath(area.href));
       expect(copy?.heading).toBe(`Glass Shower Door Installer in ${copy?.place}`);
-      expect(copy?.title).toBe(`Glass Shower Door Installation in ${copy?.place}`);
+      expect(copy?.title).toBe(
+        `Frameless Glass Shower Door Installer in ${copy?.place.split(",")[0]}`,
+      );
       expect(copy?.description).toContain(`installation in ${copy?.place}.`);
       expect(copy?.description).toContain("(704) 771-6111");
     }
