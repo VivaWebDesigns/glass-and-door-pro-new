@@ -118,14 +118,12 @@ describe("ensureSystemCmsPages", () => {
         seoDescription: copy?.description,
         updatedBy: "editor",
         content: {
-          _system: { showerSearchPositioning2026: true },
+          _system: { showerSearchPositioning2026: true, locationHero2026: true },
           blocks: [
             {
               props: {
-                heading:
-                  page.slug === "service-areas-weddington"
-                    ? "Glass Shower Door Installer"
-                    : copy?.heading,
+                heading: "Glass Shower Door Installer",
+                locationHeading: `Frameless Showers · ${copy?.place}`,
               },
             },
             { props: { content: expect.stringContaining("<p>Keep this local copy.</p>") } },
@@ -161,7 +159,7 @@ describe("ensureSystemCmsPages", () => {
     await ensureSystemCmsPages();
     const update = mockUpdatePage.mock.calls.find(([id]) => id === "weddington")?.[1];
     expect(update.content).toMatchObject({
-      _system: { weddingtonHero2026: true, weddingtonHeroCopy2026: true },
+      _system: { weddingtonHero2026: true, weddingtonHeroCopy2026: true, locationHero2026: true },
       blocks: [
         {
           props: {
@@ -196,7 +194,10 @@ describe("ensureSystemCmsPages", () => {
         seoTitle: "Glass Shower Door Installation in Waxhaw, NC",
         seoDescription: getGlassLocationSearchCopy("service-areas-waxhaw")?.description,
         updatedBy: "editor",
-        content: { _system: { showerSearchPositioning2026: true }, blocks: waxhawBlocks },
+        content: {
+          _system: { showerSearchPositioning2026: true, locationHero2026: true },
+          blocks: waxhawBlocks,
+        },
       },
       {
         id: "waxhaw-applied-id",
@@ -205,7 +206,11 @@ describe("ensureSystemCmsPages", () => {
         seoDescription: getGlassLocationSearchCopy("service-areas-waxhaw")?.description,
         updatedBy: "editor",
         content: {
-          _system: { showerSearchPositioning2026: true, waxhawShowerPage2026: true },
+          _system: {
+            showerSearchPositioning2026: true,
+            locationHero2026: true,
+            waxhawShowerPage2026: true,
+          },
           blocks: waxhawBlocks,
         },
       },
@@ -218,6 +223,7 @@ describe("ensureSystemCmsPages", () => {
     const update = mockUpdatePage.mock.calls.find(([id]) => id === "waxhaw-id")?.[1];
     expect(update?.content._system).toMatchObject({
       showerSearchPositioning2026: true,
+      locationHero2026: true,
       cityShowerPage2026: true,
     });
     expect(update?.seoKeywords).toContain("glass shower door installation Waxhaw NC");
@@ -262,7 +268,10 @@ describe("ensureSystemCmsPages", () => {
         seoTitle: getGlassLocationSearchCopy("service-areas-matthews")?.title,
         seoDescription: getGlassLocationSearchCopy("service-areas-matthews")?.description,
         updatedBy: "editor",
-        content: { _system: { showerSearchPositioning2026: true }, blocks: [servicesBlock] },
+        content: {
+          _system: { showerSearchPositioning2026: true, locationHero2026: true },
+          blocks: [servicesBlock],
+        },
       },
       {
         id: "matthews-applied-id",
@@ -271,7 +280,11 @@ describe("ensureSystemCmsPages", () => {
         seoDescription: getGlassLocationSearchCopy("service-areas-matthews")?.description,
         updatedBy: "editor",
         content: {
-          _system: { showerSearchPositioning2026: true, servicesHubLink2026: true },
+          _system: {
+            showerSearchPositioning2026: true,
+            locationHero2026: true,
+            servicesHubLink2026: true,
+          },
           blocks: [servicesBlock],
         },
       },
@@ -413,7 +426,7 @@ describe("ensureSystemCmsPages", () => {
         seoDescription: "Pineville description",
         updatedBy: "editor",
         content: {
-          _system: { showerSearchPositioning2026: true },
+          _system: { showerSearchPositioning2026: true, locationHero2026: true },
           blocks: [
             {
               id: "hero",
@@ -444,7 +457,11 @@ describe("ensureSystemCmsPages", () => {
         seoDescription: "Matthews description",
         updatedBy: "editor",
         content: {
-          _system: { showerSearchPositioning2026: true, callFirstButtons2026: true },
+          _system: {
+            showerSearchPositioning2026: true,
+            locationHero2026: true,
+            callFirstButtons2026: true,
+          },
           blocks: [
             {
               id: "hero",
@@ -474,6 +491,7 @@ describe("ensureSystemCmsPages", () => {
     const update = mockUpdatePage.mock.calls.find(([id]) => id === "pineville-id")?.[1];
     expect(update.content._system).toEqual({
       showerSearchPositioning2026: true,
+      locationHero2026: true,
       callFirstButtons2026: true,
       quoteCtaRefresh2026: true,
     });
@@ -501,7 +519,11 @@ describe("ensureSystemCmsPages", () => {
           seoDescription: "Matthews description",
           updatedBy: "editor",
           content: {
-            _system: { showerSearchPositioning2026: true, callFirstButtons2026: true },
+            _system: {
+              showerSearchPositioning2026: true,
+              locationHero2026: true,
+              callFirstButtons2026: true,
+            },
             blocks: [
               {
                 id: "doug",
@@ -555,7 +577,10 @@ describe("ensureSystemCmsPages", () => {
         slug: "service-areas-waxhaw",
         seoTitle: "Editor title",
         seoDescription: "Editor description",
-        content: { _system: { showerSearchPositioning2026: true }, blocks: [] },
+        content: {
+          _system: { showerSearchPositioning2026: true, locationHero2026: true },
+          blocks: [],
+        },
         updatedBy: "editor",
       },
     ]);
@@ -1541,7 +1566,11 @@ describe("ensureSystemCmsPages", () => {
         seoDescription: "Matthews description",
         updatedBy: "editor",
         content: {
-          _system: { showerSearchPositioning2026: true, callFirstButtons2026: true },
+          _system: {
+            showerSearchPositioning2026: true,
+            locationHero2026: true,
+            callFirstButtons2026: true,
+          },
           blocks: [
             {
               id: "reviews",

@@ -1243,7 +1243,7 @@
   }
 }
 
-/* Weddington trial: retain the location photo with a gentle shade behind the caption. */
+/* Location heroes retain their city photos with a gentle shade behind the caption. */
 .location-service-hero [data-location-heading] .hero-bottom-fade {
   height: 65%;
   background: linear-gradient(to top, rgba(7, 14, 13, 0.38), transparent);

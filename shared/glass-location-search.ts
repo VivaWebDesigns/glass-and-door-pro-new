@@ -22,10 +22,7 @@ export function getGlassLocationSearchCopy(slug: string) {
     place,
     title: `Glass Shower Door Installation in ${place}`,
     heading: `Glass Shower Door Installer in ${place}`,
-    subheading:
-      slug === "service-areas-weddington"
-        ? "<p>Custom frameless shower doors and enclosures, measured and fitted to your bathroom. Serving Weddington homeowners with 15+ years of installation experience.</p>"
-        : `<p>Custom glass shower door installation in ${place}. Doug personally measures and installs every door. 15+ years of experience and Saturday appointments available.</p>`,
+    subheading: `<p>Custom frameless shower doors and enclosures, measured and fitted to your bathroom. Serving ${place.split(",")[0]} homeowners with 15+ years of installation experience.</p>`,
     description: `Custom glass shower door installation in ${place}. Doug personally measures and installs every door. Call (704) 771-6111 for a free quote.`,
     intro: `Glass & Door Pro installs custom glass shower doors in ${place}. Doug personally measures each opening and installs the finished door himself.`,
   };
@@ -46,13 +43,12 @@ export function updateGlassLocationSearchContent(
     if (!isRecord(block) || !isRecord(block.props)) return block;
 
     if (block.type === "hero" && typeof block.props.heading === "string") {
-      const isWeddington = slug === "service-areas-weddington";
-      const heading = isWeddington ? "Glass Shower Door Installer" : copy.heading;
-      const locationHeading = isWeddington ? "Frameless Showers · Weddington, NC" : undefined;
+      const heading = "Glass Shower Door Installer";
+      const locationHeading = `Frameless Showers · ${copy.place}`;
       if (
         block.props.heading === heading &&
         block.props.subheading === copy.subheading &&
-        (!isWeddington || block.props.locationHeading === locationHeading)
+        block.props.locationHeading === locationHeading
       ) {
         return block;
       }
@@ -63,7 +59,7 @@ export function updateGlassLocationSearchContent(
           ...block.props,
           heading,
           subheading: copy.subheading,
-          ...(locationHeading ? { locationHeading } : {}),
+          locationHeading,
         },
       };
     }

@@ -18,7 +18,9 @@ describe("location shower search copy", () => {
     expect(getGlassLocationSearchCopy("service-areas")).toBeNull();
   });
 
-  it("applies the Weddington trial hierarchy without changing the target phrase", () => {
+  it.each(GLASS_PRIMARY_SERVICE_AREAS)("applies the approved hierarchy on $href", (area) => {
+    const slug = getCmsSlugForPublicPath(area.href);
+    const place = getGlassLocationSearchCopy(slug)!.place;
     const content = {
       blocks: [
         {
@@ -28,19 +30,20 @@ describe("location shower search copy", () => {
         },
       ],
     };
-    const updated = updateGlassLocationSearchContent("service-areas-weddington", content);
+    const updated = updateGlassLocationSearchContent(slug, content);
     expect(updated).toMatchObject({
       blocks: [
         {
           props: {
             heading: "Glass Shower Door Installer",
-            locationHeading: "Frameless Showers · Weddington, NC",
+            locationHeading: `Frameless Showers · ${place}`,
+            subheading: `<p>Custom frameless shower doors and enclosures, measured and fitted to your bathroom. Serving ${place.split(",")[0]} homeowners with 15+ years of installation experience.</p>`,
             backgroundImageUrl: "/keep.webp",
           },
         },
       ],
     });
-    expect(updateGlassLocationSearchContent("service-areas-weddington", updated)).toBe(updated);
+    expect(updateGlassLocationSearchContent(slug, updated)).toBe(updated);
   });
 
   it("changes the hero and opening paragraph once while retaining other content", () => {
@@ -56,8 +59,9 @@ describe("location shower search copy", () => {
       blocks: [
         {
           props: {
-            heading: "Glass Shower Door Installer in Waxhaw, NC",
-            subheading: expect.stringContaining("Doug personally measures and installs every door"),
+            heading: "Glass Shower Door Installer",
+            locationHeading: "Frameless Showers · Waxhaw, NC",
+            subheading: expect.stringContaining("Serving Waxhaw homeowners"),
           },
         },
         { props: { content: expect.stringContaining("<p>Existing local detail.</p>") } },

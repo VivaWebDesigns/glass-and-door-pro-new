@@ -139,15 +139,11 @@ describe("seedGlassPublicCms", () => {
         seoTitle: copy?.title,
         seoDescription: copy?.description,
       });
-      expect(update.content.blocks[0].props).toMatchObject(
-        slug === "service-areas-weddington"
-          ? {
-              heading: "Glass Shower Door Installer",
-              locationHeading: "Frameless Showers · Weddington, NC",
-              subheading: copy?.subheading,
-            }
-          : { heading: copy?.heading, subheading: copy?.subheading },
-      );
+      expect(update.content.blocks[0].props).toMatchObject({
+        heading: "Glass Shower Door Installer",
+        locationHeading: `Frameless Showers · ${copy?.place}`,
+        subheading: copy?.subheading,
+      });
       expect(update.content.blocks[1].props.content).toContain(copy?.intro);
     }
   });
