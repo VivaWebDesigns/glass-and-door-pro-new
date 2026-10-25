@@ -140,7 +140,7 @@ describe("seedGlassPublicCms", () => {
         seoDescription: copy?.description,
       });
       expect(update.content.blocks[0].props).toMatchObject({
-        heading: "Glass Shower Door Installer",
+        heading: "Glass Shower Door Installation",
         locationHeading: `Frameless Showers · ${copy?.place}`,
         subheading: copy?.subheading,
       });

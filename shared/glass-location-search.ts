@@ -43,7 +43,7 @@ export function updateGlassLocationSearchContent(
     if (!isRecord(block) || !isRecord(block.props)) return block;
 
     if (block.type === "hero" && typeof block.props.heading === "string") {
-      const heading = "Glass Shower Door Installer";
+      const heading = "Glass Shower Door Installation";
       const locationHeading = `Frameless Showers · ${copy.place}`;
       if (
         block.props.heading === heading &&

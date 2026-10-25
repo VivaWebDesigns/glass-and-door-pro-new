@@ -35,7 +35,7 @@ describe("location shower search copy", () => {
       blocks: [
         {
           props: {
-            heading: "Glass Shower Door Installer",
+            heading: "Glass Shower Door Installation",
             locationHeading: `Frameless Showers · ${place}`,
             subheading: `<p>Custom frameless shower doors and enclosures, measured and fitted to your bathroom. Serving ${place.split(",")[0]} homeowners with 15+ years of installation experience.</p>`,
             backgroundImageUrl: "/keep.webp",
@@ -59,7 +59,7 @@ describe("location shower search copy", () => {
       blocks: [
         {
           props: {
-            heading: "Glass Shower Door Installer",
+            heading: "Glass Shower Door Installation",
             locationHeading: "Frameless Showers · Waxhaw, NC",
             subheading: expect.stringContaining("Serving Waxhaw homeowners"),
           },

@@ -1126,6 +1126,29 @@ async function normalizeStoredCmsPages() {
         }
       }
 
+      // Rename the deployed location H1 without overwriting later copy or styling edits.
+      if (locationCopy) {
+        const content = updates.content ?? page.content;
+        if (isRecord(content) && Array.isArray(content.blocks)) {
+          const heroIndex = content.blocks.findIndex(
+            (block) => isRecord(block) && block.type === "hero",
+          );
+          const hero = content.blocks[heroIndex];
+          if (
+            isRecord(hero) &&
+            isRecord(hero.props) &&
+            hero.props.heading === "Glass Shower Door Installer"
+          ) {
+            const blocks = [...content.blocks];
+            blocks[heroIndex] = {
+              ...hero,
+              props: { ...hero.props, heading: "Glass Shower Door Installation" },
+            };
+            updates.content = { ...content, blocks } as InsertCmsPage["content"];
+          }
+        }
+      }
+
       const cityShowerCopy = getCityShowerPageCopy(page.slug);
       if (cityShowerCopy) {
         const cityContent = updates.content ?? page.content;
