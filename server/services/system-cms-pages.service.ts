@@ -1,3 +1,4 @@
+import { applyWindowDesign } from "@shared/glass-window-design";
 import { GLASS_SHOWER_BENEFITS } from "@shared/glass-shower-benefits";
 import { HOME_MOBILE_HERO_IMAGE, HOME_DESKTOP_HERO_IMAGE } from "@shared/glass-hero-images";
 import { randomUUID } from "crypto";
@@ -1017,6 +1018,9 @@ async function normalizeStoredCmsPages() {
       if (contentWithServiceHero) {
         updates.content = contentWithServiceHero as InsertCmsPage["content"];
       }
+
+      const windowDesign = applyWindowDesign(page.slug, updates.content ?? page.content);
+      if (windowDesign) updates.content = windowDesign as InsertCmsPage["content"];
 
       // Apply the selected benefits design once, preserving subsequent CMS edits.
       if (page.slug === "services-frameless-showers") {

@@ -1,3 +1,4 @@
+import { WindowServiceSection } from "./window-service-sections";
 import { TbHomeUp, TbUserCog } from "react-icons/tb";
 import {
   Fragment,
@@ -802,6 +803,12 @@ function CtaBlock({ props }: { props: Record<string, unknown> }) {
 }
 
 function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
+  if (
+    ["window-installation-steps", "window-type-catalog", "window-trust-band"].includes(
+      str(props.variant),
+    )
+  )
+    return <WindowServiceSection props={props} />;
   if (props.variant === "home-service-gallery") return <HomeServiceGallery props={props} />;
   const cols = str(props.columns) || "3";
   const colsClass =

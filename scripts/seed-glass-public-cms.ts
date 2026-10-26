@@ -1,3 +1,4 @@
+import { applyWindowDesign } from "../shared/glass-window-design";
 import { GLASS_SHOWER_BENEFITS } from "../shared/glass-shower-benefits";
 import { HOME_SOCIAL_IMAGE, HOME_DESKTOP_HERO_IMAGE } from "../shared/glass-hero-images";
 import { randomUUID } from "crypto";
@@ -1442,7 +1443,7 @@ function expandedServicePageContent(props: {
     secondaryModalDescription?: string;
   };
 }): InsertCmsPage["content"] {
-  return {
+  const content = {
     blocks: [
       serviceHero({
         ...props.hero,
@@ -1523,6 +1524,11 @@ function expandedServicePageContent(props: {
       }),
     ],
   };
+  return (
+    props.relatedServicesUrl === "/services/window-installation"
+      ? (applyWindowDesign("services-window-installation", content) ?? content)
+      : content
+  ) as InsertCmsPage["content"];
 }
 
 const glassServicesContent: InsertCmsPage["content"] = {
