@@ -7,3 +7,5 @@ healthcheckPath = "/api/health"
 healthcheckTimeout = 30
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 5
+overlapSeconds = 5
+drainingSeconds = 10
