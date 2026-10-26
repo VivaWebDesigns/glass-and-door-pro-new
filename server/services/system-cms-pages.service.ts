@@ -1,3 +1,4 @@
+import { GLASS_SHOWER_BENEFITS } from "@shared/glass-shower-benefits";
 import { HOME_MOBILE_HERO_IMAGE, HOME_DESKTOP_HERO_IMAGE } from "@shared/glass-hero-images";
 import { randomUUID } from "crypto";
 import { storage } from "../storage";
@@ -1015,6 +1016,31 @@ async function normalizeStoredCmsPages() {
       );
       if (contentWithServiceHero) {
         updates.content = contentWithServiceHero as InsertCmsPage["content"];
+      }
+
+      // Apply the selected benefits design once, preserving subsequent CMS edits.
+      if (page.slug === "services-frameless-showers") {
+        const content = updates.content ?? page.content;
+        if (isRecord(content) && Array.isArray(content.blocks)) {
+          const meta = isRecord(content._system) ? content._system : {};
+          const index = content.blocks.findIndex(
+            (block) =>
+              isRecord(block) &&
+              block.type === "cards-grid" &&
+              isRecord(block.props) &&
+              block.props.title === GLASS_SHOWER_BENEFITS.title,
+          );
+          if (meta.openShowerBenefits2026 !== true && index >= 0) {
+            const blocks = [...content.blocks];
+            const block = blocks[index];
+            blocks[index] = { ...block, props: { ...block.props, ...GLASS_SHOWER_BENEFITS } };
+            updates.content = {
+              ...content,
+              blocks,
+              _system: { ...meta, openShowerBenefits2026: true },
+            } as InsertCmsPage["content"];
+          }
+        }
       }
 
       // Add the approved project once; later CMS edits or removal remain authoritative.

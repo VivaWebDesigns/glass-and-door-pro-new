@@ -1,3 +1,4 @@
+import { TbHomeUp, TbUserCog } from "react-icons/tb";
 import {
   Fragment,
   useState,
@@ -48,6 +49,9 @@ import {
 import { SectionHeading } from "@/features/admin/cms/builder/section-heading";
 import { renderPublicDisplayText } from "@/features/admin/cms/builder/display-text";
 import {
+  Sparkles,
+  Droplet,
+  Ruler,
   Globe,
   Heart,
   Users,
@@ -92,6 +96,11 @@ import { useMobileHeroViewport } from "@/hooks/use-mobile-hero-viewport";
 export type { BlockInstance, BuilderContent };
 
 const LUCIDE_MAP: Record<string, React.ElementType> = {
+  HomeUp: TbHomeUp,
+  UserCog: TbUserCog,
+  Sparkles,
+  Droplet,
+  Ruler,
   Globe,
   Heart,
   Users,
@@ -812,6 +821,33 @@ function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
     buttonText?: string;
     openInNewTab?: boolean;
   }>(props.cards);
+  if (variant === "open-benefits-grid") {
+    return (
+      <div className="py-4" data-testid="block-open-benefits-grid">
+        <SectionHeading props={props} defaultAlignment="left" className="mb-8 md:mb-10" />
+        <ul className="grid grid-cols-1 gap-x-10 md:grid-cols-2">
+          {cards.map(
+            withContentKeys((card, _i, itemKey) => (
+              <li
+                key={itemKey}
+                className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 border-b border-slate-200 py-6 first:pt-0 last:border-b-0 md:block md:py-8 md:[&:nth-child(2)]:pt-0 md:[&:nth-last-child(2)]:border-b-0"
+              >
+                <span aria-hidden="true" className="row-span-2 text-[#1a8ead] md:mb-5 md:block">
+                  <LucideIcon name={card.icon || "Globe"} className="h-9 w-9 md:h-11 md:w-11" />
+                </span>
+                <h3 className="mb-2 text-lg font-semibold leading-snug text-slate-900">
+                  {card.title}
+                </h3>
+                <p className="text-base leading-relaxed text-muted-foreground">
+                  {card.description}
+                </p>
+              </li>
+            )),
+          )}
+        </ul>
+      </div>
+    );
+  }
   return (
     <div className="py-4" data-testid="block-cards-grid">
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />

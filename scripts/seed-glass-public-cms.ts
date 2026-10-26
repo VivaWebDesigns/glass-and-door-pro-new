@@ -1,3 +1,4 @@
+import { GLASS_SHOWER_BENEFITS } from "../shared/glass-shower-benefits";
 import { HOME_SOCIAL_IMAGE, HOME_DESKTOP_HERO_IMAGE } from "../shared/glass-hero-images";
 import { randomUUID } from "crypto";
 import { pathToFileURL } from "url";
@@ -1162,47 +1163,11 @@ const month1FramelessContent: InsertCmsPage["content"] = {
       sectionPaddingTop: "lg",
       sectionPaddingBottom: "md",
     }),
-    cardsGrid({
-      title: "Why Choose Frameless Shower Doors?",
-      columns: "3",
-      cards: [
-        {
-          icon: "Star",
-          title: "Modern Elegance",
-          description:
-            "Without bulky metal frames, the bathroom reads larger and more open. The tile, stone, and hardware you invested in become the focal point.",
-        },
-        {
-          icon: "ShieldCheck",
-          title: "Premium Quality",
-          description:
-            'We use heavy 3/8" or 1/2" tempered safety glass paired with commercial-grade hinges, clamps, and clips.',
-        },
-        {
-          icon: "Droplets",
-          title: "Easy to Clean",
-          description:
-            "No metal frames means no hidden tracks where soap, mold, and mildew collect. A weekly wipe-down keeps the glass clear.",
-        },
-        {
-          icon: "CheckCircle",
-          title: "Custom Fit",
-          description:
-            "Every shower is measured in person and glass is cut to your exact opening, which is why frameless installations look seamless.",
-        },
-        {
-          icon: "BadgeCheck",
-          title: "Increases Home Value",
-          description:
-            "A frameless shower is one of the most-requested features Charlotte-area buyers look for.",
-        },
-        {
-          icon: "Wrench",
-          title: "Personal Installation",
-          description:
-            "Doug personally handles every installation, from first measurement to final walkthrough.",
-        },
-      ],
+    block("cards-grid", {
+      ...GLASS_SHOWER_BENEFITS,
+      sectionBackgroundColor: "#ffffff",
+      sectionPaddingTop: "lg",
+      sectionPaddingBottom: "lg",
     }),
     block("rich-text", {
       title: "Frameless vs. Semi-Frameless: Which Is Right for You?",
