@@ -169,137 +169,69 @@
 .home-services-commercial-links a:last-child {
   border-bottom: 0;
 }
+/* Mobile uses the compact service grid; desktop retains the editorial layout. */
+.home-services-mobile {
+  display: none;
+}
 @media (max-width: 767px) {
-  .home-services-header {
-    padding: 0;
-    margin-bottom: 18px;
+  .home-services-desktop {
+    display: none;
   }
-  .home-services-eyebrow {
-    font-size: 11px;
-    gap: 16px;
-    letter-spacing: 0.18em;
-    margin-bottom: 10px;
-  }
-  .home-services-eyebrow::before {
-    width: 34px;
-  }
-  .home-services-header h2 {
-    font-size: 30px;
-    line-height: 1.08;
-    margin-bottom: 10px;
-  }
-  .home-services-intro {
-    font-size: 15px;
-    line-height: 1.45;
-  }
-  .home-services-residential {
+  .home-services-mobile {
     display: block;
   }
-  .home-services-feature {
-    display: grid;
-    grid-template-columns: 35% minmax(0, 1fr);
-    gap: 16px;
-    border-top: 1px solid #dce4ec;
-    padding-top: 12px;
-    margin-top: 16px;
+  .home-services-mobile > h2 {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.04em;
+    margin-bottom: 24px;
   }
-  .home-services-feature:first-child {
-    display: block;
-    border-top: 0;
-    padding-top: 0;
-    margin-top: 0;
+  .home-services-mobile-group + .home-services-mobile-group {
+    margin-top: 32px;
   }
-  .home-services-feature:first-child .home-services-photo img {
-    aspect-ratio: 3 / 2;
-  }
-  .home-services-feature:not(:first-child) .home-services-photo img {
-    height: 100%;
-    min-height: 108px;
-    aspect-ratio: 1;
-  }
-  .home-services-feature-copy {
-    padding: 0;
-  }
-  .home-services-feature:first-child .home-services-feature-copy {
-    padding-top: 6px;
-  }
-  .home-services-feature h3 {
-    font-size: 16px;
+  .home-services-mobile-group > h3 {
+    font-size: 24px;
+    font-weight: 750;
     line-height: 1.2;
-    margin-bottom: 4px;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.035em;
+    margin-bottom: 16px;
   }
-  .home-services-feature p {
-    font-size: 14px;
-    line-height: 1.4;
-    margin-bottom: 4px;
+  .home-services-mobile-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 14px;
   }
-  .home-services-link {
-    font-size: 14px;
-    gap: 8px;
-    min-height: 24px;
-  }
-  .home-services-repair {
-    position: relative;
+  .home-services-mobile-card {
     display: block;
-    margin-top: 16px;
-    padding: 10px 0 0;
+    min-width: 0;
+    color: inherit;
   }
-  .home-services-repair h3 {
-    border: 0;
-    padding: 0 28px 4px 0;
-    font-size: 16px;
-  }
-  .home-services-repair p {
-    padding-right: 24px;
-    font-size: 14px;
-    line-height: 1.35;
-  }
-  .home-services-repair .home-services-link {
-    position: absolute;
-    inset: 0;
-    font-size: 0;
-    justify-content: flex-end;
-    align-items: flex-start;
-    padding-top: 10px;
-  }
-  .home-services-commercial {
+  .home-services-mobile-card img {
     display: block;
-    margin: 16px -16px 0;
-    padding: 20px 18px 12px;
-  }
-  .home-services-commercial-photo {
-    display: block;
+    width: 100%;
     height: auto;
-    min-height: 0;
-    aspect-ratio: 2 / 1;
-    margin-bottom: 20px;
+    aspect-ratio: 7 / 5;
+    object-fit: cover;
   }
-  .home-services-commercial-copy {
-    padding: 0;
+  .home-services-mobile-card h4 {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 10px;
+    font-family: var(--font-serif);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.025em;
   }
-  .home-services-commercial .home-services-eyebrow {
-    font-size: 10px;
-    gap: 12px;
-  }
-  .home-services-commercial h2 {
-    font-size: 30px;
-    margin-bottom: 5px;
-  }
-  .home-services-commercial-intro {
-    font-size: 14px;
-    line-height: 1.3;
-    margin-bottom: 4px;
-  }
-  .home-services-commercial-links {
-    display: block;
-  }
-  .home-services-commercial-links a {
-    font-size: 13px;
-    line-height: 1.3;
-    padding: 8px 0;
-    gap: 12px;
-    min-height: 36px;
+  .home-services-mobile-card svg {
+    flex-shrink: 0;
+    width: 18px;
+    height: 20px;
+    color: #0088a5;
+    stroke-width: 1.75;
   }
 }
 
@@ -315,13 +247,5 @@
   }
   .home-services-feature .home-services-link {
     margin-top: auto;
-  }
-}
-@media (max-width: 767px) {
-  .home-services-header h2 span {
-    display: block;
-  }
-  .home-services-desktop-copy {
-    display: none;
   }
 }
