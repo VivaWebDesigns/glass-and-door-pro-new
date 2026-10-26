@@ -79,15 +79,35 @@ function getObjectKeyFromUrl(url: URL, bucketName: string): string {
   return segments.map((segment) => decodeURIComponent(segment)).join("/");
 }
 
+// Settings decryption returns the stored "iv:ciphertext" value unchanged when
+// SESSION_SECRET has been rotated, so a credential in that shape is unusable.
+function isUndecryptedSecret(value: string | undefined): boolean {
+  return !!value && /^[0-9a-f]{32}:[0-9a-f]+$/i.test(value);
+}
+
 async function getR2Config(): Promise<R2Config | null> {
   try {
     const { storage } = await import("../storage/index");
     const settings = await storage.settings.getDecryptedCategory("cloudflare_r2");
     const accountId = settings["r2_account_id"];
-    const accessKeyId = settings["r2_access_key_id"];
-    const secretAccessKey = settings["r2_secret_access_key"];
+    let accessKeyId = settings["r2_access_key_id"];
+    let secretAccessKey = settings["r2_secret_access_key"];
     const bucketName = settings["r2_bucket_name"];
     const publicUrl = settings["r2_public_url"] || "";
+
+    if (isUndecryptedSecret(accessKeyId) || isUndecryptedSecret(secretAccessKey)) {
+      const envAccessKeyId = process.env.BACKUP_R2_ACCESS_KEY_ID;
+      const envSecretAccessKey = process.env.BACKUP_R2_SECRET_ACCESS_KEY;
+      if (!envAccessKeyId || !envSecretAccessKey) {
+        logger.r2.warn(
+          "Saved R2 credentials could not be decrypted and no BACKUP_R2 fallback is set",
+        );
+        return null;
+      }
+      logger.r2.warn("Saved R2 credentials could not be decrypted; using BACKUP_R2 credentials");
+      accessKeyId = envAccessKeyId;
+      secretAccessKey = envSecretAccessKey;
+    }
 
     if (accountId && accessKeyId && secretAccessKey && bucketName) {
       return { accountId, accessKeyId, secretAccessKey, bucketName, publicUrl };

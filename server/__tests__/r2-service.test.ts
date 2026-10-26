@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 const mockSend = vi.fn();
 const MockS3Client = vi.fn(function () {
@@ -133,5 +133,46 @@ describe("R2 service", () => {
     const mod = await import("../services/r2.service");
     const url = await mod.uploadFile("images/photo.jpg", Buffer.from("data"), "image/jpeg");
     expect(url).toBe("https://cdn.example.com/images/photo.jpg");
+  });
+
+  describe("when saved credentials could not be decrypted", () => {
+    const undecrypted = `${"a".repeat(32)}:${"b".repeat(96)}`;
+
+    beforeEach(() => {
+      mockGetDecryptedCategory.mockResolvedValue({
+        r2_account_id: "acct",
+        r2_access_key_id: undecrypted,
+        r2_secret_access_key: undecrypted,
+        r2_bucket_name: "bucket",
+        r2_public_url: "",
+      });
+      mockSend.mockResolvedValue({});
+    });
+
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it("uses the BACKUP_R2 credentials", async () => {
+      vi.stubEnv("BACKUP_R2_ACCESS_KEY_ID", "env-key");
+      vi.stubEnv("BACKUP_R2_SECRET_ACCESS_KEY", "env-secret");
+
+      const mod = await import("../services/r2.service");
+      await mod.uploadFile("a.png", Buffer.from("a"), "image/png");
+
+      expect(MockS3Client).toHaveBeenCalledWith(
+        expect.objectContaining({
+          credentials: { accessKeyId: "env-key", secretAccessKey: "env-secret" },
+        }),
+      );
+    });
+
+    it("treats R2 as unconfigured without BACKUP_R2 credentials", async () => {
+      vi.stubEnv("BACKUP_R2_ACCESS_KEY_ID", "");
+      vi.stubEnv("BACKUP_R2_SECRET_ACCESS_KEY", "");
+
+      const mod = await import("../services/r2.service");
+      expect(await mod.isConfigured()).toBe(false);
+    });
   });
 });
