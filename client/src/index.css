@@ -1056,11 +1056,6 @@
       padding-top: 4rem;
       padding-bottom: 7rem;
     }
-
-    .service-editorial-grid {
-      grid-template-columns: minmax(0, 48rem) minmax(17rem, 19rem);
-      justify-content: space-between;
-    }
   }
 
   @media (max-width: 639px) {

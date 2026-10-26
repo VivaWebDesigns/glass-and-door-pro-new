@@ -1,7 +1,4 @@
-import { ChevronDown, Phone } from "lucide-react";
-import { useLocation } from "wouter";
-import { excludeServiceUtilitySnippets } from "@shared/glass-search-snippets";
-import { FormModalButton } from "@/components/forms/form-modal-button";
+import { ChevronDown } from "lucide-react";
 import { PublicPageRenderer } from "@/features/public/public-block-renderer";
 import type { BlockInstance } from "@/features/admin/cms/builder/block-registry";
 import { prepareSectionAnchorBlocks } from "./section-anchor-blocks";
@@ -32,43 +29,6 @@ function PageSectionLinks({ blocks }: { blocks: BlockInstance[] }) {
         ))}
       </ul>
     </nav>
-  );
-}
-
-function DesktopPageGuide({ blocks, hero }: { blocks: BlockInstance[]; hero: BlockInstance }) {
-  const [location] = useLocation();
-  return (
-    <aside className="service-editorial-guide hidden lg:block" aria-label="Service page guide">
-      <div className="sticky top-28 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="font-heading text-xl font-bold text-slate-900">On this page</h2>
-        <div className="mt-4 border-b border-slate-200 pb-5">
-          <PageSectionLinks blocks={blocks} />
-        </div>
-        <div
-          data-nosnippet={excludeServiceUtilitySnippets(location) ? "" : undefined}
-          className="mt-5 space-y-3"
-        >
-          <FormModalButton
-            label={text(hero.props.ctaText)}
-            action={hero.props.ctaAction}
-            href={hero.props.ctaLink}
-            openInNewTab={hero.props.ctaOpenInNewTab}
-            formSlug={hero.props.ctaFormSlug}
-            modalTitle={hero.props.ctaModalTitle}
-            modalDescription={hero.props.ctaModalDescription}
-            className="min-h-11 w-full bg-[#1a8ead] text-white hover:bg-[#167f9b]"
-            testId="service-editorial-guide-quote"
-          />
-          <a
-            href={text(hero.props.ctaSecondaryLink)}
-            className="flex min-h-11 items-center justify-center gap-2 rounded-md border border-[#1a8ead] px-4 text-sm font-bold text-[#167f9b] hover:bg-[#1a8ead]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1a8ead]"
-          >
-            <Phone className="h-4 w-4" aria-hidden="true" />
-            {text(hero.props.ctaSecondaryText)}
-          </a>
-        </div>
-      </div>
-    </aside>
   );
 }
 
@@ -113,7 +73,6 @@ export function ServiceEditorialLayout({ blocks }: { blocks: BlockInstance[] }) 
           <div className="service-editorial-content">
             <PublicPageRenderer blocks={leadingBlocks} />
           </div>
-          <DesktopPageGuide blocks={editorialBlocks} hero={hero} />
         </div>
         {featuredBlock && (
           <>
