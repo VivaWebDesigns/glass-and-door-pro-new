@@ -1282,3 +1282,163 @@
     );
   }
 }
+
+/* Window-installation page: pearl surfaces, inset panels, and full-width bands. */
+.window-depth-band {
+  background: #fff;
+  padding: 3.5rem 1.5rem;
+}
+.window-depth-inner {
+  max-width: 72rem;
+  margin-inline: auto;
+}
+.window-depth-mobile-menu {
+  max-width: 75rem;
+  margin-inline: auto;
+  padding: 1.5rem 1.5rem 0;
+}
+.window-depth-inner.service-editorial-content > div > section {
+  border: 0;
+}
+.window-depth-inner.service-editorial-content > div > section > div {
+  padding: 0;
+}
+.window-depth-inner.service-editorial-content > div > section > div > .max-w-7xl {
+  padding: 0;
+}
+.window-depth-installation,
+.window-depth-faq {
+  background-color: #f1f4f6;
+  background-image: url("/images/glass-door-pro/window-pearl-texture.webp");
+  background-size: 512px 512px;
+}
+.window-depth-installation [data-testid="window-installation-steps"] > div:first-child {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 3rem;
+}
+.window-depth-installation img {
+  border: 10px solid #fff;
+  border-radius: 6px;
+  box-shadow: 0 12px 28px rgb(32 44 70 / 13%);
+}
+.window-depth-installation ol {
+  gap: 0;
+  padding: 0.5rem 1.5rem;
+  background: #fff;
+  border: 1px solid #e8edf0;
+  border-radius: 8px;
+  box-shadow: 0 16px 35px rgb(32 44 70 / 10%);
+}
+.window-depth-installation ol > li {
+  padding: 1.5rem;
+}
+.window-depth-catalog {
+  background: #e8f5f7;
+}
+.window-depth-catalog ul {
+  gap: 1.5rem;
+}
+.window-depth-catalog li {
+  padding: 0.75rem 0.75rem 1rem;
+  background: #fff;
+  border: 1px solid #e1ecef;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgb(32 44 70 / 5%);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+.window-depth-catalog li img {
+  border-radius: 5px;
+}
+.window-depth-catalog li h3,
+.window-depth-catalog li p {
+  padding-inline: 0.25rem;
+}
+.window-depth-trust {
+  background: #202c46;
+}
+.window-depth-trust [data-testid="window-trust-band"] {
+  padding: 0;
+  background: transparent;
+}
+.window-depth-faq .window-depth-inner {
+  padding: 2rem;
+  border: 1px solid #e5eaee;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 16px 35px rgb(32 44 70 / 10%);
+}
+.window-depth-faq .public-section-card {
+  padding-inline: 0;
+  border: 0;
+  border-bottom: 1px solid #e2e8f0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.window-depth-faq .public-section-card:last-child {
+  border-bottom: 0;
+}
+.window-depth-faq .public-section-card button {
+  text-align: left;
+}
+.window-depth-faq .public-section-card button svg {
+  color: #1a8ead;
+}
+.window-depth-related .public-section-card {
+  border: 1px solid #e5ecef;
+  background: #fff;
+  box-shadow: 0 5px 18px rgb(32 44 70 / 7%);
+}
+@media (min-width: 768px) {
+  .window-depth-installation ol > li:not(:nth-child(3n)) {
+    border-right: 1px solid #e2e8f0;
+  }
+}
+@media (min-width: 1024px) {
+  .window-depth-mobile-menu {
+    display: none;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .window-depth-catalog li:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgb(32 44 70 / 10%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .window-depth-catalog li {
+    transition: none;
+  }
+}
+@media (max-width: 767px) {
+  .window-depth-band {
+    padding: 2.5rem 1rem;
+  }
+  .window-depth-mobile-menu {
+    padding-inline: 1rem;
+  }
+  .window-depth-installation [data-testid="window-installation-steps"] > div:first-child {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+  .window-depth-installation img {
+    border-width: 7px;
+  }
+  .window-depth-installation ol {
+    padding: 0 1rem;
+  }
+  .window-depth-installation ol > li {
+    padding: 1.25rem 0;
+  }
+  .window-depth-catalog ul {
+    gap: 0.75rem;
+  }
+  .window-depth-catalog li {
+    padding: 0.5rem 0.5rem 0.75rem;
+  }
+  .window-depth-faq .window-depth-inner {
+    padding: 1.25rem;
+  }
+}

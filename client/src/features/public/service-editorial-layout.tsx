@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { ChevronDown } from "lucide-react";
 import { PublicPageRenderer } from "@/features/public/public-block-renderer";
 import type { BlockInstance } from "@/features/admin/cms/builder/block-registry";
@@ -46,6 +47,71 @@ function MobilePageGuide({ blocks }: { blocks: BlockInstance[] }) {
   );
 }
 
+function WindowDepthSections({ blocks }: { blocks: BlockInstance[] }) {
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!root.current || !window.IntersectionObserver) return;
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (motion.matches) return;
+    const animations: Animation[] = [];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          if (!motion.matches)
+            animations.push(
+              entry.target.animate(
+                [
+                  { opacity: 0.65, transform: "translateY(12px)" },
+                  { opacity: 1, transform: "translateY(0)" },
+                ],
+                { duration: 350, easing: "ease-out" },
+              ),
+            );
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.08 },
+    );
+    root.current
+      .querySelectorAll(".window-depth-inner")
+      .forEach((element) => observer.observe(element));
+    return () => {
+      observer.disconnect();
+      animations.forEach((animation) => animation.cancel());
+    };
+  }, []);
+  return (
+    <div className="window-depth-sections" ref={root}>
+      <div className="window-depth-mobile-menu">
+        <MobilePageGuide blocks={blocks} />
+      </div>
+      {blocks.map((block) => {
+        const variant = text(block.props.variant);
+        const band =
+          variant === "window-installation-steps"
+            ? "installation"
+            : variant === "window-type-catalog"
+              ? "catalog"
+              : variant === "window-trust-band"
+                ? "trust"
+                : block.type === "faq"
+                  ? "faq"
+                  : text(block.props.title) === "Related Services"
+                    ? "related"
+                    : "plain";
+        return (
+          <div key={block.id} className={`window-depth-band window-depth-${band}`}>
+            <div className="window-depth-inner service-editorial-content">
+              <PublicPageRenderer blocks={[block]} />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function ServiceEditorialLayout({ blocks }: { blocks: BlockInstance[] }) {
   const hero = blocks[0];
   if (!hero || hero.type !== "hero") {
@@ -55,6 +121,9 @@ export function ServiceEditorialLayout({ blocks }: { blocks: BlockInstance[] }) 
   const contentBlocks = prepareSectionAnchorBlocks(blocks.slice(1));
   const closingCta = contentBlocks.at(-1)?.type === "cta" ? contentBlocks.at(-1) : undefined;
   const editorialBlocks = closingCta ? contentBlocks.slice(0, -1) : contentBlocks;
+  const windowDepth = editorialBlocks.some(
+    (block) => block.props.variant === "window-installation-steps",
+  );
   const featuredIndex = editorialBlocks.findIndex(
     (block) => block.props.variant === "featured-project",
   );
@@ -67,26 +136,30 @@ export function ServiceEditorialLayout({ blocks }: { blocks: BlockInstance[] }) 
       <div className="service-editorial-hero">
         <PublicPageRenderer blocks={[hero]} />
       </div>
-      <div className="service-editorial-shell">
-        <MobilePageGuide blocks={editorialBlocks} />
-        <div className="service-editorial-grid">
-          <div className="service-editorial-content">
-            <PublicPageRenderer blocks={leadingBlocks} />
+      {windowDepth ? (
+        <WindowDepthSections blocks={editorialBlocks} />
+      ) : (
+        <div className="service-editorial-shell">
+          <MobilePageGuide blocks={editorialBlocks} />
+          <div className="service-editorial-grid">
+            <div className="service-editorial-content">
+              <PublicPageRenderer blocks={leadingBlocks} />
+            </div>
           </div>
-        </div>
-        {featuredBlock && (
-          <>
-            <div className="service-editorial-content mt-14 border-t border-slate-200 pt-10">
-              <PublicPageRenderer blocks={[featuredBlock]} />
-            </div>
-            <div className="service-editorial-grid">
-              <div className="service-editorial-content border-t border-slate-200 pt-10">
-                <PublicPageRenderer blocks={editorialBlocks.slice(featuredIndex + 1)} />
+          {featuredBlock && (
+            <>
+              <div className="service-editorial-content mt-14 border-t border-slate-200 pt-10">
+                <PublicPageRenderer blocks={[featuredBlock]} />
               </div>
-            </div>
-          </>
-        )}
-      </div>
+              <div className="service-editorial-grid">
+                <div className="service-editorial-content border-t border-slate-200 pt-10">
+                  <PublicPageRenderer blocks={editorialBlocks.slice(featuredIndex + 1)} />
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
       {closingCta ? (
         <div className="service-editorial-closing-cta">
           <PublicPageRenderer blocks={[closingCta]} />
