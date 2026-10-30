@@ -76,3 +76,23 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+.service-photo-card-wide img {
+  object-position: 65% center;
+}
+@media (min-width: 1024px) {
+  .service-photo-card-wide {
+    grid-column: span 2;
+  }
+  .service-photo-card-wide .service-photo-card-image {
+    position: relative;
+    padding-top: calc((100% - 24px) * 0.43);
+  }
+  .service-photo-card-wide .service-photo-card-image img {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    aspect-ratio: auto;
+    object-position: center;
+  }
+}

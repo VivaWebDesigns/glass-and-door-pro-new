@@ -41,6 +41,11 @@ export function getServiceImage(href?: string) {
     .replace(/^https?:\/\/(?:www\.)?glassanddoorpro\.com(?=\/)/, "")
     .split(/[?#]/)[0]
     .replace(/\/$/, "");
+  if (path === "/services")
+    return {
+      src: root + "service-cards/all-services.webp",
+      alt: "Sunlit home entrance with a wood door, glass sidelights, and black-framed windows",
+    };
   const entry = path.startsWith("/services/") ? images[path.slice(10)] : undefined;
   return entry ? { src: root + entry[0], alt: entry[1] } : undefined;
 }
@@ -51,6 +56,7 @@ export type ServicePhotoCardProps = {
   href: string;
   buttonText?: string;
   openInNewTab?: boolean;
+  wide?: boolean;
 };
 
 export function ServicePhotoCard({
@@ -59,10 +65,11 @@ export function ServicePhotoCard({
   href,
   buttonText = "Learn More",
   openInNewTab,
+  wide = false,
 }: ServicePhotoCardProps) {
   const image = getServiceImage(href);
   return (
-    <article className="service-photo-card">
+    <article className={`service-photo-card${wide ? " service-photo-card-wide" : ""}`}>
       {image && (
         <div className="service-photo-card-image">
           <img

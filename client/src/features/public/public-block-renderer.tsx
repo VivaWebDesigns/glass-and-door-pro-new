@@ -510,6 +510,15 @@ function LinkListBlock({ props }: { props: Record<string, unknown> }) {
               href={link.url}
             />
           ))}
+          {links.length === 4 && /^Related Commercial Services$/i.test(str(props.title).trim()) && (
+            <ServicePhotoCard
+              title="Explore All Services"
+              description="Glass, windows, and doors for your home or business. Explore everything we install, replace, and repair."
+              href="/services"
+              buttonText="View All Services"
+              wide
+            />
+          )}
         </div>
       </div>
     );
