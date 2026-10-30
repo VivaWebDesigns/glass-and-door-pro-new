@@ -1,3 +1,4 @@
+import { ServicePhotoCard } from "./service-photo-card";
 import { Link } from "wouter";
 import { ArrowRight, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -56,22 +57,9 @@ export default function HomePage() {
         </section>
 
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="service-photo-grid">
             {featuredServices.map((service) => (
-              <Link
-                key={service.href}
-                href={service.href}
-                className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm transition-colors hover:border-primary"
-              >
-                <h2 className="text-xl font-semibold">{service.title}</h2>
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                  {service.description}
-                </p>
-                <span className="mt-5 inline-flex items-center text-sm font-semibold text-primary">
-                  Learn more
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </span>
-              </Link>
+              <ServicePhotoCard key={service.href} {...service} />
             ))}
           </div>
         </section>

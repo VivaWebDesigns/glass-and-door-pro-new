@@ -1,0 +1,78 @@
+.service-photo-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px 24px;
+}
+.service-photo-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  text-align: left;
+  color: #0c1b3e;
+}
+.service-photo-card-image {
+  display: block;
+  overflow: hidden;
+}
+.service-photo-card-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 800/688;
+  object-fit: cover;
+}
+.service-photo-card-copy {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 10px 10px 0;
+}
+.service-photo-card .service-photo-card-copy h3 {
+  margin: 0 0 6px;
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  color: #0c1b3e;
+}
+.service-photo-card .service-photo-card-copy p {
+  margin: 0 0 16px;
+  font-size: 16px;
+  line-height: 1.55;
+  color: #61708b;
+}
+.service-photo-card-link {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 14px;
+  margin-top: auto;
+  padding-top: 8px;
+  color: #0088a5;
+  font-size: 16px;
+  font-weight: 500;
+}
+.service-photo-card-link svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  stroke-width: 1.5;
+}
+.service-photo-card a:hover {
+  color: #00657d;
+}
+.service-photo-card a:focus-visible {
+  outline: 2px solid #0088a5;
+  outline-offset: 5px;
+}
+@media (min-width: 640px) {
+  .service-photo-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+  .service-photo-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

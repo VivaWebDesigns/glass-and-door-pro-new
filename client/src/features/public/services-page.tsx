@@ -1,13 +1,4 @@
-import { Link } from "wouter";
-import {
-  ArrowRight,
-  BadgeCheck,
-  Building2,
-  DoorOpen,
-  Grid3X3,
-  Wrench,
-  type LucideIcon,
-} from "lucide-react";
+import { ServicePhotoCard } from "./service-photo-card";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
@@ -16,7 +7,6 @@ type ServiceCard = {
   title: string;
   description: string;
   href: string;
-  icon: LucideIcon;
 };
 
 const residentialServices: ServiceCard[] = [
@@ -25,27 +15,23 @@ const residentialServices: ServiceCard[] = [
     description:
       "Custom frameless shower doors and glass enclosures measured and installed personally.",
     href: "/services/frameless-showers",
-    icon: BadgeCheck,
   },
   {
     title: "Window Installation",
     description:
       "Residential window installation and replacement for homes across the Charlotte area.",
     href: "/services/window-installation",
-    icon: Grid3X3,
   },
   {
     title: "Door Installation",
     description: "Entry, patio, storm, and exterior door installation with clean fit and finish.",
     href: "/services/door-installation",
-    icon: DoorOpen,
   },
   {
     title: "Window Repair",
     description:
       "Broken glass, foggy panes, seal failure, and glass-only replacement when possible.",
     href: "/services/window-repair",
-    icon: Wrench,
   },
 ];
 
@@ -55,34 +41,29 @@ const commercialServices: ServiceCard[] = [
     description:
       "Aluminum framing, fixed glass panels, and storefront doors for new construction, tenant buildouts, and commercial renovations.",
     href: "/services/commercial-storefront-glass-installation",
-    icon: Building2,
   },
   {
     title: "Commercial Storefront Glass Replacement & Repair",
     description:
       "Emergency board-up, broken panel replacement, and storefront glass repair for Charlotte businesses.",
     href: "/services/commercial-storefront-glass-replacement-repair",
-    icon: Building2,
   },
   {
     title: "Commercial Door Installation",
     description:
       "Aluminum entry doors, glass storefront doors, and complete commercial entrance systems.",
     href: "/services/commercial-door-installation",
-    icon: DoorOpen,
   },
   {
     title: "Commercial Door Replacement & Repair",
     description:
       "Broken glass panels, hardware failure, misaligned frames, and worn closers repaired or replaced fast.",
     href: "/services/commercial-door-replacement-repair",
-    icon: Wrench,
   },
   {
     title: "Commercial Window Replacement",
     description: "Apartment and multi-family window replacement with fast mobilization.",
     href: "/services/commercial-window-replacement",
-    icon: Building2,
   },
 ];
 
@@ -113,29 +94,10 @@ export default function ServicesPage() {
                 <h2 className="font-heading text-2xl font-bold text-slate-900">
                   {serviceGroup.title}
                 </h2>
-                <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                  {serviceGroup.services.map((service) => {
-                    const Icon = service.icon;
-                    return (
-                      <Link
-                        key={service.href}
-                        href={service.href}
-                        className="group rounded-lg bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md hover:ring-[#1a8ead]/40"
-                      >
-                        <Icon className="h-9 w-9 text-[#1a8ead]" aria-hidden="true" />
-                        <h3 className="mt-4 text-lg font-semibold text-slate-900">
-                          {service.title}
-                        </h3>
-                        <p className="mt-2 text-sm leading-6 text-slate-600">
-                          {service.description}
-                        </p>
-                        <span className="mt-5 inline-flex items-center text-sm font-semibold text-[#1a8ead] group-hover:text-[#167f9b]">
-                          View service
-                          <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden="true" />
-                        </span>
-                      </Link>
-                    );
-                  })}
+                <div className="service-photo-grid mt-5">
+                  {serviceGroup.services.map((service) => (
+                    <ServicePhotoCard key={service.href} {...service} />
+                  ))}
                 </div>
               </section>
             ))}

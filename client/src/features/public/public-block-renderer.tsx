@@ -1,3 +1,4 @@
+import { ServicePhotoCard, getServiceImage } from "./service-photo-card";
 import { WindowServiceSection } from "./window-service-sections";
 import { TbHomeUp, TbUserCog } from "react-icons/tb";
 import {
@@ -496,6 +497,23 @@ function CalloutBoxBlock({ props }: { props: Record<string, unknown> }) {
 function LinkListBlock({ props }: { props: Record<string, unknown> }) {
   const links = arr<{ label: string; description: string; url: string }>(props.links);
   const gridClass = str(props.columns) === "2" ? "md:grid-cols-2" : "md:grid-cols-1";
+  if (links.length > 0 && links.every((link) => getServiceImage(link.url))) {
+    return (
+      <div className="py-4" data-testid="block-service-photo-links">
+        <SectionHeading props={props} defaultAlignment="center" className="mb-6" />
+        <div className="service-photo-grid">
+          {links.map((link, index) => (
+            <ServicePhotoCard
+              key={`${link.url}-${index}`}
+              title={link.label}
+              description={link.description}
+              href={link.url}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-4">
@@ -828,6 +846,25 @@ function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
     buttonText?: string;
     openInNewTab?: boolean;
   }>(props.cards);
+  if (cards.some((card) => getServiceImage(card.link))) {
+    return (
+      <div className="py-4" data-testid="block-service-photo-cards">
+        <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
+        <div className="service-photo-grid">
+          {cards.map((card, index) => (
+            <ServicePhotoCard
+              key={`${card.link}-${index}`}
+              title={card.title}
+              description={card.description}
+              href={card.link || "#"}
+              buttonText={card.buttonText}
+              openInNewTab={card.openInNewTab}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
   if (variant === "open-benefits-grid") {
     return (
       <div className="py-4" data-testid="block-open-benefits-grid">
