@@ -940,6 +940,22 @@ async function normalizeStoredCmsPages() {
       }
 
       if (page.slug === "home") {
+        const homeContent = updates.content ?? page.content;
+        if (isRecord(homeContent) && Array.isArray(homeContent.blocks)) {
+          const blocks = homeContent.blocks.filter(
+            (block) =>
+              !(
+                isRecord(block) &&
+                block.type === "image-block" &&
+                isRecord(block.props) &&
+                block.props.imageUrl === "/images/glass-door-pro/gallery-door2-1280w.webp"
+              ),
+          );
+          if (blocks.length !== homeContent.blocks.length) {
+            updates.content = { ...homeContent, blocks } as InsertCmsPage["content"];
+          }
+        }
+
         if (page.seoTitle && legacyHomepageSeoTitles.has(page.seoTitle)) {
           updates.seoTitle = "Glass & Door Pro | Charlotte Glass, Door & Window Services";
         }

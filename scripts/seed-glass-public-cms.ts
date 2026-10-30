@@ -386,18 +386,6 @@ const glassHomeContent: InsertCmsPage["content"] = {
     },
     {
       id: uid(),
-      type: "image-block",
-      props: {
-        variant: "banner",
-        imageUrl: "/images/glass-door-pro/gallery-door2-1280w.webp",
-        alt: "Custom wooden entry door installation with decorative planters by Glass & Door Pro in Charlotte, NC",
-        width: "full",
-        sectionPaddingTop: "none",
-        sectionPaddingBottom: "none",
-      },
-    },
-    {
-      id: uid(),
       type: "text-image",
       props: {
         anchorId: "why-us",
