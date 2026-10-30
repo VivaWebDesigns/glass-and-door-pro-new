@@ -43,7 +43,7 @@ export function getServiceImage(href?: string) {
     .replace(/\/$/, "");
   if (path === "/services")
     return {
-      src: root + "service-cards/all-services-v2.webp",
+      src: root + "service-cards/all-services-v3.webp",
       alt: "Sunlit home entrance with a wood door, glass sidelights, and black-framed windows",
     };
   const entry = path.startsWith("/services/") ? images[path.slice(10)] : undefined;
