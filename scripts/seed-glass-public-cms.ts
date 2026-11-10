@@ -18,6 +18,7 @@ import {
 import { GLASS_CTA_HOURS_LINE } from "../shared/glass-quote-cta";
 import { putCallButtonFirst } from "../shared/glass-call-first";
 import { GLASS_DOUG_PORTRAIT } from "../shared/glass-doug-portrait";
+import { GLASS_CHARLOTTE_STOREFRONT_PROJECT_BLOCK } from "../shared/glass-charlotte-storefront-project";
 import {
   GLASS_CALL_CTA_LINK,
   GLASS_CALL_CTA_TEXT,
@@ -1403,6 +1404,7 @@ function expandedServicePageContent(props: {
     content: string;
   };
   detailTitle: string;
+  introProject?: typeof GLASS_CHARLOTTE_STOREFRONT_PROJECT_BLOCK;
   detailCards: GlassCard[];
   proseSections: Array<{
     title: string;
@@ -1453,6 +1455,7 @@ function expandedServicePageContent(props: {
         sectionPaddingTop: "lg",
         sectionPaddingBottom: "lg",
       }),
+      ...(props.introProject ? [props.introProject] : []),
       cardsGrid({
         title: props.detailTitle,
         cards: props.detailCards,
@@ -1511,6 +1514,7 @@ function expandedServicePageContent(props: {
         secondaryModalDescription: props.cta.secondaryModalDescription,
       }),
     ],
+    ...(props.introProject ? { _system: { charlotteStorefrontProject2026: true } } : {}),
   };
   return (
     props.relatedServicesUrl === "/services/window-installation"
@@ -2430,6 +2434,7 @@ const glassServicePages: GlassServicePageSeed[] = [
           "<p>A commercial door that isn't installed correctly creates problems that outlast the project. Misaligned frames, doors that don't close flush, hardware that fails early, thresholds that let weather in — these aren't cosmetic issues, they're functional failures that cost money to fix after the fact and reflect on whoever installed them.</p><p>Glass & Door Pro installs commercial doors for general contractors, project managers, and business owners throughout Charlotte. The work is managed personally by Doug — the same person who reviews the scope, takes the field measurements, sources the materials, and shows up for installation. There's no handoff between sales and installation, no crew you've never spoken to showing up to your job site. When you need a question answered or a schedule confirmed, one call gets you the person responsible.</p><p>We install aluminum storefront entry doors, glass commercial doors, and complete entrance systems as part of both new construction projects and tenant buildouts. For GCs managing multiple subcontractors on a commercial schedule, working with a glazing contractor who communicates clearly, shows up on time, and completes the scope correctly is the baseline — and it's something we take seriously on every project.</p><p>Commercial door installation is both a functional and aesthetic scope. The door is often the first physical interaction a customer or visitor has with a business — it needs to open easily, close completely, lock securely, and look right in the frame. We approach every commercial door installation with that standard in mind, whether it's a single storefront entry or a multi-door entrance system.</p><p>Charlotte's commercial construction and renovation activity means consistent demand for reliable commercial door contractors. Business owners opening new locations, landlords preparing tenant spaces, and GCs managing commercial fit-outs all need the same thing: a door contractor who delivers on scope and schedule without creating issues on the job site. That's what Glass & Door Pro provides.</p>",
       },
       detailTitle: "Commercial Doors We Install",
+      introProject: GLASS_CHARLOTTE_STOREFRONT_PROJECT_BLOCK,
       detailCards: [
         {
           icon: "DoorOpen",

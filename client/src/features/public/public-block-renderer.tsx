@@ -666,7 +666,11 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
       </div>
     );
   }
+  const projectPhoto = str(props.variant) === "project-photo";
   const imageRight = str(props.imagePosition) !== "left";
+  const layout = projectPhoto
+    ? "flex-col-reverse md:flex-row-reverse md:items-center"
+    : `flex-col ${imageRight ? "md:flex-row" : "md:flex-row-reverse"} md:items-stretch`;
   const hasImage = !!str(props.imageUrl);
   const mobileImageStyles = getMobileImageStyles(props);
   const align = str(props.alignment) || "left";
@@ -676,7 +680,7 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
     align === "center" ? "text-center" : align === "right" ? "text-right" : "text-left";
   return (
     <div
-      className={`flex flex-col ${imageRight ? "md:flex-row" : "md:flex-row-reverse"} gap-8 py-4 md:items-stretch lg:gap-12`}
+      className={`flex ${layout} gap-8 py-4 lg:gap-12`}
     >
       <div className="min-w-0 flex-1 space-y-3">
         <SectionHeading
@@ -692,7 +696,15 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
         )}
       </div>
       <div className="flex min-w-0 flex-1 self-stretch flex-col">
-        {hasImage ? (
+        {projectPhoto && hasImage ? (
+          <img
+            src={str(props.imageUrl)}
+            alt={str(props.imageAlt)}
+            loading="lazy"
+            decoding="async"
+            className="aspect-[4/3] h-auto w-full rounded-lg"
+          />
+        ) : hasImage ? (
           <div className="flex h-full flex-col">
             <div className="relative min-h-72 md:h-full md:min-h-0 md:flex-1">
               <img

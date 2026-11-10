@@ -17,6 +17,7 @@ import { putCallButtonFirst } from "@shared/glass-call-first";
 import { GLASS_DOUG_PORTRAIT } from "@shared/glass-doug-portrait";
 import { GLASS_SERVICE_HEROES, getGlassServiceHeroCtaProps } from "@shared/glass-service-heroes";
 import { GLASS_SOUTHPARK_PROJECT_BLOCK } from "@shared/glass-southpark-project";
+import { GLASS_CHARLOTTE_STOREFRONT_PROJECT_BLOCK } from "@shared/glass-charlotte-storefront-project";
 import { glassGoogleReviewDate } from "@shared/glass-review-dates";
 import { isGlassLegalNoindexSlug } from "@shared/glass-seo";
 import {
@@ -1230,7 +1231,7 @@ async function normalizeStoredCmsPages() {
         }
       }
 
-      if (page.slug === "services-commercial-door-installation") {
+      if (page.slug === commercialDoorInstallationSlug) {
         const content = updates.content ?? page.content;
         const updatedEntranceCopy = replaceStoredStrings(content, [
           [
@@ -1240,6 +1241,28 @@ async function normalizeStoredCmsPages() {
         ]);
         if (updatedEntranceCopy !== content) {
           updates.content = updatedEntranceCopy as InsertCmsPage["content"];
+        }
+
+        if (isRecord(updatedEntranceCopy) && Array.isArray(updatedEntranceCopy.blocks)) {
+          const meta = isRecord(updatedEntranceCopy._system) ? updatedEntranceCopy._system : {};
+          const detailsIndex = updatedEntranceCopy.blocks.findIndex(
+            (block) =>
+              isRecord(block) &&
+              block.type === "cards-grid" &&
+              isRecord(block.props) &&
+              block.props.title === "Commercial Doors We Install",
+          );
+          if (meta.charlotteStorefrontProject2026 !== true && detailsIndex >= 0) {
+            const blocks = [...updatedEntranceCopy.blocks];
+            if (!blocks.some((block) => block?.id === GLASS_CHARLOTTE_STOREFRONT_PROJECT_BLOCK.id)) {
+              blocks.splice(detailsIndex, 0, GLASS_CHARLOTTE_STOREFRONT_PROJECT_BLOCK);
+            }
+            updates.content = {
+              ...updatedEntranceCopy,
+              blocks,
+              _system: { ...meta, charlotteStorefrontProject2026: true },
+            } as InsertCmsPage["content"];
+          }
         }
       }
 
