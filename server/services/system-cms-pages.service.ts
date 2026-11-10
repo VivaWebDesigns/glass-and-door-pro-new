@@ -858,6 +858,52 @@ function applyServiceHeroRefresh(slug: string, content: unknown) {
   };
 }
 
+const commercialServiceIntroLinks: Record<string, { title: string; href: string; copy: string }> = {
+  "services-commercial-door-replacement-repair": {
+    title: "Commercial Door Problems Don't Wait — Neither Should the Fix",
+    href: "/services/commercial-storefront-glass-replacement-repair",
+    copy: "If the damage is in a fixed glass panel beside the door, see our <a href=\"/services/commercial-storefront-glass-replacement-repair\">storefront glass repair and replacement</a> service.",
+  },
+  "services-commercial-storefront-glass-installation": {
+    title: "Storefront Glass Installation That Stays on Your Timeline",
+    href: "/services/commercial-storefront-glass-replacement-repair",
+    copy: "If you only need to replace a broken or cracked panel in an existing storefront, see our <a href=\"/services/commercial-storefront-glass-replacement-repair\">storefront glass repair and replacement</a> service.",
+  },
+  "services-commercial-storefront-glass-replacement-repair": {
+    title: "When Your Storefront Glass Goes Down, You Need Fast and Reliable",
+    href: "/services/commercial-storefront-glass-installation",
+    copy: "Planning a new storefront or tenant buildout? See our <a href=\"/services/commercial-storefront-glass-installation\">storefront glass installation</a> service for complete framing, glass, and entrances.",
+  },
+};
+
+// Add an early path to the relevant service once, leaving later CMS edits in place.
+function addCommercialServiceIntroLink(slug: string, content: unknown) {
+  const link = commercialServiceIntroLinks[slug];
+  if (!link || !isRecord(content) || !Array.isArray(content.blocks)) return null;
+  const meta = isRecord(content._system) ? content._system : {};
+  if (meta.commercialServiceIntroLink2026 === true) return null;
+
+  const blocks = [...content.blocks];
+  const index = blocks.findIndex(
+    (block) =>
+      isRecord(block) &&
+      block.type === "rich-text" &&
+      isRecord(block.props) &&
+      block.props.title === link.title,
+  );
+  const intro = blocks[index];
+  if (!isRecord(intro) || !isRecord(intro.props) || typeof intro.props.content !== "string") {
+    return null;
+  }
+  if (!intro.props.content.includes(link.href)) {
+    blocks[index] = {
+      ...intro,
+      props: { ...intro.props, content: `${intro.props.content}<p>${link.copy}</p>` },
+    };
+  }
+  return { ...content, blocks, _system: { ...meta, commercialServiceIntroLink2026: true } };
+}
+
 // Use the homepage family photo for new and existing Meet Doug Adams sections,
 // preserving the location page's copy and other section settings.
 function addDougPortraitToLocationPage(slug: string, content: unknown) {
@@ -1129,6 +1175,14 @@ async function normalizeStoredCmsPages() {
       const contentWithQuoteCta = applyQuoteCtaRefresh(updates.content ?? page.content);
       if (contentWithQuoteCta) {
         updates.content = contentWithQuoteCta as InsertCmsPage["content"];
+      }
+
+      const contentWithCommercialLink = addCommercialServiceIntroLink(
+        page.slug,
+        updates.content ?? page.content,
+      );
+      if (contentWithCommercialLink) {
+        updates.content = contentWithCommercialLink as InsertCmsPage["content"];
       }
 
       const currentSeoDescription = updates.seoDescription ?? page.seoDescription;
