@@ -1217,6 +1217,19 @@ async function normalizeStoredCmsPages() {
         }
       }
 
+      if (page.slug === "services-commercial-storefront-glass-installation") {
+        const content = updates.content ?? page.content;
+        const updatedInquiryCopy = replaceStoredStrings(content, [
+          [
+            "Call or submit a project inquiry and Doug will follow up directly. We work with GCs, project managers, and business owners — and we respond fast.",
+            "Tell Doug where the project is, whether it’s a new storefront or an update to an existing one, and when you need it installed. If you have drawings or rough opening dimensions, mention those too.",
+          ],
+        ]);
+        if (updatedInquiryCopy !== content) {
+          updates.content = updatedInquiryCopy as InsertCmsPage["content"];
+        }
+      }
+
       const currentSeoDescription = updates.seoDescription ?? page.seoDescription;
       const seoDescriptionWithoutLegacyMonroeBase = replaceStoredStrings(
         currentSeoDescription,
