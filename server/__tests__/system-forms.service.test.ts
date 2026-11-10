@@ -246,6 +246,43 @@ describe("ensureSystemForms", () => {
     expect(mockUpdate.mock.calls.at(-1)?.[1].fields).toEqual(existing.fields);
   });
 
+  it("corrects legacy public copy without replacing custom form settings", async () => {
+    const existing = {
+      id: "contact-form-id",
+      description:
+        "Primary public quote and contact form used throughout the Glass & Door Pro website.",
+      fields: [
+        {
+          id: "email",
+          key: "email",
+          type: "email",
+          required: true,
+          helpText: "Optional unless you prefer an email response",
+        },
+      ],
+      settings: { schemaVersion: 4, successMessage: "Custom thanks" },
+    };
+    mockGetBySlug.mockResolvedValue(existing);
+    const { ensureSystemForms } = await import("../services/system-forms.service");
+    await ensureSystemForms();
+    const update = mockUpdate.mock.calls.at(-1)?.[1];
+    expect(update.description).toBe("Tell us about your project and how to reach you.");
+    expect(update.fields).toEqual([{ ...existing.fields[0], helpText: "" }]);
+    expect(update.settings.successMessage).toBe("Custom thanks");
+
+    const custom = {
+      ...existing,
+      description: "Custom public copy",
+      fields: [{ ...existing.fields[0], helpText: "Where we can send your estimate" }],
+    };
+    mockGetBySlug.mockResolvedValue(custom);
+    await ensureSystemForms();
+    expect(mockUpdate.mock.calls.at(-1)?.[1]).toMatchObject({
+      description: custom.description,
+      fields: custom.fields,
+    });
+  });
+
   it("rejects incomplete contact details but accepts a complete address without line 2", async () => {
     mockGetBySlug.mockResolvedValue(undefined);
     const { ensureSystemForms } = await import("../services/system-forms.service");

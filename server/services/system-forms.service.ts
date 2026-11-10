@@ -51,8 +51,7 @@ const SYSTEM_FORMS: ManagedSystemForm[] = [
   {
     name: "Contact Form",
     slug: "contact-form",
-    description:
-      "Primary public quote and contact form used throughout the Glass & Door Pro website.",
+    description: "Tell us about your project and how to reach you.",
     kind: "contact",
     isSystem: true,
     isActive: true,
@@ -150,17 +149,29 @@ export async function ensureSystemForms() {
           }
         }
 
+        const publicFields = shouldUpgradeFields
+          ? upgradedFields
+          : existingFields.length > 0
+            ? existingFields
+            : systemForm.fields;
+
         await storage.forms.update(existing.id, {
           name: existing.name || systemForm.name,
-          description: existing.description ?? systemForm.description ?? "",
+          description:
+            existing.description ===
+            "Primary public quote and contact form used throughout the Glass & Door Pro website."
+              ? systemForm.description
+              : existing.description ?? systemForm.description ?? "",
           kind: existing.kind || systemForm.kind,
           isSystem: true,
           isActive: existing.isActive ?? true,
-          fields: shouldUpgradeFields
-            ? upgradedFields
-            : existingFields.length > 0
-              ? existingFields
-              : systemForm.fields,
+          fields: publicFields.map((entry) =>
+            entry.key === "email" &&
+            entry.required &&
+            ["Optional", "Optional unless you prefer an email response"].includes(entry.helpText)
+              ? { ...entry, helpText: "" }
+              : entry,
+          ),
           settings: {
             ...systemForm.settings,
             ...existingSettings,
