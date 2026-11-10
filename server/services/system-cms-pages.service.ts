@@ -1185,6 +1185,20 @@ async function normalizeStoredCmsPages() {
         updates.content = contentWithCommercialLink as InsertCmsPage["content"];
       }
 
+      if (page.slug === "services-commercial-door-replacement-repair") {
+        const content = updates.content ?? page.content;
+        const updatedCardCopy = replaceStoredStrings(content, [
+          ["Misaligned & Dragging Doors", "Commercial Door Frame Repair & Alignment"],
+          [
+            "Doors that drag on the floor, bind in the frame, or require significant force to open or close are usually suffering from frame shift, hinge wear, or installation movement over time. We diagnose the root cause and correct the alignment — adjusting hinges, shimming the frame, or addressing the underlying issue rather than treating the symptom.",
+            "If your commercial door drags, rubs against the frame, or won’t latch, we check whether the problem is with the frame, hinges, or hardware. If the frame can be realigned, we adjust it so the door opens, closes, and latches properly. If the damage is beyond what adjustment can fix, we’ll explain what needs to be replaced before work begins.",
+          ],
+        ]);
+        if (updatedCardCopy !== content) {
+          updates.content = updatedCardCopy as InsertCmsPage["content"];
+        }
+      }
+
       const currentSeoDescription = updates.seoDescription ?? page.seoDescription;
       const seoDescriptionWithoutLegacyMonroeBase = replaceStoredStrings(
         currentSeoDescription,
