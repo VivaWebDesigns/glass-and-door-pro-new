@@ -1230,6 +1230,19 @@ async function normalizeStoredCmsPages() {
         }
       }
 
+      if (page.slug === "services-commercial-door-installation") {
+        const content = updates.content ?? page.content;
+        const updatedEntranceCopy = replaceStoredStrings(content, [
+          [
+            "<p>Charlotte's commercial construction and renovation activity means consistent demand for reliable commercial door contractors. Business owners opening new locations, landlords preparing tenant spaces, and GCs managing commercial fit-outs all need the same thing: a door contractor who delivers on scope and schedule without creating issues on the job site. That's what Glass & Door Pro provides.</p>",
+            '<p>You don’t have to replace the whole storefront to install a new entry door. We install standalone aluminum-framed glass doors as well as complete entrance systems for Charlotte businesses. If your existing door sticks, won’t close, or has damaged hardware, see our <a href="/services/commercial-door-replacement-repair">commercial door repair service</a>.</p>',
+          ],
+        ]);
+        if (updatedEntranceCopy !== content) {
+          updates.content = updatedEntranceCopy as InsertCmsPage["content"];
+        }
+      }
+
       const currentSeoDescription = updates.seoDescription ?? page.seoDescription;
       const seoDescriptionWithoutLegacyMonroeBase = replaceStoredStrings(
         currentSeoDescription,
