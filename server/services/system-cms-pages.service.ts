@@ -1199,6 +1199,24 @@ async function normalizeStoredCmsPages() {
         }
       }
 
+      if (page.slug === "services-commercial-storefront-glass-replacement-repair") {
+        const content = updates.content ?? page.content;
+        const updatedStorefrontCopy = replaceStoredStrings(content, [
+          [
+            "<p>Board-up and glass replacement to secure your storefront and restore damaged windows and doors.</p>",
+            "<p>Broken storefront glass in Charlotte? We can replace a single damaged panel if the existing frame is in good condition. If the opening needs to be secured before the new glass is ready, we can help with temporary board-up.</p>",
+          ],
+          ["Cracked or Damaged Panel Repair", "Cracked Storefront Glass Assessment"],
+          [
+            "Not every storefront glass situation is an emergency. Hairline cracks, edge damage, or developing seal failures can often be monitored and addressed on a scheduled basis. We assess the severity and advise on whether immediate replacement is warranted or whether the panel can be addressed on a planned timeline.",
+            "If you notice a crack, chipped edge, or fogging between panes, we’ll inspect the glass and frame. We’ll explain whether the panel needs prompt replacement or whether the work can be scheduled.",
+          ],
+        ]);
+        if (updatedStorefrontCopy !== content) {
+          updates.content = updatedStorefrontCopy as InsertCmsPage["content"];
+        }
+      }
+
       const currentSeoDescription = updates.seoDescription ?? page.seoDescription;
       const seoDescriptionWithoutLegacyMonroeBase = replaceStoredStrings(
         currentSeoDescription,
