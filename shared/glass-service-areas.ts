@@ -45,6 +45,15 @@ export const GLASS_SERVICE_AREA_HUB_CARDS = GLASS_PRIMARY_SERVICE_AREAS.map(
   ({ label, href }) => [label, href, serviceAreaDescriptions[label]] as const,
 );
 
+export function summarizeServiceArea(value: string) {
+  const places = value
+    .split(",")
+    .map((place) => place.trim())
+    .filter(Boolean);
+  if (places.length <= 3) return null;
+  return `${places[0]} and ${places.length - 1} nearby towns`;
+}
+
 export const GLASS_SERVICE_AREA_HUB = {
   heading: "Glass and Door Services Across Greater Charlotte",
   heroAlt: "Suburban home exterior with replacement windows installed",

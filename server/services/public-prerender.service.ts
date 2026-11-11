@@ -44,6 +44,7 @@ import {
   GLASS_SERVICE_AREAS_HERO_IMAGE,
   GLASS_SERVICE_AREA_HUB,
   GLASS_SERVICE_AREA_HUB_CARDS,
+  summarizeServiceArea,
 } from "@shared/glass-service-areas";
 import type { CmsPage, SeoSettings } from "@shared/schema";
 import { normalizeSeoDescription } from "@shared/seo-description";
@@ -765,18 +766,17 @@ function renderCmsBlockForSeo(
         isHomeServices && !Array.isArray(props.cards)
           ? GLASS_HOMEPAGE_SERVICE_CARDS
           : arrayProp<PrerenderCard>(props, "cards");
-      return [
-        sectionHeadingHtml(isHomeServices ? GLASS_HOMEPAGE_SERVICES_LAYOUT : props),
-        variant === "window-installation-steps" ? photoHtml(props.imageUrl, props.imageAlt) : "",
-        variant === "window-trust-band"
-          ? [props.experienceValue, props.experienceTitle, props.experienceDescription]
-              .map((value) => paragraphHtml(typeof value === "string" ? value : ""))
-              .join("")
-          : "",
-        ...cards.map((card) => {
+      const listTag =
+        variant === "window-installation-steps"
+          ? "ol"
+          : ["window-type-catalog", "window-trust-band", "open-benefits-grid"].includes(variant)
+            ? "ul"
+            : null;
+      const cardHtml = cards
+        .map((card) => {
           const cardTitle = card.title || "";
           const cardImage = "imageUrl" in card ? card.imageUrl : undefined;
-          return [
+          const content = [
             variant === "window-type-catalog" && cardImage
               ? photoHtml(cardImage, `Illustration of ${cardTitle.toLowerCase()}`)
               : "",
@@ -787,7 +787,18 @@ function renderCmsBlockForSeo(
               card.link ? card.buttonText || "Learn More" : undefined,
             ),
           ].join("");
-        }),
+          return listTag && content ? `<li>${content}</li>` : content;
+        })
+        .join("");
+      return [
+        sectionHeadingHtml(isHomeServices ? GLASS_HOMEPAGE_SERVICES_LAYOUT : props),
+        variant === "window-installation-steps" ? photoHtml(props.imageUrl, props.imageAlt) : "",
+        variant === "window-trust-band"
+          ? [props.experienceValue, props.experienceTitle, props.experienceDescription]
+              .map((value) => paragraphHtml(typeof value === "string" ? value : ""))
+              .join("")
+          : "",
+        listTag && cardHtml ? `<${listTag}>${cardHtml}</${listTag}>` : cardHtml,
       ].join("");
     }
 
@@ -886,9 +897,18 @@ function renderCmsBlockForSeo(
         paragraphHtml(textProp(props, "eyebrow")),
         headingHtml(2, heading),
         richHtml(textProp(props, "subheading")),
-        ...arrayProp<{ label?: string; value?: string; href?: string }>(props, "contactItems").map(
-          ({ label, value, href }) =>
+        ...arrayProp<{ icon?: string; label?: string; value?: string; href?: string }>(
+          props,
+          "contactItems",
+        ).map(({ icon, label, value, href }) =>
+          [
             `<p><strong>${escapeHtml(label || "")}</strong></p><p>${linkHtml(href, value || "")}</p>`,
+            props.variant === "split-contact" &&
+            icon === "MapPin" &&
+            summarizeServiceArea(value || "")
+              ? '<p><a href="/service-areas">See all areas</a></p>'
+              : "",
+          ].join(""),
         ),
         actionGroupHtml(
           actionHtml(
@@ -957,17 +977,32 @@ function buildCmsBodyHtml(
       ),
       closingCta ? renderBlock(closingCta) : "",
     ].join("");
+  } else if (hero?.type === "hero" && isGlassServicePageSlug(page.slug)) {
+    const heroHtml = renderBlock(hero);
+    const anchored = prepareSectionAnchorBlocks(
+      sections.map((block) => ({ ...block, props: block.props ?? {} })),
+    );
+    const closingCta = anchored.at(-1)?.type === "cta" ? anchored.pop() : undefined;
+    const content = anchored.map((block) => ({
+      html: renderBlock(block),
+      id: sanitizeAnchorId(block.props.anchorId),
+      title: textProp(block.props, "title"),
+    }));
+    const guideItems = content
+      .filter(({ html, id, title }) => html && id && title)
+      .map(({ id, title }) => `<li>${linkHtml(`#${id}`, title)}</li>`)
+      .join("");
+    const guide = guideItems
+      ? `<details><summary>On this page</summary><nav aria-label="Page sections"><ul>${guideItems}</ul></nav></details>`
+      : "";
+    rendered = [
+      heroHtml,
+      guide,
+      ...content.map(({ html }) => html),
+      closingCta ? renderBlock(closingCta) : "",
+    ].join("");
   } else {
-    const pageBlocks =
-      hero?.type === "hero" && isGlassServicePageSlug(page.slug)
-        ? [
-            hero,
-            ...prepareSectionAnchorBlocks(
-              sections.map((block) => ({ ...block, props: block.props ?? {} })),
-            ),
-          ]
-        : blocks;
-    rendered = pageBlocks.map(renderBlock).join("");
+    rendered = blocks.map(renderBlock).join("");
   }
 
   if (!rendered) {

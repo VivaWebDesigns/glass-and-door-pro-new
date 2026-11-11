@@ -725,6 +725,74 @@ describe("public-prerender.service", () => {
     expect(body).not.toContain("Draft work");
   });
 
+  it("renders service jump links and preserves ordered and unordered card lists", async () => {
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      slug: "services-window-installation",
+      content: {
+        blocks: [
+          { type: "hero", props: { heading: "Window Installation" } },
+          ...[
+            ["window-installation-steps", "Installation Steps", "Measure"],
+            ["window-type-catalog", "Window Styles", "Casement"],
+            ["window-trust-band", "Why Choose Us", "Owner Does the Work"],
+            ["open-benefits-grid", "Benefits", "Custom Fit"],
+          ].map(([variant, title, cardTitle]) => ({
+            type: "cards-grid",
+            props: { variant, title, cards: [{ title: cardTitle, description: "Details." }] },
+          })),
+          { type: "rich-text", props: { title: "Hidden Section", isActive: false } },
+          { type: "cta", props: { title: "Closing Quote", heading: "Get a Quote" } },
+        ],
+      },
+    });
+    const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
+    const body = (await getPublicHtmlSnapshot("/services/window-installation"))?.bodyHtml;
+
+    expect(body).toContain(
+      '<details><summary>On this page</summary><nav aria-label="Page sections"><ul><li><a href="#installation-steps">Installation Steps</a></li>',
+    );
+    expect(body).toContain(
+      '<section id="installation-steps"><h2>Installation Steps</h2><ol><li><h3>Measure</h3>',
+    );
+    expect(body).toContain("<h2>Window Styles</h2><ul><li><h3>Casement</h3>");
+    expect(body).toContain("<h2>Why Choose Us</h2><ul><li><h3>Owner Does the Work</h3>");
+    expect(body).toContain("<h2>Benefits</h2><ul><li><h3>Custom Fit</h3>");
+    expect(body).not.toContain('href="#hidden-section"');
+    expect(body).not.toContain('href="#closing-quote"');
+  });
+
+  it("includes the service areas link in the initial homepage contact section", async () => {
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      slug: "home",
+      content: {
+        blocks: [
+          {
+            type: "contact-form",
+            props: {
+              anchorId: "contact",
+              variant: "split-contact",
+              contactItems: [
+                {
+                  icon: "MapPin",
+                  label: "Service Area",
+                  value: "Charlotte, Pineville, Matthews, Weddington",
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+    const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
+    const body = (await getPublicHtmlSnapshot("/"))?.bodyHtml;
+
+    expect(body).toContain(
+      '<p><strong>Service Area</strong></p><p>Charlotte, Pineville, Matthews, Weddington</p><p><a href="/service-areas">See all areas</a></p>',
+    );
+  });
+
   it("returns a reviews fallback snapshot when the CMS reviews page is not seeded", async () => {
     const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
 

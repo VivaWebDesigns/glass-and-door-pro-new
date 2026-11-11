@@ -6,6 +6,7 @@ import { PublicFormRenderer } from "@/components/forms/public-form-renderer";
 import { CompanyInformationCard } from "@/components/shared/company-information-card";
 import { withContentKeys } from "@/lib/content-keys";
 import { ContactFormGrid } from "@/components/forms/contact-form-grid";
+import { summarizeServiceArea } from "@shared/glass-service-areas";
 
 function str(v: unknown): string {
   return typeof v === "string" ? v : "";
@@ -23,16 +24,6 @@ const CONTACT_ICON_MAP: Record<string, ElementType> = {
 };
 
 type ContactItem = { icon: string; label: string; value: string; href?: string };
-
-// "Charlotte, Pineville, ..." -> "Charlotte and 10 nearby towns" for the compact phone list.
-export function summarizeServiceArea(value: string) {
-  const places = value
-    .split(",")
-    .map((place) => place.trim())
-    .filter(Boolean);
-  if (places.length <= 3) return null;
-  return `${places[0]} and ${places.length - 1} nearby towns`;
-}
 
 // Phones get one compact card with tappable rows instead of four large cards.
 function CompactContactItems({ items }: { items: ContactItem[] }) {
