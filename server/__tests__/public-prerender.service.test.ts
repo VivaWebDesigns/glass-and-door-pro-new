@@ -168,8 +168,13 @@ describe("public-prerender.service", () => {
             },
           },
           {
-            type: "image",
-            props: { anchorId: "project", imageAlt: "A finished frameless shower in Charlotte." },
+            type: "image-block",
+            props: {
+              anchorId: "project",
+              imageUrl: "/images/glass-door-pro/gallery-shower1-1280w.webp",
+              alt: "A finished frameless shower in Charlotte.",
+              caption: "Shower installation",
+            },
           },
           {
             type: "rich-text",
@@ -188,7 +193,7 @@ describe("public-prerender.service", () => {
       '<section id="intro"><p>Welcome to our local glass installation business.</p>',
     );
     expect(snapshot?.bodyHtml).toContain(
-      '<section id="project"><p>A finished frameless shower in Charlotte.</p>',
+      '<section id="project"><figure><img src="/images/glass-door-pro/gallery-shower1-1280w.webp" alt="A finished frameless shower in Charlotte." loading="lazy" decoding="async"><figcaption>Shower installation</figcaption></figure>',
     );
     expect(snapshot?.bodyHtml).toContain('<section id="showers"><h2>Frameless Showers</h2>');
   });
@@ -598,9 +603,7 @@ describe("public-prerender.service", () => {
     expect(snapshot?.title).toBe(
       "Glass & Door Pro | Glass & Door Services in Charlotte & Monroe, NC",
     );
-    expect(snapshot?.bodyHtml).toContain(
-      "<h1>Greater Charlotte Shower Doors Windows · Doors</h1>",
-    );
+    expect(snapshot?.bodyHtml).toContain("<h1>Greater Charlotte Shower Doors Windows · Doors</h1>");
     expect(snapshot?.jsonLd?.map((schema) => schema["@type"])).toEqual([
       "WebSite",
       "HomeAndConstructionBusiness",
@@ -610,10 +613,16 @@ describe("public-prerender.service", () => {
       alternateName: ["Glass and Door Pro", "glassanddoorpro.com"],
       url: "https://glassanddoorpro.com/",
     });
-    expect(snapshot?.bodyHtml).toContain("We&#39;ve got your glass &amp; door needs covered.");
+    expect(snapshot?.bodyHtml).toContain(
+      "<p>Expert installation and repair across Greater Charlotte. Work directly with Doug, from first call to final fit.</p>",
+    );
+    expect(snapshot?.bodyHtml).not.toContain("We&#39;ve got your glass &amp; door needs covered.");
+    expect(snapshot?.bodyHtml).not.toContain(
+      "Specializing in frameless glass showers, windows, and doors.",
+    );
     expect(snapshot?.bodyHtml).not.toContain("cc1dbbbe");
     expect(snapshot?.bodyHtml).not.toContain("hero</p>");
-    expect(snapshot?.bodyHtml).not.toContain("#contact");
+    expect(snapshot?.bodyHtml).toContain('<a href="#contact">Get a Free Quote</a>');
     expect(snapshot?.ogImageUrl).toBe(
       "https://glassanddoorpro.com/images/glass-door-pro/home-exterior-share.jpg",
     );
@@ -628,7 +637,92 @@ describe("public-prerender.service", () => {
 
     expect(snapshot?.title).toContain("Gallery");
     expect(snapshot?.canonicalUrl).toBe("https://glassanddoorpro.com/gallery");
-    expect(snapshot?.bodyHtml).toContain("Glass &amp; Door Pro project photos");
+    expect(snapshot?.bodyHtml).toContain(
+      '<section id="commercial-glass"><h2>Commercial Glass</h2>',
+    );
+    expect(snapshot?.bodyHtml).toContain(
+      "<figcaption>Commercial Storefront Glass Installation</figcaption>",
+    );
+    expect(snapshot?.bodyHtml).toContain('<a href="/forms/contact-form">Get a Free Quote</a>');
+  });
+
+  it("uses published gallery data without changing how the browser loads the page", async () => {
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      slug: "gallery",
+      content: {
+        blocks: [
+          { type: "section-header", props: { title: "Gallery" } },
+          {
+            type: "image-grid",
+            props: {
+              title: "Published work",
+              images: [
+                { url: "/images/example.webp", alt: "Glass entry", caption: "Recent entry" },
+              ],
+            },
+          },
+        ],
+      },
+    });
+    const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
+    const snapshot = await getPublicHtmlSnapshot("/gallery");
+
+    expect(snapshot?.bodyHtml).toContain("<h1>Gallery</h1>");
+    expect(snapshot?.bodyHtml).toContain("<h2>Published work</h2>");
+    expect(snapshot?.bodyHtml).toContain('src="/images/example.webp" alt="Glass entry"');
+    expect(snapshot?.bodyHtml).toContain("<figcaption>Recent entry</figcaption>");
+    expect(snapshot?.bodyHtml).not.toContain(
+      "Commercial Storefront Glass Installation</figcaption>",
+    );
+    expect(snapshot?.cmsPage).toBeUndefined();
+  });
+
+  it("preserves quote copy and working actions in the initial service HTML", async () => {
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      slug: "services-window-repair",
+      content: {
+        blocks: [
+          {
+            type: "hero",
+            props: {
+              heading: "Window Repair",
+              ctaText: "Call Doug",
+              ctaLink: "tel:+17047716111",
+              ctaSecondaryText: "Get a Free Quote",
+              ctaSecondaryAction: "form-modal",
+              ctaSecondaryFormSlug: "contact-form",
+            },
+          },
+          {
+            type: "rich-text",
+            props: { isActive: false, title: "Draft work", content: "<p>Unpublished</p>" },
+          },
+          {
+            type: "cta",
+            props: {
+              heading: "Request a Quote",
+              subheading: "<p>Tell us what happened.</p><p><strong>Mon–Sat, 7am–7pm</strong></p>",
+              primaryText: "Get a Free Quote",
+              primaryAction: "form-modal",
+              primaryFormSlug: "contact-form",
+              secondaryText: "Unsafe destination",
+              secondaryLink: "javascript:alert(1)",
+            },
+          },
+        ],
+      },
+    });
+    const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
+    const body = (await getPublicHtmlSnapshot("/services/window-repair"))?.bodyHtml;
+
+    expect(body).toContain(
+      '<div data-nosnippet><p><a href="tel:+17047716111">Call Doug</a> <a href="/forms/contact-form">Get a Free Quote</a></p></div>',
+    );
+    expect(body).toContain("<p>Tell us what happened.</p><p><strong>Mon–Sat, 7am–7pm</strong></p>");
+    expect(body).not.toContain("Unsafe destination");
+    expect(body).not.toContain("Draft work");
   });
 
   it("returns a reviews fallback snapshot when the CMS reviews page is not seeded", async () => {

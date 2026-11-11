@@ -6,27 +6,10 @@ import { Button } from "@/components/ui/button";
 import { useMobileHeroViewport } from "@/hooks/use-mobile-hero-viewport";
 import { getMobileHeroImageUrl } from "@shared/glass-hero-images";
 import {
-  GLASS_PRIMARY_SERVICE_AREAS,
+  GLASS_SERVICE_AREA_HUB,
+  GLASS_SERVICE_AREA_HUB_CARDS,
   GLASS_SERVICE_AREAS_HERO_IMAGE,
 } from "@shared/glass-service-areas";
-
-const serviceAreaDescriptions = {
-  Charlotte: "Glass, window, door, shower, and commercial services across Charlotte.",
-  Pineville: "Glass, window, door, and repair services for Pineville properties.",
-  Matthews: "Residential and commercial glass, window, and door services in Matthews.",
-  Weddington: "Custom glass, frameless showers, windows, and doors in Weddington.",
-  "Indian Trail": "Frameless showers, windows, doors, repairs, and commercial glass.",
-  "Wesley Chapel": "Custom shower glass, replacement windows, door installation, and repair.",
-  Stallings: "Local glass and door installation and repair for Stallings homes and businesses.",
-  Waxhaw: "Custom showers, replacement windows, doors, and glass repair for Waxhaw properties.",
-  Monroe: "Owner-operated glass, window, door, and commercial services throughout Monroe.",
-  "Fort Mill": "Frameless showers, windows, doors, and commercial glass in Fort Mill.",
-  "Indian Land": "Glass and door service for Indian Land, SC homeowners and businesses.",
-};
-
-const serviceAreas = GLASS_PRIMARY_SERVICE_AREAS.map(
-  ({ label, href }) => [label, href, serviceAreaDescriptions[label]] as const,
-);
 
 export default function ServiceAreasPage() {
   const mobileHeroImage = getMobileHeroImageUrl(GLASS_SERVICE_AREAS_HERO_IMAGE);
@@ -42,7 +25,7 @@ export default function ServiceAreasPage() {
         >
           <img
             src={heroImage}
-            alt="Suburban home exterior with replacement windows installed"
+            alt={GLASS_SERVICE_AREA_HUB.heroAlt}
             loading="eager"
             decoding="async"
             fetchPriority="high"
@@ -53,12 +36,10 @@ export default function ServiceAreasPage() {
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-background/35 to-transparent" />
           <div className="relative z-10 max-w-3xl px-6 py-20 sm:px-8 sm:py-24 md:py-28 lg:ml-[max(2rem,calc((100vw-80rem)/2))]">
             <h1 className="mb-5 font-heading text-4xl font-bold leading-tight text-white sm:text-5xl md:text-6xl">
-              Glass and Door Services Across Greater Charlotte
+              {GLASS_SERVICE_AREA_HUB.heading}
             </h1>
             <div className="mb-9 max-w-2xl text-base leading-8 text-white/85 sm:text-lg [&_a]:text-white [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-white/80 [&_p]:m-0">
-              Glass & Door Pro serves Charlotte, Union County, and nearby South Carolina communities
-              with frameless showers, window installation, door installation, window repair, and
-              commercial glass services.
+              {GLASS_SERVICE_AREA_HUB.intro}
             </div>
             {/* Hidden below md, where MobileCtaBar takes over. */}
             <div className="hidden gap-3 md:flex md:flex-row md:flex-wrap md:justify-start">
@@ -85,13 +66,15 @@ export default function ServiceAreasPage() {
           <div className="mx-auto max-w-7xl">
             <div className="py-4">
               <div className="mb-8 text-center">
-                <h2 className="text-3xl font-heading font-bold">Areas We Serve</h2>
+                <h2 className="text-3xl font-heading font-bold">
+                  {GLASS_SERVICE_AREA_HUB.areasTitle}
+                </h2>
                 <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-                  Choose your city to see local glass and door services.
+                  {GLASS_SERVICE_AREA_HUB.areasIntro}
                 </p>
               </div>
               <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3">
-                {serviceAreas.map(([name, href, description]) => (
+                {GLASS_SERVICE_AREA_HUB_CARDS.map(([name, href, description]) => (
                   <div
                     key={href}
                     className="public-section-card-hover relative h-full overflow-hidden rounded-lg border-border/70 border-none bg-white text-center shadow-sm"
@@ -109,7 +92,7 @@ export default function ServiceAreasPage() {
                           href={href}
                           className="inline-flex items-center text-sm font-semibold text-[#1a8ead] transition-colors hover:text-[#167f9b] after:absolute after:inset-0 after:content-['']"
                         >
-                          View area
+                          {GLASS_SERVICE_AREA_HUB.areaLinkText}
                           <ArrowRight className="ml-1.5 h-4 w-4" />
                         </Link>
                       </div>
@@ -126,21 +109,12 @@ export default function ServiceAreasPage() {
             <div>
               <div className="mb-6 text-left">
                 <h2 className="text-3xl font-heading font-bold">
-                  Serving the Greater Charlotte Area
+                  {GLASS_SERVICE_AREA_HUB.detailsTitle}
                 </h2>
               </div>
               <div className="public-prose prose prose-sm max-w-none text-left">
-                <p>
-                  Glass & Door Pro is based in Charlotte and serves homeowners and businesses across
-                  the greater Charlotte metro and nearby South Carolina communities. Doug handles
-                  measurements, planning, and installation personally, so you work directly with the
-                  person responsible for the finished result — no matter which city you're in.
-                </p>
-                <p>
-                  From frameless showers and replacement windows to exterior doors, window repair,
-                  and commercial glass, every project starts with a clear in-home or on-site quote.
-                  Call Doug directly to get started in your area.
-                </p>
+                <p>{GLASS_SERVICE_AREA_HUB.detailsIntro}</p>
+                <p>{GLASS_SERVICE_AREA_HUB.detailsClosing}</p>
               </div>
             </div>
           </div>
@@ -151,18 +125,12 @@ export default function ServiceAreasPage() {
           style={{ backgroundColor: "#1a8ead", color: "#ffffff" }}
         >
           <h2 className="mb-3 text-2xl font-heading font-bold leading-tight sm:text-3xl md:text-4xl">
-            Ready to Get Started?
+            {GLASS_SERVICE_AREA_HUB.quoteTitle}
           </h2>
           <div className="mb-8 mx-auto max-w-xl text-sm leading-relaxed opacity-80 sm:text-base [&_a]:text-current [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:opacity-80 [&_p]:m-0">
+            <p>{GLASS_SERVICE_AREA_HUB.quoteIntro}</p>
             <p>
-              Call, text, or request a free quote. Doug will review your project personally and give
-              you clear next steps — wherever you are in the Charlotte metro.
-            </p>
-            <p>
-              <strong>
-                Mon–Sat: 7am – 7pm | Serving Charlotte, Monroe, Union County, and nearby South
-                Carolina communities
-              </strong>
+              <strong>{GLASS_SERVICE_AREA_HUB.quoteHours}</strong>
             </p>
           </div>
           <div className="flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">

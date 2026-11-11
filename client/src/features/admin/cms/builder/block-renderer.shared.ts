@@ -1,5 +1,8 @@
 import type { CSSProperties, SyntheticEvent } from "react";
 import { normalizeHexColor } from "./section-style";
+import { resolveCmsAssetUrl } from "@shared/cms-asset-url";
+
+export { resolveCmsAssetUrl };
 
 export function str(v: unknown): string {
   return typeof v === "string" ? v : "";
@@ -65,12 +68,6 @@ export const IMAGE_WIDTH_MAP: Record<string, string> = {
   narrow: "max-w-2xl mx-auto",
 };
 
-const LEGACY_CMS_ASSET_MAP: Record<string, string> = {
-  "/images/hero-therapy-session.png": "/images/hero-therapy-session-1920w.webp",
-  "/uploads/cms/1781107243034-monroe.webp": "/images/glass-door-pro/city-monroe-hero.webp",
-  "/uploads/cms/1781107218199-charlotte1.webp": "/images/glass-door-pro/city-charlotte-hero.webp",
-};
-
 export const CMS_MISSING_IMAGE_PLACEHOLDER_URL = "/images/cms-media-missing.svg";
 
 export function cmsBackgroundImageValue(url: string): string {
@@ -84,8 +81,4 @@ export function handleCmsPreviewImageError(event: SyntheticEvent<HTMLImageElemen
   if (image.src.endsWith(CMS_MISSING_IMAGE_PLACEHOLDER_URL)) return;
   image.onerror = null;
   image.src = CMS_MISSING_IMAGE_PLACEHOLDER_URL;
-}
-
-export function resolveCmsAssetUrl(url: string): string {
-  return LEGACY_CMS_ASSET_MAP[url] ?? url;
 }

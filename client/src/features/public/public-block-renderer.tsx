@@ -1,4 +1,9 @@
-import { ServicePhotoCard, getServiceImage } from "./service-photo-card";
+import { ServicePhotoCard } from "./service-photo-card";
+import {
+  GLASS_ALL_SERVICES_CARD,
+  getServiceImage,
+  hasGlassAllServicesCard,
+} from "@shared/glass-service-photo-cards";
 import { WindowServiceSection } from "./window-service-sections";
 import { TbHomeUp, TbUserCog } from "react-icons/tb";
 import {
@@ -50,7 +55,11 @@ import {
 } from "@/features/admin/cms/builder/block-renderer.shared";
 import { SectionHeading } from "@/features/admin/cms/builder/section-heading";
 import { renderPublicDisplayText } from "@/features/admin/cms/builder/display-text";
-import { GLASS_HOME_HERO_HEADING, getCmsHeroHeadingParts } from "@shared/glass-hero-heading";
+import {
+  GLASS_HOME_HERO_HEADING,
+  GLASS_HOME_HERO_INTRO,
+  getCmsHeroHeadingParts,
+} from "@shared/glass-hero-heading";
 import {
   Sparkles,
   Droplet,
@@ -279,9 +288,7 @@ function HeroHeading({ props, variant }: { props: Record<string, unknown>; varia
     return (
       <h1 className="service-location-heading">
         <span className="service-location-label">{location}</span>{" "}
-        <span className="service-location-title">
-          {renderPublicDisplayText(heading)}
-        </span>
+        <span className="service-location-title">{renderPublicDisplayText(heading)}</span>
       </h1>
     );
   }
@@ -348,9 +355,7 @@ function HeroBlock({ props }: { props: Record<string, unknown> }) {
   const config = getHeroConfig(props);
   const badge = str(props.badge);
   const subheading =
-    config.variant === "glass-home"
-      ? "Expert installation and repair across Greater Charlotte. Work directly with Doug, from first call to final fit."
-      : str(props.subheading);
+    config.variant === "glass-home" ? GLASS_HOME_HERO_INTRO : str(props.subheading);
 
   return (
     <section
@@ -511,14 +516,8 @@ function LinkListBlock({ props }: { props: Record<string, unknown> }) {
               href={link.url}
             />
           ))}
-          {links.length === 4 && /^Related Commercial Services$/i.test(str(props.title).trim()) && (
-            <ServicePhotoCard
-              title="Explore All Services"
-              description="Glass, windows, and doors for your home or business. Explore everything we install, replace, and repair."
-              href="/services"
-              buttonText="View All Services"
-              wide
-            />
+          {hasGlassAllServicesCard(props.title, links) && (
+            <ServicePhotoCard {...GLASS_ALL_SERVICES_CARD} wide />
           )}
         </div>
       </div>
@@ -680,9 +679,7 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
   const bodyAlign =
     align === "center" ? "text-center" : align === "right" ? "text-right" : "text-left";
   return (
-    <div
-      className={`flex ${layout} gap-8 py-4 lg:gap-12`}
-    >
+    <div className={`flex ${layout} gap-8 py-4 lg:gap-12`}>
       <div className="min-w-0 flex-1 space-y-3">
         <SectionHeading
           props={props}

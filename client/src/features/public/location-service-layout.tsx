@@ -2,7 +2,7 @@ import { ChevronDown } from "lucide-react";
 import { PublicPageRenderer } from "@/features/public/public-block-renderer";
 import { resolveCmsAssetUrl } from "@/features/admin/cms/builder/block-renderer.shared";
 import type { BlockInstance } from "@/features/admin/cms/builder/block-registry";
-import { prepareSectionAnchorBlocks } from "./section-anchor-blocks";
+import { getLocationSectionOrder, prepareSectionAnchorBlocks } from "@shared/glass-section-layout";
 
 function text(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -85,22 +85,13 @@ export function LocationServiceLayout({
   const contentBlocks = prepareSectionAnchorBlocks(blocks.slice(1));
   const closingCta = contentBlocks.at(-1)?.type === "cta" ? contentBlocks.at(-1) : undefined;
   const pageBlocks = closingCta ? contentBlocks.slice(0, -1) : contentBlocks;
-  const serviceBlock = pageBlocks.find(
-    (block) => block.type === "cards-grid" && /^Our Services in /i.test(text(block.props.title)),
-  );
-  const localIntroBlock = pageBlocks.find((block) => block.type === "rich-text");
-  const whyBlock = pageBlocks.find(
-    (block) =>
-      block.type === "cards-grid" &&
-      /^Why .+ Choose Glass (?:&|and) Door Pro$/i.test(text(block.props.title)),
-  );
-  const featuredIds = new Set(
-    [serviceBlock?.id, localIntroBlock?.id, whyBlock?.id].filter(Boolean),
-  );
-  const remainingBlocks = pageBlocks.filter((block) => !featuredIds.has(block.id));
-  const orderedBlocks = [serviceBlock, localIntroBlock, whyBlock, ...remainingBlocks].filter(
-    (block): block is BlockInstance => Boolean(block),
-  );
+  const {
+    serviceBlock,
+    introBlock: localIntroBlock,
+    whyBlock,
+    remainingBlocks,
+    orderedBlocks,
+  } = getLocationSectionOrder(pageBlocks);
   const image = firstGalleryImage(galleryBlock);
 
   if (!serviceBlock && localIntroBlock) {

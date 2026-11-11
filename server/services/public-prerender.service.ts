@@ -1,13 +1,32 @@
 import { HOME_SOCIAL_IMAGE } from "@shared/glass-hero-images";
 import { getRemoteFontStylesheet } from "@shared/branding-fonts";
+import { resolveCmsAssetUrl } from "@shared/cms-asset-url";
 import { getGlassLocationSearchCopy } from "@shared/glass-location-search";
-import { GLASS_HOME_HERO_HEADING, getCmsHeroHeadingParts } from "@shared/glass-hero-heading";
+import {
+  GLASS_HOME_HERO_HEADING,
+  GLASS_HOME_HERO_INTRO,
+  getCmsHeroHeadingParts,
+} from "@shared/glass-hero-heading";
+import { GLASS_GALLERY_FALLBACK_BLOCKS } from "@shared/glass-gallery-fallback";
+import {
+  GLASS_HOMEPAGE_SERVICE_CARDS,
+  GLASS_HOMEPAGE_SERVICES_LAYOUT,
+} from "@shared/glass-homepage-services";
+import {
+  GLASS_ALL_SERVICES_CARD,
+  getServiceImage,
+  hasGlassAllServicesCard,
+} from "@shared/glass-service-photo-cards";
+import { getLocationSectionOrder, prepareSectionAnchorBlocks } from "@shared/glass-section-layout";
 import {
   DESKTOP_HERO_MEDIA,
   getMobileHeroImageUrl,
   MOBILE_HERO_MEDIA,
 } from "@shared/glass-hero-images";
-import { correctGlassSearchTitle } from "@shared/glass-search-snippets";
+import {
+  correctGlassSearchTitle,
+  excludeServiceUtilitySnippets,
+} from "@shared/glass-search-snippets";
 import {
   buildGlassBreadcrumbItems,
   buildGlassLocalBusinessLd,
@@ -23,6 +42,8 @@ import {
   GLASS_PRIMARY_SERVICE_AREAS,
   GLASS_PRIMARY_SERVICE_AREA_NAMES,
   GLASS_SERVICE_AREAS_HERO_IMAGE,
+  GLASS_SERVICE_AREA_HUB,
+  GLASS_SERVICE_AREA_HUB_CARDS,
 } from "@shared/glass-service-areas";
 import type { CmsPage, SeoSettings } from "@shared/schema";
 import { normalizeSeoDescription } from "@shared/seo-description";
@@ -354,11 +375,40 @@ function filterServiceAreaWorkGalleryFromPage(page: CmsPage): CmsPage {
 
 function sanitizeRichHtml(value: string) {
   return sanitizeHtml(value, {
-    allowedTags: ["p", "br", "strong", "em", "ul", "ol", "li", "blockquote", "a", "h2", "h3", "h4"],
+    allowedTags: [
+      "p",
+      "br",
+      "hr",
+      "strong",
+      "b",
+      "em",
+      "i",
+      "ul",
+      "ol",
+      "li",
+      "blockquote",
+      "a",
+      "h2",
+      "h3",
+      "h4",
+      "h5",
+      "h6",
+      "div",
+      "table",
+      "caption",
+      "thead",
+      "tbody",
+      "tr",
+      "th",
+      "td",
+      "dl",
+      "dt",
+      "dd",
+    ],
     allowedAttributes: {
       a: ["href", "target", "rel"],
     },
-    allowedSchemes: ["http", "https", "mailto", "tel"],
+    allowedSchemes: ["http", "https", "mailto", "tel", "sms"],
     transformTags: {
       a: sanitizeHtml.simpleTransform("a", {
         rel: "noopener noreferrer",
@@ -371,9 +421,15 @@ function isSafePrerenderHref(value: unknown): value is string {
   if (typeof value !== "string") return false;
   const href = value.trim();
   if (!href) return false;
+  if (
+    href.includes("\\") ||
+    Array.from(href).some((character) => character < " " || character === "\u007f")
+  ) {
+    return false;
+  }
   if (href.startsWith("/") && !href.startsWith("//")) return true;
   if (href.startsWith("#")) return true;
-  return /^(https?:|mailto:|tel:)/i.test(href);
+  return /^(https?:|mailto:|tel:|sms:)/i.test(href);
 }
 
 function normalizePrerenderLink(link: PrerenderLink): PrerenderLink | null {
@@ -438,7 +494,7 @@ function buildSeoFooterHtml() {
   ].join("");
 }
 
-type CmsBlock = { type?: string; props?: Record<string, unknown> };
+type CmsBlock = { id?: string; type?: string; props?: Record<string, unknown> };
 
 function cmsBlocks(content: unknown): CmsBlock[] {
   if (!content || typeof content !== "object") return [];
@@ -491,6 +547,55 @@ function linkedHeadingHtml(href: unknown, label: string) {
   return link ? `<h3>${link}</h3>` : "";
 }
 
+function photoHtml(src: unknown, alt: unknown, caption?: unknown) {
+  if (typeof src !== "string") return "";
+  const url = src.trim();
+  if (!isSafePrerenderHref(url) || !/^(?:\/(?!\/)|https?:\/\/)/i.test(url)) return "";
+  const image = `<img src="${escapeHtml(url)}" alt="${escapeHtml(typeof alt === "string" ? alt : "")}" loading="lazy" decoding="async">`;
+  return typeof caption === "string" && caption.trim()
+    ? `<figure>${image}<figcaption>${escapeHtml(caption)}</figcaption></figure>`
+    : image;
+}
+
+function heroPhotoHtml(src: string, alt: unknown, variant?: string) {
+  const desktop = resolveCmsAssetUrl(src);
+  const image = photoHtml(desktop, alt);
+  if (!image) return "";
+  const mobile = getMobileHeroImageUrl(desktop, variant);
+  return mobile
+    ? `<picture><source media="${MOBILE_HERO_MEDIA}" srcset="${escapeHtml(mobile)}">${image}</picture>`
+    : image;
+}
+
+function quoteFormHref(slug: string) {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(slug) ? `/forms/${encodeURIComponent(slug)}` : "";
+}
+
+function actionHtml(label: string, action: string, href: string, formSlug: string) {
+  const destination = action === "form-modal" && formSlug ? quoteFormHref(formSlug) : href;
+  return label && destination !== "#" && isSafePrerenderHref(destination)
+    ? linkHtml(destination, label)
+    : "";
+}
+
+function actionGroupHtml(...actions: string[]) {
+  const links = actions.filter(Boolean);
+  return links.length ? `<p>${links.join(" ")}</p>` : "";
+}
+
+function blockActionHtml(
+  props: Record<string, unknown>,
+  prefix: string,
+  labelKey = `${prefix}Text`,
+) {
+  return actionHtml(
+    textProp(props, labelKey),
+    textProp(props, `${prefix}Action`),
+    textProp(props, `${prefix}Link`),
+    textProp(props, `${prefix}FormSlug`),
+  );
+}
+
 function richHtml(value: string) {
   const sanitized = sanitizeRichHtml(value)
     .replace(/<a href="(mailto:[^"]*)"[^>]*>[\s\S]*?<\/a>/gi, (anchor, href: string) =>
@@ -498,27 +603,73 @@ function richHtml(value: string) {
     )
     .trim();
   if (!sanitized) return "";
-  return /^<(p|ul|ol|h[2-4]|blockquote)\b/i.test(sanitized) ? sanitized : `<p>${sanitized}</p>`;
+  return /<(?:p|ul|ol|h[2-6]|blockquote|div|table|dl|hr)\b/i.test(sanitized)
+    ? sanitized
+    : `<p>${sanitized}</p>`;
 }
 
-function sectionHeadingHtml(props: Record<string, unknown>, heading = textProp(props, "title")) {
-  return [headingHtml(2, heading), paragraphHtml(textProp(props, "subtitle"))].join("");
+function sectionHeadingHtml(
+  props: Record<string, unknown>,
+  heading = textProp(props, "title") || textProp(props, "heading"),
+  level: 1 | 2 = 2,
+) {
+  return [
+    paragraphHtml(textProp(props, "sectionEyebrow") || textProp(props, "eyebrow")),
+    headingHtml(level, heading),
+    richHtml(textProp(props, "subtitle") || textProp(props, "subheading")),
+  ].join("");
 }
 
-function renderCmsBlockForSeo(block: CmsBlock, h1: { used: boolean }) {
+type PrerenderImage = { url?: string; alt?: string; caption?: string };
+type PrerenderCard = {
+  title?: string;
+  description?: string;
+  link?: string;
+  buttonText?: string;
+  imageUrl?: string;
+};
+
+function serviceCardHtml(title: string, description: string, href?: string, label?: string) {
+  const image = getServiceImage(href);
+  return [
+    image ? photoHtml(image.src, image.alt) : "",
+    linkedHeadingHtml(href, title),
+    paragraphHtml(description),
+    href && label ? actionGroupHtml(actionHtml(label, "", href, "")) : "",
+  ].join("");
+}
+
+function renderCmsBlockForSeo(
+  block: CmsBlock,
+  h1: { used: boolean },
+  excludeUtilitySnippets: boolean,
+) {
   const props = block.props ?? {};
+  if (props.isActive === false) return "";
   const title = textProp(props, "title");
   const heading = textProp(props, "heading") || title;
+  const utilityActions = (...actions: string[]) => {
+    const group = actionGroupHtml(...actions);
+    return group && excludeUtilitySnippets ? `<div data-nosnippet>${group}</div>` : group;
+  };
 
   switch (block.type) {
     case "hero": {
-      if (props.isActive === false) return "";
-      const subheading = paragraphHtml(
-        textProp(props, "subheading") || textProp(props, "subtitle"),
-      );
-      if (h1.used) return [headingHtml(2, heading), subheading].join("");
-      h1.used = true;
       const isHomeHero = props.variant === "glass-home";
+      const subheading = richHtml(
+        isHomeHero ? GLASS_HOME_HERO_INTRO : textProp(props, "subheading"),
+      );
+      const image = heroPhotoHtml(
+        textProp(props, "backgroundImageUrl"),
+        props.backgroundImageAlt || props.imageAlt,
+        textProp(props, "variant"),
+      );
+      const actions = utilityActions(
+        blockActionHtml(props, "cta"),
+        blockActionHtml(props, "ctaSecondary", "ctaSecondaryText"),
+      );
+      if (h1.used) return [headingHtml(2, heading), subheading, image, actions].join("");
+      h1.used = true;
       const parts = getCmsHeroHeadingParts(props);
       const headingText = isHomeHero
         ? [
@@ -528,26 +679,21 @@ function renderCmsBlockForSeo(block: CmsBlock, h1: { used: boolean }) {
           ].join(" ")
         : [parts.location, parts.heading, parts.accent].filter(Boolean).join(" ");
       return [
+        image,
+        paragraphHtml(textProp(props, "badge")),
         `<h1>${escapeHtml(headingText)}</h1>`,
-        isHomeHero ? headingHtml(2, heading) : "",
         subheading,
+        actions,
       ].join("");
     }
 
     case "section-header": {
       const isPrimaryHeading = (props.sectionHeadingLevel ?? props.headingLevel) === "h1";
-      if (isPrimaryHeading && props.isActive === false) return "";
       if (isPrimaryHeading && !h1.used && (title || heading)) {
         h1.used = true;
-        return [
-          headingHtml(1, title || heading),
-          paragraphHtml(textProp(props, "subtitle") || textProp(props, "subheading")),
-        ].join("");
+        return sectionHeadingHtml(props, title || heading, 1);
       }
-      return [
-        headingHtml(textProp(props, "headingLevel") === "h3" ? 3 : 2, title),
-        paragraphHtml(textProp(props, "subtitle")),
-      ].join("");
+      return sectionHeadingHtml(props);
     }
 
     case "rich-text":
@@ -555,31 +701,95 @@ function renderCmsBlockForSeo(block: CmsBlock, h1: { used: boolean }) {
       return [sectionHeadingHtml(props), richHtml(textProp(props, "content"))].join("");
 
     case "text-image":
-      return [sectionHeadingHtml(props, heading), richHtml(textProp(props, "body"))].join("");
+      return [
+        sectionHeadingHtml(
+          props,
+          props.variant === "featured-project" ? heading : title || heading,
+        ),
+        photoHtml(props.imageUrl, props.imageAlt, props.imageCaption),
+        richHtml(textProp(props, "body")),
+        props.variant === "featured-project"
+          ? actionGroupHtml(
+              actionHtml(textProp(props, "ctaText"), "form-modal", "", "contact-form"),
+            )
+          : "",
+      ].join("");
 
-    case "link-list":
+    case "image":
+    case "image-block":
       return [
         sectionHeadingHtml(props),
-        ...arrayProp<{ label?: string; description?: string; url?: string }>(props, "links").map(
-          (link) =>
-            [
-              linkedHeadingHtml(link.url, link.label || ""),
-              paragraphHtml(link.description || ""),
-            ].join(""),
+        photoHtml(props.imageUrl, props.alt || props.imageAlt, props.caption),
+      ].join("");
+
+    case "image-grid":
+      return [
+        sectionHeadingHtml(props),
+        ...arrayProp<PrerenderImage>(props, "images").map(({ url, alt, caption }) =>
+          photoHtml(url, alt, caption),
         ),
       ].join("");
 
-    case "cards-grid":
+    case "link-list": {
+      const links = arrayProp<{ label?: string; description?: string; url?: string }>(
+        props,
+        "links",
+      );
+      const usesPhotos = links.length > 0 && links.every((link) => getServiceImage(link.url));
+      const allServices = GLASS_ALL_SERVICES_CARD;
       return [
         sectionHeadingHtml(props),
-        ...arrayProp<{ title?: string; description?: string; link?: string }>(props, "cards").map(
-          (card) =>
-            [
-              linkedHeadingHtml(card.link, card.title || ""),
-              paragraphHtml(card.description || ""),
-            ].join(""),
+        ...links.map((link) =>
+          usesPhotos
+            ? serviceCardHtml(link.label || "", link.description || "", link.url, "Learn More")
+            : [
+                linkedHeadingHtml(link.url, link.label || "Untitled link"),
+                paragraphHtml(link.description || ""),
+              ].join(""),
         ),
+        hasGlassAllServicesCard(props.title, links)
+          ? serviceCardHtml(
+              allServices.title,
+              allServices.description,
+              allServices.href,
+              allServices.buttonText,
+            )
+          : "",
       ].join("");
+    }
+
+    case "cards-grid": {
+      const variant = textProp(props, "variant");
+      const isHomeServices = variant === "home-service-gallery";
+      const cards =
+        isHomeServices && !Array.isArray(props.cards)
+          ? GLASS_HOMEPAGE_SERVICE_CARDS
+          : arrayProp<PrerenderCard>(props, "cards");
+      return [
+        sectionHeadingHtml(isHomeServices ? GLASS_HOMEPAGE_SERVICES_LAYOUT : props),
+        variant === "window-installation-steps" ? photoHtml(props.imageUrl, props.imageAlt) : "",
+        variant === "window-trust-band"
+          ? [props.experienceValue, props.experienceTitle, props.experienceDescription]
+              .map((value) => paragraphHtml(typeof value === "string" ? value : ""))
+              .join("")
+          : "",
+        ...cards.map((card) => {
+          const cardTitle = card.title || "";
+          const cardImage = "imageUrl" in card ? card.imageUrl : undefined;
+          return [
+            variant === "window-type-catalog" && cardImage
+              ? photoHtml(cardImage, `Illustration of ${cardTitle.toLowerCase()}`)
+              : "",
+            serviceCardHtml(
+              cardTitle,
+              card.description || "",
+              card.link,
+              card.link ? card.buttonText || "Learn More" : undefined,
+            ),
+          ].join("");
+        }),
+      ].join("");
+    }
 
     case "feature-list":
     case "icon-grid":
@@ -627,11 +837,21 @@ function renderCmsBlockForSeo(block: CmsBlock, h1: { used: boolean }) {
     case "testimonials":
       return [
         sectionHeadingHtml(props),
-        ...arrayProp<{ quote?: string; name?: string }>(props, "items").map((item) =>
-          item.quote
-            ? `<blockquote>${paragraphHtml(item.quote)}${item.name ? `<cite>${escapeHtml(item.name)}</cite>` : ""}</blockquote>`
-            : "",
-        ),
+        ...arrayProp<{ quote?: string; name?: string; role?: string; location?: string }>(
+          props,
+          "items",
+        )
+          .filter((item) => item.quote)
+          .map((item) =>
+            [
+              "<blockquote>",
+              paragraphHtml(`"${item.quote}"`),
+              item.name ? `<cite>${escapeHtml(item.name)}</cite>` : "",
+              paragraphHtml(`${item.role || ""}${item.location ? ` · ${item.location}` : ""}`),
+              "</blockquote>",
+            ].join(""),
+          ),
+        actionGroupHtml(blockActionHtml(props, "cta")),
       ].join("");
 
     case "faq":
@@ -655,7 +875,30 @@ function renderCmsBlockForSeo(block: CmsBlock, h1: { used: boolean }) {
     }
 
     case "cta":
-      return [headingHtml(2, heading), paragraphHtml(textProp(props, "subheading"))].join("");
+      return [
+        headingHtml(2, heading),
+        richHtml(textProp(props, "subheading")),
+        utilityActions(blockActionHtml(props, "primary"), blockActionHtml(props, "secondary")),
+      ].join("");
+
+    case "contact-form":
+      return [
+        paragraphHtml(textProp(props, "eyebrow")),
+        headingHtml(2, heading),
+        richHtml(textProp(props, "subheading")),
+        ...arrayProp<{ label?: string; value?: string; href?: string }>(props, "contactItems").map(
+          ({ label, value, href }) =>
+            `<p><strong>${escapeHtml(label || "")}</strong></p><p>${linkHtml(href, value || "")}</p>`,
+        ),
+        actionGroupHtml(
+          actionHtml(
+            textProp(props, "formTitle") || "Send a Message",
+            "form-modal",
+            "",
+            textProp(props, "formSlug") || "contact-form",
+          ),
+        ),
+      ].join("");
 
     case "divider":
     case "video-embed":
@@ -673,22 +916,69 @@ function renderCmsBlockForSeo(block: CmsBlock, h1: { used: boolean }) {
   }
 }
 
-function buildCmsBodyHtml(page: CmsPage, h1Text: string, description: string) {
+function buildCmsBodyHtml(
+  page: Pick<CmsPage, "slug" | "content">,
+  h1Text: string,
+  description: string,
+) {
   const h1 = { used: false };
-  const rendered = cmsBlocks(page.content)
-    .map((block) => {
-      const html = renderCmsBlockForSeo(block, h1);
-      const anchorId = sanitizeAnchorId(block.props?.anchorId);
-      return html && anchorId ? `<section id="${escapeHtml(anchorId)}">${html}</section>` : html;
-    })
-    .filter(Boolean)
-    .join("");
+  const excludeUtilitySnippets = excludeServiceUtilitySnippets(getCmsPublicPath(page.slug));
+  const blocks = cmsBlocks(page.content);
+  const renderBlock = (block: CmsBlock) => {
+    const html = renderCmsBlockForSeo(block, h1, excludeUtilitySnippets);
+    const anchorId = sanitizeAnchorId(block.props?.anchorId);
+    return html && anchorId ? `<section id="${escapeHtml(anchorId)}">${html}</section>` : html;
+  };
+
+  const [hero, ...sections] = blocks;
+  let rendered: string;
+  if (hero?.type === "hero" && isServiceAreaPageSlug(page.slug)) {
+    const anchored = prepareSectionAnchorBlocks(
+      sections.map((block) => ({ ...block, props: block.props ?? {} })),
+    );
+    const closingCta = anchored.at(-1)?.type === "cta" ? anchored.pop() : undefined;
+    const { introBlock, serviceBlock, orderedBlocks } = getLocationSectionOrder(anchored);
+    const ordered =
+      serviceBlock || !introBlock
+        ? orderedBlocks
+        : [introBlock, ...anchored.filter((block) => block !== introBlock)];
+    const guideLinks = ordered.flatMap((block) => {
+      const id = sanitizeAnchorId(block.props.anchorId);
+      const label = textProp(block.props, "title");
+      return id && label && block.props.isActive !== false ? [{ href: `#${id}`, label }] : [];
+    });
+    const guide = guideLinks.length
+      ? `<aside aria-label="Location page guide">${buildLinkListHtml("On this page", guideLinks, "location-page-guide")}</aside>`
+      : "";
+    rendered = [
+      renderBlock(hero),
+      ...ordered.flatMap((block, index) =>
+        index === 0 ? [renderBlock(block), guide] : [renderBlock(block)],
+      ),
+      closingCta ? renderBlock(closingCta) : "",
+    ].join("");
+  } else {
+    const pageBlocks =
+      hero?.type === "hero" && isGlassServicePageSlug(page.slug)
+        ? [
+            hero,
+            ...prepareSectionAnchorBlocks(
+              sections.map((block) => ({ ...block, props: block.props ?? {} })),
+            ),
+          ]
+        : blocks;
+    rendered = pageBlocks.map(renderBlock).join("");
+  }
 
   if (!rendered) {
     return buildSimplePageBody(
       h1Text,
       description,
-      uniqueFragments(collectTextFragments(page.content)),
+      uniqueFragments(
+        collectTextFragments(
+          blocks.length ? blocks.filter((block) => block.props?.isActive !== false) : page.content,
+        ),
+      ),
       [buildSeoFooterHtml()],
     );
   }
@@ -851,16 +1141,36 @@ function getFallbackLinkSections(pathname: string) {
       { title: "Service Areas", links: SERVICE_AREA_LINKS },
     ];
   }
-  if (pathname === "/service-areas") {
-    return [
-      { title: "Areas We Serve", links: SERVICE_AREA_LINKS },
-      {
-        title: "Services Available Across These Areas",
-        links: [...PRIMARY_SERVICE_LINKS, ...COMMERCIAL_SERVICE_LINKS],
-      },
-    ];
-  }
   return [];
+}
+
+function buildServiceAreaHubBody() {
+  const hub = GLASS_SERVICE_AREA_HUB;
+  const actions = actionGroupHtml(
+    linkHtml("tel:+17047716111", "Call (704) 771-6111"),
+    linkHtml("/#contact", "Get a Free Quote"),
+  );
+  return [
+    '<main class="seo-prerender-content"><article>',
+    heroPhotoHtml(GLASS_SERVICE_AREAS_HERO_IMAGE, hub.heroAlt),
+    headingHtml(1, hub.heading),
+    paragraphHtml(hub.intro),
+    actions,
+    headingHtml(2, hub.areasTitle),
+    paragraphHtml(hub.areasIntro),
+    ...GLASS_SERVICE_AREA_HUB_CARDS.map(([name, href, description]) =>
+      serviceCardHtml(name, description, href, hub.areaLinkText),
+    ),
+    headingHtml(2, hub.detailsTitle),
+    paragraphHtml(hub.detailsIntro),
+    paragraphHtml(hub.detailsClosing),
+    headingHtml(2, hub.quoteTitle),
+    paragraphHtml(hub.quoteIntro),
+    `<p><strong>${escapeHtml(hub.quoteHours)}</strong></p>`,
+    actions,
+    buildSeoFooterHtml(),
+    "</article></main>",
+  ].join("");
 }
 
 function buildCmsSnapshot(
@@ -939,9 +1249,39 @@ function buildFallbackSnapshot(
   pathname: string,
   seo: SeoSettings | null,
   siteUrl: string,
+  galleryPage?: CmsPage,
 ): PublicHtmlSnapshot | null {
   const fallback = FALLBACK_STATIC_PAGES[pathname];
   if (!fallback) return null;
+  let bodyHtml: string;
+  if (pathname === "/gallery") {
+    const blocks = (
+      galleryPage ? cmsBlocks(galleryPage.content) : GLASS_GALLERY_FALLBACK_BLOCKS
+    ).map((block, index) =>
+      index === 0 && block.type === "section-header"
+        ? { ...block, props: { ...block.props, sectionHeadingLevel: "h1" } }
+        : block,
+    );
+    bodyHtml = buildCmsBodyHtml(
+      { slug: "gallery", content: { blocks } },
+      fallback.title,
+      fallback.body,
+    );
+  } else if (pathname === "/service-areas") {
+    bodyHtml = buildServiceAreaHubBody();
+  } else {
+    bodyHtml = buildSimplePageBody(
+      fallback.heading ?? fallback.title,
+      fallback.body,
+      [],
+      [
+        ...getFallbackLinkSections(pathname).map((section) =>
+          buildLinkListHtml(section.title, section.links),
+        ),
+        buildSeoFooterHtml(),
+      ].filter(Boolean),
+    );
+  }
   const fallbackJsonLd = [
     buildGlassLocalBusinessLd(siteUrl),
     buildWebsiteSchema(seo, siteUrl),
@@ -968,17 +1308,7 @@ function buildFallbackSnapshot(
     canonicalUrl: `${siteUrl}${pathname}`,
     ogImageUrl: absoluteUrl(seo?.defaultOgImageUrl, siteUrl) || null,
     robots: fallback.noindex ? "noindex,follow" : null,
-    bodyHtml: buildSimplePageBody(
-      fallback.heading ?? fallback.title,
-      fallback.body,
-      [],
-      [
-        ...getFallbackLinkSections(pathname).map((section) =>
-          buildLinkListHtml(section.title, section.links),
-        ),
-        buildSeoFooterHtml(),
-      ].filter(Boolean),
-    ),
+    bodyHtml,
     jsonLd: fallbackJsonLd,
     heroImageUrl: pathname === "/service-areas" ? GLASS_SERVICE_AREAS_HERO_IMAGE : undefined,
   };
@@ -1014,7 +1344,13 @@ export async function getPublicHtmlSnapshot(
   const slug = getCmsSlugForPublicPath(pathname);
   if (slug) {
     if (slug === "gallery") {
-      return buildFallbackSnapshot(pathname, seo, siteUrl);
+      const gallery = await storage.cmsPages.getPageBySlug(slug);
+      return buildFallbackSnapshot(
+        pathname,
+        seo,
+        siteUrl,
+        gallery?.status === "published" ? gallery : undefined,
+      );
     }
 
     const page = await storage.cmsPages.getPageBySlug(slug);
