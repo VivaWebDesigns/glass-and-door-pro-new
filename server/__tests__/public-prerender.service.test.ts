@@ -57,7 +57,7 @@ const cmsPage: CmsPage = {
       {
         id: "b1",
         type: "hero",
-        props: { title: "Glass Services", subtitle: "Schedule local glass and door service." },
+        props: { heading: "Glass Services", subheading: "Schedule local glass and door service." },
       },
     ],
   },
@@ -76,6 +76,35 @@ const cmsPage: CmsPage = {
 };
 
 describe("public-prerender.service", () => {
+  it.each([
+    [
+      { heading: "Frameless Shower Doors", locationHeading: "Greater Charlotte" },
+      "Greater Charlotte Frameless Shower Doors",
+    ],
+    [
+      { heading: "Glass & Door Services", accentHeading: "in Charlotte" },
+      "Glass &amp; Door Services in Charlotte",
+    ],
+  ])("uses the public hero wording for the initial H1 (%j)", async (props, expected) => {
+    mockGetPageBySlug.mockResolvedValue({
+      ...cmsPage,
+      slug: "services-frameless-showers",
+      title: "Frameless Showers",
+      content: {
+        blocks: [
+          { type: "hero", props: { heading: "Draft hero", isActive: false } },
+          { type: "hero", props },
+        ],
+      },
+    });
+    const { getPublicHtmlSnapshot } = await import("../services/public-prerender.service");
+
+    const snapshot = await getPublicHtmlSnapshot("/services/frameless-showers");
+
+    expect(snapshot?.bodyHtml.match(/<h1>.*?<\/h1>/g)).toEqual([`<h1>${expected}</h1>`]);
+    expect(snapshot?.bodyHtml).not.toContain("Draft hero");
+  });
+
   it("keeps complete CMS copy available to readers without JavaScript", async () => {
     const comparison = `${"Custom shower layouts depend on the opening. ".repeat(12)}Compare the full enclosure options with Doug.`;
     mockGetSeo.mockResolvedValue(seoSettings);
@@ -332,7 +361,7 @@ describe("public-prerender.service", () => {
     const snapshot = await getPublicHtmlSnapshot("/custom-landing");
 
     expect(snapshot?.title).toContain("Custom Landing Page");
-    expect(snapshot?.bodyHtml).toContain("Glass Services");
+    expect(snapshot?.bodyHtml).toContain("<h1>Glass Services</h1>");
     expect(snapshot?.canonicalUrl).toBe("https://glassanddoorpro.com/custom-landing");
   });
 
@@ -570,7 +599,7 @@ describe("public-prerender.service", () => {
       "Glass & Door Pro | Glass & Door Services in Charlotte & Monroe, NC",
     );
     expect(snapshot?.bodyHtml).toContain(
-      "<h1>Greater Charlotte Shower Doors, Windows &amp; Doors</h1>",
+      "<h1>Greater Charlotte Shower Doors Windows · Doors</h1>",
     );
     expect(snapshot?.jsonLd?.map((schema) => schema["@type"])).toEqual([
       "WebSite",

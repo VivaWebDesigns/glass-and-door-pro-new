@@ -1,6 +1,7 @@
 import { HOME_SOCIAL_IMAGE } from "@shared/glass-hero-images";
 import { getRemoteFontStylesheet } from "@shared/branding-fonts";
 import { getGlassLocationSearchCopy } from "@shared/glass-location-search";
+import { GLASS_HOME_HERO_HEADING, getCmsHeroHeadingParts } from "@shared/glass-hero-heading";
 import {
   DESKTOP_HERO_MEDIA,
   getMobileHeroImageUrl,
@@ -55,10 +56,11 @@ const DEFAULT_DESCRIPTION =
 
 const FALLBACK_STATIC_PAGES: Record<
   string,
-  { title: string; description: string; body: string; noindex?: boolean }
+  { title: string; heading?: string; description: string; body: string; noindex?: boolean }
 > = {
   "/": {
     title: "Charlotte Glass, Door & Window Services",
+    heading: "Glass, Door & Window Services Across Greater Charlotte",
     description:
       "Explore frameless showers, window installation, door installation, window repair, and commercial glass from Glass & Door Pro.",
     body: "Glass & Door Pro serves greater Charlotte with frameless showers, windows, doors, window repair, and commercial glass.",
@@ -71,17 +73,20 @@ const FALLBACK_STATIC_PAGES: Record<
   },
   "/reviews": {
     title: "Customer Reviews",
+    heading: "What Charlotte Customers Say About Glass & Door Pro",
     description:
       "Read customer reviews for Glass & Door Pro glass, shower, window, door, and commercial glass work in the Charlotte area.",
     body: `Read Glass & Door Pro customer reviews from homeowners and businesses across ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby communities.`,
   },
   "/services": {
     title: "Glass and Door Services",
+    heading: "Glass and Door Services in Charlotte, NC",
     description: `Explore frameless showers, window installation, door installation, window repair, and commercial glass services from Glass & Door Pro in ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby areas.`,
     body: `Glass & Door Pro provides frameless shower doors, residential window installation, door installation, window repair, and commercial glass services across ${GLASS_PRIMARY_SERVICE_AREA_NAMES}, and nearby communities.`,
   },
   "/service-areas": {
     title: "Service Areas",
+    heading: "Glass and Door Services Across Greater Charlotte",
     description:
       "Explore Glass & Door Pro service areas across Charlotte, Union County, and nearby South Carolina for showers, windows, doors, repairs, and commercial glass.",
     body: "Explore Glass & Door Pro service areas across the greater Charlotte metro, Union County, and nearby South Carolina communities.",
@@ -500,32 +505,50 @@ function sectionHeadingHtml(props: Record<string, unknown>, heading = textProp(p
   return [headingHtml(2, heading), paragraphHtml(textProp(props, "subtitle"))].join("");
 }
 
-function renderCmsBlockForSeo(block: CmsBlock, h1: { text: string; used: boolean }) {
+function renderCmsBlockForSeo(block: CmsBlock, h1: { used: boolean }) {
   const props = block.props ?? {};
   const title = textProp(props, "title");
   const heading = textProp(props, "heading") || title;
 
   switch (block.type) {
     case "hero": {
+      if (props.isActive === false) return "";
       const subheading = paragraphHtml(
         textProp(props, "subheading") || textProp(props, "subtitle"),
       );
       if (h1.used) return [headingHtml(2, heading), subheading].join("");
       h1.used = true;
-      // The page H1 can be rewritten (home, location pages); keep the hero's own heading too.
-      const keepHeroHeading = !h1.text.toLowerCase().includes(stripHtml(heading).toLowerCase());
+      const isHomeHero = props.variant === "glass-home";
+      const parts = getCmsHeroHeadingParts(props);
+      const headingText = isHomeHero
+        ? [
+            GLASS_HOME_HERO_HEADING.location,
+            GLASS_HOME_HERO_HEADING.firstLine,
+            GLASS_HOME_HERO_HEADING.secondLine,
+          ].join(" ")
+        : [parts.location, parts.heading, parts.accent].filter(Boolean).join(" ");
       return [
-        headingHtml(1, h1.text),
-        keepHeroHeading ? headingHtml(2, heading) : "",
+        `<h1>${escapeHtml(headingText)}</h1>`,
+        isHomeHero ? headingHtml(2, heading) : "",
         subheading,
       ].join("");
     }
 
-    case "section-header":
+    case "section-header": {
+      const isPrimaryHeading = (props.sectionHeadingLevel ?? props.headingLevel) === "h1";
+      if (isPrimaryHeading && props.isActive === false) return "";
+      if (isPrimaryHeading && !h1.used && (title || heading)) {
+        h1.used = true;
+        return [
+          headingHtml(1, title || heading),
+          paragraphHtml(textProp(props, "subtitle") || textProp(props, "subheading")),
+        ].join("");
+      }
       return [
         headingHtml(textProp(props, "headingLevel") === "h3" ? 3 : 2, title),
         paragraphHtml(textProp(props, "subtitle")),
       ].join("");
+    }
 
     case "rich-text":
     case "callout-box":
@@ -651,7 +674,7 @@ function renderCmsBlockForSeo(block: CmsBlock, h1: { text: string; used: boolean
 }
 
 function buildCmsBodyHtml(page: CmsPage, h1Text: string, description: string) {
-  const h1 = { text: h1Text, used: false };
+  const h1 = { used: false };
   const rendered = cmsBlocks(page.content)
     .map((block) => {
       const html = renderCmsBlockForSeo(block, h1);
@@ -840,30 +863,6 @@ function getFallbackLinkSections(pathname: string) {
   return [];
 }
 
-function getPrerenderHeading(page: Pick<CmsPage, "slug" | "title" | "content">) {
-  if (page.slug === "home") {
-    return "Greater Charlotte Shower Doors, Windows & Doors";
-  }
-
-  if (getGlassLocationSearchCopy(page.slug)) {
-    const content = page.content;
-    const blocks =
-      content && typeof content === "object" && !Array.isArray(content)
-        ? (content as Record<string, unknown>).blocks
-        : null;
-    if (Array.isArray(blocks)) {
-      const hero = blocks.find((block) => block?.type === "hero");
-      if (typeof hero?.props?.heading === "string") {
-        return typeof hero.props.locationHeading === "string"
-          ? `${hero.props.locationHeading} ${hero.props.heading}`
-          : hero.props.heading;
-      }
-    }
-  }
-
-  return page.title;
-}
-
 function buildCmsSnapshot(
   page: CmsPage,
   seo: SeoSettings | null,
@@ -892,7 +891,7 @@ function buildCmsSnapshot(
   const faqItems = extractFaqItems(normalizedVisiblePage.content);
   const bodyHtml = buildCmsBodyHtml(
     normalizedVisiblePage,
-    getPrerenderHeading(normalizedVisiblePage),
+    normalizedVisiblePage.title,
     description,
   );
 
@@ -970,7 +969,7 @@ function buildFallbackSnapshot(
     ogImageUrl: absoluteUrl(seo?.defaultOgImageUrl, siteUrl) || null,
     robots: fallback.noindex ? "noindex,follow" : null,
     bodyHtml: buildSimplePageBody(
-      fallback.title,
+      fallback.heading ?? fallback.title,
       fallback.body,
       [],
       [

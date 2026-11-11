@@ -50,6 +50,7 @@ import {
 } from "@/features/admin/cms/builder/block-renderer.shared";
 import { SectionHeading } from "@/features/admin/cms/builder/section-heading";
 import { renderPublicDisplayText } from "@/features/admin/cms/builder/display-text";
+import { GLASS_HOME_HERO_HEADING, getCmsHeroHeadingParts } from "@shared/glass-hero-heading";
 import {
   Sparkles,
   Droplet,
@@ -264,37 +265,37 @@ function HeroHeading({ props, variant }: { props: Record<string, unknown>; varia
     return (
       <h1 className={isMobile ? "home-mobile-heading" : "service-location-heading"}>
         <span className={isMobile ? "home-mobile-location" : "service-location-label"}>
-          Greater Charlotte
+          {GLASS_HOME_HERO_HEADING.location}
         </span>{" "}
         <span className={isMobile ? "home-mobile-title" : "service-location-title"}>
-          Shower Doors <br />
-          Windows · Doors
+          {GLASS_HOME_HERO_HEADING.firstLine} <br />
+          {GLASS_HOME_HERO_HEADING.secondLine}
         </span>
       </h1>
     );
   }
-  if (str(props.locationHeading)) {
+  const { location, heading, accent } = getCmsHeroHeadingParts(props);
+  if (location) {
     return (
       <h1 className="service-location-heading">
-        <span className="service-location-label">{str(props.locationHeading)}</span>{" "}
+        <span className="service-location-label">{location}</span>{" "}
         <span className="service-location-title">
-          {renderPublicDisplayText(str(props.heading))}
+          {renderPublicDisplayText(heading)}
         </span>
       </h1>
     );
   }
-  const accentHeading = str(props.accentHeading);
   return (
     <h1
       className={`mb-5 font-heading font-bold leading-tight text-white ${variant === "glass-home" ? "text-4xl sm:text-5xl md:text-6xl lg:text-7xl" : "text-4xl sm:text-5xl md:text-6xl"}`}
       style={colorStyle(props.headingColor)}
     >
-      {renderPublicDisplayText(str(props.heading) || "Hero Heading")}
-      {accentHeading && (
+      {renderPublicDisplayText(heading)}
+      {accent && (
         <>
           {" "}
           <span className="text-accent" style={colorStyle(props.accentHeadingColor)}>
-            {renderPublicDisplayText(accentHeading)}
+            {renderPublicDisplayText(accent)}
           </span>
         </>
       )}
