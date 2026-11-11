@@ -36,6 +36,78 @@ vi.mock("../utils/logger", () => ({
 }));
 
 describe("ensureSystemCmsPages", () => {
+  it.each([
+    [
+      "services-commercial-storefront-glass-installation",
+      "Commercial Storefront Glass Systems We Install",
+      "charlotte-storefront-entry-project",
+      "commercial-storefront-glass-installation.webp",
+    ],
+    [
+      "services-commercial-door-installation",
+      "Commercial Doors We Install",
+      "commercial-glass-entry-doors-project",
+      "02.webp",
+    ],
+  ])(
+    "places the approved project and metadata once on %s",
+    async (slug, title, projectId, filename) => {
+      const intro = {
+        id: "intro",
+        type: "rich-text",
+        props: { content: "<p>Keep the full introduction and its links.</p>" },
+      };
+      const details = { id: "details", type: "cards-grid", props: { title, cards: [] } };
+      const legacyProject = {
+        id: "charlotte-storefront-entry-project",
+        type: "text-image",
+        props: { title: "Glass Storefront Entry Installation in Charlotte" },
+      };
+      const page = {
+        id: "installation",
+        slug,
+        updatedBy: "editor",
+        content: {
+          _system: { charlotteStorefrontProject2026: true },
+          blocks:
+            slug === "services-commercial-door-installation"
+              ? [intro, legacyProject, details]
+              : [intro, details],
+        },
+      };
+      mockGetAllPages.mockResolvedValue([page]);
+      mockGetPageBySlug.mockResolvedValue(null);
+      const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
+      const { getGlassServiceSeoOverride } = await import("@shared/glass-seo");
+      await ensureSystemCmsPages();
+      const update = mockUpdatePage.mock.calls.find(([id]) => id === page.id)?.[1];
+      expect(update.content.blocks.map((block: { id: string }) => block.id)).toEqual([
+        "intro",
+        projectId,
+        "details",
+      ]);
+      expect(update.content.blocks[0]).toEqual(intro);
+      expect(update.content.blocks[2]).toEqual(details);
+      expect(update.content.blocks[1].props.imageUrl).toBe(
+        `/images/glass-door-pro/gallery/commercial-glass/${filename}`,
+      );
+      expect(update.ogImageUrl).toBe(update.content.blocks[1].props.imageUrl);
+      expect(update.seoTitle).toBe(getGlassServiceSeoOverride(slug)?.title);
+      expect(update.seoDescription).toBe(getGlassServiceSeoOverride(slug)?.description);
+      expect(update.updatedBy).toBe("editor");
+
+      update.content.blocks[1].props.body = "<p>A later approved CMS edit.</p>";
+      mockUpdatePage.mockClear();
+      mockGetAllPages.mockResolvedValue([{ ...page, ...update }]);
+      await ensureSystemCmsPages();
+      expect(
+        mockUpdatePage.mock.calls.some(
+          ([id, changes]) => id === page.id && (changes.content || changes.ogImageUrl),
+        ),
+      ).toBe(false);
+    },
+  );
+
   it("adds the SouthPark feature before the shower gallery once and preserves later CMS edits", async () => {
     const content = {
       _system: {

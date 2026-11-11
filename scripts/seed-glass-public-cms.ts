@@ -18,7 +18,10 @@ import {
 import { GLASS_CTA_HOURS_LINE } from "../shared/glass-quote-cta";
 import { putCallButtonFirst } from "../shared/glass-call-first";
 import { GLASS_DOUG_PORTRAIT } from "../shared/glass-doug-portrait";
-import { GLASS_CHARLOTTE_STOREFRONT_PROJECT_BLOCK } from "../shared/glass-charlotte-storefront-project";
+import {
+  GLASS_CHARLOTTE_STOREFRONT_PROJECT_BLOCK,
+  GLASS_COMMERCIAL_ENTRY_DOORS_PROJECT_BLOCK,
+} from "../shared/glass-charlotte-storefront-project";
 import {
   GLASS_CALL_CTA_LINK,
   GLASS_CALL_CTA_TEXT,
@@ -1514,7 +1517,9 @@ function expandedServicePageContent(props: {
         secondaryModalDescription: props.cta.secondaryModalDescription,
       }),
     ],
-    ...(props.introProject ? { _system: { charlotteStorefrontProject2026: true } } : {}),
+    ...(props.introProject
+      ? { _system: { charlotteStorefrontProject2026: true, commercialProjectPlacement2026: true } }
+      : {}),
   };
   return (
     props.relatedServicesUrl === "/services/window-installation"
@@ -2103,10 +2108,10 @@ const glassServicePages: GlassServicePageSeed[] = [
     slug: "services-commercial-storefront-glass-installation",
     seoTitle: "Commercial Storefront Glass Installation in Charlotte, NC | Glass & Door Pro",
     seoDescription:
-      "Professional commercial storefront glass installation for new construction and business buildouts in Charlotte, NC. Aluminum framing, glass systems, and storefront doors. Call (704) 771-6111.",
+      "Commercial storefront glass installation in Charlotte, NC. Aluminum framing, fixed glass panels, and entry doors for new builds, buildouts, and renovations.",
     seoKeywords:
       "commercial storefront glass installation Charlotte NC, aluminum storefront framing, commercial glass doors, tenant buildout glazing",
-    ogImageUrl: "/images/glass-door-pro/commercial-hero-1280w.webp",
+    ogImageUrl: GLASS_CHARLOTTE_STOREFRONT_PROJECT_BLOCK.props.imageUrl,
     content: expandedServicePageContent({
       serviceAreaContent: commercialLinkedServiceAreaContent,
       relatedCommercialUrl: "/services/commercial-storefront-glass-installation",
@@ -2122,6 +2127,7 @@ const glassServicePages: GlassServicePageSeed[] = [
         content:
           "<p>When you're managing a commercial buildout or new construction project in Charlotte, the glazing contractor is one of the variables you can't afford to have go sideways. A missed installation window doesn't just affect one trade — it backs up everything behind it.</p><p>Glass & Door Pro handles commercial storefront glass installation for general contractors, project managers, and business owners across the Charlotte area. Every project is managed personally. When you call to discuss a project, you're talking to the person who will be on site. There's no project manager in the middle, no handoff to a crew you've never met, and no communication gaps between the person who took the measurements and the person doing the installation.</p><p>We install complete storefront glass systems for new commercial construction, tenant buildouts, retail renovations, and commercial property upgrades. That includes aluminum storefront framing, fixed glass panels, glass storefront doors, and entrance systems. Whether you're working on a single retail suite in a strip center, a full commercial renovation, or a new commercial building that needs its exterior glazing package completed, we bring the same attention to detail and schedule reliability to every project.</p><p>For GCs and project managers, working with an owner-operator changes the dynamic. You get direct access to the person accountable for the work — not a dispatcher, not an account manager. If there's a scheduling question, a field condition that needs a decision, or a specification that needs to be confirmed on site, you make one call. That level of responsiveness matters when a job site is moving fast and you need answers now.</p><p>Charlotte's commercial market is active — new retail, restaurant, and office buildouts are happening across the metro, and the demand for reliable commercial glazing contractors who can execute on schedule is real. Glass & Door Pro is positioned to serve that market with the responsiveness and accountability that larger glazing operations can't always deliver.</p>",
       },
+      introProject: GLASS_CHARLOTTE_STOREFRONT_PROJECT_BLOCK,
       detailTitle: "Commercial Storefront Glass Systems We Install",
       detailCards: [
         {
@@ -2412,12 +2418,12 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Commercial Door Installation",
     slug: "services-commercial-door-installation",
-    seoTitle: "Commercial Door Installation Charlotte NC | Glass & Door Pro",
+    seoTitle: "Commercial Door Installation in Charlotte, NC | Glass & Door Pro",
     seoDescription:
-      "Commercial door installation for storefront entries, glass doors and entrance systems in Charlotte. Built for GCs, buildouts and business renovations.",
+      "Commercial door installation in Charlotte, NC. Aluminum entry doors, glass storefront doors, and entrance systems for new builds, buildouts, and renovations.",
     seoKeywords:
       "commercial door installation Charlotte NC, aluminum entry doors, glass storefront doors, commercial entrance systems",
-    ogImageUrl: "/images/glass-door-pro/storefront-door-installation-hero.webp",
+    ogImageUrl: GLASS_COMMERCIAL_ENTRY_DOORS_PROJECT_BLOCK.props.imageUrl,
     content: expandedServicePageContent({
       serviceAreaContent: commercialLinkedServiceAreaContent,
       relatedCommercialUrl: "/services/commercial-door-installation",
@@ -2434,7 +2440,7 @@ const glassServicePages: GlassServicePageSeed[] = [
           "<p>A commercial door that isn't installed correctly creates problems that outlast the project. Misaligned frames, doors that don't close flush, hardware that fails early, thresholds that let weather in — these aren't cosmetic issues, they're functional failures that cost money to fix after the fact and reflect on whoever installed them.</p><p>Glass & Door Pro installs commercial doors for general contractors, project managers, and business owners throughout Charlotte. The work is managed personally by Doug — the same person who reviews the scope, takes the field measurements, sources the materials, and shows up for installation. There's no handoff between sales and installation, no crew you've never spoken to showing up to your job site. When you need a question answered or a schedule confirmed, one call gets you the person responsible.</p><p>We install aluminum storefront entry doors, glass commercial doors, and complete entrance systems as part of both new construction projects and tenant buildouts. For GCs managing multiple subcontractors on a commercial schedule, working with a glazing contractor who communicates clearly, shows up on time, and completes the scope correctly is the baseline — and it's something we take seriously on every project.</p><p>Commercial door installation is both a functional and aesthetic scope. The door is often the first physical interaction a customer or visitor has with a business — it needs to open easily, close completely, lock securely, and look right in the frame. We approach every commercial door installation with that standard in mind, whether it's a single storefront entry or a multi-door entrance system.</p><p>Charlotte's commercial construction and renovation activity means consistent demand for reliable commercial door contractors. Business owners opening new locations, landlords preparing tenant spaces, and GCs managing commercial fit-outs all need the same thing: a door contractor who delivers on scope and schedule without creating issues on the job site. That's what Glass & Door Pro provides.</p>",
       },
       detailTitle: "Commercial Doors We Install",
-      introProject: GLASS_CHARLOTTE_STOREFRONT_PROJECT_BLOCK,
+      introProject: GLASS_COMMERCIAL_ENTRY_DOORS_PROJECT_BLOCK,
       detailCards: [
         {
           icon: "DoorOpen",

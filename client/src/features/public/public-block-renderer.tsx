@@ -700,7 +700,7 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
             alt={str(props.imageAlt)}
             loading="lazy"
             decoding="async"
-            className="aspect-[4/3] h-auto w-full rounded-lg"
+            className="h-auto w-full rounded-lg"
           />
         ) : hasImage ? (
           <div className="flex h-full flex-col">

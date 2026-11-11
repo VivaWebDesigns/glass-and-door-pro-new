@@ -77,9 +77,9 @@ const serviceSocialMetadata: Record<
     twitterSite: "@GlassDoorPro",
   },
   "services-commercial-storefront-glass-installation": {
-    ogTitle: "Commercial Storefront Glass Installation Charlotte, NC | Glass & Door Pro",
+    ogTitle: "Commercial Storefront Glass Installation in Charlotte, NC | Glass & Door Pro",
     ogDescription:
-      "Storefront glass installation for new construction, tenant buildouts, and commercial renovations in Charlotte, NC. Owner-operated, reliable scheduling, and clean execution on every project.",
+      "Commercial storefront glass installation in Charlotte, NC. Aluminum framing, fixed glass panels, and entry doors for new builds, buildouts, and renovations.",
     twitterCard: "summary_large_image",
   },
   "services-commercial-storefront-glass-replacement-repair": {
@@ -89,9 +89,9 @@ const serviceSocialMetadata: Record<
     twitterCard: "summary_large_image",
   },
   "services-commercial-door-installation": {
-    ogTitle: "Commercial Door Installation Charlotte, NC | Glass & Door Pro",
+    ogTitle: "Commercial Door Installation in Charlotte, NC | Glass & Door Pro",
     ogDescription:
-      "Commercial door installation for GCs, project managers, and business owners in Charlotte. Aluminum entry doors, glass storefront doors, and complete entrance systems. Reliable scheduling, owner-operated.",
+      "Commercial door installation in Charlotte, NC. Aluminum entry doors, glass storefront doors, and entrance systems for new builds, buildouts, and renovations.",
     twitterCard: "summary_large_image",
   },
   "services-commercial-door-replacement-repair": {
@@ -221,7 +221,7 @@ const servicePageNames: Record<
     name: "Commercial Storefront Glass Installation",
     seoTitle: "Commercial Storefront Glass Installation in Charlotte, NC | Glass & Door Pro",
     seoDescription:
-      "Professional commercial storefront glass installation for new construction and business buildouts in Charlotte, NC. Aluminum framing, glass systems, and storefront doors. Call (704) 771-6111.",
+      "Commercial storefront glass installation in Charlotte, NC. Aluminum framing, fixed glass panels, and entry doors for new builds, buildouts, and renovations.",
     description:
       "Commercial storefront glass installation for new construction, tenant buildouts, and commercial renovations in Charlotte, NC. Aluminum framing systems, fixed glass panels, and commercial glass doors.",
     offerCatalogName: "Commercial Storefront Glass Installation Services",
@@ -258,10 +258,9 @@ const servicePageNames: Record<
   "services-commercial-door-installation": {
     serviceType: "Commercial Door Installation",
     name: "Commercial Door Installation",
-    seoTitle:
-      "Commercial Door Installation in Charlotte, NC | Storefront & Entry Doors | Glass & Door Pro",
+    seoTitle: "Commercial Door Installation in Charlotte, NC | Glass & Door Pro",
     seoDescription:
-      "Commercial door installation for new construction, tenant buildouts, and business renovations in Charlotte, NC. Aluminum entry doors, glass storefront doors, and commercial entrance systems. Call (704) 771-6111.",
+      "Commercial door installation in Charlotte, NC. Aluminum entry doors, glass storefront doors, and entrance systems for new builds, buildouts, and renovations.",
     description:
       "Commercial door installation for new construction, tenant buildouts, and business renovations in Charlotte, NC. Aluminum entry doors, glass storefront doors, and complete commercial entrance systems.",
     offerCatalogName: "Commercial Door Installation Services",

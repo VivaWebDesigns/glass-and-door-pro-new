@@ -17,9 +17,12 @@ import { putCallButtonFirst } from "@shared/glass-call-first";
 import { GLASS_DOUG_PORTRAIT } from "@shared/glass-doug-portrait";
 import { GLASS_SERVICE_HEROES, getGlassServiceHeroCtaProps } from "@shared/glass-service-heroes";
 import { GLASS_SOUTHPARK_PROJECT_BLOCK } from "@shared/glass-southpark-project";
-import { GLASS_CHARLOTTE_STOREFRONT_PROJECT_BLOCK } from "@shared/glass-charlotte-storefront-project";
+import {
+  GLASS_CHARLOTTE_STOREFRONT_PROJECT_BLOCK,
+  GLASS_COMMERCIAL_ENTRY_DOORS_PROJECT_BLOCK,
+} from "@shared/glass-charlotte-storefront-project";
 import { glassGoogleReviewDate } from "@shared/glass-review-dates";
-import { isGlassLegalNoindexSlug } from "@shared/glass-seo";
+import { getGlassServiceSeoOverride, isGlassLegalNoindexSlug } from "@shared/glass-seo";
 import {
   GLASS_PRIMARY_SERVICE_AREA_LINKS_HTML,
   GLASS_PRIMARY_SERVICE_AREA_NAMES,
@@ -951,6 +954,7 @@ async function normalizeStoredCmsPages() {
         seoTitle?: string;
         seoDescription?: string | null;
         seoKeywords?: string | null;
+        ogImageUrl?: string | null;
         content?: InsertCmsPage["content"];
         noindex?: boolean;
         updatedBy?: string | null;
@@ -1242,26 +1246,52 @@ async function normalizeStoredCmsPages() {
         if (updatedEntranceCopy !== content) {
           updates.content = updatedEntranceCopy as InsertCmsPage["content"];
         }
+      }
 
-        if (isRecord(updatedEntranceCopy) && Array.isArray(updatedEntranceCopy.blocks)) {
-          const meta = isRecord(updatedEntranceCopy._system) ? updatedEntranceCopy._system : {};
-          const detailsIndex = updatedEntranceCopy.blocks.findIndex(
+      if (
+        page.slug === "services-commercial-storefront-glass-installation" ||
+        page.slug === commercialDoorInstallationSlug
+      ) {
+        const content = updates.content ?? page.content;
+        if (isRecord(content) && Array.isArray(content.blocks)) {
+          const meta = isRecord(content._system) ? content._system : {};
+          const storefront = page.slug === "services-commercial-storefront-glass-installation";
+          const project = storefront
+            ? GLASS_CHARLOTTE_STOREFRONT_PROJECT_BLOCK
+            : GLASS_COMMERCIAL_ENTRY_DOORS_PROJECT_BLOCK;
+          const detailsTitle = storefront
+            ? "Commercial Storefront Glass Systems We Install"
+            : "Commercial Doors We Install";
+          const detailsIndex = content.blocks.findIndex(
             (block) =>
               isRecord(block) &&
               block.type === "cards-grid" &&
               isRecord(block.props) &&
-              block.props.title === "Commercial Doors We Install",
+              block.props.title === detailsTitle,
           );
-          if (meta.charlotteStorefrontProject2026 !== true && detailsIndex >= 0) {
-            const blocks = [...updatedEntranceCopy.blocks];
-            if (!blocks.some((block) => block?.id === GLASS_CHARLOTTE_STOREFRONT_PROJECT_BLOCK.id)) {
-              blocks.splice(detailsIndex, 0, GLASS_CHARLOTTE_STOREFRONT_PROJECT_BLOCK);
-            }
+          if (meta.commercialProjectPlacement2026 !== true && detailsIndex >= 0) {
+            const blocks = content.blocks.filter(
+              (block) =>
+                block?.id !== GLASS_CHARLOTTE_STOREFRONT_PROJECT_BLOCK.id &&
+                block?.id !== GLASS_COMMERCIAL_ENTRY_DOORS_PROJECT_BLOCK.id,
+            );
+            const insertionIndex = blocks.findIndex(
+              (block) => isRecord(block.props) && block.props.title === detailsTitle,
+            );
+            blocks.splice(insertionIndex, 0, project);
             updates.content = {
-              ...updatedEntranceCopy,
+              ...content,
               blocks,
-              _system: { ...meta, charlotteStorefrontProject2026: true },
+              _system: {
+                ...meta,
+                charlotteStorefrontProject2026: true,
+                commercialProjectPlacement2026: true,
+              },
             } as InsertCmsPage["content"];
+            const seo = getGlassServiceSeoOverride(page.slug);
+            updates.seoTitle = seo?.title;
+            updates.seoDescription = seo?.description;
+            updates.ogImageUrl = project.props.imageUrl;
           }
         }
       }
