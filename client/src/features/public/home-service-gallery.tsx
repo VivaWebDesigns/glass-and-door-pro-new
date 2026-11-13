@@ -1,4 +1,5 @@
 import { GLASS_HOMEPAGE_SERVICE_CARDS } from "@shared/glass-homepage-services";
+import { ArrowRight } from "lucide-react";
 import { ServicePhotoCard } from "./service-photo-card";
 import "./home-service-gallery.css";
 type Service = { title: string; description: string; link: string; buttonText?: string };
@@ -6,6 +7,8 @@ export function HomeServiceGallery({ props }: { props: Record<string, unknown> }
   const cards = (
     Array.isArray(props.cards) ? props.cards : GLASS_HOMEPAGE_SERVICE_CARDS
   ) as readonly Service[];
+  const featuredCards = cards.slice(0, 6);
+  const additionalServices = cards.slice(6);
   return (
     <div className="home-services-gallery" data-testid="home-services-gallery">
       <header className="home-services-header">
@@ -23,7 +26,7 @@ export function HomeServiceGallery({ props }: { props: Record<string, unknown> }
         </p>
       </header>
       <div className="service-photo-grid">
-        {cards.map((card) => (
+        {featuredCards.map((card) => (
           <ServicePhotoCard
             key={card.link}
             title={card.title}
@@ -34,6 +37,21 @@ export function HomeServiceGallery({ props }: { props: Record<string, unknown> }
           />
         ))}
       </div>
+      {additionalServices.length > 0 && (
+        <nav className="home-services-additional" aria-label="More commercial services">
+          <h3>More commercial services</h3>
+          <ul>
+            {additionalServices.map((service) => (
+              <li key={service.link}>
+                <a href={service.link}>
+                  <span>{service.title}</span>
+                  <ArrowRight aria-hidden="true" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
     </div>
   );
 }
