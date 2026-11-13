@@ -13,6 +13,14 @@ function googleReview(name: string, quote: string) {
   };
 }
 
+// Google Business Profile totals, including star-only and non-5-star reviews the site doesn't show.
+// Update these whenever new reviews are pulled from Google.
+export const GLASS_GOOGLE_RATING_SUMMARY = {
+  rating: 5.0,
+  reviewCount: 91,
+  checkedOn: "2026-11-13",
+};
+
 export const GLASS_NEW_GOOGLE_REVIEWS = [
   googleReview(
     "Austin Quick",

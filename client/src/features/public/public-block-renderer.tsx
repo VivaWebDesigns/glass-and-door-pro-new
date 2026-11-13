@@ -103,6 +103,7 @@ import { sanitizeHtml } from "@/lib/sanitize-html";
 import { ReviewSourceBadge } from "@/components/shared/review-source-badge";
 import { withContentKeys } from "@/lib/content-keys";
 import { getMobileHeroImageUrl } from "@shared/glass-hero-images";
+import { GLASS_GOOGLE_RATING_SUMMARY } from "@shared/glass-new-reviews";
 import { HomeServiceGallery } from "./home-service-gallery";
 import { useMobileHeroViewport } from "@/hooks/use-mobile-hero-viewport";
 
@@ -1112,9 +1113,6 @@ function ReviewsGrid({
   const columnCount = useReviewColumnCount();
   const ctaText = str(props.ctaText);
   const ctaLink = str(props.ctaLink);
-  const average =
-    items.reduce((sum, item) => sum + Math.max(1, Math.min(5, num(item.rating, 5))), 0) /
-    items.length;
 
   const entries: ReactElement[] = items
     .slice(0, visible)
@@ -1160,7 +1158,8 @@ function ReviewsGrid({
           ))}
         </div>
         <p className="font-semibold text-slate-900">
-          {average.toFixed(1)} on Google · {items.length} reviews
+          {GLASS_GOOGLE_RATING_SUMMARY.rating.toFixed(1)} on Google ·{" "}
+          {GLASS_GOOGLE_RATING_SUMMARY.reviewCount} reviews
         </p>
         {ctaText && ctaLink ? (
           <a
