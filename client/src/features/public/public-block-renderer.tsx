@@ -507,7 +507,7 @@ function LinkListBlock({ props }: { props: Record<string, unknown> }) {
   const gridClass = str(props.columns) === "2" ? "md:grid-cols-2" : "md:grid-cols-1";
   if (links.length > 0 && links.every((link) => getServiceImage(link.url))) {
     return (
-      <div className="py-4" data-testid="block-service-photo-links">
+      <div className="related-service-gallery py-4" data-testid="block-service-photo-links">
         <SectionHeading props={props} defaultAlignment="center" className="mb-6" />
         <div className="service-photo-grid">
           {links.map((link, index) => (
@@ -516,12 +516,15 @@ function LinkListBlock({ props }: { props: Record<string, unknown> }) {
               title={link.label}
               description={link.description}
               href={link.url}
+              wholeCardLink
             />
           ))}
-          {hasGlassAllServicesCard(props.title, links) && (
-            <ServicePhotoCard {...GLASS_ALL_SERVICES_CARD} wide />
-          )}
         </div>
+        {hasGlassAllServicesCard(props.title, links) && (
+          <a className="service-hub-link" href={GLASS_ALL_SERVICES_CARD.href}>
+            View All Services <ArrowRight aria-hidden="true" />
+          </a>
+        )}
       </div>
     );
   }
@@ -867,12 +870,17 @@ function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
     buttonText?: string;
     openInNewTab?: boolean;
   }>(props.cards);
-  if (cards.some((card) => getServiceImage(card.link))) {
+  if (cards.length > 0 && cards.every((card) => getServiceImage(card.link))) {
+    const isLocationServices = /^(Our|Other) Services in /i.test(str(props.title).trim());
+    const hubCards = isLocationServices
+      ? cards.filter((card) => card.link?.replace(/\/$/, "") === "/services")
+      : [];
+    const photoCards = cards.filter((card) => !hubCards.includes(card));
     return (
-      <div className="py-4" data-testid="block-service-photo-cards">
+      <div className="related-service-gallery py-4" data-testid="block-service-photo-cards">
         <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
         <div className="service-photo-grid">
-          {cards.map((card, index) => (
+          {photoCards.map((card, index) => (
             <ServicePhotoCard
               key={`${card.link}-${index}`}
               title={card.title}
@@ -880,9 +888,21 @@ function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
               href={card.link || "#"}
               buttonText={card.buttonText}
               openInNewTab={card.openInNewTab}
+              wholeCardLink
             />
           ))}
         </div>
+        {hubCards.map((card, index) => (
+          <a
+            key={`${card.link}-${index}`}
+            className="service-hub-link"
+            href={card.link}
+            target={card.openInNewTab ? "_blank" : undefined}
+            rel={card.openInNewTab ? "noopener noreferrer" : undefined}
+          >
+            View All Services <ArrowRight aria-hidden="true" />
+          </a>
+        ))}
       </div>
     );
   }

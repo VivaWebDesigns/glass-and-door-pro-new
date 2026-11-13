@@ -66,12 +66,100 @@
   outline: 2px solid #0088a5;
   outline-offset: 5px;
 }
+
+.related-service-gallery .service-photo-grid {
+  gap: 20px;
+}
+.related-service-gallery .service-photo-card {
+  overflow: hidden;
+  border: 1px solid #d8e5eb;
+  border-radius: 6px;
+  background: #ffffff;
+  text-decoration: none;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+.related-service-gallery .service-photo-card:hover {
+  border-color: #0088a5;
+  box-shadow: 0 4px 12px rgb(12 27 62 / 8%);
+}
+.related-service-gallery .service-photo-card:focus-visible,
+.service-hub-link:focus-visible {
+  outline: 2px solid #0088a5;
+  outline-offset: 4px;
+}
+.related-service-gallery .service-photo-card-image img {
+  aspect-ratio: 2 / 1;
+}
+.related-service-gallery .service-photo-card-copy {
+  padding: 18px 20px;
+}
+.related-service-gallery .service-photo-card-copy h3 {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 18px;
+  line-height: 1.3;
+}
+.related-service-gallery .service-photo-card-copy p {
+  margin-bottom: 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.related-service-gallery .service-photo-card-arrow {
+  width: 18px;
+  height: 18px;
+  margin-top: 3px;
+  flex-shrink: 0;
+  color: #0088a5;
+  stroke-width: 1.5;
+}
+.service-hub-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 400px;
+  min-height: 56px;
+  margin-top: 24px;
+  padding: 12px 16px;
+  border: 1px solid #a8ced6;
+  border-radius: 6px;
+  background: #eef8fa;
+  color: #0c1b3e;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.service-hub-link:hover {
+  border-color: #0088a5;
+  background: #dff1f5;
+  color: #00657d;
+}
+.service-hub-link svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: #0088a5;
+  stroke-width: 1.5;
+}
+@media (prefers-reduced-motion: reduce) {
+  .related-service-gallery .service-photo-card {
+    transition: none;
+  }
+}
 @media (min-width: 640px) {
   .service-photo-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (min-width: 1024px) {
+  .related-service-gallery .service-photo-card-copy {
+    padding-bottom: 12px;
+  }
+
   .service-photo-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
