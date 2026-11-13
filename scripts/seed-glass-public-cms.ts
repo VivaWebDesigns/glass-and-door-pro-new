@@ -327,6 +327,50 @@ export const glassReviewItems = [
   ),
 ];
 
+function homeContactBlock() {
+  return {
+    id: uid(),
+    type: "contact-form",
+    props: {
+      anchorId: "contact",
+      variant: "split-contact",
+      eyebrow: "Get in touch",
+      heading: "Ready to start your project?",
+      subheading:
+        "Tell us what you need installed, repaired, or replaced. Doug will follow up with the next steps.",
+      formTitle: "Send a Message",
+      formSlug: "contact-form",
+      sectionBackgroundColor: "#f0f8fb",
+      sectionPaddingTop: "none",
+      sectionPaddingBottom: "none",
+      contactItems: [
+        {
+          icon: "Phone",
+          label: "Phone",
+          value: "(704) 771-6111",
+          href: "tel:+17047716111",
+        },
+        {
+          icon: "Mail",
+          label: "Email",
+          value: "Doug@GlassandDoorPro.com",
+          href: "mailto:Doug@GlassandDoorPro.com",
+        },
+        {
+          icon: "MapPin",
+          label: "Service Area",
+          value: GLASS_PRIMARY_SERVICE_AREA_NAMES,
+        },
+        {
+          icon: "Clock",
+          label: "Hours",
+          value: "Mon-Sat: 7am - 7pm",
+        },
+      ],
+    },
+  };
+}
+
 const glassHomeContent: InsertCmsPage["content"] = {
   blocks: [
     {
@@ -454,47 +498,7 @@ const glassHomeContent: InsertCmsPage["content"] = {
         ctaLink: "/reviews",
       },
     },
-    {
-      id: uid(),
-      type: "contact-form",
-      props: {
-        anchorId: "contact",
-        variant: "split-contact",
-        eyebrow: "Get in touch",
-        heading: "Ready to start your project?",
-        subheading:
-          "Tell us what you need installed, repaired, or replaced. Doug will follow up with the next steps.",
-        formTitle: "Send a Message",
-        formSlug: "contact-form",
-        sectionBackgroundColor: "#f0f8fb",
-        sectionPaddingTop: "none",
-        sectionPaddingBottom: "none",
-        contactItems: [
-          {
-            icon: "Phone",
-            label: "Phone",
-            value: "(704) 771-6111",
-            href: "tel:+17047716111",
-          },
-          {
-            icon: "Mail",
-            label: "Email",
-            value: "Doug@GlassandDoorPro.com",
-            href: "mailto:Doug@GlassandDoorPro.com",
-          },
-          {
-            icon: "MapPin",
-            label: "Service Area",
-            value: GLASS_PRIMARY_SERVICE_AREA_NAMES,
-          },
-          {
-            icon: "Clock",
-            label: "Hours",
-            value: "Mon-Sat: 7am - 7pm",
-          },
-        ],
-      },
-    },
+    homeContactBlock(),
   ],
 };
 
@@ -836,7 +840,7 @@ const glassReviewsContent: InsertCmsPage["content"] = {
       backgroundImageUrl: "/images/glass-door-pro/reviews-hero-1920w.webp",
       overlayColor: "#0f172a",
       overlayOpacity: 18,
-      minHeight: "660",
+      minHeight: "420",
       backgroundPositionX: 50,
       backgroundPositionY: 46,
     }),
@@ -844,13 +848,17 @@ const glassReviewsContent: InsertCmsPage["content"] = {
       anchorId: "reviews",
       title: "Latest Google Reviews",
       subtitle: "Newest first from the Glass & Door Pro Google Business Profile.",
-      variant: "google-carousel",
+      variant: "google-grid",
+      ctaText: "Read all reviews on Google",
+      ctaLink: "https://share.google/XGkNPblei2YGTC8FB",
       sectionBackgroundColor: "#ffffff",
       sectionPaddingTop: "md",
       sectionPaddingBottom: "lg",
       items: glassReviewItems,
     }),
+    homeContactBlock(),
   ],
+  _system: { reviewsGridLayout2026: true },
 };
 
 type GlassCard = {

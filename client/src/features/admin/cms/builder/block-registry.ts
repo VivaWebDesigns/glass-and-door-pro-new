@@ -162,6 +162,7 @@ const CARDS_GRID_VARIANT_OPTIONS = [
 const TESTIMONIAL_VARIANT_OPTIONS = [
   { label: "Default", value: "default" },
   { label: "Google Carousel", value: "google-carousel" },
+  { label: "Google Grid (Reviews page)", value: "google-grid" },
 ];
 
 const IMAGE_BLOCK_VARIANT_OPTIONS = [

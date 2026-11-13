@@ -1066,39 +1066,151 @@ function ReviewsCta({ text, link }: { text: string; link: string }) {
   );
 }
 
+type TestimonialItem = {
+  quote: string;
+  name: string;
+  role: string;
+  location: string;
+  rating?: number;
+  source?: string;
+  sourceIcon?: string;
+  date?: string;
+  reviewDate?: string;
+};
+
+const REVIEWS_PAGE_SIZE = 12;
+const REVIEWS_INLINE_CTA_AFTER = 6;
+
+function useReviewColumnCount() {
+  const read = () => {
+    if (typeof window === "undefined" || !window.matchMedia) return 1;
+    if (window.matchMedia("(min-width: 1024px)").matches) return 3;
+    return window.matchMedia("(min-width: 768px)").matches ? 2 : 1;
+  };
+  const [count, setCount] = useState(read);
+  useEffect(() => {
+    const queries = ["(min-width: 1024px)", "(min-width: 768px)"].map((q) => window.matchMedia(q));
+    const update = () => setCount(read());
+    queries.forEach((query) => query.addEventListener("change", update));
+    return () => queries.forEach((query) => query.removeEventListener("change", update));
+  }, []);
+  return count;
+}
+
+// Reviews page layout: rating summary, masonry columns filled left to right, "Show more" paging,
+// and a quote card after the sixth review.
+function ReviewsGrid({
+  props,
+  items,
+  renderCard,
+}: {
+  props: Record<string, unknown>;
+  items: TestimonialItem[];
+  renderCard: (item: TestimonialItem) => ReactElement;
+}) {
+  const [visible, setVisible] = useState(REVIEWS_PAGE_SIZE);
+  const columnCount = useReviewColumnCount();
+  const ctaText = str(props.ctaText);
+  const ctaLink = str(props.ctaLink);
+  const average =
+    items.reduce((sum, item) => sum + Math.max(1, Math.min(5, num(item.rating, 5))), 0) /
+    items.length;
+
+  const entries: ReactElement[] = items
+    .slice(0, visible)
+    .map(
+      withContentKeys((item, _index, itemKey) => (
+        <Fragment key={itemKey}>{renderCard(item)}</Fragment>
+      )),
+    );
+  if (items.length > REVIEWS_INLINE_CTA_AFTER) {
+    entries.splice(
+      REVIEWS_INLINE_CTA_AFTER,
+      0,
+      <div key="reviews-inline-cta" className="rounded-lg bg-[#0f2f3d] p-6 text-white shadow-lg">
+        <p className="font-heading text-xl font-bold">
+          {str(props.inlineCtaHeading) || "Ready for yours?"}
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-slate-200">
+          {str(props.inlineCtaText) ||
+            "Tell Doug about your glass, shower, window, or door project and get a free quote."}
+        </p>
+        <FormModalButton
+          label={str(props.inlineCtaButtonText) || "Get a Free Quote"}
+          action="form-modal"
+          formSlug={str(props.inlineCtaFormSlug) || "contact-form"}
+          modalTitle="Get a Free Quote"
+          modalDescription="Share a few project details and Doug will follow up with next steps."
+          className={`mt-5 ${GLASS_CTA_PRIMARY_CLASS}`}
+          testId="reviews-inline-cta"
+        />
+      </div>,
+    );
+  }
+  const columns = Array.from({ length: columnCount }, (_, column) =>
+    entries.filter((_entry, index) => index % columnCount === column),
+  );
+
+  return (
+    <div>
+      <div className="mb-8 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-sm">
+        <div className="flex text-yellow-400" aria-hidden="true">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <Star key={index} className="h-5 w-5 fill-current" />
+          ))}
+        </div>
+        <p className="font-semibold text-slate-900">
+          {average.toFixed(1)} on Google · {items.length} reviews
+        </p>
+        {ctaText && ctaLink ? (
+          <a
+            href={ctaLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center font-semibold text-[#1a8ead] hover:underline"
+          >
+            {ctaText}
+            <ExternalLink className="ml-1 h-4 w-4" aria-hidden="true" />
+          </a>
+        ) : null}
+      </div>
+      <div className="flex items-start gap-6">
+        {columns.map((column, index) => (
+          <div key={index} className="flex min-w-0 flex-1 flex-col gap-6">
+            {column}
+          </div>
+        ))}
+      </div>
+      {visible < items.length ? (
+        <div className="mt-8 flex justify-center">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setVisible((count) => count + REVIEWS_PAGE_SIZE)}
+            className="border-[#1a8ead] bg-white text-[#1a8ead] hover:bg-[#1a8ead] hover:text-white"
+          >
+            Show more reviews
+          </Button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
   const variant = str(props.variant);
   const ctaText = str(props.ctaText);
   const ctaLink = str(props.ctaLink);
-  const items = arr<{
-    quote: string;
-    name: string;
-    role: string;
-    location: string;
-    rating?: number;
-    source?: string;
-    sourceIcon?: string;
-    date?: string;
-    reviewDate?: string;
-  }>(props.items);
+  const items = arr<TestimonialItem>(props.items);
+  const isGoogle = variant === "google-carousel" || variant === "google-grid";
   const shouldCarousel = items.length > 2;
 
-  const renderCard = (item: {
-    quote: string;
-    name: string;
-    role: string;
-    location: string;
-    rating?: number;
-    source?: string;
-    sourceIcon?: string;
-    date?: string;
-    reviewDate?: string;
-  }) => (
+  const renderCard = (item: TestimonialItem, fullHeight = true) => (
     <Card
-      className={`public-section-card h-full rounded-lg ${variant === "google-carousel" ? "border-none bg-white shadow-lg" : ""}`}
+      className={`public-section-card rounded-lg ${fullHeight ? "h-full" : ""} ${isGoogle ? "border-none bg-white shadow-lg" : ""}`}
     >
       <CardContent className="pt-6">
-        {variant === "google-carousel" ? (
+        {isGoogle ? (
           <div className="mb-4 flex items-center justify-between gap-3">
             <div className="flex text-yellow-400">
               {Array.from({ length: Math.max(1, Math.min(5, num(item.rating, 5))) }).map(
@@ -1134,6 +1246,8 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
       <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
       {items.length === 0 ? (
         <p className="text-muted-foreground">Add testimonials to display here.</p>
+      ) : variant === "google-grid" ? (
+        <ReviewsGrid props={props} items={items} renderCard={(item) => renderCard(item, false)} />
       ) : shouldCarousel ? (
         <div>
           <Carousel
@@ -1157,9 +1271,7 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
               <CarouselNext className="static h-9 w-9 translate-x-0 translate-y-0 border-border/70 bg-background/95" />
             </div>
           </Carousel>
-          {ctaText && ctaLink ? (
-            <ReviewsCta text={ctaText} link={ctaLink} />
-          ) : null}
+          {ctaText && ctaLink ? <ReviewsCta text={ctaText} link={ctaLink} /> : null}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1170,7 +1282,7 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
           )}
         </div>
       )}
-      {!shouldCarousel && ctaText && ctaLink ? (
+      {!shouldCarousel && variant !== "google-grid" && ctaText && ctaLink ? (
         <ReviewsCta text={ctaText} link={ctaLink} />
       ) : null}
     </div>

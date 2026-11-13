@@ -376,6 +376,48 @@ function ensureGoogleReviewItems(
   return { ...content, blocks };
 }
 
+// Reviews page layout: shorter hero, review grid with a Google rating line, and the homepage
+// contact section at the end. Runs once; later editor changes are kept.
+function applyReviewsGridLayout(content: unknown, homeContent: unknown) {
+  if (!isRecord(content) || !Array.isArray(content.blocks)) return null;
+  const meta = isRecord(content._system) ? content._system : {};
+  if (meta.reviewsGridLayout2026 === true) return null;
+
+  let blocks = content.blocks.map((block) => {
+    if (!isRecord(block) || !isRecord(block.props)) return block;
+    if (block.type === "hero" && block.props.variant === "glass-reviews") {
+      return { ...block, props: { ...block.props, minHeight: "420" } };
+    }
+    if (block.type === "testimonials" && block.props.anchorId === "reviews") {
+      return {
+        ...block,
+        props: {
+          ...block.props,
+          variant: "google-grid",
+          ctaText: block.props.ctaText || "Read all reviews on Google",
+          ctaLink: block.props.ctaLink || GLASS_GOOGLE_REVIEWS_URL,
+        },
+      };
+    }
+    return block;
+  });
+
+  const homeContact =
+    isRecord(homeContent) && Array.isArray(homeContent.blocks)
+      ? homeContent.blocks.find((block) => isRecord(block) && block.type === "contact-form")
+      : undefined;
+  if (
+    isRecord(homeContact) &&
+    !blocks.some((block) => isRecord(block) && block.type === "contact-form")
+  ) {
+    blocks = [...blocks, { ...homeContact, id: randomUUID() }];
+  }
+
+  return { ...content, blocks, _system: { ...meta, reviewsGridLayout2026: true } };
+}
+
+const GLASS_GOOGLE_REVIEWS_URL = "https://share.google/XGkNPblei2YGTC8FB";
+
 // The homepage reviews carousel links to the full Reviews page unless an editor set a button.
 function ensureHomepageReviewsLink(content: unknown) {
   if (!isRecord(content) || !Array.isArray(content.blocks)) return null;
@@ -890,17 +932,17 @@ const commercialServiceIntroLinks: Record<string, { title: string; href: string;
   "services-commercial-door-replacement-repair": {
     title: "Commercial Door Problems Don't Wait — Neither Should the Fix",
     href: "/services/commercial-storefront-glass-replacement-repair",
-    copy: "If the damage is in a fixed glass panel beside the door, see our <a href=\"/services/commercial-storefront-glass-replacement-repair\">storefront glass repair and replacement</a> service.",
+    copy: 'If the damage is in a fixed glass panel beside the door, see our <a href="/services/commercial-storefront-glass-replacement-repair">storefront glass repair and replacement</a> service.',
   },
   "services-commercial-storefront-glass-installation": {
     title: "Storefront Glass Installation That Stays on Your Timeline",
     href: "/services/commercial-storefront-glass-replacement-repair",
-    copy: "If you only need to replace a broken or cracked panel in an existing storefront, see our <a href=\"/services/commercial-storefront-glass-replacement-repair\">storefront glass repair and replacement</a> service.",
+    copy: 'If you only need to replace a broken or cracked panel in an existing storefront, see our <a href="/services/commercial-storefront-glass-replacement-repair">storefront glass repair and replacement</a> service.',
   },
   "services-commercial-storefront-glass-replacement-repair": {
     title: "When Your Storefront Glass Goes Down, You Need Fast and Reliable",
     href: "/services/commercial-storefront-glass-installation",
-    copy: "Planning a new storefront or tenant buildout? See our <a href=\"/services/commercial-storefront-glass-installation\">storefront glass installation</a> service for complete framing, glass, and entrances.",
+    copy: 'Planning a new storefront or tenant buildout? See our <a href="/services/commercial-storefront-glass-installation">storefront glass installation</a> service for complete framing, glass, and entrances.',
   },
 };
 
@@ -1079,6 +1121,10 @@ async function normalizeStoredCmsPages() {
       if (page.slug === "reviews") {
         const content = ensureGoogleReviewItems(updates.content ?? page.content, false);
         if (content) updates.content = content as InsertCmsPage["content"];
+
+        const homeContent = pages.find((candidate) => candidate.slug === "home")?.content;
+        const layout = applyReviewsGridLayout(updates.content ?? page.content, homeContent);
+        if (layout) updates.content = layout as InsertCmsPage["content"];
       }
 
       if (

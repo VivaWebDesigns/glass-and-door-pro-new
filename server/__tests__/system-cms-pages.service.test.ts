@@ -1621,7 +1621,55 @@ describe("ensureSystemCmsPages", () => {
       ctaText: "See All Reviews",
       ctaLink: "/reviews",
     });
-    expect(reviewsUpdate.content.blocks[0].props.ctaText).toBeUndefined();
+    expect(reviewsUpdate.content.blocks[0].props).toMatchObject({
+      variant: "google-grid",
+      ctaText: "Read all reviews on Google",
+    });
+    expect(reviewsUpdate.content._system.reviewsGridLayout2026).toBe(true);
+  });
+
+  it("moves the Reviews page to the grid layout with a shorter hero and the homepage contact section", async () => {
+    const contactBlock = {
+      id: "home-contact",
+      type: "contact-form",
+      props: { formSlug: "contact-form" },
+    };
+    mockGetAllPages.mockResolvedValue([
+      {
+        id: "reviews-id",
+        slug: "reviews",
+        seoDescription: "Reviews.",
+        content: {
+          blocks: [
+            { id: "hero", type: "hero", props: { variant: "glass-reviews", minHeight: "660" } },
+            {
+              id: "reviews",
+              type: "testimonials",
+              props: { anchorId: "reviews", variant: "google-carousel", items: [] },
+            },
+          ],
+        },
+        updatedBy: "admin-id",
+      },
+      {
+        id: "home-id",
+        slug: "home",
+        seoDescription: "Home.",
+        content: { blocks: [contactBlock] },
+        updatedBy: "admin-id",
+      },
+    ]);
+    mockGetPageBySlug.mockResolvedValue(null);
+
+    const mod = await import("../services/system-cms-pages.service");
+    await mod.ensureSystemCmsPages();
+
+    const update = mockUpdatePage.mock.calls.find(([id]) => id === "reviews-id")?.[1];
+    const [hero, reviews, contact] = update.content.blocks;
+    expect(hero.props.minHeight).toBe("420");
+    expect(reviews.props.variant).toBe("google-grid");
+    expect(contact).toMatchObject({ type: "contact-form", props: contactBlock.props });
+    expect(contact.id).not.toBe("home-contact");
   });
 
   it("adds new gallery photo batches to the gallery page on startup", async () => {
