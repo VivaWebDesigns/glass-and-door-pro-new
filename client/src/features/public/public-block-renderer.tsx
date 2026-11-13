@@ -689,7 +689,7 @@ function TextImageBlock({ props }: { props: Record<string, unknown> }) {
         />
         {str(props.body) && (
           <div
-            className={`public-prose prose prose-sm max-w-none ${bodyAlign}`}
+            className={`public-prose prose ${str(props.anchorId) === "about" ? "text-[17px] leading-relaxed" : "prose-sm"} max-w-none ${bodyAlign}`}
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(str(props.body)) }}
           />
         )}
