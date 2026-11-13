@@ -870,6 +870,49 @@ function CardsGridBlock({ props }: { props: Record<string, unknown> }) {
     buttonText?: string;
     openInNewTab?: boolean;
   }>(props.cards);
+  const showerStyleImage = /^Glass Shower Door Styles We Install in /i.test(str(props.title).trim())
+    ? getServiceImage("/services/frameless-showers")
+    : undefined;
+  if (showerStyleImage) {
+    return (
+      <div className="shower-styles-section py-4" data-testid="block-shower-styles">
+        <SectionHeading props={props} defaultAlignment="center" className="mb-8" />
+        <div className="shower-styles-layout">
+          <img
+            className="shower-styles-photo"
+            src={showerStyleImage.src}
+            alt={showerStyleImage.alt}
+            width={1200}
+            height={1032}
+            loading="lazy"
+            decoding="async"
+          />
+          <ul className="shower-styles-list">
+            {cards.map((card, index) => (
+              <li key={`${card.title}-${index}`}>
+                <span aria-hidden="true">
+                  <LucideIcon name={card.icon || "Droplets"} />
+                </span>
+                <div>
+                  <h3>{card.title}</h3>
+                  <p>{card.description}</p>
+                  {card.link && (
+                    <a
+                      href={card.link}
+                      target={card.openInNewTab ? "_blank" : undefined}
+                      rel={card.openInNewTab ? "noopener noreferrer" : undefined}
+                    >
+                      {card.buttonText || card.title} <ArrowRight aria-hidden="true" />
+                    </a>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    );
+  }
   if (cards.length > 0 && cards.every((card) => getServiceImage(card.link))) {
     const isLocationServices = /^(Our|Other) Services in /i.test(str(props.title).trim());
     const hubCards = isLocationServices
