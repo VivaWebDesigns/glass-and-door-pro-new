@@ -1,5 +1,5 @@
 import { GLASS_HOMEPAGE_SERVICE_CARDS } from "@shared/glass-homepage-services";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, DoorOpen, PanelsTopLeft } from "lucide-react";
 import { ServicePhotoCard } from "./service-photo-card";
 import "./home-service-gallery.css";
 type Service = { title: string; description: string; link: string; buttonText?: string };
@@ -41,14 +41,18 @@ export function HomeServiceGallery({ props }: { props: Record<string, unknown> }
         <nav className="home-services-additional" aria-label="More commercial services">
           <h3>More commercial services</h3>
           <ul>
-            {additionalServices.map((service) => (
-              <li key={service.link}>
-                <a href={service.link}>
-                  <span>{service.title}</span>
-                  <ArrowRight aria-hidden="true" />
-                </a>
-              </li>
-            ))}
+            {additionalServices.map((service) => {
+              const ServiceIcon = service.link.includes("window") ? PanelsTopLeft : DoorOpen;
+              return (
+                <li key={service.link}>
+                  <a href={service.link}>
+                    <ServiceIcon className="home-services-additional-icon" aria-hidden="true" />
+                    <span>{service.title}</span>
+                    <ArrowRight aria-hidden="true" />
+                  </a>
+                </li>
+              );
+            })}
           </ul>
         </nav>
       )}
