@@ -1617,6 +1617,11 @@ describe("ensureSystemCmsPages", () => {
     expect(
       homeUpdate.content.blocks[0].props.items.map((item: { name: string }) => item.name),
     ).toEqual(["Yuriy Kobzyev", "L M", "Noah Clark"]);
+    expect(homeUpdate.content.blocks[0].props).toMatchObject({
+      ctaText: "See All Reviews",
+      ctaLink: "/reviews",
+    });
+    expect(reviewsUpdate.content.blocks[0].props.ctaText).toBeUndefined();
   });
 
   it("adds new gallery photo batches to the gallery page on startup", async () => {

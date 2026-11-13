@@ -376,6 +376,30 @@ function ensureGoogleReviewItems(
   return { ...content, blocks };
 }
 
+// The homepage reviews carousel links to the full Reviews page unless an editor set a button.
+function ensureHomepageReviewsLink(content: unknown) {
+  if (!isRecord(content) || !Array.isArray(content.blocks)) return null;
+
+  const index = content.blocks.findIndex(
+    (block) =>
+      isRecord(block) &&
+      block.type === "testimonials" &&
+      isRecord(block.props) &&
+      block.props.anchorId === "reviews",
+  );
+  if (index < 0) return null;
+
+  const block = content.blocks[index];
+  if (!isRecord(block) || !isRecord(block.props) || block.props.ctaText) return null;
+
+  const blocks = [...content.blocks];
+  blocks[index] = {
+    ...block,
+    props: { ...block.props, ctaText: "See All Reviews", ctaLink: "/reviews" },
+  };
+  return { ...content, blocks };
+}
+
 const businessHoursReplacements = [
   ["7am - 6pm", "7am - 7pm"],
   ["7am – 6pm", "7am – 7pm"],
@@ -1016,6 +1040,11 @@ async function normalizeStoredCmsPages() {
 
         const contentWithReviews = ensureGoogleReviewItems(updates.content ?? page.content, true);
         if (contentWithReviews) updates.content = contentWithReviews as InsertCmsPage["content"];
+
+        const contentWithReviewsLink = ensureHomepageReviewsLink(updates.content ?? page.content);
+        if (contentWithReviewsLink) {
+          updates.content = contentWithReviewsLink as InsertCmsPage["content"];
+        }
 
         const contentWithHomepageCorrections = replaceStoredStrings(
           updates.content ?? page.content,

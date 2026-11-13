@@ -450,6 +450,8 @@ const glassHomeContent: InsertCmsPage["content"] = {
         sectionPaddingTop: "lg",
         sectionPaddingBottom: "lg",
         items: [...glassReviewItems.slice(0, 2), ...glassReviewItems.slice(11, 16)],
+        ctaText: "See All Reviews",
+        ctaLink: "/reviews",
       },
     },
     {

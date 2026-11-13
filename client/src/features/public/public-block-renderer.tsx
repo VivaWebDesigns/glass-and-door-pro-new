@@ -10,12 +10,13 @@ import {
   Fragment,
   useState,
   useEffect,
+  useRef,
   lazy,
   Suspense,
   type MouseEvent,
   type ReactElement,
 } from "react";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { excludeServiceUtilitySnippets } from "@shared/glass-search-snippets";
 import { Button } from "@/components/ui/button";
 import { FormModalButton } from "@/components/forms/form-modal-button";
@@ -1002,6 +1003,69 @@ function FaqBlock({ props }: { props: Record<string, unknown> }) {
   );
 }
 
+// Long reviews are clamped on mobile only; desktop shows the full quote.
+function ReviewQuote({ quote }: { quote: string }) {
+  const ref = useRef<HTMLParagraphElement>(null);
+  const [expanded, setExpanded] = useState(false);
+  const [clamped, setClamped] = useState(false);
+
+  useEffect(() => {
+    const measure = () => {
+      const el = ref.current;
+      if (el) setClamped(el.scrollHeight > el.clientHeight + 1);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [quote]);
+
+  return (
+    <div className="mb-4">
+      <p
+        ref={ref}
+        className={`text-sm leading-relaxed italic ${expanded ? "" : "line-clamp-4 md:line-clamp-none"}`}
+      >
+        "{quote}"
+      </p>
+      {clamped || expanded ? (
+        <button
+          type="button"
+          aria-expanded={expanded}
+          onClick={() => setExpanded((value) => !value)}
+          className="mt-1 text-xs font-semibold text-[#1a8ead] hover:underline md:hidden"
+        >
+          {expanded ? "Show less" : "Read more"}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+function ReviewsCta({ text, link }: { text: string; link: string }) {
+  const isInternal = link.startsWith("/") && !link.startsWith("//");
+  return (
+    <div className="mt-7 flex justify-center">
+      <Button
+        asChild
+        variant="outline"
+        className="border-[#1a8ead] bg-white text-[#1a8ead] hover:bg-[#1a8ead] hover:text-white"
+      >
+        {isInternal ? (
+          <Link href={link}>
+            {text}
+            <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+          </Link>
+        ) : (
+          <a href={link} target="_blank" rel="noopener noreferrer">
+            {text}
+            <ExternalLink className="ml-2 h-4 w-4" aria-hidden="true" />
+          </a>
+        )}
+      </Button>
+    </div>
+  );
+}
+
 function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
   const variant = str(props.variant);
   const ctaText = str(props.ctaText);
@@ -1048,7 +1112,7 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
         ) : (
           <Quote className="h-5 w-5 text-accent mb-3" />
         )}
-        <p className="text-sm leading-relaxed mb-4 italic">"{item.quote}"</p>
+        <ReviewQuote quote={item.quote} />
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center">
             <span className="text-xs font-semibold text-accent">{item.name?.[0] ?? "?"}</span>
@@ -1094,18 +1158,7 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
             </div>
           </Carousel>
           {ctaText && ctaLink ? (
-            <div className="mt-7 flex justify-center">
-              <Button
-                asChild
-                variant="outline"
-                className="border-[#1a8ead] bg-white text-[#1a8ead] hover:bg-[#1a8ead] hover:text-white"
-              >
-                <a href={ctaLink} target="_blank" rel="noopener noreferrer">
-                  {ctaText}
-                  <ExternalLink className="ml-2 h-4 w-4" aria-hidden="true" />
-                </a>
-              </Button>
-            </div>
+            <ReviewsCta text={ctaText} link={ctaLink} />
           ) : null}
         </div>
       ) : (
@@ -1118,18 +1171,7 @@ function TestimonialsBlock({ props }: { props: Record<string, unknown> }) {
         </div>
       )}
       {!shouldCarousel && ctaText && ctaLink ? (
-        <div className="mt-7 flex justify-center">
-          <Button
-            asChild
-            variant="outline"
-            className="border-[#1a8ead] bg-white text-[#1a8ead] hover:bg-[#1a8ead] hover:text-white"
-          >
-            <a href={ctaLink} target="_blank" rel="noopener noreferrer">
-              {ctaText}
-              <ExternalLink className="ml-2 h-4 w-4" aria-hidden="true" />
-            </a>
-          </Button>
-        </div>
+        <ReviewsCta text={ctaText} link={ctaLink} />
       ) : null}
     </div>
   );
