@@ -30,6 +30,7 @@ export function HomeServiceGallery({ props }: { props: Record<string, unknown> }
             description={card.description}
             href={card.link}
             buttonText={card.buttonText}
+            wholeCardLink
           />
         ))}
       </div>

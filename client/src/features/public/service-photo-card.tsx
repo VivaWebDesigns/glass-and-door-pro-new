@@ -10,6 +10,7 @@ export type ServicePhotoCardProps = {
   buttonText?: string;
   openInNewTab?: boolean;
   wide?: boolean;
+  wholeCardLink?: boolean;
 };
 
 export function ServicePhotoCard({
@@ -19,10 +20,18 @@ export function ServicePhotoCard({
   buttonText = "Learn More",
   openInNewTab,
   wide = false,
+  wholeCardLink = false,
 }: ServicePhotoCardProps) {
   const image = getServiceImage(href);
+  const Card = wholeCardLink ? "a" : "article";
   return (
-    <article className={`service-photo-card${wide ? " service-photo-card-wide" : ""}`}>
+    <Card
+      className={`service-photo-card${wide ? " service-photo-card-wide" : ""}`}
+      href={wholeCardLink ? href : undefined}
+      aria-label={wholeCardLink ? title : undefined}
+      target={wholeCardLink && openInNewTab ? "_blank" : undefined}
+      rel={wholeCardLink && openInNewTab ? "noopener noreferrer" : undefined}
+    >
       {image && (
         <div className="service-photo-card-image">
           <img
@@ -36,19 +45,24 @@ export function ServicePhotoCard({
         </div>
       )}
       <div className="service-photo-card-copy">
-        <h3>{title}</h3>
+        <h3>
+          {title}
+          {wholeCardLink && <ArrowRight className="service-photo-card-arrow" aria-hidden="true" />}
+        </h3>
         {description && <p>{description}</p>}
-        <a
-          className="service-photo-card-link"
-          href={href}
-          aria-label={`${buttonText}: ${title}`}
-          target={openInNewTab ? "_blank" : undefined}
-          rel={openInNewTab ? "noopener noreferrer" : undefined}
-        >
-          {buttonText}
-          <ArrowRight aria-hidden="true" />
-        </a>
+        {!wholeCardLink && (
+          <a
+            className="service-photo-card-link"
+            href={href}
+            aria-label={`${buttonText}: ${title}`}
+            target={openInNewTab ? "_blank" : undefined}
+            rel={openInNewTab ? "noopener noreferrer" : undefined}
+          >
+            {buttonText}
+            <ArrowRight aria-hidden="true" />
+          </a>
+        )}
       </div>
-    </article>
+    </Card>
   );
 }
