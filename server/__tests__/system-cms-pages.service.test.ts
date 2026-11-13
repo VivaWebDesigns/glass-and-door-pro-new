@@ -1598,11 +1598,11 @@ describe("ensureSystemCmsPages", () => {
     const reviewsUpdate = mockUpdatePage.mock.calls.find(([id]) => id === "reviews-id")?.[1];
     const reviewItems = reviewsUpdate.content.blocks[0].props.items;
     expect(reviewItems.slice(0, 5).map((item: { name: string }) => item.name)).toEqual([
-      "Yuriy Kobzyev",
-      "L M",
-      "Danielle O'Keeffe",
-      "Mariela Salgado",
-      "Mark Evans",
+      "Austin Quick",
+      "Kristen Johnson",
+      "Ty Roselli",
+      "Hayes Bolton",
+      "Benita D.",
     ]);
     expect(reviewItems.map((item: { name: string }) => item.name)).not.toContain(
       "Frankie23 “Patricia”",
@@ -1616,7 +1616,7 @@ describe("ensureSystemCmsPages", () => {
     const homeUpdate = mockUpdatePage.mock.calls.find(([id]) => id === "home-id")?.[1];
     expect(
       homeUpdate.content.blocks[0].props.items.map((item: { name: string }) => item.name),
-    ).toEqual(["Yuriy Kobzyev", "L M", "Noah Clark"]);
+    ).toEqual(["Austin Quick", "Kristen Johnson", "Noah Clark"]);
     expect(homeUpdate.content.blocks[0].props).toMatchObject({
       ctaText: "See All Reviews",
       ctaLink: "/reviews",
@@ -1743,7 +1743,7 @@ describe("ensureSystemCmsPages", () => {
 
     const update = mockUpdatePage.mock.calls.find(([id]) => id === "matthews-id")?.[1];
     const names = update.content.blocks[0].props.items.map((item: { name: string }) => item.name);
-    expect(names.slice(0, 2)).toEqual(["Yuriy Kobzyev", "L M"]);
+    expect(names.slice(0, 2)).toEqual(["Austin Quick", "Kristen Johnson"]);
     expect(names.length).toBeGreaterThan(2);
     expect(names.at(-1)).toBe("Thomas F.");
   });

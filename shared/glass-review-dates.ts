@@ -1,9 +1,14 @@
 /**
  * Review dates captured from the Glass & Door Pro Google Business Profile on
- * August 18, 2026, with newer reviews added on October 11, 2026. Google's week-based labels only expose week-level precision,
+ * August 18, 2026, with newer reviews added on October 11 and November 13, 2026. Google's week-based labels only expose week-level precision,
  * so recent dates are anchored to the corresponding week.
  */
 export const GLASS_GOOGLE_REVIEW_DATES = {
+  "Austin Quick": "2026-11-06",
+  "Kristen Johnson": "2026-10-30",
+  "Ty Roselli": "2026-10-30",
+  "Hayes Bolton": "2026-10-23",
+  "Benita D.": "2026-10-23",
   "Yuriy Kobzyev": "2026-10-08",
   "L M": "2026-09-27",
   "Danielle O'Keeffe": "2026-09-27",

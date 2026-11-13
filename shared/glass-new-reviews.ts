@@ -14,6 +14,26 @@ function googleReview(name: string, quote: string) {
 }
 
 export const GLASS_NEW_GOOGLE_REVIEWS = [
+  googleReview(
+    "Austin Quick",
+    "Doug is a true professional. Very responsive. Down to earth. A great craftsman and took the time and care to do the job right! Highly recommend for window repair or replacement",
+  ),
+  googleReview(
+    "Kristen Johnson",
+    "Doug did a great job installing our storm door! Our doorway was a little challenging due to the way the house was built, but he worked through it and made everything look great. He was very professional, took the time to get everything right, and we are very happy with the results. Highly recommend Glass and Door Pro!",
+  ),
+  googleReview(
+    "Ty Roselli",
+    "Doug was great to work with on our shower glass. He knew the options well and gave us great recommendations, and his attention to detail stood out. You can tell he made sure everything was perfect before calling it done. Highly recommend.",
+  ),
+  googleReview(
+    "Hayes Bolton",
+    "While didn’t actually do business, they were very helpful in helping me figure out my best option for my situation. I would definitely use him when a glass need comes up and truly appreciate his help which he didn’t have to do!",
+  ),
+  googleReview(
+    "Benita D.",
+    "Doug did great job repairing my shattered sliding glass door. He was quick- (finished in about 30 minutes), knowledgeable and courteous . I would recommend him to anyone that needs similar repairs.",
+  ),
   googleReview("Yuriy Kobzyev", "great glass door installation company"),
   googleReview(
     "L M",
