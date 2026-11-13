@@ -267,7 +267,22 @@ export function Navbar() {
         data-nosnippet={excludeServiceUtilitySnippets(location) ? "" : undefined}
         className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2 sm:gap-6 sm:px-6"
       >
-        <Link href="/" data-testid="link-brand">
+        <Link
+          href="/"
+          data-testid="link-brand"
+          onClick={(event) => {
+            if (
+              location === "/" &&
+              event.button === 0 &&
+              !event.metaKey &&
+              !event.ctrlKey &&
+              !event.shiftKey &&
+              !event.altKey
+            ) {
+              window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+            }
+          }}
+        >
           <img src={brandLogo} alt={brandName} className="h-14 w-auto sm:h-16" />
         </Link>
 
