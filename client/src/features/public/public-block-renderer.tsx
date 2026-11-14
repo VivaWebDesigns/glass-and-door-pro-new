@@ -279,7 +279,16 @@ function HeroHeading({ props, variant }: { props: Record<string, unknown>; varia
           {GLASS_HOME_HERO_HEADING.location}
         </span>{" "}
         <span className={isMobile ? "home-mobile-title" : "service-location-title"}>
-          {GLASS_HOME_HERO_HEADING.firstLine} <br />
+          {GLASS_HOME_HERO_HEADING.firstLine.split(/(&)/).map((part, index) =>
+            part === "&" ? (
+              <span key={index} className="align-baseline text-[0.8em]">
+                {part}
+              </span>
+            ) : (
+              part
+            ),
+          )}{" "}
+          <br />
           {GLASS_HOME_HERO_HEADING.secondLine}
         </span>
       </h1>
