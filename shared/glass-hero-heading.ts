@@ -1,7 +1,7 @@
 export const GLASS_HOME_HERO_HEADING = {
   location: "Greater Charlotte",
-  firstLine: "Shower Doors",
-  secondLine: "Windows · Doors",
+  firstLine: "Windows, Doors &",
+  secondLine: "Frameless Showers",
 };
 
 export const GLASS_HOME_HERO_INTRO =

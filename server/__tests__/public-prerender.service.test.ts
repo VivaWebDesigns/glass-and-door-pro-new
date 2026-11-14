@@ -603,7 +603,9 @@ describe("public-prerender.service", () => {
     expect(snapshot?.title).toBe(
       "Glass & Door Pro | Glass & Door Services in Charlotte & Monroe, NC",
     );
-    expect(snapshot?.bodyHtml).toContain("<h1>Greater Charlotte Shower Doors Windows · Doors</h1>");
+    expect(snapshot?.bodyHtml).toContain(
+      "<h1>Greater Charlotte Windows, Doors &amp; Frameless Showers</h1>",
+    );
     expect(snapshot?.jsonLd?.map((schema) => schema["@type"])).toEqual([
       "WebSite",
       "HomeAndConstructionBusiness",
