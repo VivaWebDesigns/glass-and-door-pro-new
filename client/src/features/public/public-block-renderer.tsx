@@ -57,7 +57,7 @@ import {
 import { SectionHeading } from "@/features/admin/cms/builder/section-heading";
 import { renderPublicDisplayText } from "@/features/admin/cms/builder/display-text";
 import {
-  GLASS_HOME_HERO_HEADING,
+  getHomeHeroHeadingParts,
   GLASS_HOME_HERO_INTRO,
   getCmsHeroHeadingParts,
 } from "@shared/glass-hero-heading";
@@ -273,13 +273,14 @@ function HeroBackdrop({ config }: { config: HeroConfig }) {
 function HeroHeading({ props, variant }: { props: Record<string, unknown>; variant: string }) {
   const isMobile = useMobileHeroViewport();
   if (variant === "glass-home") {
+    const heading = getHomeHeroHeadingParts(props);
     return (
       <h1 className={isMobile ? "home-mobile-heading" : "service-location-heading"}>
         <span className={isMobile ? "home-mobile-location" : "service-location-label"}>
-          {GLASS_HOME_HERO_HEADING.location}
+          {heading.location}
         </span>{" "}
         <span className={isMobile ? "home-mobile-title" : "service-location-title"}>
-          {GLASS_HOME_HERO_HEADING.firstLine.split(/(&)/).map((part, index) =>
+          {heading.firstLine.split(/(&)/).map((part, index) =>
             part === "&" ? (
               <span key={index} className="align-baseline text-[0.8em]">
                 {part}
@@ -289,7 +290,7 @@ function HeroHeading({ props, variant }: { props: Record<string, unknown>; varia
             ),
           )}{" "}
           <br />
-          {GLASS_HOME_HERO_HEADING.secondLine}
+          {heading.secondLine}
         </span>
       </h1>
     );

@@ -36,6 +36,50 @@ vi.mock("../utils/logger", () => ({
 }));
 
 describe("ensureSystemCmsPages", () => {
+  it("stores the approved homepage heading once and preserves later CMS edits", async () => {
+    const page = {
+      id: "home-heading",
+      slug: "home",
+      updatedBy: "editor",
+      content: {
+        blocks: [
+          {
+            id: "hero",
+            type: "hero",
+            props: { variant: "glass-home", heading: "Legacy hidden heading" },
+          },
+        ],
+      },
+    };
+    mockGetAllPages.mockResolvedValue([page]);
+    mockGetPageBySlug.mockResolvedValue({ content: { blocks: [] } });
+    const { ensureSystemCmsPages } = await import("../services/system-cms-pages.service");
+    await ensureSystemCmsPages();
+    const migrated = mockUpdatePage.mock.calls.find(([id]) => id === page.id)![1].content;
+    expect(migrated.blocks[0].props).toMatchObject({
+      locationHeading: "Greater Charlotte",
+      heading: "Windows, Doors &",
+      accentHeading: "Frameless Showers",
+    });
+    expect(migrated._system.homeHeroCmsHeading2026).toBe(true);
+
+    const editedProps = {
+      ...migrated.blocks[0].props,
+      locationHeading: "Charlotte & Beyond",
+      heading: "Custom Windows & Doors",
+      accentHeading: "Custom Showers",
+    };
+    const edited = {
+      ...migrated,
+      blocks: [{ ...migrated.blocks[0], props: editedProps }, ...migrated.blocks.slice(1)],
+    };
+    mockUpdatePage.mockClear();
+    mockGetAllPages.mockResolvedValue([{ ...page, content: edited }]);
+    await ensureSystemCmsPages();
+    const next = mockUpdatePage.mock.calls.find(([id]) => id === page.id)?.[1].content ?? edited;
+    expect(next.blocks[0].props).toEqual(editedProps);
+  });
+
   it.each([
     [
       "services-commercial-storefront-glass-installation",

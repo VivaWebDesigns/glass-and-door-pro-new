@@ -3,7 +3,7 @@ import { getRemoteFontStylesheet } from "@shared/branding-fonts";
 import { resolveCmsAssetUrl } from "@shared/cms-asset-url";
 import { getGlassLocationSearchCopy } from "@shared/glass-location-search";
 import {
-  GLASS_HOME_HERO_HEADING,
+  getHomeHeroHeadingParts,
   GLASS_HOME_HERO_INTRO,
   getCmsHeroHeadingParts,
 } from "@shared/glass-hero-heading";
@@ -672,12 +672,9 @@ function renderCmsBlockForSeo(
       if (h1.used) return [headingHtml(2, heading), subheading, image, actions].join("");
       h1.used = true;
       const parts = getCmsHeroHeadingParts(props);
+      const homeParts = getHomeHeroHeadingParts(props);
       const headingText = isHomeHero
-        ? [
-            GLASS_HOME_HERO_HEADING.location,
-            GLASS_HOME_HERO_HEADING.firstLine,
-            GLASS_HOME_HERO_HEADING.secondLine,
-          ].join(" ")
+        ? [homeParts.location, homeParts.firstLine, homeParts.secondLine].filter(Boolean).join(" ")
         : [parts.location, parts.heading, parts.accent].filter(Boolean).join(" ");
       return [
         image,

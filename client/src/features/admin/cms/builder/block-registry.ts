@@ -611,12 +611,18 @@ const BASE_BLOCK_REGISTRY: BlockDef[] = [
     propDefs: [
       { key: "variant", label: "Design Variant", type: "select", options: HERO_VARIANT_OPTIONS },
       { key: "badge", label: "Badge Text", type: "text", placeholder: "e.g. New, Coming Soon" },
+      {
+        key: "locationHeading",
+        label: "Location Heading",
+        type: "text",
+        placeholder: "e.g. Greater Charlotte",
+      },
       { key: "heading", label: "Heading", type: "text", placeholder: "Main heading" },
       {
         key: "accentHeading",
         label: "Accent Heading",
         type: "text",
-        placeholder: "Optional highlighted heading text",
+        placeholder: "Optional highlighted text; bottom line on the homepage",
       },
       { key: "headingColor", label: "Heading Color", type: "color", placeholder: "#ffffff" },
       {

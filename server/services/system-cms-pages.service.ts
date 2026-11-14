@@ -1,4 +1,5 @@
 import { applyWindowDesign } from "@shared/glass-window-design";
+import { GLASS_HOME_HERO_HEADING } from "@shared/glass-hero-heading";
 import { GLASS_SHOWER_BENEFITS } from "@shared/glass-shower-benefits";
 import { HOME_MOBILE_HERO_IMAGE, HOME_DESKTOP_HERO_IMAGE } from "@shared/glass-hero-images";
 import { randomUUID } from "crypto";
@@ -639,6 +640,14 @@ function ensureHomeHeroDefaults(content: unknown) {
   }
 
   const props = { ...heroBlock.props };
+  const systemMeta = isRecord(content._system) ? content._system : {};
+  const migrateHeading =
+    props.variant === "glass-home" && systemMeta.homeHeroCmsHeading2026 !== true;
+  if (migrateHeading) {
+    props.locationHeading = GLASS_HOME_HERO_HEADING.location;
+    props.heading = GLASS_HOME_HERO_HEADING.firstLine;
+    props.accentHeading = GLASS_HOME_HERO_HEADING.secondLine;
+  }
   if (props.videoBackgroundUrl === "/videos/glass-door-pro/hero-video.mp4") {
     props.videoBackgroundUrl = "";
     props.backgroundImageUrl = HOME_DESKTOP_HERO_IMAGE;
@@ -656,14 +665,18 @@ function ensureHomeHeroDefaults(content: unknown) {
     props.overlayColor = "#000000";
     props.overlayOpacity = 28;
   }
-  if (JSON.stringify(props) === JSON.stringify(heroBlock.props)) return null;
+  if (!migrateHeading && JSON.stringify(props) === JSON.stringify(heroBlock.props)) return null;
 
   const blocks = [...content.blocks];
   blocks[heroIndex] = {
     ...heroBlock,
     props,
   };
-  return { ...content, blocks };
+  return {
+    ...content,
+    blocks,
+    ...(migrateHeading ? { _system: { ...systemMeta, homeHeroCmsHeading2026: true } } : {}),
+  };
 }
 
 // Puts the call button first on every hero and CTA block once per page. The

@@ -585,7 +585,9 @@ describe("public-prerender.service", () => {
             props: {
               anchorId: "hero",
               variant: "glass-home",
-              heading: "We've got your glass & door needs covered.",
+              locationHeading: "Charlotte & Beyond",
+              heading: "Custom Windows & Doors",
+              accentHeading: "Custom Showers",
               subheading: "<p>Specializing in frameless glass showers, windows, and doors.</p>",
               ctaText: "Get a Free Quote",
               ctaLink: "#contact",
@@ -604,7 +606,7 @@ describe("public-prerender.service", () => {
       "Glass & Door Pro | Glass & Door Services in Charlotte & Monroe, NC",
     );
     expect(snapshot?.bodyHtml).toContain(
-      "<h1>Greater Charlotte Windows, Doors &amp; Frameless Showers</h1>",
+      "<h1>Charlotte &amp; Beyond Custom Windows &amp; Doors Custom Showers</h1>",
     );
     expect(snapshot?.jsonLd?.map((schema) => schema["@type"])).toEqual([
       "WebSite",

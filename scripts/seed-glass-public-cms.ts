@@ -1,4 +1,5 @@
 import { applyWindowDesign } from "../shared/glass-window-design";
+import { GLASS_HOME_HERO_HEADING } from "../shared/glass-hero-heading";
 import { GLASS_SHOWER_BENEFITS } from "../shared/glass-shower-benefits";
 import { HOME_SOCIAL_IMAGE, HOME_DESKTOP_HERO_IMAGE } from "../shared/glass-hero-images";
 import { randomUUID } from "crypto";
@@ -379,7 +380,9 @@ const glassHomeContent: InsertCmsPage["content"] = {
       props: putCallButtonFirst("hero", {
         anchorId: "hero",
         variant: "glass-home",
-        heading: "Glass, Door & Window Services Across Greater Charlotte",
+        locationHeading: GLASS_HOME_HERO_HEADING.location,
+        heading: GLASS_HOME_HERO_HEADING.firstLine,
+        accentHeading: GLASS_HOME_HERO_HEADING.secondLine,
         subheading:
           "<p>Frameless shower doors, window installation, door installation, window repair, and commercial glass — owner-operated by Doug Adams with 15+ years of experience.</p>",
         ctaText: "Get a Free Quote",
