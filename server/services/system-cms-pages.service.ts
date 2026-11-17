@@ -1212,7 +1212,7 @@ async function normalizeStoredCmsPages() {
             ? content.blocks.findIndex((block) => isRecord(block) && block.type === "hero")
             : -1;
         if (
-          meta.framelessGlassInstallationHero2026 !== true &&
+          meta.framelessGlassEnclosureHero2026 !== true &&
           isRecord(content) &&
           heroIndex >= 0
         ) {
@@ -1230,7 +1230,7 @@ async function normalizeStoredCmsPages() {
           updates.content = {
             ...content,
             blocks,
-            _system: { ...meta, framelessGlassInstallationHero2026: true },
+            _system: { ...meta, framelessGlassEnclosureHero2026: true },
           } as InsertCmsPage["content"];
         }
       }

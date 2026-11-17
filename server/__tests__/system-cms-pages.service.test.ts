@@ -486,7 +486,7 @@ describe("ensureSystemCmsPages", () => {
       serviceHeroCallFirst2026: true,
       serviceHeroLocation2026: true,
       callFirstButtons2026: true,
-      framelessGlassInstallationHero2026: true,
+      framelessGlassEnclosureHero2026: true,
     });
     expect(update.content.blocks[0].props).toEqual({
       heading: "Custom Frameless Glass Shower Door Installation",

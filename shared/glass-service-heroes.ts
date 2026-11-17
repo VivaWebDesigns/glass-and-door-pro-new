@@ -14,7 +14,7 @@ export const GLASS_SERVICE_HEROES: Record<string, GlassServiceHero> = {
   "services-frameless-showers": {
     heading: "Custom Frameless Glass Shower Door Installation",
     subheading:
-      "Custom frameless shower doors measured, fabricated and installed by Doug. From replacing an old framed door to a full enclosure for a remodel, each installation is fitted to your space.",
+      "Custom frameless shower doors measured, fabricated and installed by Doug. From replacing an old framed door to a full glass enclosure for a remodel, each installation is fitted to your space.",
     quoteText: "Get a Free Quote",
   },
   "services-window-installation": {
