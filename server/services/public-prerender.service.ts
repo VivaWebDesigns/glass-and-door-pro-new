@@ -1243,11 +1243,12 @@ function buildCmsSnapshot(
       : buildBreadcrumbSchema(buildGlassBreadcrumbItems(normalizedVisiblePage, siteUrl));
 
   return {
-    title: getGlassLocationSearchCopy(normalizedVisiblePage.slug)
-      ? title
-      : buildHeadTitle(title, seo, {
-          brandLast: isGlassServicePageSlug(normalizedVisiblePage.slug),
-        }),
+    title:
+      getGlassLocationSearchCopy(normalizedVisiblePage.slug) || seoOverride?.unbrandedTitle
+        ? title
+        : buildHeadTitle(title, seo, {
+            brandLast: isGlassServicePageSlug(normalizedVisiblePage.slug),
+          }),
     description,
     canonicalUrl,
     ogTitle: socialOverride?.ogTitle || null,

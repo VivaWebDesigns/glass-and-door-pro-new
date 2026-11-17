@@ -16,11 +16,7 @@ import {
 } from "@shared/glass-homepage-services";
 import { putCallButtonFirst } from "@shared/glass-call-first";
 import { GLASS_DOUG_PORTRAIT } from "@shared/glass-doug-portrait";
-import {
-  GLASS_FRAMELESS_SHOWER_SEO,
-  GLASS_SERVICE_HEROES,
-  getGlassServiceHeroCtaProps,
-} from "@shared/glass-service-heroes";
+import { GLASS_SERVICE_HEROES, getGlassServiceHeroCtaProps } from "@shared/glass-service-heroes";
 import { GLASS_SOUTHPARK_PROJECT_BLOCK } from "@shared/glass-southpark-project";
 import {
   GLASS_CHARLOTTE_STOREFRONT_PROJECT_BLOCK,
@@ -1206,8 +1202,8 @@ async function normalizeStoredCmsPages() {
         }
       }
 
-      // Write the installation-focused H1, subheading and SEO copy once; later
-      // CMS edits to these fields remain authoritative.
+      // Write the installation-focused H1 and subheading once; later CMS edits
+      // remain authoritative. SEO title and description come from glass-seo.ts.
       if (page.slug === "services-frameless-showers") {
         const content = updates.content ?? page.content;
         const meta = isRecord(content) && isRecord(content._system) ? content._system : {};
@@ -1215,7 +1211,11 @@ async function normalizeStoredCmsPages() {
           isRecord(content) && Array.isArray(content.blocks)
             ? content.blocks.findIndex((block) => isRecord(block) && block.type === "hero")
             : -1;
-        if (meta.framelessInstallationCopy2026 !== true && isRecord(content) && heroIndex >= 0) {
+        if (
+          meta.framelessGlassInstallationHero2026 !== true &&
+          isRecord(content) &&
+          heroIndex >= 0
+        ) {
           const hero = GLASS_SERVICE_HEROES[page.slug];
           const blocks = [...(content.blocks as unknown[])];
           const heroBlock = blocks[heroIndex] as Record<string, unknown>;
@@ -1230,10 +1230,8 @@ async function normalizeStoredCmsPages() {
           updates.content = {
             ...content,
             blocks,
-            _system: { ...meta, framelessInstallationCopy2026: true },
+            _system: { ...meta, framelessGlassInstallationHero2026: true },
           } as InsertCmsPage["content"];
-          updates.seoTitle = GLASS_FRAMELESS_SHOWER_SEO.seoTitle;
-          updates.seoDescription = GLASS_FRAMELESS_SHOWER_SEO.seoDescription;
         }
       }
 

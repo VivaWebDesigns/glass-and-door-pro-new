@@ -430,7 +430,6 @@ describe("public-prerender.service", () => {
       ...cmsPage,
       title: "Frameless Showers",
       slug: "services-frameless-showers",
-      seoTitle: "CMS Frameless Installation Title | Glass & Door Pro",
       pageType: "service",
       ogImageUrl: "/images/glass-door-pro/modern-frameless-shower-hero-1920x1080.webp",
       canonicalUrl: "https://glassanddoorpro.com/services/frameless-showers",
@@ -461,7 +460,7 @@ describe("public-prerender.service", () => {
     );
 
     expect(mockGetPageBySlug).toHaveBeenCalledWith("services-frameless-showers");
-    expect(snapshot?.title).toBe("CMS Frameless Installation Title | Glass & Door Pro");
+    expect(snapshot?.title).toBe("Frameless Glass Shower Door Installation Charlotte NC");
     expect(snapshot?.jsonLd?.map((schema) => schema["@type"])).toEqual([
       "HomeAndConstructionBusiness",
       "Service",

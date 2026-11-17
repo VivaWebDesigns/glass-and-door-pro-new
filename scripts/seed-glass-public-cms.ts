@@ -26,7 +26,6 @@ import {
 import {
   GLASS_CALL_CTA_LINK,
   GLASS_CALL_CTA_TEXT,
-  GLASS_FRAMELESS_SHOWER_SEO,
   GLASS_SERVICE_HEROES,
 } from "../shared/glass-service-heroes";
 import { GLASS_PRIVACY_POLICY_HTML } from "../shared/glass-privacy-policy";
@@ -1661,7 +1660,9 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Frameless Showers",
     slug: "services-frameless-showers",
-    ...GLASS_FRAMELESS_SHOWER_SEO,
+    seoTitle: "Frameless Glass Shower Door Installation Charlotte NC",
+    seoDescription:
+      "Custom frameless glass shower doors measured, built and installed by Doug, with 15+ years of experience. Serving Charlotte, Matthews, Indian Trail, Waxhaw & Monroe.",
     seoKeywords:
       "frameless shower doors Charlotte NC, glass shower installation, custom shower enclosure, shower glass Monroe NC",
     ogImageUrl: "/images/glass-door-pro/modern-frameless-shower-hero-1920x1080.webp",

@@ -10,17 +10,9 @@ type GlassServiceHero = {
   quoteText: string;
 };
 
-// Installation-focused search copy for the frameless shower page. It is written
-// to the CMS page once; afterwards the CMS SEO fields are authoritative.
-export const GLASS_FRAMELESS_SHOWER_SEO = {
-  seoTitle: "Frameless Shower Door Installation Charlotte NC | Glass & Door Pro",
-  seoDescription:
-    "Custom frameless shower doors measured, built and installed by Doug, with 15+ years of experience. Serving Charlotte, Matthews, Indian Trail, Waxhaw & Monroe.",
-};
-
 export const GLASS_SERVICE_HEROES: Record<string, GlassServiceHero> = {
   "services-frameless-showers": {
-    heading: "Custom Frameless Shower Door Installation",
+    heading: "Custom Frameless Glass Shower Door Installation",
     subheading:
       "Custom frameless shower doors measured, fabricated and installed by Doug. From replacing an old framed door to a full enclosure for a remodel, each installation is fitted to your space.",
     quoteText: "Get a Free Quote",

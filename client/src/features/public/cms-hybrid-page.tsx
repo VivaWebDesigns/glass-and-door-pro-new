@@ -121,9 +121,10 @@ function CmsPageSeo({ page, globalSeo }: { page: CmsPage; globalSeo?: SeoSetting
     const titleFormatter = isGlassServicePageSlug(page.slug)
       ? formatBrandLastTitle
       : formatBrandFirstTitle;
-    const headTitle = getGlassLocationSearchCopy(page.slug)
-      ? effectiveTitle || page.title
-      : titleFormatter(effectiveTitle, titleSuffix, globalSeo?.siteName ?? "Glass & Door Pro");
+    const headTitle =
+      getGlassLocationSearchCopy(page.slug) || seoOverride?.unbrandedTitle
+        ? effectiveTitle || page.title
+        : titleFormatter(effectiveTitle, titleSuffix, globalSeo?.siteName ?? "Glass & Door Pro");
     const effectiveDescription =
       seoOverride?.description ||
       normalizeSeoDescription(page.seoDescription) ||
