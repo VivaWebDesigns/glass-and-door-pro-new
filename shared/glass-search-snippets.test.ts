@@ -19,11 +19,8 @@ describe("scoped search listing cleanup", () => {
     expect(getGlassServiceSeoOverride("services-door-installation")?.description).toBe(
       "Residential door installation for entry doors, patio doors, storm doors, and exterior doors across Charlotte, Monroe, Indian Trail, Matthews, and surrounding areas. Call (704) 771-6111.",
     );
-    expect(getGlassServiceSeoOverride("services-frameless-showers")).toEqual({
-      title: "Frameless Shower Doors Charlotte NC | Glass & Door Pro",
-      description:
-        "Custom frameless shower doors installed by Doug with 15+ years of experience. Serving Charlotte, Matthews, Indian Trail, Waxhaw & Monroe.",
-    });
+    // Frameless shower SEO copy is CMS-editable, so no code override applies.
+    expect(getGlassServiceSeoOverride("services-frameless-showers")).toBeNull();
   });
 
   it("does not affect frameless, window installation, or other routes", () => {

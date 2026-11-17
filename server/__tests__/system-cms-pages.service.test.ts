@@ -7,7 +7,11 @@ import {
 import { getCmsSlugForPublicPath } from "@shared/glass-seo";
 import { GLASS_CTA_HOURS_LINE } from "@shared/glass-quote-cta";
 import { getGlassLocationSearchCopy } from "@shared/glass-location-search";
-import { GLASS_SERVICE_HEROES, getGlassServiceHeroCtaProps } from "@shared/glass-service-heroes";
+import {
+  GLASS_FRAMELESS_SHOWER_SEO,
+  GLASS_SERVICE_HEROES,
+  getGlassServiceHeroCtaProps,
+} from "@shared/glass-service-heroes";
 
 const mockGetPageBySlug = vi.fn();
 const mockGetAllPages = vi.fn();
@@ -486,9 +490,12 @@ describe("ensureSystemCmsPages", () => {
       serviceHeroCallFirst2026: true,
       serviceHeroLocation2026: true,
       callFirstButtons2026: true,
+      framelessInstallationCopy2026: true,
     });
+    expect(update.seoTitle).toBe(GLASS_FRAMELESS_SHOWER_SEO.seoTitle);
+    expect(update.seoDescription).toBe(GLASS_FRAMELESS_SHOWER_SEO.seoDescription);
     expect(update.content.blocks[0].props).toEqual({
-      heading: "Frameless Shower Doors",
+      heading: "Custom Frameless Shower Door Installation",
       locationHeading: "Greater Charlotte",
       subheading: `<p>${GLASS_SERVICE_HEROES["services-frameless-showers"].subheading}</p>`,
       backgroundImageUrl: "/keep.webp",

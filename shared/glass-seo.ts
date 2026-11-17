@@ -150,9 +150,6 @@ const servicePageNames: Record<
   "services-frameless-showers": {
     serviceType: "Frameless Glass Shower Door Installation",
     name: "Custom Frameless Shower Door Installation",
-    seoTitle: "Frameless Shower Doors Charlotte NC | Glass & Door Pro",
-    seoDescription:
-      "Custom frameless shower doors installed by Doug with 15+ years of experience. Serving Charlotte, Matthews, Indian Trail, Waxhaw & Monroe.",
     description:
       'Custom frameless glass shower door measurement, design, and installation. Tempered safety glass in 3/8" and 1/2" thicknesses, low-iron glass available, premium hardware in multiple finishes. Serving the greater Charlotte, NC metro and surrounding areas.',
   },

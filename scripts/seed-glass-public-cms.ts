@@ -26,6 +26,7 @@ import {
 import {
   GLASS_CALL_CTA_LINK,
   GLASS_CALL_CTA_TEXT,
+  GLASS_FRAMELESS_SHOWER_SEO,
   GLASS_SERVICE_HEROES,
 } from "../shared/glass-service-heroes";
 import { GLASS_PRIVACY_POLICY_HTML } from "../shared/glass-privacy-policy";
@@ -1154,7 +1155,6 @@ function relatedCommercialServicesBlock(currentUrl: string) {
 const month1FramelessContent: InsertCmsPage["content"] = {
   blocks: [
     serviceHero({
-      heading: "Frameless Glass Shower Doors in Charlotte, NC",
       imageUrl: "/images/glass-door-pro/modern-frameless-shower-hero-1920x1080.webp",
       imageAlt: "Frameless glass shower door installed in a Charlotte area bathroom",
       imagePositionY: 25,
@@ -1661,9 +1661,7 @@ const glassServicePages: GlassServicePageSeed[] = [
   {
     title: "Frameless Showers",
     slug: "services-frameless-showers",
-    seoTitle: "Frameless Shower Doors Charlotte NC | Glass & Door Pro",
-    seoDescription:
-      "Custom frameless shower doors installed by Doug with 15+ years of experience. Serving Charlotte, Matthews, Indian Trail, Waxhaw & Monroe.",
+    ...GLASS_FRAMELESS_SHOWER_SEO,
     seoKeywords:
       "frameless shower doors Charlotte NC, glass shower installation, custom shower enclosure, shower glass Monroe NC",
     ogImageUrl: "/images/glass-door-pro/modern-frameless-shower-hero-1920x1080.webp",
